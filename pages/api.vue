@@ -74,7 +74,7 @@
     "courseType":"☆",
     "class":[{
       "name":"機械四甲",
-      "link":"Subj.jsp?format=-4&year=109&sem=2&code=2171",
+      "link":"Subj.jsp?format=-4&ye...",
       "code":"2171"
     }],
     "teacher":[],
@@ -115,8 +115,8 @@
       "email": "alice_2001@hotmail.com.tw",
       "latestUpdate": "2020-12-22 16:44:55",
       "objective": "使學生進一步瞭解首飾設計觀念，...",
-      "schedule": "1. 課程簡介   [第1週]\r\n\t2. 蠟模製...",
-      "materials": "‧「軟蠟變銀飾超簡單」，王美玲著，積木文化...",
+      "schedule": "1. 課程簡介   [第1週]\r\n...",
+      "materials": "‧「軟蠟變銀飾超簡單」，王美...",
       "foreignLanguageTextbooks": false
   }
 ]</pre>
@@ -127,5 +127,6 @@ pre
   background: #ffffff
   padding: 16px
   border-radius: 8px
+  overflow-y: scroll
 </style>
   
