@@ -1,62 +1,60 @@
 <template>
-  <div>
-    <Nuxt />
-  </div>
+	<div>
+		<vs-navbar center-collapsed v-model="active" not-line>
+			<template #left>
+				<span>
+					<strong @click="$router.push('/')">🍤 北科課程好朋友</strong> 109年第2學期
+				</span>
+			</template>
+			<template #right>
+				<vs-navbar-item :active="active=='/'" to="/">首頁</vs-navbar-item>
+				<vs-navbar-item :active="active=='/search'" to="/search" id="search">搜尋</vs-navbar-item>
+				<vs-navbar-item :active="active=='/about'" to="/about" id="about">關於</vs-navbar-item>
+			</template>
+		</vs-navbar>
+		<div class="container">
+			<Nuxt />
+		</div>
+	</div>
 </template>
-
-<style>
-html {
-  font-family:
-    'Source Sans Pro',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-  font-size: 16px;
-  word-spacing: 1px;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
+<script>
+export default {
+	data: () => ({
+		active: '/'
+	}),
+	created() {
+		localStorage['data-year'] = '109'
+		localStorage['data-sem'] = '2'
+		this.fetchCourse(localStorage['data-year'], localStorage['data-sem'])
+		this.$router.beforeEach((to, from, next) => {
+			console.log(to.path)
+			this.active = to.path
+			next();
+		});
+	},
+	methods: {
+		async fetchCourse(y, s) {
+			const loading = this.$vs.loading()
+			localStorage[`course-${y}-${s}`] = JSON.stringify((await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/main.json`)).data)
+			loading.close()
+			const noti = this.$vs.notification({
+				color: 'primary',
+				position: 'top-center',
+				title: '資料下載完畢',
+				text: `${y} 年第 ${s} 學期資料已下載完成，共 ${JSON.parse(localStorage[`course-${y}-${s}`]).length} 筆`
+			})
+		},
+	}
 }
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-}
-
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
-}
-
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
-}
-
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
-}
-
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
-}
+</script>
+<style lang="sass">
+body
+  background-color: #f4f7f8
+  margin: 0
+.container
+  min-height: calc(100vh - 74px)
+  padding-top: 74px
+  width: 1024px
+  max-width: 98%
+  margin: 0 auto
 </style>

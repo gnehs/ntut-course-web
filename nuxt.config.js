@@ -7,20 +7,21 @@ export default {
 
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
-    title: 'ntut-course-web',
+    title: '北科課程好朋友',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/png', href: '/icon.png' }
     ]
   },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [
-    'vuesax/dist/vuesax.css'
+    'vuesax/dist/vuesax.css',
+    '@/assets/main.sass'
   ],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)

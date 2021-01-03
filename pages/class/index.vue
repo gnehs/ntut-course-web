@@ -1,0 +1,53 @@
+<template>
+	<div v-if="filteredDepartmentData">
+		<h1>選擇班級</h1>
+		<div style="padding: 16px;background:#FFF;border-radius: 8px;">
+			<span>輸入關鍵字來篩選</span>
+			<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
+		</div>
+		<div v-for="department in filteredDepartmentData" :key="department.name">
+			<h3>{{department.name}}</h3>
+			<ul>
+				<li v-for="{name} in department.class" :key="name">
+					<router-link :to="'/class/'+name">{{name}}</router-link>
+				</li>
+			</ul>
+		</div>
+	</div>
+</template>
+   <script>
+export default {
+	created() {
+		this.fetchData()
+	},
+	data: () => ({
+		departmentData: null,
+		filteredDepartmentData: null,
+		filterDapartmentVal: null
+	}),
+	methods: {
+		async fetchData() {
+			const loading = this.$vs.loading()
+			this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${localStorage['data-year']}/${localStorage['data-sem']}/department.json`)).data
+			this.filteredDepartmentData = this.departmentData
+			loading.close()
+		},
+		filterDapartment() {
+			let val = this.filterDapartmentVal
+			if (val != '') {
+				this.filteredDepartmentData =
+					this.departmentData
+						.filter(x => x.name.match(val) || x.class.map(x => x.name).join('').match(val))
+						.map(x => {
+							x.class = x.class.filter(y => y.name.match(val))
+							return x
+						})
+						.filter(x => x.class.length)
+			}
+			else {
+				this.filteredDepartmentData = this.departmentData
+			}
+		}
+	}
+}
+  </script>
