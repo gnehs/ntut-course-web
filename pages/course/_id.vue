@@ -13,6 +13,14 @@
 			<div class="cards">
 				<vs-card>
 					<template #title>
+						<h3>{{courseData.id}}</h3>
+					</template>
+					<template #text>
+						<p>課號</p>
+					</template>
+				</vs-card>
+				<vs-card>
+					<template #title>
 						<h3>{{courseData.class.map(x=>x.name).join('、')}}</h3>
 					</template>
 					<template #text>
@@ -29,18 +37,10 @@
 				</vs-card>
 				<vs-card>
 					<template #title>
-						<h3>{{courseData.stage}}</h3>
+						<h3>{{courseData.hours}}/{{courseData.credit}}/{{courseData.stage}}</h3>
 					</template>
 					<template #text>
-						<p>階段</p>
-					</template>
-				</vs-card>
-				<vs-card>
-					<template #title>
-						<h3>{{courseData.hours}}/{{courseData.credit}}</h3>
-					</template>
-					<template #text>
-						<p>時數/學分</p>
+						<p>時數/學分/階段</p>
 					</template>
 				</vs-card>
 				<vs-card>
@@ -63,19 +63,38 @@
 			<h3>課程概述</h3>
 			<p v-html="parseTextarea(courseData.description.zh)" />
 			<p v-html="parseTextarea(courseData.description.en)" />
-			<div v-for="item in fetchedCourseData" :key="item">
-				<h3>教師</h3>
-				<p>{{item.name}} {{item.email}}</p>
-				<h3>課程大綱</h3>
-				<p v-html="parseTextarea(item.objective)" />
-				<h3>課程進度</h3>
-				<p v-html="parseTextarea(item.schedule)" />
-				<h3>評量標準</h3>
-				<p v-html="parseTextarea(item.scorePolicy)" />
-				<h3>使用教材、參考書目或其他</h3>
-				<p v-html="parseTextarea(item.materials)" />
-				<h3>使用原文書籍：{{item.foreignLanguageTextbooks?"是":"否"}}</h3>
-				<h3>最後更新：{{item.latestUpdate}}</h3>
+			<div style="padding: 16px;background:#FFF;border-radius: 8px;">
+				<vs-alert shadow style="background:#FFF" v-show="chooseClassSelect">
+					<template #title>含有多項資料</template>
+					本課程含有多項資料可供查詢，請使用下方提供的下拉式選單選取教師來查看相關資料。
+					<br />
+					<br />
+					<br />
+					<vs-select label="選擇教師" v-model="chooseClassIndex" v-show="chooseClassSelect">
+						<vs-option
+							v-for="(item,i) in fetchedCourseData.map(x=>x.name)"
+							:label="fetchedCourseData.map(x=>x.name)[i]"
+							:value="i.toString()"
+							:key="i"
+						>{{item}}</vs-option>
+					</vs-select>
+				</vs-alert>
+				<div v-for="(item,i) in fetchedCourseData" :key="item">
+					<div v-show="chooseClassIndex==i.toString()">
+						<h3>教師</h3>
+						<p>{{item.name}} {{item.email}}</p>
+						<h3>課程大綱</h3>
+						<p v-html="parseTextarea(item.objective)" />
+						<h3>課程進度</h3>
+						<p v-html="parseTextarea(item.schedule)" />
+						<h3>評量標準</h3>
+						<p v-html="parseTextarea(item.scorePolicy)" />
+						<h3>使用教材、參考書目或其他</h3>
+						<p v-html="parseTextarea(item.materials)" />
+						<h3>使用原文書籍：{{item.foreignLanguageTextbooks?"是":"否"}}</h3>
+						<h3>最後更新：{{item.latestUpdate}}</h3>
+					</div>
+				</div>
 			</div>
 			<h3>備註</h3>
 			<p v-html="parseTextarea(courseData.notes)" />
@@ -87,6 +106,8 @@
 export default {
 	data: () => ({
 		onError: false,
+		chooseClassIndex: '0',
+		chooseClassSelect: false,
 		fetchedCourseData: null,
 		courseData: null
 	}),
@@ -101,6 +122,9 @@ export default {
 				let course = JSON.parse(localStorage[`course-${localStorage['data-year']}-${localStorage['data-sem']}`])
 				this.courseData = course.filter(x => x.id == courseId)[0]
 				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${localStorage['data-year']}/${localStorage['data-sem']}/course/${courseId}.json`)).data
+				if (this.fetchedCourseData.length > 1) {
+					this.chooseClassSelect = true
+				}
 			} catch (e) {
 				this.onError = e
 				loading.close()
