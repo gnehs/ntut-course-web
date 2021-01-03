@@ -112,7 +112,7 @@
 		<pre>[
   {
       "name": "林小媛",
-      "email": "alice_2001@hotmail.com.tw",
+      "email": "...",
       "latestUpdate": "2020-12-22 16:44:55",
       "objective": "使學生進一步瞭解首飾設計觀念，...",
       "schedule": "1. 課程簡介   [第1週]\r\n...",
