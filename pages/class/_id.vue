@@ -16,7 +16,7 @@
 			<template #tbody>
 				<vs-tr
 					:key="tr.id"
-					v-for="(tr, i) in $vs.getPage(result, page, max)"
+					v-for="tr in $vs.getPage(result, page, max)"
 					:data="tr"
 					@click="$router.push(`/course/${tr.id}`)"
 				>
