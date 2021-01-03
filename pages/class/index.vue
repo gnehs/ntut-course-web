@@ -5,17 +5,46 @@
 			<span>輸入關鍵字來篩選</span>
 			<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
 		</div>
-		<div v-for="department in filteredDepartmentData" :key="department.name">
+		<div v-for="(department,i) in filteredDepartmentData" :key="department.name">
 			<h3>{{department.name}}</h3>
-			<ul>
-				<li v-for="{name} in department.class" :key="name">
-					<router-link :to="'/class/'+name">{{name}}</router-link>
+			<ul class="department">
+				<li v-for="({name},j) in department.class" :key="name">
+					<router-link :to="'/class/'+name" :style="{'--bg-color':generateRandomColor(i, j)}">{{name}}</router-link>
 				</li>
 			</ul>
 		</div>
 	</div>
 </template>
-   <script>
+<style lang="sass" scoped>
+ul.department
+	display: flex
+	align-items: flex-start
+	justify-content: flex-start
+	flex-wrap: wrap
+	list-style-type: none
+	padding: 0
+	li a
+		width: 150px
+		height: 150px
+		background: var(--bg-color,#555)
+		color: #333
+		text-decoration: none
+		margin: 10px
+		display: block
+		border-radius: 30px
+		font-weight: 700
+		display: flex
+		align-items: flex-end
+		justify-content: flex-start
+		padding: 20px
+		transition: all .25s ease
+		box-sizing: border-box!important
+		&:hover
+			transform: translateY(-5px)
+			padding-bottom: 30px
+			box-shadow: inset 0 0 100em gold
+</style>
+<script>
 export default {
 	created() {
 		this.fetchData()
@@ -47,7 +76,14 @@ export default {
 			else {
 				this.filteredDepartmentData = this.departmentData
 			}
+		},
+		generateRandomColor(i, j) {
+			let r, g, b
+			r = i * 929 % 50 + (255 - 40)
+			g = i * 199 % 50 + (255 - 40)
+			b = i * 680 % 50 + (255 - 40)
+			return `rgb(${r},${g},${b})`
 		}
 	}
 }
-  </script>
+</script>
