@@ -3,14 +3,12 @@
 		<vs-navbar center-collapsed v-model="active" not-line>
 			<template #left>
 				<span>
-					<strong @click="$router.push('/')">🍤 北科課程好朋友</strong> 109年第2學期
+					<strong @click="$router.push('/')">🍤 北科課程好朋友</strong>
 				</span>
 			</template>
-			<template #right>
-				<vs-navbar-item :active="active=='/'" to="/">首頁</vs-navbar-item>
-				<vs-navbar-item :active="active=='/search'" to="/search" id="search">搜尋</vs-navbar-item>
-				<vs-navbar-item :active="active=='/about'" to="/about" id="about">關於</vs-navbar-item>
-			</template>
+			<vs-navbar-item :active="active=='/'" to="/">首頁</vs-navbar-item>
+			<vs-navbar-item :active="active=='/search'" to="/search" id="search">搜尋</vs-navbar-item>
+			<template #right>109年第2學期</template>
 		</vs-navbar>
 		<div class="container">
 			<Nuxt />
@@ -34,15 +32,17 @@ export default {
 	},
 	methods: {
 		async fetchCourse(y, s) {
+			let c = localStorage[`course-${y}-${s}`] || null
 			const loading = this.$vs.loading()
 			localStorage[`course-${y}-${s}`] = JSON.stringify((await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/main.json`)).data)
 			loading.close()
-			const noti = this.$vs.notification({
-				color: 'primary',
-				position: 'top-center',
-				title: '資料下載完畢',
-				text: `${y} 年第 ${s} 學期資料已下載完成，共 ${JSON.parse(localStorage[`course-${y}-${s}`]).length} 筆`
-			})
+			if (!c)
+				this.$vs.notification({
+					color: 'primary',
+					position: 'top-center',
+					title: '資料下載完畢',
+					text: `${y} 年第 ${s} 學期資料已下載完成，共 ${JSON.parse(localStorage[`course-${y}-${s}`]).length} 筆`
+				})
 		},
 	}
 }
