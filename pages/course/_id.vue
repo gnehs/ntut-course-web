@@ -79,7 +79,7 @@
 						>{{item}}</vs-option>
 					</vs-select>
 				</vs-alert>
-				<div v-for="(item,i) in fetchedCourseData" :key="item">
+				<div v-for="(item,i) in fetchedCourseData" :key="i.toString()">
 					<div v-show="chooseClassIndex==i.toString()">
 						<h3>教師</h3>
 						<p>{{item.name}} {{item.email}}</p>
@@ -117,11 +117,12 @@ export default {
 	methods: {
 		async fetchData() {
 			let courseId = this.$route.params.id
+			let { year, sem } = this.$route.query
 			const loading = this.$vs.loading()
 			try {
-				let course = JSON.parse(localStorage[`course-${localStorage['data-year']}-${localStorage['data-sem']}`])
+				let course = await this.$fetchCourse(year, sem)
 				this.courseData = course.filter(x => x.id == courseId)[0]
-				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${localStorage['data-year']}/${localStorage['data-sem']}/course/${courseId}.json`)).data
+				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${year}/${sem}/course/${courseId}.json`)).data
 				if (this.fetchedCourseData.length > 1) {
 					this.chooseClassSelect = true
 				}
@@ -140,7 +141,6 @@ export default {
 			let result = []
 			let eng2zh = { "sun": '週日', "mon": '週一', "tue": '週二', "wed": '週三', "thu": '週四', "fri": '週五', "sat": '週六' }
 			for (let i of Object.entries(t)) {
-				console.log(i)
 				if (i[1].length)
 					result.push(`${eng2zh[i[0]]}：${i[1].join('、')}`)
 			}

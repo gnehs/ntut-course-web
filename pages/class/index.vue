@@ -9,7 +9,10 @@
 			<h3>{{department.name}}</h3>
 			<ul class="department">
 				<li v-for="({name},j) in department.class" :key="name">
-					<router-link :to="'/class/'+name" :style="{'--bg-color':generateRandomColor(i, j)}">{{name}}</router-link>
+					<router-link
+						:to="`class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`"
+						:style="{'--bg-color':generateRandomColor(i, j)}"
+					>{{name}}</router-link>
 				</li>
 			</ul>
 		</div>

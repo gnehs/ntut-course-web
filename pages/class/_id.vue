@@ -1,6 +1,10 @@
 <template>
 	<div>
 		<h1>{{classname}}</h1>
+		<vs-alert v-show="onError">
+			<template #title>擷取資料時發生了錯誤</template>
+			<pre>{{onError}}</pre>
+		</vs-alert>
 		<vs-table striped v-if="result">
 			<template #thead>
 				<vs-tr>
@@ -18,7 +22,7 @@
 					:key="tr.id"
 					v-for="tr in $vs.getPage(result, page, max)"
 					:data="tr"
-					@click="$router.push(`/course/${tr.id}`)"
+					@click="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
 				>
 					<vs-td>{{tr.courseType}}{{ tr.name.zh }}</vs-td>
 					<vs-td v-html="parseTime(tr.time)" />
@@ -39,6 +43,7 @@
 <script>
 export default {
 	data: () => ({
+		onError: null,
 		result: null,
 		classname: null,
 		max: 50,
@@ -48,24 +53,29 @@ export default {
 		this.getCourseByClass()
 	},
 	methods: {
-		getCourseByClass() {
-			this.classname = this.$route.params.id
-			let classname = this.$route.params.id
-			let course = JSON.parse(localStorage[`course-${localStorage['data-year']}-${localStorage['data-sem']}`])
-			function detectClass(c) {
-				let d = c.map(x => x.name)
-				console.log(d, d.includes(classname));
-				return d.includes(classname)
+		async getCourseByClass() {
+			const loading = this.$vs.loading()
+			try {
+				this.classname = this.$route.params.id
+				let classname = this.classname
+				let { year, sem } = this.$route.query
+				let course = await this.$fetchCourse(year, sem)
+				function detectClass(c) {
+					let d = c.map(x => x.name)
+					return d.includes(classname)
+				}
+				course = course.filter(x => detectClass(x.class))
+				this.result = course
+			} catch (e) {
+				this.onError = e
+				loading.close()
 			}
-			course = course.filter(x => detectClass(x.class))
-			console.log(course);
-			this.result = course
+			loading.close()
 		},
 		parseTime(t) {
 			let result = []
 			let eng2zh = { "sun": '日', "mon": '一', "tue": '二', "wed": '三', "thu": '四', "fri": '五', "sat": '六' }
 			for (let i of Object.entries(t)) {
-				console.log(i)
 				if (i[1].length)
 					result.push(`${eng2zh[i[0]]}：${i[1].join('、')}`)
 			}

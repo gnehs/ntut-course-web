@@ -8,7 +8,16 @@
 			</template>
 			<vs-navbar-item :active="active=='/'" to="/">首頁</vs-navbar-item>
 			<vs-navbar-item :active="active=='/search'" to="/search" id="search">搜尋</vs-navbar-item>
-			<template #right>109年第2學期</template>
+			<template #right v-if="yearSemItems">
+				<vs-select v-model="yearSemVal" @change="yearSemSelected">
+					<vs-option
+						v-for="(item,i) in yearSemItems"
+						:label="parseYearSemVal(item)"
+						:value="item"
+						:key="i"
+					>{{parseYearSemVal(item)}}</vs-option>
+				</vs-select>
+			</template>
 		</vs-navbar>
 		<div class="container">
 			<Nuxt />
@@ -16,34 +25,94 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
 export default {
 	data: () => ({
-		active: '/'
+		active: '/',
+		yearSemItems: null,
+		yearSemVal: null,
 	}),
 	created() {
-		localStorage['data-year'] = '109'
-		localStorage['data-sem'] = '2'
-		this.fetchCourse(localStorage['data-year'], localStorage['data-sem'])
+		Vue.prototype.$fetchCourse = async (y, s) => {
+			if (!y || !s) {
+				let yearData = await this.$fetchYearData()
+				// trying get from localStorage
+				if (localStorage['data-year'] && localStorage['data-sem']) {
+					y = localStorage['data-year']
+					s = localStorage['data-sem']
+				}
+				if (!yearData[y] || !yearData[y].includes(s)) {
+					let yrs = Object.keys(yearData)
+					y = yrs[yrs.length - 1]
+					s = yearData[y][0]
+				}
+			}
+			this.yearSemVal = `${y}-${s}`
+			let dataKey = `course_${y}_${s}`
+
+			let loading
+			try {
+				if (!window[dataKey]) {
+					loading = this.$vs.loading()
+					window[dataKey] = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/main.json`)).data
+					loading.close()
+				}
+				this.$store.commit('updateYear', y)
+				this.$store.commit('updateSem', s)
+				return window[dataKey]
+			} catch (e) {
+				this.$vs.notification({
+					title: '擷取資料時發生了錯誤',
+					text: e,
+					color: 'danger'
+				})
+				loading.close()
+
+				this.$store.commit('updateYear', '109')
+				this.$store.commit('updateSem', '2')
+			}
+		};
+		Vue.prototype.$fetchYearData = async () => {
+			let key = `main_year`
+			try {
+				if (!localStorage[key]) {
+					let res = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/main.json`)).data
+					localStorage[key] = JSON.stringify(res)
+				}
+				return JSON.parse(localStorage[key])
+			} catch (e) {
+				this.$vs.notification({
+					title: '擷取資料時發生了錯誤',
+					text: e,
+					color: 'danger'
+				})
+			}
+		};
+		this.initYearSem()
+		this.$fetchCourse()
 		this.$router.beforeEach((to, from, next) => {
-			console.log(to.path)
 			this.active = to.path
 			next();
 		});
 	},
 	methods: {
-		async fetchCourse(y, s) {
-			let c = localStorage[`course-${y}-${s}`] || null
-			const loading = this.$vs.loading()
-			localStorage[`course-${y}-${s}`] = JSON.stringify((await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/main.json`)).data)
-			loading.close()
-			if (!c)
-				this.$vs.notification({
-					color: 'primary',
-					position: 'top-center',
-					title: '資料下載完畢',
-					text: `${y} 年第 ${s} 學期資料已下載完成，共 ${JSON.parse(localStorage[`course-${y}-${s}`]).length} 筆`
-				})
+		async initYearSem() {
+			let d = await this.$fetchYearData()
+			let res = []
+			for (let year of Object.keys(d).reverse()) {
+				for (let sem of d[year].reverse()) {
+					res.push(`${year}-${sem}`)
+				}
+			}
+			this.yearSemItems = res
 		},
+		parseYearSemVal(v) {
+			let s = v.split('-')
+			return `${s[0]} 年${s[1] == '1' ? '上' : '下'}學期`
+		}, yearSemSelected() {
+			let s = this.yearSemVal.split('-')
+			this.$fetchCourse(s[0], s[1])
+		}
 	}
 }
 </script>

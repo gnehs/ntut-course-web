@@ -22,7 +22,7 @@
 					:key="tr.id"
 					v-for="tr in $vs.getPage(searchResult, page, max)"
 					:data="tr"
-					@click="$router.push(`/course/${tr.id}`)"
+					@click="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
 				>
 					<vs-td>{{tr.courseType}}{{ tr.name.zh }}</vs-td>
 					<vs-td v-html="parseTime(tr.time)" />
@@ -43,17 +43,20 @@
 <script>
 export default {
 	data: () => ({
+		course: null,
 		searchVal: '',
 		searchResult: null,
 		max: 50,
 		page: 1
 	}),
-	created() {
-
-	},
 	methods: {
-		searchCourse() {
-			let course = JSON.parse(localStorage[`course-${localStorage['data-year']}-${localStorage['data-sem']}`])
+		async fetchCourseData() {
+			if (!this.course)
+				this.course = await this.$fetchCourse()
+			return this.course
+		},
+		async searchCourse() {
+			let course = await this.fetchCourseData()
 			if (this.searchVal != '')
 				course = course.filter(x => x.name.zh.match(this.searchVal))
 
@@ -63,7 +66,6 @@ export default {
 			let result = []
 			let eng2zh = { "sun": '日', "mon": '一', "tue": '二', "wed": '三', "thu": '四', "fri": '五', "sat": '六' }
 			for (let i of Object.entries(t)) {
-				console.log(i)
 				if (i[1].length)
 					result.push(`${eng2zh[i[0]]}：${i[1].join('、')}`)
 			}
