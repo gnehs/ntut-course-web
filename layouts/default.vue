@@ -12,8 +12,14 @@
 				:to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`"
 				id="search"
 			>搜尋</vs-navbar-item>
-			<template #right v-if="yearSemItems">
-				<vs-select v-model="yearSemVal" @change="yearSemSelected" :disabled="$route.query.year">
+			<template #right>
+				<vs-select
+					v-model="yearSemVal"
+					@change="yearSemSelected"
+					:disabled="$route.query.year"
+					v-if="yearSemItems"
+				>
+					<vs-option label="選擇學期" value="no" disabled>選擇學期</vs-option>
 					<vs-option
 						v-for="(item,i) in yearSemItems"
 						:label="parseYearSemVal(item)"
@@ -34,7 +40,7 @@ export default {
 	data: () => ({
 		active: '/',
 		yearSemItems: null,
-		yearSemVal: null,
+		yearSemVal: '-1',
 	}),
 	created() {
 		Vue.prototype.$fetchCourse = async (y, s) => {
