@@ -7,9 +7,13 @@
 				</span>
 			</template>
 			<vs-navbar-item :active="active=='/'" to="/">首頁</vs-navbar-item>
-			<vs-navbar-item :active="active=='/search'" to="/search" id="search">搜尋</vs-navbar-item>
+			<vs-navbar-item
+				:active="active=='/search'"
+				:to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`"
+				id="search"
+			>搜尋</vs-navbar-item>
 			<template #right v-if="yearSemItems">
-				<vs-select v-model="yearSemVal" @change="yearSemSelected">
+				<vs-select v-model="yearSemVal" @change="yearSemSelected" :disabled="$route.query.year">
 					<vs-option
 						v-for="(item,i) in yearSemItems"
 						:label="parseYearSemVal(item)"
@@ -34,6 +38,12 @@ export default {
 	}),
 	created() {
 		Vue.prototype.$fetchCourse = async (y, s) => {
+			//replace yr & sem if query seleted
+			let { year, sem } = this.$route.query
+			if (year && sem) {
+				y = year
+				s = sem
+			}
 			if (!y || !s) {
 				let yearData = await this.$fetchYearData()
 				// trying get from localStorage
@@ -109,7 +119,8 @@ export default {
 		parseYearSemVal(v) {
 			let s = v.split('-')
 			return `${s[0]} 年${s[1] == '1' ? '上' : '下'}學期`
-		}, yearSemSelected() {
+		},
+		yearSemSelected() {
 			let s = this.yearSemVal.split('-')
 			this.$fetchCourse(s[0], s[1])
 		}

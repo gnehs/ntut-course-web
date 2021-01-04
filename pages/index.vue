@@ -7,7 +7,7 @@
 		</vs-alert>
 		<br />
 		<div class="cards">
-			<vs-card @click="$router.push('/search')">
+			<vs-card @click="$router.push(`/search?year=${$store.state.year}&sem=${$store.state.sem}`)">
 				<template #title>
 					<h3>搜尋課程</h3>
 				</template>
@@ -15,7 +15,7 @@
 					<p>根據課號、關鍵字或是教師等資訊搜尋課程</p>
 				</template>
 			</vs-card>
-			<vs-card @click="$router.push('/class')">
+			<vs-card @click="$router.push(`/class?year=${$store.state.year}&sem=${$store.state.sem}`)">
 				<template #title>
 					<h3>上課時間表</h3>
 				</template>
