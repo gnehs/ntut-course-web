@@ -7,46 +7,20 @@
 		</div>
 		<div v-for="(department,i) in filteredDepartmentData" :key="department.name">
 			<h3>{{department.name}}</h3>
-			<ul class="department">
-				<li v-for="({name},j) in department.class" :key="name">
-					<router-link
-						:to="`class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`"
-						:style="{'--bg-color':generateRandomColor(i, j)}"
-					>{{name}}</router-link>
-				</li>
-			</ul>
+			<div class="cards">
+				<card
+					v-for="({name},j) in department.class"
+					:key="name"
+					@click.native="$router.push(`class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+					style="--card-row: 5;--card-row-sm: 3"
+				>
+					<card-title>{{name}}</card-title>
+					<p>{{department.name}}</p>
+				</card>
+			</div>
 		</div>
 	</div>
-</template>
-<style lang="sass" scoped>
-ul.department
-	display: flex
-	align-items: flex-start
-	justify-content: flex-start
-	flex-wrap: wrap
-	list-style-type: none
-	padding: 0
-	li a
-		width: 150px
-		height: 150px
-		background: var(--bg-color,#555)
-		color: #333
-		text-decoration: none
-		margin: 10px
-		display: block
-		border-radius: 30px
-		font-weight: 700
-		display: flex
-		align-items: flex-end
-		justify-content: flex-start
-		padding: 20px
-		transition: all .25s ease
-		box-sizing: border-box!important
-		&:hover
-			transform: translateY(-5px)
-			padding-bottom: 30px
-			box-shadow: inset 0 0 100em gold
-</style>
+</template> 
 <script>
 export default {
 	created() {

@@ -11,54 +11,46 @@
 				{{courseData.name.en}}
 			</h2>
 			<div class="cards">
-				<vs-card>
-					<template #title>
-						<h3>{{courseData.id}}</h3>
-					</template>
-					<template #text>
-						<p>課號</p>
-					</template>
-				</vs-card>
-				<vs-card>
-					<template #title>
-						<h3>{{courseData.class.map(x=>x.name).join('、')}}</h3>
-					</template>
-					<template #text>
-						<p>班級</p>
-					</template>
-				</vs-card>
-				<vs-card>
-					<template #title>
-						<h3>{{courseData.classroom.length?courseData.classroom.map(x=>x.name).join('、'):'無資料'}}</h3>
-					</template>
-					<template #text>
-						<p>教室</p>
-					</template>
-				</vs-card>
-				<vs-card>
-					<template #title>
-						<h3>{{courseData.hours}}/{{courseData.credit}}/{{courseData.stage}}</h3>
-					</template>
-					<template #text>
-						<p>時數/學分/階段</p>
-					</template>
-				</vs-card>
-				<vs-card>
-					<template #title>
-						<h3>{{courseData.peopleWithdraw}}/{{courseData.people}}</h3>
-					</template>
-					<template #text>
-						<p>撤選/人數</p>
-					</template>
-				</vs-card>
-				<vs-card>
-					<template #title>
-						<h3>{{parseTime(courseData.time)}}</h3>
-					</template>
-					<template #text>
-						<p>上課時間</p>
-					</template>
-				</vs-card>
+				<card>
+					<card-title>{{courseData.id}}</card-title>
+					<p>課號</p>
+				</card>
+				<card>
+					<card-title>{{courseData.class.map(x=>x.name).join('、')}}</card-title>
+					<p>班級</p>
+				</card>
+				<card>
+					<card-title>{{courseData.classroom.length?courseData.classroom.map(x=>x.name).join('、'):'無資料'}}</card-title>
+					<p>教室</p>
+				</card>
+				<div class="cards">
+					<card>
+						<card-title>{{courseData.credit}}</card-title>
+						<p>學分</p>
+					</card>
+					<card>
+						<card-title>{{courseData.hours}}</card-title>
+						<p>時數</p>
+					</card>
+					<card>
+						<card-title>{{courseData.stage}}</card-title>
+						<p>階段</p>
+					</card>
+				</div>
+				<div class="cards">
+					<card>
+						<card-title>{{courseData.peopleWithdraw}}</card-title>
+						<p>撤選</p>
+					</card>
+					<card>
+						<card-title>{{courseData.people}}</card-title>
+						<p>人數</p>
+					</card>
+				</div>
+				<card>
+					<card-title>{{parseTime(courseData.time)}}</card-title>
+					<p>上課時間</p>
+				</card>
 			</div>
 			<h3>課程概述</h3>
 			<p v-html="parseTextarea(courseData.description.zh)" />
