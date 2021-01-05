@@ -14,16 +14,17 @@
     box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity))
     border-radius: 12px
     transition: all .25s ease
-    cursor: pointer
     position: relative
     padding: 8px 12px
-    &:hover
-        box-shadow: 0px 0px 0px 0px rgba(0,0,0,0)
-        box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
-        transform: translate(0, 5px)
-        opacity: .7
-    &:active
-        opacity: 1
+    &.hoverable
+        cursor: pointer
+        &:hover
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0)
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
+            transform: translate(0, 5px)
+            opacity: .7
+        &:active
+            opacity: 1
     p
         margin: 0
         opacity: 0.8

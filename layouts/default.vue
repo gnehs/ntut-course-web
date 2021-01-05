@@ -16,7 +16,7 @@
 				<vs-select
 					v-model="yearSemVal"
 					@change="yearSemSelected"
-					:disabled="$route.query.year"
+					:disabled="Boolean($route.query.year)"
 					v-if="yearSemItems"
 				>
 					<vs-option label="選擇學期" value="no" disabled>選擇學期</vs-option>
