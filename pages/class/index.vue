@@ -5,13 +5,13 @@
 			<span>輸入關鍵字來篩選</span>
 			<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
 		</div>
-		<div v-for="(department,i) in filteredDepartmentData" :key="department.name">
+		<div v-for="department in filteredDepartmentData" :key="department.name">
 			<h3>{{department.name}}</h3>
 			<div class="cards">
 				<card
-					v-for="({name},j) in department.class"
+					v-for="{name} in department.class"
 					:key="name"
-					@click.native="$router.push(`class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+					@click.native="$router.push(`/class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`)"
 					style="--card-row: 5;--card-row-sm: 3"
 				>
 					<card-title>{{name}}</card-title>
