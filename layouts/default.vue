@@ -43,6 +43,9 @@ export default {
 		yearSemVal: '-1',
 	}),
 	created() {
+		String.prototype.trimEllip = function (length) {
+			return this.length > length ? this.substring(0, length) + "..." : this;
+		}
 		Vue.prototype.$fetchCourse = async (y, s) => {
 			//replace yr & sem if query seleted
 			let { year, sem } = this.$route.query
