@@ -7,12 +7,12 @@
 		</div>
 		<div v-for="department in filteredDepartmentData" :key="department.name">
 			<h3>{{department.name}}</h3>
-			<div class="cards">
+			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
 				<card
 					v-for="{name} in department.class"
 					:key="name"
+					class="hoverable"
 					@click.native="$router.push(`/class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`)"
-					style="--card-row: 5;--card-row-sm: 3"
 				>
 					<card-title>{{name}}</card-title>
 					<p>{{department.name}}</p>
