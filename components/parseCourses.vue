@@ -1,6 +1,57 @@
 <template>
-	<div>
-		<card v-if="courses" style="padding:0">
+	<div v-if="courses">
+		<div class="center">
+			<vs-button flat :active="layout == 'table'" @click="layout = 'table'">
+				<i class="bx bx-table"></i>表格
+			</vs-button>
+			<vs-button flat :active="layout == 'card'" @click="layout = 'card'">
+				<i class="bx bx-card"></i>卡片
+			</vs-button>
+		</div>
+		<div v-if="layout == 'card'">
+			<div class="cards">
+				<card
+					class="hoverable"
+					v-for="tr in $vs.getPage(courses, page, max)"
+					:key="tr.id"
+					@click.native="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+				>
+					<card-title>{{ tr.courseType }}{{ tr.name.zh }}</card-title>
+
+					<div class="cards">
+						<card>
+							<card-title>{{tr.id}}</card-title>
+							<p>課號</p>
+						</card>
+						<card>
+							<card-title>{{tr.credit}}</card-title>
+							<p>學分</p>
+						</card>
+						<card v-for="item in parseTime(tr.time)" :key="item.title">
+							<card-title>{{item.content}}</card-title>
+							<p>{{item.title}}</p>
+						</card>
+						<card v-if="!parseTime(tr.time).length">
+							<card-title>無資料</card-title>
+							<p>上課時間</p>
+						</card>
+					</div>
+					<p>
+						班級：{{ tr.class.map(x=>x.name).join('、').trimEllip(9) }}
+						<br />
+						教師：{{ tr.teacher.map(y => y.name).join('、').trimEllip(13) }}
+						<br />
+						備註：{{ tr.notes.trimEllip(15) }}
+					</p>
+				</card>
+			</div>
+			<div class="center">
+				<p v-if="!courses.length">查無資料</p>
+			</div>
+			<br />
+			<vs-pagination v-model="page" :length="$vs.getLength(courses, max)" />
+		</div>
+		<card style="padding:0" v-if="layout == 'table'">
 			<vs-table striped>
 				<template #thead>
 					<vs-tr>
@@ -62,6 +113,9 @@
 				<template #footer>
 					<vs-pagination v-model="page" :length="$vs.getLength(courses, max)" />
 				</template>
+				<template #notFound>
+					<p v-if="!courses.length">查無資料</p>
+				</template>
 			</vs-table>
 		</card>
 		<br />
@@ -69,11 +123,20 @@
 		<br />
 	</div>
 </template>
+<style lang="sass" scoped>
+.center
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 20px
+    flex-wrap: wrap
+</style>
 <script>
 export default {
 	name: 'parse-courses',
 	props: ['courses'],
 	data: () => ({
+		layout: 'card',
 		max: 50,
 		page: 1
 	}),
