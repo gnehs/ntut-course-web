@@ -47,10 +47,12 @@
 						<p>人數</p>
 					</card>
 				</div>
-				<card>
-					<card-title>{{parseTime(courseData.time)}}</card-title>
-					<p>上課時間</p>
-				</card>
+				<div class="cards">
+					<card v-for="item in parseTime(courseData.time)" :key="item.title">
+						<card-title>{{item.content}}</card-title>
+						<p>{{item.title}}</p>
+					</card>
+				</div>
 			</div>
 			<h3>課程概述</h3>
 			<p v-html="parseTextarea(courseData.description.zh)" />
@@ -134,9 +136,9 @@ export default {
 			let eng2zh = { "sun": '週日', "mon": '週一', "tue": '週二', "wed": '週三', "thu": '週四', "fri": '週五', "sat": '週六' }
 			for (let i of Object.entries(t)) {
 				if (i[1].length)
-					result.push(`${eng2zh[i[0]]}：${i[1].join('、')}`)
+					result.push({ title: eng2zh[i[0]], content: i[1].join('、') })
 			}
-			return result.join(';')
+			return result
 		}
 	}
 }

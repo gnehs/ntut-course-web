@@ -23,6 +23,9 @@
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0)
         box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
         transform: translate(0, 5px)
+        opacity: .9
+    &:active
+        opacity: 1
     p
         margin: 0
         opacity: 0.8
