@@ -31,4 +31,6 @@
         margin: 0
         opacity: 0.8
         font-size: 0.85rem
+        &+p
+            margin-top: 8px
 </style> 

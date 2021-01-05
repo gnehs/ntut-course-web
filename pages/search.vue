@@ -7,15 +7,15 @@
 		</p>
 		<div class="cards" style="--card-row: 4;--card-row-sm: 2">
 			<card>
-				<card-title>課號</card-title>
+				<p>課號</p>
 				<vs-input v-model="searchCourseId" @input="searchCourse" />
 			</card>
 			<card>
-				<card-title>關鍵字</card-title>
+				<p>關鍵字</p>
 				<vs-input v-model="searchVal" @input="searchCourse" />
 			</card>
 			<card>
-				<card-title>教師</card-title>
+				<p>教師</p>
 				<vs-input v-model="searchTeacher" @input="searchCourse" />
 			</card>
 		</div>

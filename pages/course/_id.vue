@@ -11,18 +11,20 @@
 				{{courseData.name.en}}
 			</h2>
 			<div class="cards">
-				<card>
-					<card-title>{{courseData.id}}</card-title>
-					<p>課號</p>
-				</card>
-				<card>
-					<card-title>{{courseData.class.map(x=>x.name).join('、')}}</card-title>
-					<p>班級</p>
-				</card>
-				<card>
-					<card-title>{{courseData.classroom.length?courseData.classroom.map(x=>x.name).join('、'):'無資料'}}</card-title>
-					<p>教室</p>
-				</card>
+				<div class="cards">
+					<card>
+						<card-title>{{courseData.id}}</card-title>
+						<p>課號</p>
+					</card>
+					<card>
+						<card-title>{{courseData.peopleWithdraw}}</card-title>
+						<p>撤選</p>
+					</card>
+					<card>
+						<card-title>{{courseData.people}}</card-title>
+						<p>人數</p>
+					</card>
+				</div>
 				<div class="cards">
 					<card>
 						<card-title>{{courseData.credit}}</card-title>
@@ -37,32 +39,40 @@
 						<p>階段</p>
 					</card>
 				</div>
-				<div class="cards">
-					<card>
-						<card-title>{{courseData.peopleWithdraw}}</card-title>
-						<p>撤選</p>
-					</card>
-					<card>
-						<card-title>{{courseData.people}}</card-title>
-						<p>人數</p>
-					</card>
-				</div>
+				<card>
+					<card-title>{{courseData.courseType}} {{courseStandard[courseData.courseType]}}</card-title>
+					<p>課程標準</p>
+				</card>
+				<card>
+					<card-title>{{courseData.class.map(x=>x.name).join('、')}}</card-title>
+					<p>班級</p>
+				</card>
+				<card>
+					<card-title>{{courseData.classroom.length?courseData.classroom.map(x=>x.name).join('、'):'無資料'}}</card-title>
+					<p>教室</p>
+				</card>
 				<div class="cards">
 					<card v-for="item in parseTime(courseData.time)" :key="item.title">
 						<card-title>{{item.content}}</card-title>
 						<p>{{item.title}}</p>
+					</card>
+					<card v-if="!parseTime(courseData.time).length">
+						<card-title>無資料</card-title>
+						<p>上課時間</p>
 					</card>
 				</div>
 			</div>
 			<h3>課程概述</h3>
 			<p v-html="parseTextarea(courseData.description.zh)" />
 			<p v-html="parseTextarea(courseData.description.en)" />
-			<h3>備註</h3>
-			<p v-html="parseTextarea(courseData.notes)" />
-			<div style="padding: 4px 16px;background:#FFF;border-radius: 8px;">
+			<div v-if="courseData.notes.trim()!=''">
+				<h3>備註</h3>
+				<p v-html="parseTextarea(courseData.notes)" />
+			</div>
+			<div v-if="fetchedCourseData.length">
 				<vs-alert shadow style="background:#FFF" v-show="chooseClassSelect">
 					<template #title>含有多項資料</template>
-					本課程含有多項資料可供查詢，請使用下方提供的下拉式選單選取教師來查看相關資料。
+					本課程含有多項資料可供查詢，請使用下拉式選單選取教師來查看資料。
 					<br />
 					<br />
 					<br />
@@ -103,7 +113,15 @@ export default {
 		chooseClassIndex: '0',
 		chooseClassSelect: false,
 		fetchedCourseData: null,
-		courseData: null
+		courseData: [],
+		courseStandard: {
+			'○': '部訂共同必修',
+			'△': '校訂共同必修',
+			'☆': '共同選修',
+			'●': '部訂專業必修',
+			'▲': '校訂專業必修',
+			'★': '專業選修'
+		}
 	}),
 	created() {
 		this.fetchData()

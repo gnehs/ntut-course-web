@@ -1,9 +1,11 @@
 <template>
 	<div v-if="filteredDepartmentData">
 		<h1>選擇班級</h1>
-		<div style="padding: 16px;background:#FFF;border-radius: 8px;">
-			<span>輸入關鍵字來篩選</span>
-			<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
+		<div class="cards" style="--card-row: 4;--card-row-sm: 1">
+			<card>
+				<p>輸入關鍵字來篩選</p>
+				<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
+			</card>
 		</div>
 		<div v-for="department in filteredDepartmentData" :key="department.name">
 			<h3>{{department.name}}</h3>

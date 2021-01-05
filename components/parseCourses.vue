@@ -21,10 +21,6 @@
 						<template #expand>
 							<div class="cards">
 								<card>
-									<card-title>{{tr.class.map(x=>x.name).join('、')}}</card-title>
-									<p>班級</p>
-								</card>
-								<card>
 									<card-title>{{tr.classroom.length?tr.classroom.map(x=>x.name).join('、'):'無資料'}}</card-title>
 									<p>教室</p>
 								</card>
@@ -43,16 +39,6 @@
 									</card>
 								</div>
 								<div class="cards">
-									<card>
-										<card-title>{{tr.peopleWithdraw}}</card-title>
-										<p>撤選</p>
-									</card>
-									<card>
-										<card-title>{{tr.people}}</card-title>
-										<p>人數</p>
-									</card>
-								</div>
-								<div class="cards">
 									<card v-for="item in parseTime(tr.time)" :key="item.title">
 										<card-title>{{item.content}}</card-title>
 										<p>{{item.title}}</p>
@@ -62,13 +48,13 @@
 										<p>上課時間</p>
 									</card>
 								</div>
-								<card
-									class="hoverable"
-									@click.native="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
-								>
-									<card-title>查看詳細資料</card-title>
-									<p>輕觸此處查看此課程之詳細資料</p>
-								</card>
+							</div>
+							<div style="display:flex">
+								<div style="flex:1" />
+								<vs-button
+									flat
+									@click="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+								>詳細資料</vs-button>
 							</div>
 						</template>
 					</vs-tr>
