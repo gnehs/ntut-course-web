@@ -57,7 +57,9 @@
 			<h3>課程概述</h3>
 			<p v-html="parseTextarea(courseData.description.zh)" />
 			<p v-html="parseTextarea(courseData.description.en)" />
-			<div style="padding: 16px;background:#FFF;border-radius: 8px;">
+			<h3>備註</h3>
+			<p v-html="parseTextarea(courseData.notes)" />
+			<div style="padding: 4px 16px;background:#FFF;border-radius: 8px;">
 				<vs-alert shadow style="background:#FFF" v-show="chooseClassSelect">
 					<template #title>含有多項資料</template>
 					本課程含有多項資料可供查詢，請使用下方提供的下拉式選單選取教師來查看相關資料。
@@ -90,8 +92,6 @@
 					</div>
 				</div>
 			</div>
-			<h3>備註</h3>
-			<p v-html="parseTextarea(courseData.notes)" />
 		</div>
 	</div>
 </template>

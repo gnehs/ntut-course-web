@@ -18,7 +18,6 @@
     position: relative
     padding: 0px 12px
     padding-bottom: 8px
-    box-sizing: border-box
     &:hover
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0)
         box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
