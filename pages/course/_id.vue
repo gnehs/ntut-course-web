@@ -10,6 +10,7 @@
 				<br />
 				{{courseData.name.en}}
 			</h2>
+			<vs-alert danger v-show="isEarlyEight">該課程為早八，選課前請先三思！</vs-alert>
 			<div class="cards">
 				<div class="cards">
 					<card>
@@ -110,6 +111,7 @@
 export default {
 	data: () => ({
 		onError: false,
+		isEarlyEight: false,
 		chooseClassIndex: '0',
 		chooseClassSelect: false,
 		fetchedCourseData: null,
@@ -153,8 +155,10 @@ export default {
 			let result = []
 			let eng2zh = { "sun": '週日', "mon": '週一', "tue": '週二', "wed": '週三', "thu": '週四', "fri": '週五', "sat": '週六' }
 			for (let i of Object.entries(t)) {
-				if (i[1].length)
+				if (i[1].length) {
+					if (i[1].includes('1')) this.isEarlyEight = true
 					result.push({ title: eng2zh[i[0]], content: i[1].join('、') })
+				}
 			}
 			return result
 		}
