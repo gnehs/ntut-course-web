@@ -14,7 +14,9 @@ export default {
       { hid: 'description', name: 'description', content: '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/png', href: '/icon.png' }
+      { rel: 'icon', type: 'image/png', href: '/icon.png' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono&display=swap' }
     ]
   },
 
