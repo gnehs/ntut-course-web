@@ -16,6 +16,8 @@
     transition: all .25s ease
     position: relative
     padding: 8px 12px
+    &:not(.hoverable)
+        box-shadow: 0 0px 0px 1px rgba(0,0,0,.05)
     &.hoverable
         cursor: pointer
         &:hover
