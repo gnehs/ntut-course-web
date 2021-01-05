@@ -3,15 +3,15 @@
     display: flex
     flex-direction: row
     flex-wrap: wrap 
-    margin: 0 -10px
+    margin: 0 -4px
     box-sizing: border-box
     --card-row: 3
     --card-row-sm: 2
     .vs-card-content,&>.card,&>.cards
-        width: calc(100% / var(--card-row) - 20px) 
-        margin: 8px 10px
+        width: calc(100% / var(--card-row) - 8px) 
+        margin: 8px 4px
         @media screen and (max-width: 768px)
-            width: calc(100% / var(--card-row-sm) - 20px) 
+            width: calc(100% / var(--card-row-sm) - 8px) 
     &>.cards
         width: calc(100% / var(--card-row)) 
         margin: 0 0

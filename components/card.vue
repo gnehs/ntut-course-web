@@ -12,12 +12,12 @@
     width: 100%
     box-shadow: 0 5px 20px 0 rgba(0,0,0,.05)
     box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity))
-    border-radius: 20px
+    border-radius: 12px
     transition: all .25s ease
     cursor: pointer
     position: relative
-    padding: 0px 15px
-    padding-bottom: 15px
+    padding: 0px 12px
+    padding-bottom: 8px
     box-sizing: border-box
     &:hover
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0)
