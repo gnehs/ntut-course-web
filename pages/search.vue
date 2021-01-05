@@ -1,14 +1,33 @@
 <template>
 	<div>
 		<h1>搜尋</h1>
-		<div style="padding: 16px;background:#FFF;border-radius: 8px;">
-			<span>關鍵字</span>
-			<vs-input v-model="searchVal" @input="searchCourse" />
+		<p style="font-size:0.85rem;">
+			＊關鍵字與教師欄位支援
+			<a href="https://en.wikipedia.org/wiki/Regular_expression" teaget="_blank">regex</a>！
+		</p>
+		<div class="cards" style="--card-row: 4;--card-row-sm: 2">
+			<card>
+				<card-title>課號</card-title>
+				<vs-input v-model="searchCourseId" @input="searchCourse" />
+			</card>
+			<card>
+				<card-title>關鍵字</card-title>
+				<vs-input v-model="searchVal" @input="searchCourse" />
+			</card>
+			<card>
+				<card-title>教師</card-title>
+				<vs-input v-model="searchTeacher" @input="searchCourse" />
+			</card>
 		</div>
+		<vs-alert v-show="onError">
+			<template #title>搜尋時發生了錯誤</template>
+			<pre>{{onError}}</pre>
+		</vs-alert>
 		<vs-table striped v-if="searchResult">
 			<template #thead>
 				<vs-tr>
 					<vs-th>課程名稱</vs-th>
+					<vs-th>教師</vs-th>
 					<vs-th>上課時間</vs-th>
 					<vs-th>學分</vs-th>
 					<vs-th>班級</vs-th>
@@ -25,6 +44,7 @@
 					@click="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
 				>
 					<vs-td>{{tr.courseType}}{{ tr.name.zh }}</vs-td>
+					<vs-td>{{tr.teacher.map(y => y.name).join('、')}}</vs-td>
 					<vs-td v-html="parseTime(tr.time)" />
 					<vs-td>{{ tr.credit }}</vs-td>
 					<vs-td>{{ tr.class.map(x=>x.name).join('、') }}</vs-td>
@@ -43,24 +63,65 @@
 <script>
 export default {
 	data: () => ({
+		onError: null,
 		course: null,
 		searchVal: '',
+		searchCourseId: '',
+		searchTeacher: '',
 		searchResult: null,
 		max: 50,
 		page: 1
 	}),
+	created() {
+		let { q, id, teacher } = this.$route.query
+		this.searchVal = q || ''
+		this.searchCourseId = id || ''
+		this.searchTeacher = teacher || ''
+		this.searchCourse()
+	},
 	methods: {
 		async fetchCourseData() {
-			if (!this.course)
-				this.course = await this.$fetchCourse()
+			if (!this.course) {
+				let { year, sem } = this.$route.query
+				this.course = await this.$fetchCourse(year, sem)
+			}
 			return this.course
 		},
 		async searchCourse() {
-			let course = await this.fetchCourseData()
-			if (this.searchVal != '')
-				course = course.filter(x => x.name.zh.match(this.searchVal))
+			try {
+				this.onError = null
+				let course = await this.fetchCourseData()
+				let query = Object.assign({}, this.$route.query)
+				if (this.searchVal != '') {
+					course = course.filter(x => x.name.zh.match(this.searchVal))
+					query.q = this.searchVal
+				} else {
+					query.q = ''
+					delete query.q
+				}
+				if (this.searchCourseId != '') {
+					let searchCourseId = this.searchCourseId
+					course = course.filter(x => x.id.startsWith(searchCourseId))
+					query.id = searchCourseId
+				} else {
+					query.id = ''
+					delete query.id
+				}
+				if (this.searchTeacher != '') {
+					let searchTeacher = this.searchTeacher
 
-			this.searchResult = course
+					course = course.filter(x => x.teacher.map(y => y.name).join('').match(searchTeacher))
+					query.teacher = searchTeacher
+				} else {
+					query.teacher = ''
+					delete query.teacher
+				}
+				this.searchResult = course
+				this.$router.replace({ path: "/search", query }, () => { });
+			} catch (e) {
+				this.onError = e
+				this.searchResult = []
+			}
 		},
 		parseTime(t) {
 			let result = []
