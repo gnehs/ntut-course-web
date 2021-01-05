@@ -1,4 +1,6 @@
-# ntut-course-web
+# 🍤 北科課程好朋友
+Demo: https://gnehs.github.io/ntut-course-web/
+
 
 ## Build Setup
 
