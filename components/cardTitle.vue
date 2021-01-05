@@ -5,7 +5,7 @@
 </template>
 <style lang="sass" scoped>
 .card-title
-    padding-top: 6px
-    padding-bottom: 5px
+    padding-bottom: 4px
     margin: 0
+    line-height: 20px
 </style> 
