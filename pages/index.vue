@@ -12,15 +12,19 @@
 				@click.native="$router.push(`/search?year=${$store.state.year}&sem=${$store.state.sem}`)"
 			>
 				<card-title>搜尋課程</card-title>
-				<p>根據課號、關鍵字或是教師等資訊搜尋課程</p>
+				<p>依課號、關鍵字或教師搜尋課程</p>
 			</card>
 			<card class="hoverable padding" @click.native="$router.push(`/class`)">
 				<card-title>上課時間表</card-title>
 				<p>查看班級上課時間表</p>
 			</card>
+			<card class="hoverable padding" @click.native="$router.push('/my-course')">
+				<card-title>我的課程（Beta）</card-title>
+				<p>查看已儲存的課程</p>
+			</card>
 			<card class="hoverable padding" @click.native="$router.push('/api')">
 				<card-title>API 手冊</card-title>
-				<p>探索本站開放公眾使用的開放資料</p>
+				<p>探索開放公眾使用的資料</p>
 			</card>
 			<card class="hoverable padding" @click.native="$router.push('/about')">
 				<card-title>關於</card-title>

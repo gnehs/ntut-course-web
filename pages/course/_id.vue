@@ -5,11 +5,23 @@
 			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
 		<div v-if="fetchedCourseData&&courseData">
-			<h2>
-				{{courseData.name.zh}}
-				<br />
-				{{courseData.name.en}}
-			</h2>
+			<div class="lr-container">
+				<div class="l">
+					<h2>
+						{{courseData.name.zh}}
+						<br />
+						{{courseData.name.en}}
+					</h2>
+				</div>
+				<div class="r">
+					<vs-button flat @click="add2myCourse" v-if="!isInMyCourse">
+						<i class="bx bx-plus"></i>加入我的課程
+					</vs-button>
+					<vs-button flat danger @click="removeFromMyCourse" v-else>
+						<i class="bx bx-minus"></i>從我的課程移除
+					</vs-button>
+				</div>
+			</div>
 			<vs-alert danger v-show="isEarlyEight">該課程為早八，選課前請先三思！</vs-alert>
 			<div class="cards">
 				<div class="cards">
@@ -112,6 +124,7 @@ export default {
 	data: () => ({
 		onError: false,
 		isEarlyEight: false,
+		isInMyCourse: false,
 		chooseClassIndex: '0',
 		chooseClassSelect: false,
 		fetchedCourseData: null,
@@ -136,6 +149,7 @@ export default {
 			try {
 				let course = await this.$fetchCourse(year, sem)
 				this.courseData = course.filter(x => x.id == courseId)[0]
+				this.checkCourseInMyCourse()
 				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${year}/${sem}/course/${courseId}.json`)).data
 				if (this.fetchedCourseData.length > 1) {
 					this.chooseClassSelect = true
@@ -161,6 +175,42 @@ export default {
 				}
 			}
 			return result
+		},
+		checkCourseInMyCourse() {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-${year}-${sem}`
+
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
+			this.isInMyCourse = Boolean(myCourseData[this.courseData.id])
+		},
+		add2myCourse() {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-${year}-${sem}`
+
+
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
+			myCourseData[this.courseData.id] = this.courseData
+			localStorage[myCourseKey] = JSON.stringify(myCourseData)
+
+			this.isInMyCourse = true
+			this.$vs.notification({
+				title: '加入完成！',
+				text: `已將「${this.courseData.name.zh}」加入到我的課程`
+			})
+		},
+		removeFromMyCourse() {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-${year}-${sem}`
+
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
+			delete myCourseData[this.courseData.id]
+			localStorage[myCourseKey] = JSON.stringify(myCourseData)
+
+			this.isInMyCourse = false
+			this.$vs.notification({
+				title: '已移除',
+				text: `已將「${this.courseData.name.zh}」從我的課程中移除`
+			})
 		}
 	}
 }
