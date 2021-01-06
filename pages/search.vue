@@ -1,24 +1,26 @@
 <template>
 	<div>
 		<h1>搜尋</h1>
-		<p style="font-size:0.85rem;">
-			＊關鍵字與教師欄位支援
-			<a href="https://en.wikipedia.org/wiki/Regular_expression" teaget="_blank">regex</a>！
-		</p>
-		<div class="cards" style="--card-row: 4;--card-row-sm: 2">
-			<card>
-				<p>課號</p>
-				<vs-input v-model="searchCourseId" @input="searchCourse" />
-			</card>
-			<card>
-				<p>關鍵字</p>
-				<vs-input v-model="searchVal" @input="searchCourse" />
-			</card>
-			<card>
-				<p>教師</p>
-				<vs-input v-model="searchTeacher" @input="searchCourse" />
-			</card>
-		</div>
+		<card>
+			<div class="cards" style="--card-row: 4;--card-row-sm: 2">
+				<card class="borderless">
+					<p>課號</p>
+					<vs-input v-model="searchCourseId" @input="searchCourse" />
+				</card>
+				<card class="borderless">
+					<p>關鍵字</p>
+					<vs-input v-model="searchVal" @input="searchCourse" />
+				</card>
+				<card class="borderless">
+					<p>教師</p>
+					<vs-input v-model="searchTeacher" @input="searchCourse" />
+				</card>
+			</div>
+			<p style="font-size:0.85rem;">
+				＊關鍵字與教師欄位支援
+				<a href="https://en.wikipedia.org/wiki/Regular_expression" teaget="_blank">regex</a>！
+			</p>
+		</card>
 		<vs-alert v-show="onError">
 			<template #title>搜尋時發生了錯誤</template>
 			<pre>{{onError||'Error'}}</pre>
