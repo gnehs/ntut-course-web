@@ -7,5 +7,6 @@
 .card-title
     padding-bottom: 4px
     margin: 0
-    line-height: 20px
+    line-height: 18px
+    width: 100%
 </style> 

@@ -13,7 +13,7 @@
 				<card
 					v-for="{name} in department.class"
 					:key="name"
-					class="hoverable"
+					class="hoverable padding"
 					@click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}`)"
 				>
 					<card-title>{{name}}</card-title>

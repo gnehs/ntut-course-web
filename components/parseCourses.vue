@@ -11,7 +11,7 @@
 		<div v-if="layout == 'card'">
 			<div class="cards">
 				<card
-					class="hoverable"
+					class="hoverable padding"
 					v-for="tr in $vs.getPage(courses, page, max)"
 					:key="tr.id"
 					@click.native="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
@@ -19,19 +19,19 @@
 					<card-title>{{ tr.courseType }}{{ tr.name.zh }}</card-title>
 
 					<div class="cards">
-						<card>
+						<card class="borderless">
 							<card-title>{{tr.id}}</card-title>
 							<p>課號</p>
 						</card>
-						<card>
+						<card class="borderless">
 							<card-title>{{tr.credit}}</card-title>
 							<p>學分</p>
 						</card>
-						<card v-for="item in parseTime(tr.time)" :key="item.title">
+						<card v-for="item in parseTime(tr.time)" :key="item.title" class="borderless">
 							<card-title>{{item.content}}</card-title>
 							<p>{{item.title}}</p>
 						</card>
-						<card v-if="!parseTime(tr.time).length">
+						<card v-if="!parseTime(tr.time).length" class="borderless">
 							<card-title>無資料</card-title>
 							<p>上課時間</p>
 						</card>
@@ -125,11 +125,11 @@
 </template>
 <style lang="sass" scoped>
 .center
-    display: flex
-    align-items: center
-    justify-content: center
-    padding: 20px
-    flex-wrap: wrap
+	display: flex
+	align-items: center
+	justify-content: center
+	padding: 20px
+	flex-wrap: wrap
 </style>
 <script>
 export default {

@@ -147,7 +147,7 @@ export default {
 			loading.close()
 		},
 		parseTextarea(t) {
-			t = t.replace(/\t/g, '   ')
+			t = t.replace(/\t/g, '　　')
 			t = t.replace(/\r\n/g, '<br/>')
 			return t
 		},

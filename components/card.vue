@@ -15,9 +15,15 @@
     border-radius: 12px
     transition: all .25s ease
     position: relative
-    padding: 8px 12px
+    padding: 6px 8px
     &:not(.hoverable)
         box-shadow: 0 0px 0px 1px rgba(0,0,0,.05)
+    &.borderless
+        box-shadow: none
+        background: transparent
+        padding: 4px 0px
+    &.padding
+        padding: 12px 16px
     &.hoverable
         cursor: pointer
         &:hover
