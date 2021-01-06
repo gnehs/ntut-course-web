@@ -55,5 +55,20 @@ export default {
   },
   router: {
     base: "/ntut-course-web/"
+  },
+  pwa: {
+    icon: {
+      fileName: 'icon-pwa.png'
+    },
+    manifest: {
+      name: '北科課程好朋友',
+      short_name: '北科課程好朋友',
+    },
+    meta: {
+      name: '北科課程好朋友',
+      description: '提供臺北科技大學最新課程資訊'
+    },
+    theme_color: '#FFF',
+    nativeUI: true
   }
 }
