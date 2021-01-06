@@ -14,7 +14,7 @@
 					v-for="{name} in department.class"
 					:key="name"
 					class="hoverable"
-					@click.native="$router.push(`/class/${name}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+					@click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}`)"
 				>
 					<card-title>{{name}}</card-title>
 					<p>{{department.name}}</p>
@@ -33,10 +33,26 @@ export default {
 		filteredDepartmentData: null,
 		filterDapartmentVal: null
 	}),
+	computed: {
+		year() {
+			return this.$store.state.year
+		},
+		sem() {
+			return this.$store.state.sem
+		}
+	},
+	watch: {
+		year(newCount, oldCount) {
+			this.fetchData()
+		},
+		sem(newCount, oldCount) {
+			this.fetchData()
+		}
+	},
 	methods: {
 		async fetchData() {
 			const loading = this.$vs.loading()
-			this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${localStorage['data-year']}/${localStorage['data-sem']}/department.json`)).data
+			this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${this.year}/${this.sem}/department.json`)).data
 			this.filteredDepartmentData = this.departmentData
 			loading.close()
 		},

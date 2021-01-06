@@ -14,10 +14,7 @@
 				<card-title>搜尋課程</card-title>
 				<p>根據課號、關鍵字或是教師等資訊搜尋課程</p>
 			</card>
-			<card
-				class="hoverable"
-				@click.native="$router.push(`/class?year=${$store.state.year}&sem=${$store.state.sem}`)"
-			>
+			<card class="hoverable" @click.native="$router.push(`/class`)">
 				<card-title>上課時間表</card-title>
 				<p>查看班級上課時間表</p>
 			</card>
