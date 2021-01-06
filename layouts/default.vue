@@ -2,7 +2,7 @@
 	<div>
 		<vs-navbar center-collapsed v-model="active" not-line>
 			<template #left>
-				<span>
+				<span style="cursor: pointer">
 					<strong @click="$router.push('/')">🍤 北科課程好朋友</strong>
 				</span>
 			</template>
