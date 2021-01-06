@@ -21,7 +21,7 @@
 		</div>
 		<vs-alert v-show="onError">
 			<template #title>搜尋時發生了錯誤</template>
-			<pre>{{onError}}</pre>
+			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
 		<parse-courses :courses="searchResult" />
 	</div>

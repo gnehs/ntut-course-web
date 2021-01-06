@@ -2,7 +2,7 @@
 	<div>
 		<vs-alert v-show="onError">
 			<template #title>擷取資料時發生了錯誤</template>
-			<pre>{{onError}}</pre>
+			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
 		<div v-if="fetchedCourseData&&courseData">
 			<h2>
