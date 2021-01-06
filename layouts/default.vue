@@ -144,6 +144,6 @@ body
   min-height: calc(100vh - 74px)
   padding-top: 74px
   width: 1024px
-  max-width: 98%
+  max-width: 97%
   margin: 0 auto
 </style>
