@@ -63,10 +63,14 @@ export default {
     manifest: {
       name: '北科課程好朋友',
       short_name: '北科課程好朋友',
+      description: '提供臺北科技大學最新課程資訊',
+      lang: 'zh-TW'
     },
     meta: {
       name: '北科課程好朋友',
-      description: '提供臺北科技大學最新課程資訊'
+      description: '提供臺北科技大學最新課程資訊',
+      ogHost: 'https://gnehs.github.io/ntut-course-web/',
+      ogImage: 'og.jpg'
     },
     theme_color: '#FFF',
     nativeUI: true
