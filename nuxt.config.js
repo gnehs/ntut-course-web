@@ -64,7 +64,32 @@ export default {
       name: '北科課程好朋友',
       short_name: '北科課程好朋友',
       description: '提供臺北科技大學最新課程資訊',
-      lang: 'zh-TW'
+      lang: 'zh-TW',
+      shortcuts: [{
+        name: "我的課程",
+        url: "/ntut-course-web/my-course",
+        icons: [{
+          src: "/ntut-course-web/img/user.png",
+          type: "image/png",
+          sizes: "512x512"
+        }]
+      }, {
+        name: "上課時間表",
+        url: "/ntut-course-web/class",
+        icons: [{
+          src: "/ntut-course-web/img/table.png",
+          type: "image/png",
+          sizes: "512x512"
+        }]
+      }, {
+        name: "搜尋",
+        url: "/ntut-course-web/search",
+        icons: [{
+          src: "/ntut-course-web/img/search.png",
+          type: "image/png",
+          sizes: "512x512"
+        }]
+      }],
     },
     meta: {
       name: '北科課程好朋友',
