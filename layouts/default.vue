@@ -18,6 +18,7 @@
 					@change="yearSemSelected"
 					:disabled="Boolean($route.query.year)"
 					v-if="yearSemItems"
+					class="year-sem-select"
 				>
 					<vs-option label="選擇學期" value="no" disabled>選擇學期</vs-option>
 					<vs-option
@@ -181,4 +182,6 @@ body
 
 		border-radius: 15px 15px 0px 0px
 		box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
+.year-sem-select
+	max-width: 130px
 </style>
