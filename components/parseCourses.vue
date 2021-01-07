@@ -167,7 +167,7 @@ export default {
 
 			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
 			let course = await this.$fetchCourse(year, sem)
-			let myCourse = course.filter(x => courseIds.includes(x.id))
+			let myCourses = course.filter(x => courseIds.includes(x.id))
 			function checkCrash(a, b) {
 				for (let i of Object.entries(a.time)) {
 					for (let j of i[1]) {
@@ -178,12 +178,14 @@ export default {
 				}
 				return false
 			}
-			for (let inputCourse of this.courses) {
-				if (myCourse.filter(x => x.id == inputCourse.id).length) {
-					this.crashCourseData.push(inputCourse.id)
+			for (let dataCourse of this.courses) {
+				for (let myCourse of myCourses) {
+					if (checkCrash(dataCourse, myCourse)) {
+						this.crashCourseData.push(dataCourse.id)
+					}
 				}
 			}
-		},
+		}
 	}
 }
 </script>
