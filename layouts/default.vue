@@ -38,7 +38,17 @@
 					Developed by
 					<a href="https://gnehs.net" target="_blank" style="margin-left: .2em">勝勝</a>
 				</div>
-				<div class="r"></div>
+				<div class="r">
+					<vs-button
+						icon
+						transparent
+						href="https://github.com/gnehs/ntut-course-web"
+						blank
+						color="rgb(33,31,31)"
+					>
+						<i class="bx bxl-github"></i>
+					</vs-button>
+				</div>
 			</div>
 		</footer>
 	</div>
@@ -165,7 +175,7 @@ body
 		text-align: center
 		font-size: .85rem
 		opacity: .7
-		padding: 12px 15px
+		padding: 0 15px
 		width: 100%
 		background: #FFF
 
