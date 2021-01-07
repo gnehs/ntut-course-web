@@ -23,17 +23,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install npm packages
-      run: npm install 
-    - name: Declare commit SHA
-      id: vars
-      shell: bash
-      run: |
-        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      run: npm install
     - name: Generate Pages
       run: npm run generate
-      env:
-        NUXT_ENV_CURRENT_GIT_SHA: ${{steps.vars.outputs.sha_short}}
     - name: Fix 404
       uses: canastro/copy-file-action@master
       with:

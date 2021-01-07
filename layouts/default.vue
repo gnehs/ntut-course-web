@@ -38,12 +38,7 @@
 					Developed by
 					<a href="https://gnehs.net" target="_blank" style="margin-left: .2em">勝勝</a>
 				</div>
-				<div class="r">
-					<a
-						v-if="commitSha"
-						:href="`https://github.com/gnehs/ntut-course-web/commit/${commitSha}`"
-					>#{{ commitSha }}</a>
-				</div>
+				<div class="r"></div>
 			</div>
 		</footer>
 	</div>
@@ -55,7 +50,6 @@ export default {
 		active: '/',
 		yearSemItems: null,
 		yearSemVal: '-1',
-		commitSha: process.env.GITHUB_REF
 	}),
 	created() {
 		String.prototype.trimEllip = function (length) {
