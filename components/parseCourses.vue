@@ -35,6 +35,10 @@
 							<card-title>無資料</card-title>
 							<p>上課時間</p>
 						</card>
+						<card v-if="crashCourseData.includes(tr.id)" class="borderless">
+							<card-title style="color:red">衝堂</card-title>
+							<p>狀態</p>
+						</card>
 					</div>
 					<p>
 						班級：{{ tr.class.map(x=>x.name).join('、').trimEllip(9) }}
@@ -68,7 +72,10 @@
 						<vs-td>{{ tr.courseType }}{{ tr.name.zh }}</vs-td>
 						<vs-td>{{ tr.teacher.map(y => y.name).join('、').trimEllip(9)}}</vs-td>
 						<vs-td>{{ tr.class.map(x=>x.name).join('、').trimEllip(9) }}</vs-td>
-						<vs-td>{{ tr.notes }}</vs-td>
+						<vs-td>
+							<span style="color:red" v-if="crashCourseData.includes(tr.id)">衝堂</span>
+							<span v-else>{{ tr.notes }}</span>
+						</vs-td>
 						<template #expand>
 							<div class="cards">
 								<card>
@@ -138,8 +145,12 @@ export default {
 	data: () => ({
 		layout: 'card',
 		max: 50,
-		page: 1
+		page: 1,
+		crashCourseData: []
 	}),
+	created() {
+		this.checkIsCourseCrash()
+	},
 	methods: {
 		parseTime(t) {
 			let result = []
@@ -149,7 +160,30 @@ export default {
 					result.push({ title: eng2zh[i[0]], content: i[1].join('、') })
 			}
 			return result
-		}
+		},
+		async checkIsCourseCrash() {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+
+			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
+			let course = await this.$fetchCourse(year, sem)
+			let myCourse = course.filter(x => courseIds.includes(x.id))
+			function checkCrash(a, b) {
+				for (let i of Object.entries(a.time)) {
+					for (let j of i[1]) {
+						if (b.time[i[0]].includes(j)) {
+							return true
+						}
+					}
+				}
+				return false
+			}
+			for (let inputCourse of this.courses) {
+				if (myCourse.filter(x => x.id == inputCourse.id).length) {
+					this.crashCourseData.push(inputCourse.id)
+				}
+			}
+		},
 	}
 }
 </script>

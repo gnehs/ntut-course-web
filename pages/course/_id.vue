@@ -22,6 +22,14 @@
 					</vs-button>
 				</div>
 			</div>
+			<vs-alert v-show="isCourseCrashed">
+				<template #title>課程衝堂</template>
+				本課程與
+				<span v-for="(item,i) in crashCourseData" :key="item.id">
+					<span v-if="i>0">、</span>
+					{{item.name.zh}}
+				</span> 衝堂！
+			</vs-alert>
 			<vs-alert danger v-show="isEarlyEight">該課程為早八，選課前請先三思！</vs-alert>
 			<div class="cards">
 				<div class="cards">
@@ -125,6 +133,8 @@ export default {
 		onError: false,
 		isEarlyEight: false,
 		isInMyCourse: false,
+		isCourseCrashed: false,
+		crashCourseData: [],
 		chooseClassIndex: '0',
 		chooseClassSelect: false,
 		fetchedCourseData: null,
@@ -150,6 +160,7 @@ export default {
 				let course = await this.$fetchCourse(year, sem)
 				this.courseData = course.filter(x => x.id == courseId)[0]
 				this.checkCourseInMyCourse()
+				this.checkIsCourseCrash()
 				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${year}/${sem}/course/${courseId}.json`)).data
 				if (this.fetchedCourseData.length > 1) {
 					this.chooseClassSelect = true
@@ -182,6 +193,30 @@ export default {
 
 			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
 			this.isInMyCourse = Boolean(myCourseData.includes(this.courseData.id))
+		},
+		async checkIsCourseCrash() {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+
+			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
+			let course = await this.$fetchCourse(year, sem)
+			let myCourse = course.filter(x => courseIds.includes(x.id))
+			function checkCrash(a, b) {
+				for (let i of Object.entries(a.time)) {
+					for (let j of i[1]) {
+						if (b.time[i[0]].includes(j)) {
+							return true
+						}
+					}
+				}
+				return false
+			}
+			for (let c of myCourse) {
+				if (checkCrash(this.courseData, c)) {
+					this.isCourseCrashed = true
+					this.crashCourseData.push(c)
+				}
+			}
 		},
 		add2myCourse() {
 			let { year, sem } = this.$store.state
