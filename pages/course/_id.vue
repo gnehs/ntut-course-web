@@ -22,15 +22,18 @@
 					</vs-button>
 				</div>
 			</div>
-			<vs-alert v-show="isCourseCrashed">
+			<vs-alert danger v-show="isCourseCrashed">
 				<template #title>課程衝堂</template>
 				本課程與
 				<span v-for="(item,i) in crashCourseData" :key="item.id">
 					<span v-if="i>0">、</span>
-					{{item.name.zh}}
+					<a
+						style="cursor: pointer;"
+						@click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+					>{{item.name.zh}}</a>
 				</span> 衝堂！
 			</vs-alert>
-			<vs-alert danger v-show="isEarlyEight">該課程為早八，選課前請先三思！</vs-alert>
+			<vs-alert v-show="isEarlyEight">該課程為早八，選課前請先三思！</vs-alert>
 			<div class="cards">
 				<div class="cards">
 					<card>

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<vs-alert shadow style="background:#FFF">
+		<vs-alert relief>
 			<template #title>免責聲明</template>
 			本站資料擷取自
 			<a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank">國立臺北科技大學課程系統</a>，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
