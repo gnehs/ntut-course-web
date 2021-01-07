@@ -212,7 +212,7 @@ export default {
 				return false
 			}
 			for (let c of myCourse) {
-				if (checkCrash(this.courseData, c)) {
+				if (checkCrash(this.courseData, c) && this.courseData.id != c.id) {
 					this.isCourseCrashed = true
 					this.crashCourseData.push(c)
 				}

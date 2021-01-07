@@ -180,7 +180,7 @@ export default {
 			}
 			for (let dataCourse of this.courses) {
 				for (let myCourse of myCourses) {
-					if (checkCrash(dataCourse, myCourse)) {
+					if (checkCrash(dataCourse, myCourse) && dataCourse.id != myCourse.id) {
 						this.crashCourseData.push(dataCourse.id)
 					}
 				}
