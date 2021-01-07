@@ -15,12 +15,12 @@
 		</div>
 		<!--<p>你可以在這裡儲存一些課程，會於搜尋與課程頁面自動與其他課程比對是否衝堂。</p>-->
 		<p>你可以在這裡儲存一些課程供未來選課時參考用。</p>
-		<vs-alert v-if="myCourses.length">
+		<vs-alert v-if="myCourses.length" key="notice">
 			<template #title>提醒</template>
 			請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
 		</vs-alert>
 		<parse-courses :courses="myCourses" showTimetable v-if="myCourses.length" />
-		<vs-alert v-else>
+		<vs-alert v-else key="noCourses">
 			<template #title>尚未儲存任何課程</template>
 			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
 			<br />如果沒看到先前加入的，請嘗試在右上角的下拉選單切換學期。
