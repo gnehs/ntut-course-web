@@ -146,13 +146,20 @@
 				<div class="content" v-for="time in timetable" :key="time">
 					<div class="item">{{ time }}</div>
 					<div class="item" v-for="date in Object.keys(dateEng2zh).slice(1, 5+1)" :key="date">
-						<div
-							class="course"
-							:class="{crash:crashCourseData.includes(item.id)}"
-							v-for="item in $vs.getPage(courses, page, max).filter(x=>x.time[date].includes(time))"
-							:key="item.id"
-							@click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
-						>{{item.name.zh}}</div>
+						<template
+							v-if="$vs.getPage(courses, page, max).filter(x=>x.time[date].includes(time)).length<=2"
+						>
+							<div
+								class="course"
+								:class="{crash:crashCourseData.includes(item.id)}"
+								v-for="item in $vs.getPage(courses, page, max).filter(x=>x.time[date].includes(time))"
+								:key="item.id"
+								@click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+							>{{item.name.zh}}</div>
+						</template>
+						<template v-else>
+							<div class="course">課程數量過多無法顯示</div>
+						</template>
 					</div>
 				</div>
 			</div>
