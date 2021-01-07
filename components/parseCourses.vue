@@ -170,29 +170,34 @@
 	padding: 20px
 	flex-wrap: wrap
 .timetable
+	font-size: .85em
 	.header
 		top: 0
 		position: sticky
 		.item
 			padding: 10px 12px
 			background: #f2f2f2
-			font-size: .85em
 			text-align: center
 	.content
 		&:nth-child(2n)
 			background: rgba(var(--vs-gray-1), 1)
 		.item
-			padding: 4px
+			display: flex
+			padding: 2px
 			.course
 				cursor: pointer
 				text-align: center
 				width: 100%
 				background: #f4f4f4
-				padding: 10px 12px
+				padding: 4px 6px
 				border-radius: 8px
 				transition: all .25s ease
-				&+.course
-					margin-top: 4px
+				height: 100%
+				margin: 2px
+
+				display: flex
+				align-items: center
+				justify-content: center
 				&.crash
 					box-shadow: 0 0px 0px 1px rgba(255, 44, 44,.5)
 				&:hover
@@ -203,12 +208,13 @@
 		display: grid
 		grid-template-columns: 1.25em repeat(5, 1fr)
 		.item
+			min-height: 40px
 			&:first-child
 				background: #f2f2f2
-				font-size: .85em
+				font-size: 1.15em
 				display: flex
-				align-content: center
-				justify-items: center
+				align-items: center
+				justify-content: center
 </style>
 <script>
 import card from './card.vue'
