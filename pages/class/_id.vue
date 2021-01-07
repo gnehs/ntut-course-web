@@ -18,7 +18,7 @@
 			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
 
-		<parse-courses :courses="result" />
+		<parse-courses :courses="result" showTimetable />
 	</div>
 </template>
   

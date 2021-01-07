@@ -19,7 +19,7 @@
 			<template #title>提醒</template>
 			請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
 		</vs-alert>
-		<parse-courses :courses="myCourses" v-if="myCourses.length" />
+		<parse-courses :courses="myCourses" showTimetable v-if="myCourses.length" />
 		<vs-alert v-else>
 			<template #title>尚未儲存任何課程</template>
 			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！

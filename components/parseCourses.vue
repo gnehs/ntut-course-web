@@ -7,6 +7,14 @@
 			<vs-button flat :active="layout == 'card'" @click="layout = 'card'">
 				<i class="bx bx-card"></i>卡片
 			</vs-button>
+			<vs-button
+				flat
+				:active="layout == 'timetable'"
+				@click="layout = 'timetable'"
+				v-if="showTimetable"
+			>
+				<i class="bx bx-time"></i>課表
+			</vs-button>
 		</div>
 		<div v-if="layout == 'card'">
 			<div class="cards">
@@ -125,6 +133,30 @@
 				</template>
 			</vs-table>
 		</card>
+		<card style="padding:0;overflow:hidden" v-if="layout == 'timetable'">
+			<div class="timetable">
+				<div class="header">
+					<div class="item"></div>
+					<div class="item">一</div>
+					<div class="item">二</div>
+					<div class="item">三</div>
+					<div class="item">四</div>
+					<div class="item">五</div>
+				</div>
+				<div class="content" v-for="time in timetable" :key="time">
+					<div class="item">{{ time }}</div>
+					<div class="item" v-for="date in Object.keys(dateEng2zh).slice(1, 5+1)" :key="date">
+						<div
+							class="course"
+							:class="{crash:crashCourseData.includes(item.id)}"
+							v-for="item in $vs.getPage(courses, page, max).filter(x=>x.time[date].includes(time))"
+							:key="item.id"
+							@click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+						>{{item.name.zh}}</div>
+					</div>
+				</div>
+			</div>
+		</card>
 		<br />
 		<br />
 		<br />
@@ -137,16 +169,66 @@
 	justify-content: center
 	padding: 20px
 	flex-wrap: wrap
+.timetable
+	.header
+		top: 0
+		position: sticky
+		.item
+			padding: 10px 12px
+			background: #f2f2f2
+			font-size: .85em
+			text-align: center
+	.content
+		&:nth-child(2n)
+			background: rgba(var(--vs-gray-1), 1)
+		.item
+			padding: 4px
+			.course
+				cursor: pointer
+				text-align: center
+				width: 100%
+				background: #f4f4f4
+				padding: 10px 12px
+				border-radius: 8px
+				transition: all .25s ease
+				&+.course
+					margin-top: 4px
+				&.crash
+					box-shadow: 0 0px 0px 1px rgba(255, 44, 44,.5)
+				&:hover
+					box-shadow: 0 0px 0px 2px rgba(0,0,0,.25)
+				&:active
+					box-shadow: 0 0px 0px 2px rgba(0,0,0,.5)
+	.header,.content
+		display: grid
+		grid-template-columns: 1.25em repeat(5, 1fr)
+		.item
+			&:first-child
+				background: #f2f2f2
+				font-size: .85em
+				display: flex
+				align-content: center
+				justify-items: center
 </style>
 <script>
+import card from './card.vue'
 export default {
+	components: { card },
 	name: 'parse-courses',
-	props: ['courses'],
+	props: {
+		courses: Object,
+		showTimetable: {
+			type: Boolean,
+			default: false
+		}
+	},
 	data: () => ({
 		layout: 'card',
 		max: 50,
 		page: 1,
-		crashCourseData: []
+		crashCourseData: [],
+		timetable: ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C'],
+		dateEng2zh: { "sun": '週日', "mon": '週一', "tue": '週二', "wed": '週三', "thu": '週四', "fri": '週五', "sat": '週六' }
 	}),
 	created() {
 		this.checkIsCourseCrash()
@@ -154,10 +236,9 @@ export default {
 	methods: {
 		parseTime(t) {
 			let result = []
-			let eng2zh = { "sun": '週日', "mon": '週一', "tue": '週二', "wed": '週三', "thu": '週四', "fri": '週五', "sat": '週六' }
 			for (let i of Object.entries(t)) {
 				if (i[1].length)
-					result.push({ title: eng2zh[i[0]], content: i[1].join('、') })
+					result.push({ title: this.dateEng2zh[i[0]], content: i[1].join('、') })
 			}
 			return result
 		},
