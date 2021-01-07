@@ -55,7 +55,7 @@ export default {
 		active: '/',
 		yearSemItems: null,
 		yearSemVal: '-1',
-		commitSha: process.env.NUXT_ENV_CURRENT_GIT_SHA
+		commitSha: process.env.GITHUB_REF
 	}),
 	created() {
 		String.prototype.trimEllip = function (length) {
