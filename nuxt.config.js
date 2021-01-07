@@ -67,7 +67,7 @@ export default {
       lang: 'zh-TW',
       shortcuts: [{
         name: "我的課程",
-        url: "/ntut-course-web/my-course",
+        url: "/ntut-course-web/my-course?utm_source=homescreen",
         icons: [{
           src: "/ntut-course-web/img/user.png",
           type: "image/png",
@@ -75,7 +75,7 @@ export default {
         }]
       }, {
         name: "上課時間表",
-        url: "/ntut-course-web/class",
+        url: "/ntut-course-web/class?utm_source=homescreen",
         icons: [{
           src: "/ntut-course-web/img/table.png",
           type: "image/png",
@@ -83,7 +83,7 @@ export default {
         }]
       }, {
         name: "搜尋",
-        url: "/ntut-course-web/search",
+        url: "/ntut-course-web/search?utm_source=homescreen",
         icons: [{
           src: "/ntut-course-web/img/search.png",
           type: "image/png",
