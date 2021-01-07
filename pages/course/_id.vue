@@ -178,18 +178,19 @@ export default {
 		},
 		checkCourseInMyCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-${year}-${sem}`
+			let myCourseKey = `my-couse-data-${year}-${sem}`
 
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
-			this.isInMyCourse = Boolean(myCourseData[this.courseData.id])
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			this.isInMyCourse = Boolean(myCourseData.includes(this.courseData.id))
 		},
 		add2myCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-${year}-${sem}`
+			let myCourseKey = `my-couse-data-${year}-${sem}`
 
-
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
-			myCourseData[this.courseData.id] = this.courseData
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			if (!myCourseData.includes(this.courseData.id)) {
+				myCourseData.push(this.courseData.id)
+			}
 			localStorage[myCourseKey] = JSON.stringify(myCourseData)
 
 			this.isInMyCourse = true
@@ -200,10 +201,10 @@ export default {
 		},
 		removeFromMyCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-${year}-${sem}`
+			let myCourseKey = `my-couse-data-${year}-${sem}`
 
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
-			delete myCourseData[this.courseData.id]
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			myCourseData = myCourseData.filter(x => x != this.courseData.id)
 			localStorage[myCourseKey] = JSON.stringify(myCourseData)
 
 			this.isInMyCourse = false

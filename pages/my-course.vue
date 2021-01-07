@@ -1,13 +1,25 @@
 <template>
 	<div>
-		<h1>我的課程（Beta）</h1>
+		<div class="lr-container">
+			<div class="l">
+				<h1>我的課程（Beta）</h1>
+			</div>
+			<div class="r" style="display: flex">
+				<vs-button flat @click="exportData">
+					<i class="bx bxs-file-export"></i>匯出
+				</vs-button>
+				<vs-button flat @click="importData">
+					<i class="bx bxs-file-import"></i>匯入
+				</vs-button>
+			</div>
+		</div>
 		<!--<p>你可以在這裡儲存一些課程，會於搜尋與課程頁面自動與其他課程比對是否衝堂。</p>-->
 		<p>你可以在這裡儲存一些課程供未來選課時參考用。</p>
-		<vs-alert v-if="Object.values(myCourses).length">
+		<vs-alert v-if="myCourses.length">
 			<template #title>提醒</template>
 			請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
 		</vs-alert>
-		<parse-courses :courses="Object.values(myCourses)" v-if="Object.values(myCourses).length" />
+		<parse-courses :courses="myCourses" v-if="myCourses.length" />
 		<vs-alert v-else>
 			<template #title>尚未儲存任何課程</template>
 			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
@@ -42,12 +54,36 @@ export default {
 		this.getMyCourse()
 	},
 	methods: {
-		getMyCourse() {
+		async getMyCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-${year}-${sem}`
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+
+			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
+			let course = await this.$fetchCourse(year, sem)
+			this.myCourses = course.filter(x => courseIds.includes(x.id))
+		},
+		exportData() {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-data-${year}-${sem}`
 			let myCourseClassKey = `my-couse-class-${year}-${sem}`
-			this.myCourses = JSON.parse(localStorage[myCourseKey] || '{}')
-			console.log(Object.values(this.myCourses))
+
+			let res = JSON.stringify({ key: myCourseKey, data: localStorage[myCourseKey], classKey: myCourseClassKey, classData: localStorage[myCourseClassKey] })
+			prompt('請複製以下資料：', res)
+
+		},
+		importData() {
+			let importedData = prompt('請貼上先前複製的資料：')
+			if (importedData) {
+				let { key, data, classKey, classData } = JSON.parse(importedData)
+				localStorage[key] = data
+				localStorage[classKey] = classData
+
+				this.$vs.notification({
+					title: '匯入完成！',
+					text: `已匯入 ${JSON.parse(localStorage[key]).length} 筆課程到我的課程`
+				})
+				this.getMyCourse()
+			}
 		}
 	}
 }

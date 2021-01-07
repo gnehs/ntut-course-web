@@ -61,7 +61,7 @@ export default {
 		},
 		addCourse2myCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-${year}-${sem}`
+			let myCourseKey = `my-couse-data-${year}-${sem}`
 			let myCourseClassKey = `my-couse-class-${year}-${sem}`
 
 			if (localStorage[myCourseClassKey] != this.classname && localStorage[myCourseClassKey]) {
@@ -74,7 +74,9 @@ export default {
 
 			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
 			for (let course of this.result) {
-				myCourseData[course.id] = course
+				if (!myCourseData.includes(course.id)) {
+					myCourseData.push(course.id)
+				}
 			}
 			localStorage[myCourseKey] = JSON.stringify(myCourseData)
 
@@ -86,13 +88,13 @@ export default {
 		},
 		removeFromMyCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-${year}-${sem}`
+			let myCourseKey = `my-couse-data-${year}-${sem}`
 			let myCourseClassKey = `my-couse-class-${year}-${sem}`
 
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
 
 			for (let course of this.result) {
-				delete myCourseData[course.id]
+				myCourseData = myCourseData.filter(x => x != course.id)
 			}
 			localStorage[myCourseKey] = JSON.stringify(myCourseData)
 			localStorage.removeItem(myCourseClassKey)
