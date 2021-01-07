@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "current-git-sha": "NUXT_ENV_CURRENT_GIT_SHA=`git rev-parse --short HEAD`",
     "dev": "nuxt --port 7190",
     "build": "nuxt build",
     "start": "nuxt start",

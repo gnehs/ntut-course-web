@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<vs-navbar center-collapsed v-model="active" not-line>
+	<div id="app">
+		<vs-navbar center-collapsed v-model="active" shadow fixed not-line>
 			<template #left>
 				<span style="cursor: pointer">
 					<strong @click="$router.push('/')">🍤 北科課程好朋友</strong>
@@ -32,6 +32,17 @@
 		<div class="container">
 			<Nuxt />
 		</div>
+		<footer>
+			<div class="lr-container">
+				<div class="l">
+					Developed by
+					<a href="https://gnehs.net" target="_blank">勝勝</a>
+				</div>
+				<div class="r">
+					<a :href="`https://github.com/gnehs/ntut-course-web/commit/${commitSha}`">#{{ commitSha }}</a>
+				</div>
+			</div>
+		</footer>
 	</div>
 </template>
 <script>
@@ -41,6 +52,7 @@ export default {
 		active: '/',
 		yearSemItems: null,
 		yearSemVal: '-1',
+		commitSha: process.env.NUXT_ENV_CURRENT_GIT_SHA || 'dev'
 	}),
 	created() {
 		String.prototype.trimEllip = function (length) {
@@ -138,12 +150,28 @@ export default {
 </script>
 <style lang="sass">
 body
-  background-color: #f4f7f8
-  margin: 0
-.container
-  min-height: calc(100vh - 74px)
-  padding-top: 74px
-  width: 1024px
-  max-width: 97%
-  margin: 0 auto
+	background-color: #f4f7f8
+	margin: 0
+#app
+	display: flex
+	flex-direction: column
+	min-height: 100vh
+	.container
+		flex: 1
+		padding-top: 74px
+		width: 1024px
+		max-width: 97%
+		margin: 0 auto
+	footer
+		margin: 0 auto
+		margin-top: 10px
+		text-align: center
+		font-size: .85rem
+		opacity: .7
+		padding: 12px 15px
+		width: 100%
+		background: #FFF
+
+		border-radius: 15px 15px 0px 0px
+		box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
 </style>
