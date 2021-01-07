@@ -32,7 +32,7 @@
 export default {
 	data: () => ({
 		onError: null,
-		myCourses: null,
+		myCourses: [],
 	}),
 	computed: {
 		year() {
