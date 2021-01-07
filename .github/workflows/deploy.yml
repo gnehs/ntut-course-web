@@ -23,11 +23,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
     - name: Install npm packages
-      run: npm install
-    - name: Get SHA
-      run: npm run current-git-sha 
+      run: npm install 
     - name: Generate Pages
-      run: npm run generate
+      run: npm run current-git-sha && npm run generate
     - name: fix 404
       uses: canastro/copy-file-action@master
       with:
