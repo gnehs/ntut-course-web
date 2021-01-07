@@ -45,6 +45,8 @@ export default {
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
+    // https://www.npmjs.com/package/@nuxtjs/google-gtag
+    '@nuxtjs/google-gtag',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
@@ -99,5 +101,8 @@ export default {
     },
     theme_color: '#FFF',
     nativeUI: true
+  },
+  'google-gtag': {
+    id: 'G-6V6Y6MHKGE'
   }
 }
