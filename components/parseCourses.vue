@@ -43,7 +43,7 @@
 							<card-title>無資料</card-title>
 							<p>上課時間</p>
 						</card>
-						<card v-if="crashCourseData.includes(tr.id)" class="borderless">
+						<card v-if="conflictCourseData.includes(tr.id)" class="borderless">
 							<card-title style="color:red">衝堂</card-title>
 							<p>狀態</p>
 						</card>
@@ -81,7 +81,7 @@
 						<vs-td>{{ tr.teacher.map(y => y.name).join('、').trimEllip(9)}}</vs-td>
 						<vs-td>{{ tr.class.map(x=>x.name).join('、').trimEllip(9) }}</vs-td>
 						<vs-td>
-							<span style="color:red" v-if="crashCourseData.includes(tr.id)">衝堂</span>
+							<span style="color:red" v-if="conflictCourseData.includes(tr.id)">衝堂</span>
 							<span v-else>{{ tr.notes }}</span>
 						</vs-td>
 						<template #expand>
@@ -151,7 +151,7 @@
 						>
 							<div
 								class="course"
-								:class="{crash:crashCourseData.includes(item.id)}"
+								:class="{conflict:conflictCourseData.includes(item.id)}"
 								v-for="item in $vs.getPage(courses, page, max).filter(x=>x.time[date].includes(time))"
 								:key="item.id"
 								@click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
@@ -205,7 +205,7 @@
 				display: flex
 				align-items: center
 				justify-content: center
-				&.crash
+				&.conflict
 					box-shadow: 0 0px 0px 1px rgba(255, 44, 44,.5)
 				&:hover
 					box-shadow: 0 0px 0px 2px rgba(0,0,0,.25)
@@ -239,16 +239,16 @@ export default {
 		layout: 'card',
 		max: 50,
 		page: 1,
-		crashCourseData: [],
+		conflictCourseData: [],
 		timetable: ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C'],
 		dateEng2zh: { "sun": '週日', "mon": '週一', "tue": '週二', "wed": '週三', "thu": '週四', "fri": '週五', "sat": '週六' }
 	}),
 	mounted() {
-		this.checkIsCourseCrash()
+		this.checkIsCourseConflict()
 	},
 	watch: {
 		courses(newCount, oldCount) {
-			this.checkIsCourseCrash()
+			this.checkIsCourseConflict()
 		},
 	},
 	methods: {
@@ -260,8 +260,8 @@ export default {
 			}
 			return result
 		},
-		async checkIsCourseCrash() {
-			this.crashCourseData = await this.$checkCrashedCourse(this.courses)
+		async checkIsCourseConflict() {
+			this.conflictCourseData = await this.$checkConflictedCourse(this.courses)
 		}
 	}
 }

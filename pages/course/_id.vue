@@ -22,10 +22,10 @@
 					</vs-button>
 				</div>
 			</div>
-			<vs-alert danger v-show="isCourseCrashed">
+			<vs-alert danger v-show="isCourseConflicted">
 				<template #title>課程衝堂</template>
 				本課程與
-				<span v-for="(item,i) in crashCourseData" :key="item.id">
+				<span v-for="(item,i) in conflictCourseData" :key="item.id">
 					<span v-if="i>0">、</span>
 					<a
 						style="cursor: pointer;"
@@ -136,8 +136,8 @@ export default {
 		onError: false,
 		isEarlyEight: false,
 		isInMyCourse: false,
-		isCourseCrashed: false,
-		crashCourseData: [],
+		isCourseConflicted: false,
+		conflictCourseData: [],
 		chooseClassIndex: '0',
 		chooseClassSelect: false,
 		fetchedCourseData: null,
@@ -163,7 +163,7 @@ export default {
 				let course = await this.$fetchCourse(year, sem)
 				this.courseData = course.filter(x => x.id == courseId)[0]
 				this.checkCourseInMyCourse()
-				this.checkIsCourseCrash()
+				this.checkIsCourseConflict()
 				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${year}/${sem}/course/${courseId}.json`)).data
 				if (this.fetchedCourseData.length > 1) {
 					this.chooseClassSelect = true
@@ -193,15 +193,15 @@ export default {
 		checkCourseInMyCourse() {
 			this.isInMyCourse = this.$checkIsInCourse(this.courseData.id)
 		},
-		async checkIsCourseCrash() {
+		async checkIsCourseConflict() {
 			let { year, sem } = this.$route.query
-			let crachedCourseIds = await this.$checkCrashedCourse([this.courseData])
+			let crachedCourseIds = await this.$checkConflictedCourse([this.courseData])
 			for (let course of (await this.$fetchCourse(year, sem))) {
 				if (crachedCourseIds.includes(course.id)) {
-					this.crashCourseData.push(course)
+					this.conflictCourseData.push(course)
 				}
 			}
-			this.isCourseCrashed = crachedCourseIds.length > 0
+			this.isCourseConflicted = crachedCourseIds.length > 0
 		},
 		add2myCourse() {
 			this.$addCourse(this.courseData.id)
