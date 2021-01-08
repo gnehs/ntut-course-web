@@ -155,7 +155,12 @@ export default {
 			for (let dataCourse of courses) {
 				for (let myCourse of myCourses) {
 					if (checkConflict(dataCourse, myCourse) && dataCourse.id != myCourse.id) {
-						conflictCourseIds.push(dataCourse.id)
+						if (!conflictCourseIds.includes(dataCourse.id)) {
+							conflictCourseIds.push(dataCourse.id)
+						}
+						if (!conflictCourseIds.includes(myCourse.id)) {
+							conflictCourseIds.push(myCourse.id)
+						}
 					}
 				}
 			}

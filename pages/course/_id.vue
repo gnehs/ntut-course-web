@@ -197,7 +197,7 @@ export default {
 			let { year, sem } = this.$route.query
 			let conflictCourseIds = await this.$checkConflictedCourse([this.courseData])
 			for (let course of (await this.$fetchCourse(year, sem))) {
-				if (conflictCourseIds.includes(course.id)) {
+				if (conflictCourseIds.includes(course.id) && course.id != this.courseData.id) {
 					this.conflictCourseData.push(course)
 				}
 			}
