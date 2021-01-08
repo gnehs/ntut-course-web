@@ -7,6 +7,10 @@
 				<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
 			</card>
 		</div>
+		<vs-alert v-show="onError">
+			<template #title>搜尋時發生了錯誤</template>
+			<pre>{{onError||'Error'}}</pre>
+		</vs-alert>
 		<div v-for="department in filteredDepartmentData" :key="department.name">
 			<h3>{{department.name}}</h3>
 			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
@@ -29,6 +33,7 @@ export default {
 		this.fetchData()
 	},
 	data: () => ({
+		onError: null,
 		departmentData: null,
 		filteredDepartmentData: null,
 		filterDapartmentVal: null
@@ -61,19 +66,25 @@ export default {
 			}
 		},
 		filterDapartment() {
-			let val = this.filterDapartmentVal
-			if (val != '') {
-				this.filteredDepartmentData =
-					this.departmentData
-						.filter(x => x.name.match(val) || x.class.map(x => x.name).join('').match(val))
-						.map(x => {
-							x.class = x.class.filter(y => y.name.match(val))
-							return x
-						})
-						.filter(x => x.class.length)
-			}
-			else {
-				this.filteredDepartmentData = this.departmentData
+			this.onError = null
+			try {
+				let val = this.filterDapartmentVal
+				if (val != '') {
+					this.filteredDepartmentData =
+						this.departmentData
+							.filter(x => x.name.match(val) || x.class.map(x => x.name).join('').match(val))
+							.map(x => {
+								x.class = x.class.filter(y => y.name.match(val))
+								return x
+							})
+							.filter(x => x.class.length)
+				}
+				else {
+					this.filteredDepartmentData = this.departmentData
+				}
+			} catch (e) {
+				this.onError = e
+				this.filteredDepartmentData = []
 			}
 		},
 		generateRandomColor(i, j) {
