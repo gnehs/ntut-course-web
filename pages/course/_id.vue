@@ -191,11 +191,7 @@ export default {
 			return result
 		},
 		checkCourseInMyCourse() {
-			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
-
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
-			this.isInMyCourse = Boolean(myCourseData.includes(this.courseData.id))
+			this.isInMyCourse = this.$checkIsInCourse(this.courseData.id)
 		},
 		async checkIsCourseCrash() {
 			let { year, sem } = this.$store.state
@@ -222,15 +218,7 @@ export default {
 			}
 		},
 		add2myCourse() {
-			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
-
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
-			if (!myCourseData.includes(this.courseData.id)) {
-				myCourseData.push(this.courseData.id)
-			}
-			localStorage[myCourseKey] = JSON.stringify(myCourseData)
-
+			this.$addCourse(this.courseData.id)
 			this.isInMyCourse = true
 			this.$vs.notification({
 				title: '加入完成！',
@@ -238,13 +226,7 @@ export default {
 			})
 		},
 		removeFromMyCourse() {
-			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
-
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
-			myCourseData = myCourseData.filter(x => x != this.courseData.id)
-			localStorage[myCourseKey] = JSON.stringify(myCourseData)
-
+			this.$removeCourse(this.courseData.id)
 			this.isInMyCourse = false
 			this.$vs.notification({
 				title: '已移除',

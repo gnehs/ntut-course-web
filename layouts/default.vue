@@ -127,6 +127,28 @@ export default {
 				})
 			}
 		};
+		Vue.prototype.$checkIsInCourse = (id) => {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			return Boolean(myCourseData.includes(id))
+		};
+		Vue.prototype.$addCourse = (id) => {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			if (!myCourseData.includes(id)) {
+				myCourseData.push(id)
+			}
+			localStorage[myCourseKey] = JSON.stringify(myCourseData)
+		};
+		Vue.prototype.$removeCourse = (id) => {
+			let { year, sem } = this.$store.state
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			myCourseData = myCourseData.filter(x => x != id)
+			localStorage[myCourseKey] = JSON.stringify(myCourseData)
+		};
 		this.initYearSem()
 		this.$fetchCourse()
 		this.$router.beforeEach((to, from, next) => {

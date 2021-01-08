@@ -61,9 +61,7 @@ export default {
 		},
 		addCourse2myCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
 			let myCourseClassKey = `my-couse-class-${year}-${sem}`
-
 			if (localStorage[myCourseClassKey] != this.classname && localStorage[myCourseClassKey]) {
 				let changeClass = confirm(`您先前已將「${localStorage[myCourseClassKey]}」之課程加入我的課程，此行為會導致課程過多，要繼續嗎？`)
 				if (!changeClass) {
@@ -71,15 +69,9 @@ export default {
 				}
 			}
 			localStorage[myCourseClassKey] = this.classname
-
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '{}')
 			for (let course of this.result) {
-				if (!myCourseData.includes(course.id)) {
-					myCourseData.push(course.id)
-				}
+				this.$addCourse(course.id)
 			}
-			localStorage[myCourseKey] = JSON.stringify(myCourseData)
-
 			this.isInMyCouse = true
 			this.$vs.notification({
 				title: '加入完成！',
@@ -88,17 +80,10 @@ export default {
 		},
 		removeFromMyCourse() {
 			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
-			let myCourseClassKey = `my-couse-class-${year}-${sem}`
-
-			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
-
 			for (let course of this.result) {
-				myCourseData = myCourseData.filter(x => x != course.id)
+				this.$removeCourse(course.id)
 			}
-			localStorage[myCourseKey] = JSON.stringify(myCourseData)
-			localStorage.removeItem(myCourseClassKey)
-
+			localStorage.removeItem(`my-couse-class-${year}-${sem}`)
 			this.isInMyCouse = false
 			this.$vs.notification({
 				title: '已移除',
