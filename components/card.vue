@@ -26,9 +26,9 @@
     &.hoverable
         cursor: pointer
         &:hover
-            box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05)),0 0px 0px 2px rgba(0,0,0,.25)
+            box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05)),0 0px 0px 2px rgba(var(--vs-primary), 0.15)
         &:active
-            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0)),0 0px 0px 2px rgba(0,0,0,.5)
+            box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0)),0 0px 0px 2px rgba(var(--vs-primary), 1)
             transform: translate(0, 5px)
     p
         margin: 0

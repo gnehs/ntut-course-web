@@ -194,28 +194,14 @@ export default {
 			this.isInMyCourse = this.$checkIsInCourse(this.courseData.id)
 		},
 		async checkIsCourseCrash() {
-			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
-
-			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
-			let course = await this.$fetchCourse(year, sem)
-			let myCourse = course.filter(x => courseIds.includes(x.id))
-			function checkCrash(a, b) {
-				for (let i of Object.entries(a.time)) {
-					for (let j of i[1]) {
-						if (b.time[i[0]].includes(j)) {
-							return true
-						}
-					}
-				}
-				return false
-			}
-			for (let c of myCourse) {
-				if (checkCrash(this.courseData, c) && this.courseData.id != c.id) {
-					this.isCourseCrashed = true
-					this.crashCourseData.push(c)
+			let { year, sem } = this.$route.query
+			let crachedCourseIds = await this.$checkCrashedCourse([this.courseData])
+			for (let course of (await this.$fetchCourse(year, sem))) {
+				if (crachedCourseIds.includes(course.id)) {
+					this.crashCourseData.push(course)
 				}
 			}
+			this.isCourseCrashed = crachedCourseIds.length > 0
 		},
 		add2myCourse() {
 			this.$addCourse(this.courseData.id)

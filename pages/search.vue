@@ -15,6 +15,10 @@
 					<p>教師</p>
 					<vs-input v-model="searchTeacher" @input="searchCourse" />
 				</card>
+				<card class="borderless">
+					<p>其他</p>
+					<vs-checkbox v-model="hideCrashCourses">隱藏衝堂課程</vs-checkbox>
+				</card>
 			</div>
 			<p style="font-size:0.85rem;">
 				＊關鍵字與教師欄位支援
@@ -33,26 +37,33 @@
 export default {
 	data: () => ({
 		onError: null,
-		course: null,
+		courseData: null,
 		searchVal: '',
 		searchCourseId: '',
 		searchTeacher: '',
 		searchResult: null,
+		hideCrashCourses: false
 	}),
 	created() {
-		let { q, id, teacher } = this.$route.query
+		let { q, id, teacher, hideCrash } = this.$route.query
 		this.searchVal = q || ''
 		this.searchCourseId = id || ''
 		this.searchTeacher = teacher || ''
+		this.hideCrashCourses = Boolean(hideCrash)
 		this.searchCourse()
+	},
+	watch: {
+		hideCrashCourses(newCount, oldCount) {
+			this.searchCourse()
+		},
 	},
 	methods: {
 		async fetchCourseData() {
-			if (!this.course) {
+			if (!this.courseData) {
 				let { year, sem } = this.$route.query
-				this.course = await this.$fetchCourse(year, sem)
+				this.courseData = await this.$fetchCourse(year, sem)
 			}
-			return this.course
+			return this.courseData
 		},
 		async searchCourse() {
 			try {
@@ -76,12 +87,20 @@ export default {
 				}
 				if (this.searchTeacher != '') {
 					let searchTeacher = this.searchTeacher
-
 					course = course.filter(x => x.teacher.map(y => y.name).join('').match(searchTeacher))
 					query.teacher = searchTeacher
 				} else {
 					query.teacher = ''
 					delete query.teacher
+				}
+				console.log(this.hideCrashCourses)
+				if (this.hideCrashCourses) {
+					let crashedCourse = await this.$checkCrashedCourse(course)
+					course = course.filter(x => !crashedCourse.includes(x.id))
+					query.hideCrash = true
+				} else {
+					query.hideCrash = ''
+					delete query.hideCrash
 				}
 				this.searchResult = course
 				this.$router.replace({ path: "/search", query }, () => { });

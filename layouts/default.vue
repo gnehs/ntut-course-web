@@ -133,6 +133,34 @@ export default {
 			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
 			return Boolean(myCourseData.includes(id))
 		};
+		Vue.prototype.$checkCrashedCourse = async (courses) => {
+			let { year, sem } = this.$store.state
+			// get my course
+			let myCourseKey = `my-couse-data-${year}-${sem}`
+			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
+			let myCourses = (await this.$fetchCourse(year, sem)).filter(x => myCourseData.includes(x.id))
+
+			function checkCrash(a, b) {
+				for (let i of Object.entries(a.time)) {
+					for (let j of i[1]) {
+						if (b.time[i[0]].includes(j)) {
+							return true
+						}
+					}
+				}
+				return false
+			}
+
+			let crachedCourseIds = []
+			for (let dataCourse of courses) {
+				for (let myCourse of myCourses) {
+					if (checkCrash(dataCourse, myCourse) && dataCourse.id != myCourse.id) {
+						crachedCourseIds.push(dataCourse.id)
+					}
+				}
+			}
+			return crachedCourseIds
+		};
 		Vue.prototype.$addCourse = (id) => {
 			let { year, sem } = this.$store.state
 			let myCourseKey = `my-couse-data-${year}-${sem}`

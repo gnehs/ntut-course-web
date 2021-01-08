@@ -229,7 +229,7 @@ export default {
 	components: { card },
 	name: 'parse-courses',
 	props: {
-		courses: Object,
+		courses: Array,
 		showTimetable: {
 			type: Boolean,
 			default: false
@@ -261,29 +261,7 @@ export default {
 			return result
 		},
 		async checkIsCourseCrash() {
-			let { year, sem } = this.$store.state
-			let myCourseKey = `my-couse-data-${year}-${sem}`
-
-			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
-			let course = await this.$fetchCourse(year, sem)
-			let myCourses = course.filter(x => courseIds.includes(x.id))
-			function checkCrash(a, b) {
-				for (let i of Object.entries(a.time)) {
-					for (let j of i[1]) {
-						if (b.time[i[0]].includes(j)) {
-							return true
-						}
-					}
-				}
-				return false
-			}
-			for (let dataCourse of this.courses) {
-				for (let myCourse of myCourses) {
-					if (checkCrash(dataCourse, myCourse) && dataCourse.id != myCourse.id) {
-						this.crashCourseData.push(dataCourse.id)
-					}
-				}
-			}
+			this.crashCourseData = await this.$checkCrashedCourse(this.courses)
 		}
 	}
 }
