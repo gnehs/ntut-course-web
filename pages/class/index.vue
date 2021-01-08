@@ -52,9 +52,13 @@ export default {
 	methods: {
 		async fetchData() {
 			const loading = this.$vs.loading()
-			this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${this.year}/${this.sem}/department.json`)).data
-			this.filteredDepartmentData = this.departmentData
-			loading.close()
+			try {
+				this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${this.year}/${this.sem}/department.json`)).data
+				this.filteredDepartmentData = this.departmentData
+				loading.close()
+			} catch (e) {
+				loading.close()
+			}
 		},
 		filterDapartment() {
 			let val = this.filterDapartmentVal
