@@ -195,13 +195,13 @@ export default {
 		},
 		async checkIsCourseConflict() {
 			let { year, sem } = this.$route.query
-			let crachedCourseIds = await this.$checkConflictedCourse([this.courseData])
+			let conflictCourseIds = await this.$checkConflictedCourse([this.courseData])
 			for (let course of (await this.$fetchCourse(year, sem))) {
-				if (crachedCourseIds.includes(course.id)) {
+				if (conflictCourseIds.includes(course.id)) {
 					this.conflictCourseData.push(course)
 				}
 			}
-			this.isCourseConflicted = crachedCourseIds.length > 0
+			this.isCourseConflicted = conflictCourseIds.length > 0
 		},
 		add2myCourse() {
 			this.$addCourse(this.courseData.id)

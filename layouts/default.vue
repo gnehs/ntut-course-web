@@ -151,15 +151,15 @@ export default {
 				return false
 			}
 
-			let crachedCourseIds = []
+			let conflictCourseIds = []
 			for (let dataCourse of courses) {
 				for (let myCourse of myCourses) {
 					if (checkConflict(dataCourse, myCourse) && dataCourse.id != myCourse.id) {
-						crachedCourseIds.push(dataCourse.id)
+						conflictCourseIds.push(dataCourse.id)
 					}
 				}
 			}
-			return crachedCourseIds
+			return conflictCourseIds
 		};
 		Vue.prototype.$addCourse = (id) => {
 			let { year, sem } = this.$store.state
