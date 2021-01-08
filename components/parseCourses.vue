@@ -193,24 +193,38 @@
 			padding: 2px
 			.course
 				cursor: pointer
-				text-align: center
 				width: 100%
-				background: #f4f4f4
-				padding: 4px 6px
-				border-radius: 8px
+				--main-color: 25, 91, 255
+				background: rgba(var(--main-color), 0.15)
+				color: rgb(var(--main-color))
+				padding: 12px 6px
+				padding-right: 8px
+				border-radius: 0 8px 8px 0
 				transition: all .25s ease
 				height: 100%
 				margin: 2px
-
 				display: flex
 				align-items: center
-				justify-content: center
+				position: relative
 				&.conflict
-					box-shadow: 0 0px 0px 1px rgba(255, 44, 44,.5)
+					--main-color: 255, 44, 44
+				&:before
+					content: ""
+					background: rgb(var(--main-color))
+					left: 0px
+					top: 0px
+					width: 2px
+					height: 100%
+					position: absolute
+					transition: all .1s linear
+
 				&:hover
-					box-shadow: 0 0px 0px 2px rgba(0,0,0,.25)
+					padding: 12px 8px
+					padding-right: 6px
+					&:before
+						width: 4px
 				&:active
-					box-shadow: 0 0px 0px 2px rgba(0,0,0,.5)
+					transform: scale(.9)
 	.header,.content
 		display: grid
 		grid-template-columns: 1.25em repeat(5, 1fr)
