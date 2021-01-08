@@ -17,7 +17,7 @@
 			</vs-button>
 		</div>
 		<div v-if="layout == 'card'">
-			<div class="cards">
+			<transition-group name="flip-card" tag="div" class="cards">
 				<card
 					class="hoverable padding"
 					v-for="tr in $vs.getPage(courses, page, max)"
@@ -56,7 +56,7 @@
 						備註：{{ tr.notes.trimEllip(15) }}
 					</p>
 				</card>
-			</div>
+			</transition-group>
 			<div class="center">
 				<p v-if="!courses.length">查無資料</p>
 			</div>

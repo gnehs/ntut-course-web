@@ -32,6 +32,7 @@ a
     margin: 0 -4px  
     --card-row: 3
     --card-row-sm: 2
+    position: relative
     .vs-card-content,&>.card,&>.cards
         width: calc(100% / var(--card-row) - 8px) 
         margin: 8px 4px
@@ -47,4 +48,14 @@ a
             width: 100% 
 
             
- 
+  
+.flip-card-move
+    transition: all .4s ease
+
+.flip-card-enter,
+.flip-card-leave-to
+    opacity: 0
+    transform: scale(0)
+
+.flip-card-leave-active
+    position: absolute !important 
