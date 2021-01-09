@@ -198,7 +198,7 @@
 				background: rgba(var(--main-color), 0.15)
 				color: rgb(var(--main-color))
 				padding: 12px 6px
-				padding-right: 8px
+				padding-right: 2px
 				border-radius: 0 8px 8px 0
 				transition: all .25s ease
 				height: 100%
@@ -220,7 +220,7 @@
 
 				&:hover
 					padding: 12px 8px
-					padding-right: 6px
+					padding-right: 0px
 					&:before
 						width: 4px
 				&:active
