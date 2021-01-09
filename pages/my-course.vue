@@ -2,7 +2,7 @@
 	<div>
 		<div class="lr-container">
 			<div class="l">
-				<h1>我的課程（Beta）</h1>
+				<h1>我的課程</h1>
 			</div>
 			<div class="r" style="display: flex">
 				<vs-button flat @click="exportData">

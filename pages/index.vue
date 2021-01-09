@@ -19,7 +19,7 @@
 				<p>查看班級上課時間表</p>
 			</card>
 			<card class="hoverable padding" @click.native="$router.push('/my-course')">
-				<card-title>我的課程（Beta）</card-title>
+				<card-title>我的課程</card-title>
 				<p>查看已儲存的課程</p>
 			</card>
 			<card class="hoverable padding" @click.native="$router.push('/api')">
