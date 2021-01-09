@@ -18,7 +18,7 @@
 			</div>
 		</div>
 		<p>你可以在這裡儲存一些課程供未來選課時參考用，儲存的課程會於搜尋與課程頁面自動與其他課程比對是否衝堂。</p>
-		<div class="cards" style="--card-row: 3;--card-row-sm: 3">
+		<div class="cards" style="--card-row: 3;--card-row-sm: 3" v-show="myCourses.length">
 			<card>
 				<card-title>{{myCourseCredit}}</card-title>
 				<p>學分</p>
