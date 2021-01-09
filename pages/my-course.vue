@@ -1,5 +1,9 @@
 <template>
 	<div>
+		<vs-alert v-if="myCourses.length" key="notice">
+			<template #title>提醒</template>
+			請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
+		</vs-alert>
 		<div class="lr-container">
 			<div class="l">
 				<h1>我的課程</h1>
@@ -14,10 +18,20 @@
 			</div>
 		</div>
 		<p>你可以在這裡儲存一些課程供未來選課時參考用，儲存的課程會於搜尋與課程頁面自動與其他課程比對是否衝堂。</p>
-		<vs-alert v-if="myCourses.length" key="notice">
-			<template #title>提醒</template>
-			請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
-		</vs-alert>
+		<div class="cards" style="--card-row: 3;--card-row-sm: 3">
+			<card>
+				<card-title>{{myCourseCredit}}</card-title>
+				<p>學分</p>
+			</card>
+			<card>
+				<card-title>{{myCourseHours}}</card-title>
+				<p>時數</p>
+			</card>
+			<card>
+				<card-title>{{myCourses.length}}</card-title>
+				<p>課程數</p>
+			</card>
+		</div>
 		<parse-courses :courses="myCourses" showTimetable v-if="myCourses.length" />
 		<vs-alert v-else key="noCourses">
 			<template #title>尚未儲存任何課程</template>
@@ -32,6 +46,8 @@ export default {
 	data: () => ({
 		onError: null,
 		myCourses: [],
+		myCourseCredit: 0,
+		myCourseHours: 0,
 	}),
 	head() {
 		return {
@@ -65,6 +81,8 @@ export default {
 			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
 			let course = await this.$fetchCourse(year, sem)
 			this.myCourses = course.filter(x => courseIds.includes(x.id))
+			this.myCourseCredit = this.myCourses.map(x => x.credit).map(parseFloat).reduce((a, b) => a + b)
+			this.myCourseHours = this.myCourses.map(x => x.hours).map(parseFloat).reduce((a, b) => a + b)
 		},
 		exportData() {
 			let { year, sem } = this.$store.state
