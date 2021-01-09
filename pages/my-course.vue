@@ -33,6 +33,11 @@ export default {
 		onError: null,
 		myCourses: [],
 	}),
+	head() {
+		return {
+			title: '我的課程'
+		}
+	},
 	computed: {
 		year() {
 			return this.$store.state.year
@@ -86,4 +91,4 @@ export default {
 		}
 	}
 }
-</script>
+</script> 

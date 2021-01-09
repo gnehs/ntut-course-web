@@ -149,10 +149,16 @@ export default {
 			'●': '部訂專業必修',
 			'▲': '校訂專業必修',
 			'★': '專業選修'
-		}
+		},
+		title: '課程'
 	}),
 	created() {
 		this.fetchData()
+	},
+	head() {
+		return {
+			title: this.title
+		}
 	},
 	methods: {
 		async fetchData() {
@@ -162,6 +168,7 @@ export default {
 			try {
 				let course = await this.$fetchCourse(year, sem)
 				this.courseData = course.filter(x => x.id == courseId)[0]
+				this.title = this.courseData.name.zh
 				this.checkCourseInMyCourse()
 				this.checkIsCourseConflict()
 				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${year}/${sem}/course/${courseId}.json`)).data

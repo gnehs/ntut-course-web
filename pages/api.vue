@@ -128,5 +128,13 @@ pre
   padding: 16px
   border-radius: 8px
   overflow-y: scroll
-</style>
-  
+</style> 
+<script>
+export default {
+	head() {
+		return {
+			title: 'API 手冊'
+		}
+	}
+}
+</script>

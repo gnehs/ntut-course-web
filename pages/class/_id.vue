@@ -27,9 +27,14 @@ export default {
 	data: () => ({
 		onError: null,
 		result: null,
-		classname: null,
+		classname: '班級',
 		isInMyCouse: false
 	}),
+	head() {
+		return {
+			title: this.classname
+		}
+	},
 	created() {
 		this.getCourseByClass()
 	},

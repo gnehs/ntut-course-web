@@ -44,6 +44,11 @@ export default {
 		searchResult: null,
 		hideConflictCourses: false
 	}),
+	head() {
+		return {
+			title: '搜尋'
+		}
+	},
 	created() {
 		let { q, id, teacher, hideConflict } = this.$route.query
 		this.searchVal = q || ''
@@ -111,4 +116,4 @@ export default {
 		}
 	}
 }
-</script>
+</script> 

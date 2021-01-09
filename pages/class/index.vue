@@ -38,6 +38,11 @@ export default {
 		filteredDepartmentData: null,
 		filterDapartmentVal: null
 	}),
+	head() {
+		return {
+			title: '上課時間表'
+		}
+	},
 	computed: {
 		year() {
 			return this.$store.state.year
