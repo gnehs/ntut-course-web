@@ -133,7 +133,7 @@ export default {
 			let myCourseData = JSON.parse(localStorage[myCourseKey] || '[]')
 			return Boolean(myCourseData.includes(id))
 		};
-		Vue.prototype.$checkConflictedCourse = async (courses) => {
+		Vue.prototype.$checkConflictedCourse = async (courses, pushMyCourse = false) => {
 			let { year, sem } = this.$store.state
 			// get my course
 			let myCourseKey = `my-couse-data-${year}-${sem}`
@@ -155,11 +155,9 @@ export default {
 			for (let dataCourse of courses) {
 				for (let myCourse of myCourses) {
 					if (checkConflict(dataCourse, myCourse) && dataCourse.id != myCourse.id) {
-						if (!conflictCourseIds.includes(dataCourse.id)) {
-							conflictCourseIds.push(dataCourse.id)
-						}
-						if (!conflictCourseIds.includes(myCourse.id)) {
-							conflictCourseIds.push(myCourse.id)
+						let pushId = pushMyCourse ? myCourse.id : dataCourse.id
+						if (!conflictCourseIds.includes(pushId)) {
+							conflictCourseIds.push(pushId)
 						}
 					}
 				}
