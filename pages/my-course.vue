@@ -4,6 +4,11 @@
 			<template #title>提醒</template>
 			請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
 		</vs-alert>
+		<vs-alert v-if="!myCourses.length" key="noCourses">
+			<template #title>尚未儲存任何課程</template>
+			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
+			<br />如果沒看到先前加入的，請嘗試在右上角的下拉選單切換學期。
+		</vs-alert>
 		<div class="lr-container">
 			<div class="l">
 				<h1>我的課程</h1>
@@ -17,7 +22,7 @@
 				</vs-button>
 			</div>
 		</div>
-		<p>你可以在這裡儲存一些課程供未來選課時參考用，儲存的課程會於搜尋與課程頁面自動與其他課程比對是否衝堂。</p>
+		<p style="margin-top: -1em;">你可以在這裡儲存一些課程供未來選課時參考用，且在此處的課程會自動與其他課程比對是否衝堂。</p>
 		<div class="cards" style="--card-row: 3;--card-row-sm: 3" v-show="myCourses.length">
 			<card>
 				<card-title>{{myCourseCredit}}</card-title>
@@ -33,11 +38,6 @@
 			</card>
 		</div>
 		<parse-courses :courses="myCourses" showTimetable v-if="myCourses.length" />
-		<vs-alert v-else key="noCourses">
-			<template #title>尚未儲存任何課程</template>
-			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
-			<br />如果沒看到先前加入的，請嘗試在右上角的下拉選單切換學期。
-		</vs-alert>
 	</div>
 </template>
   
