@@ -15,6 +15,7 @@
     transition: all .25s ease
     position: relative
     padding: 6px 8px
+    overflow: hidden
     &:not(.hoverable)
         box-shadow: 0 0px 0px 1px rgba(0,0,0,.05)
     &.borderless
@@ -25,8 +26,14 @@
         padding: 12px 16px
     &.hoverable
         cursor: pointer
+
+        &>i
+            transform: translateY(20%)
         &:hover
             box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05)),0 0px 0px 2px rgba(var(--vs-primary), 0.15)
+            &>i
+                opacity: .4
+                transform: none
         &:active
             box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0)),0 0px 0px 2px rgba(var(--vs-primary), 1)
             transform: translate(0, 5px)
@@ -36,4 +43,13 @@
         font-size: 0.85rem
         &+p
             margin-top: 8px
+    &>i
+        position: absolute
+        bottom: 0
+        right: .1em
+        font-size: 48px
+        opacity: .2
+        transition: all .25s ease
+        margin: auto
+        transform-origin: bottom right
 </style>

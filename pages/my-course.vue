@@ -27,14 +27,17 @@
 			<card>
 				<card-title>{{myCourseCredit}}</card-title>
 				<p>學分</p>
+				<i class="bx bx-book"></i>
 			</card>
 			<card>
 				<card-title>{{myCourseHours}}</card-title>
 				<p>時數</p>
+				<i class="bx bx-time"></i>
 			</card>
 			<card>
 				<card-title>{{myCourses.length}}</card-title>
 				<p>課程數</p>
+				<i class="bx bx-category-alt"></i>
 			</card>
 		</div>
 		<parse-courses :courses="myCourses" showTimetable v-if="myCourses.length" />
