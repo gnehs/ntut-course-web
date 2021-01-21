@@ -18,7 +18,7 @@
 					v-for="{name} in department.class"
 					:key="name"
 					class="hoverable padding"
-					@click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}`)"
+					@click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}&d=${$store.state.department}`)"
 				>
 					<card-title>{{name}}</card-title>
 					<p>{{department.name}}</p>

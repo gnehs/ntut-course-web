@@ -7,7 +7,7 @@
 		<vs-alert v-if="!myCourses.length" key="noCourses">
 			<template #title>尚未儲存任何課程</template>
 			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
-			<br />如果沒看到先前加入的，請嘗試在右上角的下拉選單切換學期。
+			<br />如果沒看到先前加入的，請嘗試於右上按鈕切換資料集。
 		</vs-alert>
 		<div class="lr-container">
 			<div class="l">
@@ -63,6 +63,9 @@ export default {
 		},
 		sem() {
 			return this.$store.state.sem
+		},
+		department() {
+			return this.$store.state.department
 		}
 	},
 	watch: {
@@ -71,6 +74,9 @@ export default {
 		},
 		sem(newCount, oldCount) {
 			this.getMyCourse()
+		},
+		department(newCount, oldCount) {
+			this.getMyCourse()
 		}
 	},
 	created() {
@@ -78,11 +84,13 @@ export default {
 	},
 	methods: {
 		async getMyCourse() {
-			let { year, sem } = this.$store.state
+			let { year, sem, department } = this.$store.state
 			let myCourseKey = `my-couse-data-${year}-${sem}`
-
+			if (department != 'main') {
+				myCourseKey += `-${department}`
+			}
 			let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
-			let course = await this.$fetchCourse(year, sem)
+			let course = await this.$fetchCourse(year, sem, department)
 			this.myCourses = course.filter(x => courseIds.includes(x.id))
 			this.myCourseCredit = this.myCourses.map(x => x.credit).map(parseFloat).reduce((a, b) => a + b)
 			this.myCourseHours = this.myCourses.map(x => x.hours).map(parseFloat).reduce((a, b) => a + b)

@@ -13,27 +13,16 @@
 				id="search"
 			>搜尋</vs-navbar-item>
 			<template #right>
-				<vs-select
-					v-model="yearSemVal"
-					@change="yearSemSelected"
+				<vs-button
+					@click="datasetDialog=true"
 					:disabled="Boolean($route.query.year)"
-					v-if="yearSemItems"
-					class="year-sem-select"
-				>
-					<vs-option label="選擇學期" value="no" disabled>選擇學期</vs-option>
-					<vs-option
-						v-for="(item,i) in yearSemItems"
-						:label="parseYearSemVal(item)"
-						:value="item"
-						:key="i"
-					>{{parseYearSemVal(item)}}</vs-option>
-				</vs-select>
+				>{{parseYearSemVal(yearSemVal)}}</vs-button>
 			</template>
 		</vs-navbar>
 		<div class="container">
 			<Nuxt />
 		</div>
-		<footer>
+		<footer id="footer">
 			<div class="lr-container">
 				<div class="l">
 					Developed by
@@ -52,6 +41,32 @@
 				</div>
 			</div>
 		</footer>
+		<vs-dialog v-model="datasetDialog">
+			<template #header>
+				<h4>選擇資料集</h4>
+			</template>
+			<div class="datasetDialog-form">
+				<vs-select v-model="yearSemVal" @change="datasetSelected" v-if="yearSemItems" label="學期">
+					<vs-option label="選擇學期" value="no" disabled>選擇學期</vs-option>
+					<vs-option
+						v-for="(item,i) in yearSemItems"
+						:label="parseYearSemVal(item)"
+						:value="item"
+						:key="i"
+					>{{parseYearSemVal(item)}}</vs-option>
+				</vs-select>
+				<br />
+				<vs-select v-model="departmentVal" @change="datasetSelected" label="學制">
+					<vs-option label="選擇學制" value="no" disabled>選擇學制</vs-option>
+					<vs-option v-for="(item,i) in departmentItems" :label="item" :value="i" :key="i">{{item}}</vs-option>
+				</vs-select>
+			</div>
+			<template #footer>
+				<div class="datasetDialog-footer">
+					<vs-button block @click="datasetDialog=false">完成</vs-button>
+				</div>
+			</template>
+		</vs-dialog>
 	</div>
 </template>
 <script>
@@ -61,17 +76,26 @@ export default {
 		active: '/',
 		yearSemItems: null,
 		yearSemVal: '-1',
+		departmentItems: ['日間部', '日間部五專', '日間部四技', '日間部研究所(碩、博)', '進修部', '進修部二技', '學士後學位學程', '進修部四技', '進修部碩士在職專班', 'ＥＭＢＡ', '週末碩士班', '研究所(日間部、進修部、週末碩士班)', '進修學院(二技)', '二技(日間部、進修部暨進修學院)', '四技(日間部、進修部)', '學程'],
+		departmentVal: 2,
+		datasetDialog: false
 	}),
+	mounted() {
+		if (localStorage['data-department'] != 'main') {
+			this.departmentVal = this.departmentItems.indexOf(localStorage['data-department'])
+		}
+	},
 	created() {
 		String.prototype.trimEllip = function (length) {
 			return this.length > length ? this.substring(0, length) + "..." : this;
 		}
-		Vue.prototype.$fetchCourse = async (y, s) => {
+		Vue.prototype.$fetchCourse = async (y, s, department) => {
 			//replace yr & sem if query seleted
-			let { year, sem } = this.$route.query
-			if (year && sem) {
+			let { year, sem, d } = this.$route.query
+			if (year && sem && d) {
 				y = year
 				s = sem
+				department = d
 			}
 			if (!y || !s) {
 				let yearData = await this.$fetchYearData()
@@ -86,18 +110,23 @@ export default {
 					s = yearData[y][0]
 				}
 			}
+			if (!department) {
+				department = localStorage['data-department'] || 'main'
+				this.departmentVal = this.departmentItems.indexOf(department)
+			}
 			this.yearSemVal = `${y}-${s}`
-			let dataKey = `course_${y}_${s}`
+			let dataKey = `course_${y}_${s}_${department}`
 
 			let loading
 			try {
 				if (!window[dataKey]) {
 					loading = this.$vs.loading()
-					window[dataKey] = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/main.json`)).data
+					window[dataKey] = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/${department}.json`)).data
 					loading.close()
 				}
 				this.$store.commit('updateYear', y)
 				this.$store.commit('updateSem', s)
+				this.$store.commit('updateDepartment', department)
 				return window[dataKey]
 			} catch (e) {
 				this.$vs.notification({
@@ -109,6 +138,7 @@ export default {
 
 				this.$store.commit('updateYear', '109')
 				this.$store.commit('updateSem', '2')
+				this.$store.commit('updateDepartment', 'main')
 			}
 		};
 		Vue.prototype.$fetchYearData = async () => {
@@ -202,10 +232,15 @@ export default {
 			let s = v.split('-')
 			return `${s[0]} 年${s[1] == '1' ? '上' : '下'}學期`
 		},
-		yearSemSelected() {
+		datasetSelected() {
 			let s = this.yearSemVal.split('-')
-			this.$fetchCourse(s[0], s[1])
-		}
+			let department = this.departmentItems[this.departmentVal]
+			if (this.departmentVal == 2) {
+				department = 'main'
+			}
+
+			this.$fetchCourse(s[0], s[1], department)
+		},
 	}
 }
 </script>
@@ -223,7 +258,7 @@ body
 		width: 1024px
 		max-width: 97%
 		margin: 0 auto
-	footer
+	#footer
 		margin: 0 auto
 		margin-top: 10px
 		text-align: center
@@ -235,6 +270,7 @@ body
 
 		border-radius: 15px 15px 0px 0px
 		box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
-.year-sem-select
-	max-width: 130px
+.datasetDialog-form
+	.vs-select-content
+		max-width: 100%
 </style>

@@ -43,17 +43,24 @@
 }</pre>
 		<h2>
 			GET
-			<code>/{年份}/{學期}/main.json</code>
+			<code>/{年份}/{學期}/{學制}.json</code>
 		</h2>
 		<p>
-			取得該學期課程資料
+			取得該學期某一學制課程資料
+			<br />你可以在此處查看所有可用之學制：
+			<a
+				href="https://github.com/gnehs/ntut-course-crawler/tree/gh-pages/109/2"
+				target="_blank"
+			>https://github.com/gnehs/ntut-course-crawler/tree/gh-pages/109/2</a>
+			<br />＊日間部四技被重新命名為 main.json
 			<br />
 			<br />Example:
 			<a
 				href="https://gnehs.github.io/ntut-course-crawler/109/2/main.json"
 				target="_blank"
 			>https://gnehs.github.io/ntut-course-crawler/109/2/main.json</a>
-			<br />＊請注意：該檔案非常大，可能有機會無法解析
+			<br />
+＊請注意：該檔案非常大，可能有機會無法解析
 		</p>
 		<pre>
 [
