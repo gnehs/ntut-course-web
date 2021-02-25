@@ -113,6 +113,7 @@ export default {
 			if (!department) {
 				department = localStorage['data-department'] || 'main'
 				this.departmentVal = this.departmentItems.indexOf(department)
+				if (this.departmentVal == -1) this.departmentVal = 0
 			}
 			this.yearSemVal = `${y}-${s}`
 			let dataKey = `course_${y}_${s}_${department}`
