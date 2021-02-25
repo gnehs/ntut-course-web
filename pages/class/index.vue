@@ -63,7 +63,7 @@ export default {
 		async fetchData() {
 			const loading = this.$vs.loading()
 			try {
-				this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${this.year}/${this.sem}/department.json`)).data
+				this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${this.year}/${this.sem}/department.json`)).data
 				this.filteredDepartmentData = this.departmentData
 				loading.close()
 			} catch (e) {
@@ -77,7 +77,7 @@ export default {
 				if (val != '') {
 					this.filteredDepartmentData =
 						this.departmentData
-							.filter(x => x.name.match(val) || x.class.map(x => x.name).join('').match(val))
+							.filter(x => x.name.match(val) || x.class.map(a => a.name).join('').match(val))
 							.map(x => {
 								x.class = x.class.filter(y => y.name.match(val))
 								return x

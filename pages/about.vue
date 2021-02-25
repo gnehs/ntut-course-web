@@ -27,9 +27,9 @@
 			>https://github.com/gnehs/ntut-course-web</a>
 			<br />爬蟲：
 			<a
-				href="https://github.com/gnehs/ntut-course-crawler"
+				href="https://github.com/gnehs/ntut-course-crawler-node"
 				target="_blank"
-			>https://github.com/gnehs/ntut-course-crawler</a>
+			>https://github.com/gnehs/ntut-course-crawler-node</a>
 		</p>
 	</div>
 </template>

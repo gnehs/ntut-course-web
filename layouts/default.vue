@@ -76,8 +76,8 @@ export default {
 		active: '/',
 		yearSemItems: null,
 		yearSemVal: '-1',
-		departmentItems: ['日間部', '日間部五專', '日間部四技', '日間部研究所(碩、博)', '進修部', '進修部二技', '學士後學位學程', '進修部四技', '進修部碩士在職專班', 'ＥＭＢＡ', '週末碩士班', '研究所(日間部、進修部、週末碩士班)', '進修學院(二技)', '二技(日間部、進修部暨進修學院)', '四技(日間部、進修部)', '學程'],
-		departmentVal: 2,
+		departmentItems: ['日間部', '進修部', '研究所(日間部、進修部、週末碩士班)',],
+		departmentVal: 0,
 		datasetDialog: false
 	}),
 	mounted() {
@@ -121,7 +121,7 @@ export default {
 			try {
 				if (!window[dataKey]) {
 					loading = this.$vs.loading()
-					window[dataKey] = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${y}/${s}/${department}.json`)).data
+					window[dataKey] = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`)).data
 					loading.close()
 				}
 				this.$store.commit('updateYear', y)
@@ -145,7 +145,7 @@ export default {
 			let key = `main_year`
 			try {
 				if (!localStorage[key]) {
-					let res = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/main.json`)).data
+					let res = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/main.json`)).data
 					localStorage[key] = JSON.stringify(res)
 				}
 				return JSON.parse(localStorage[key])
@@ -235,7 +235,7 @@ export default {
 		datasetSelected() {
 			let s = this.yearSemVal.split('-')
 			let department = this.departmentItems[this.departmentVal]
-			if (this.departmentVal == 2) {
+			if (this.departmentVal == 0) {
 				department = 'main'
 			}
 

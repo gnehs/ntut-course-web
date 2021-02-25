@@ -171,7 +171,7 @@ export default {
 				this.title = this.courseData.name.zh
 				this.checkCourseInMyCourse()
 				this.checkIsCourseConflict()
-				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler/${year}/${sem}/course/${courseId}.json`)).data
+				this.fetchedCourseData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/course/${courseId}.json`)).data
 				if (this.fetchedCourseData.length > 1) {
 					this.chooseClassSelect = true
 				}
@@ -183,7 +183,7 @@ export default {
 		},
 		parseTextarea(t) {
 			t = t.replace(/\t/g, '　　')
-			t = t.replace(/\r\n/g, '<br/>')
+			t = t.replace(/\n/g, '<br/>')
 			return t
 		},
 		parseTime(t) {

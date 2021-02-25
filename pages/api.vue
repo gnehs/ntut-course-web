@@ -8,13 +8,13 @@
 				target="_blank"
 			>JSON Formatter</a> 來檢視 JSON 檔案
 		</p>
-		<p>API Endpoint: https://gnehs.github.io/ntut-course-crawler/{API}</p>
+		<p>API Endpoint: https://gnehs.github.io/ntut-course-crawler-node/{API}</p>
 		<p>
 			source code:
 			<a
-				href="https://github.com/gnehs/ntut-course-crawler"
+				href="https://github.com/gnehs/ntut-course-crawler-node"
 				target="_blank"
-			>https://github.com/gnehs/ntut-course-crawler</a>
+			>https://github.com/gnehs/ntut-course-crawler-node</a>
 		</p>
 		<h2>
 			GET
@@ -25,9 +25,9 @@
 			<br />
 			<br />Example:
 			<a
-				href="https://gnehs.github.io/ntut-course-crawler/main.json"
+				href="https://gnehs.github.io/ntut-course-crawler-node/main.json"
 				target="_blank"
-			>https://gnehs.github.io/ntut-course-crawler/main.json</a>
+			>https://gnehs.github.io/ntut-course-crawler-node/main.json</a>
 		</p>
 		<pre>
 {
@@ -49,18 +49,17 @@
 			取得該學期某一學制課程資料
 			<br />你可以在此處查看所有可用之學制：
 			<a
-				href="https://github.com/gnehs/ntut-course-crawler/tree/gh-pages/109/2"
+				href="https://github.com/gnehs/ntut-course-crawler-node/tree/gh-pages/109/2"
 				target="_blank"
-			>https://github.com/gnehs/ntut-course-crawler/tree/gh-pages/109/2</a>
+			>https://github.com/gnehs/ntut-course-crawler-node/tree/gh-pages/109/2</a>
 			<br />＊日間部四技被重新命名為 main.json
 			<br />
 			<br />Example:
 			<a
-				href="https://gnehs.github.io/ntut-course-crawler/109/2/main.json"
+				href="https://gnehs.github.io/ntut-course-crawler-node/109/2/main.json"
 				target="_blank"
-			>https://gnehs.github.io/ntut-course-crawler/109/2/main.json</a>
-			<br />
-＊請注意：該檔案非常大，可能有機會無法解析
+			>https://gnehs.github.io/ntut-course-crawler-node/109/2/main.json</a>
+			<br />＊請注意：該檔案非常大，可能有機會無法解析
 		</p>
 		<pre>
 [
@@ -112,9 +111,9 @@
 			<br />
 			<br />Example:
 			<a
-				href="https://gnehs.github.io/ntut-course-crawler/109/2/course/281841.json"
+				href="https://gnehs.github.io/ntut-course-crawler-node/109/2/course/281841.json"
 				target="_blank"
-			>https://gnehs.github.io/ntut-course-crawler/109/2/course/281841.json</a>
+			>https://gnehs.github.io/ntut-course-crawler-node/109/2/course/281841.json</a>
 		</p>
 		<pre>[
   {

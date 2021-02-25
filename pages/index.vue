@@ -9,7 +9,7 @@
 			</template>
 			<template
 				#page-2
-			>你可以點選右上方的學期按鈕來切換檢視的學制與學期，目前顯示的資料為 {{`${$store.state.year} 年${$store.state.sem == '1' ? '上' : '下'}學期`}}，{{$store.state.department=='main'?'日間部四技':$store.state.department}}。</template>
+			>你可以點選右上方的學期按鈕來切換檢視的學制與學期，目前顯示的資料為 {{`${$store.state.year} 年${$store.state.sem == '1' ? '上' : '下'}學期`}}，{{$store.state.department=='main'?'日間部':$store.state.department}}。</template>
 		</vs-alert>
 		<br />
 		<div class="cards">
