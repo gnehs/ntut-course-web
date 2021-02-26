@@ -52,7 +52,7 @@
 				href="https://github.com/gnehs/ntut-course-crawler-node/tree/gh-pages/109/2"
 				target="_blank"
 			>https://github.com/gnehs/ntut-course-crawler-node/tree/gh-pages/109/2</a>
-			<br />＊日間部四技被重新命名為 main.json
+			<br />＊日間部被重新命名為 main.json
 			<br />
 			<br />Example:
 			<a
