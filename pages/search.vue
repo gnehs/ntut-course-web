@@ -17,7 +17,7 @@
 				</card>
 				<card class="borderless">
 					<p>其他</p>
-					<vs-checkbox v-model="hideConflictCourses">隱藏衝堂課程</vs-checkbox>
+					<vs-checkbox v-model="showConflictCourse">顯示衝堂課程</vs-checkbox>
 				</card>
 			</div>
 			<p style="font-size:0.85rem;">
@@ -29,7 +29,7 @@
 			<template #title>搜尋時發生了錯誤</template>
 			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
-		<parse-courses :courses="searchResult" />
+		<parse-courses :courses="searchResult" :show-conflict-course="showConflictCourse" />
 	</div>
 </template>
   
@@ -42,7 +42,7 @@ export default {
 		searchCourseId: '',
 		searchTeacher: '',
 		searchResult: null,
-		hideConflictCourses: false
+		showConflictCourse: true
 	}),
 	head() {
 		return {
@@ -50,15 +50,15 @@ export default {
 		}
 	},
 	created() {
-		let { q, id, teacher, hideConflict } = this.$route.query
+		let { q, id, teacher, showConflictCourse } = this.$route.query
 		this.searchVal = q || ''
 		this.searchCourseId = id || ''
 		this.searchTeacher = teacher || ''
-		this.hideConflictCourses = Boolean(hideConflict)
+		this.showConflictCourse = Boolean(showConflictCourse)
 		this.searchCourse()
 	},
 	watch: {
-		hideConflictCourses(newCount, oldCount) {
+		showConflictCourse(newCount, oldCount) {
 			this.searchCourse()
 		},
 	},
@@ -98,14 +98,11 @@ export default {
 					query.teacher = ''
 					delete query.teacher
 				}
-				console.log(this.hideConflictCourses)
-				if (this.hideConflictCourses) {
-					let conflictedCourse = await this.$checkConflictedCourse(course)
-					course = course.filter(x => !conflictedCourse.includes(x.id))
-					query.hideConflict = true
+				if (!this.showConflictCourse) {
+					query.showConflictCourse = ''
+					delete query.showConflictCourse
 				} else {
-					query.hideConflict = ''
-					delete query.hideConflict
+					query.showConflictCourse = true
 				}
 				this.searchResult = course
 				this.$router.replace({ path: "/search", query }, () => { });

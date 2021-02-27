@@ -20,7 +20,7 @@
 			<transition-group name="flip-card" tag="div" class="cards">
 				<card
 					class="hoverable padding"
-					v-for="tr in $vs.getPage(courses, page, max)"
+					v-for="tr in $vs.getPage(showConflictCourse?courses:courses.filter(x=>!conflictCourseData.includes(x.id)), page, max)"
 					:key="tr.id"
 					@click.native="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
 				>
@@ -61,7 +61,10 @@
 				<p v-if="!courses.length">查無資料</p>
 			</div>
 			<br />
-			<vs-pagination v-model="page" :length="$vs.getLength(courses, max)" />
+			<vs-pagination
+				v-model="page"
+				:length="$vs.getLength(showConflictCourse?courses:courses.filter(x=>!conflictCourseData.includes(x.id)), max)"
+			/>
 		</div>
 		<card style="padding:0" v-if="layout == 'table'">
 			<vs-table striped>
@@ -75,7 +78,11 @@
 					</vs-tr>
 				</template>
 				<template #tbody>
-					<vs-tr :key="tr.id" v-for="tr in $vs.getPage(courses, page, max)" :data="tr">
+					<vs-tr
+						:key="tr.id"
+						v-for="tr in $vs.getPage(showConflictCourse?courses:courses.filter(x=>!conflictCourseData.includes(x.id)), page, max)"
+						:data="tr"
+					>
 						<vs-td>{{ tr.id }}</vs-td>
 						<vs-td>{{ tr.courseType }}{{ tr.name.zh }}</vs-td>
 						<vs-td>{{ tr.teacher.map(y => y.name).join('、').trimEllip(9)}}</vs-td>
@@ -126,10 +133,15 @@
 					</vs-tr>
 				</template>
 				<template #footer>
-					<vs-pagination v-model="page" :length="$vs.getLength(courses, max)" />
+					<vs-pagination
+						v-model="page"
+						:length="$vs.getLength(showConflictCourse?courses:courses.filter(x=>!conflictCourseData.includes(x.id)), max)"
+					/>
 				</template>
 				<template #notFound>
-					<p v-if="!courses.length">查無資料</p>
+					<p
+						v-if="!(showConflictCourse?courses:courses.filter(x=>!conflictCourseData.includes(x.id))).length"
+					>查無資料</p>
 				</template>
 			</vs-table>
 		</card>
@@ -152,7 +164,7 @@
 							<div
 								class="course"
 								:class="{conflict:conflictCourseData.includes(item.id)}"
-								v-for="item in $vs.getPage(courses, page, max).filter(x=>x.time[date].includes(time))"
+								v-for="item in $vs.getPage(showConflictCourse?courses:courses.filter(x=>!conflictCourseData.includes(x.id)), page, max).filter(x=>x.time[date].includes(time))"
 								:key="item.id"
 								@click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
 							>{{item.name.zh}}</div>
@@ -247,6 +259,10 @@ export default {
 		showTimetable: {
 			type: Boolean,
 			default: false
+		},
+		showConflictCourse: {
+			type: Boolean,
+			default: true
 		}
 	},
 	data: () => ({

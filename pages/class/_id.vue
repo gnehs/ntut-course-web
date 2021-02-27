@@ -5,6 +5,14 @@
 				<h1>{{classname}}</h1>
 			</div>
 			<div class="r">
+				<vs-button
+					transparent
+					:active="showConflictCourse"
+					@click="showConflictCourse = !showConflictCourse"
+				>
+					<i class="bx bx-check" v-if="showConflictCourse"></i>
+					<i class="bx bx-x" v-else></i>衝堂課程
+				</vs-button>
 				<vs-button flat @click="addCourse2myCourse" v-if="!isInMyCouse">
 					<i class="bx bx-plus"></i>加入我的課程
 				</vs-button>
@@ -18,7 +26,7 @@
 			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
 
-		<parse-courses :courses="result" showTimetable />
+		<parse-courses :courses="result" show-timetable :show-conflict-course="showConflictCourse" />
 	</div>
 </template>
   
@@ -28,7 +36,8 @@ export default {
 		onError: null,
 		result: null,
 		classname: '班級',
-		isInMyCouse: false
+		isInMyCouse: false,
+		showConflictCourse: true
 	}),
 	head() {
 		return {
