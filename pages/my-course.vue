@@ -9,11 +9,11 @@
 			你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
 			<br />如果沒看到先前加入的，請嘗試於右上按鈕切換資料集。
 		</vs-alert>
-		<div class="lr-container">
+		<div class="lr-container nowrap">
 			<div class="l">
 				<h1>我的課程</h1>
 			</div>
-			<div class="r" style="display: flex">
+			<div class="r">
 				<vs-button flat @click="exportData">
 					<i class="bx bxs-file-export"></i>匯出
 				</vs-button>
