@@ -41,10 +41,6 @@
 						<p>課號</p>
 					</card>
 					<card>
-						<card-title>{{courseData.peopleWithdraw}}</card-title>
-						<p>撤選</p>
-					</card>
-					<card>
 						<card-title>{{courseData.people}}</card-title>
 						<p>人數</p>
 					</card>

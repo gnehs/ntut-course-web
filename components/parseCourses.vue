@@ -180,75 +180,7 @@
 		<br />
 		<br />
 	</div>
-</template>
-<style lang="sass" scoped>
-.center
-	display: flex
-	align-items: center
-	justify-content: center
-	padding: 20px
-	flex-wrap: wrap
-.timetable
-	font-size: .85em
-	.header
-		top: 0
-		position: sticky
-		.item
-			padding: 10px 12px
-			background: #f2f2f2
-			text-align: center
-	.content
-		&:nth-child(2n)
-			background: rgba(var(--vs-gray-1), 1)
-		.item
-			display: flex
-			padding: 2px
-			.course
-				cursor: pointer
-				width: 100%
-				--main-color: 25, 91, 255
-				background: rgba(var(--main-color), 0.15)
-				color: rgb(var(--main-color))
-				padding: 12px 6px
-				padding-right: 2px
-				border-radius: 0 8px 8px 0
-				transition: all .25s ease
-				height: 100%
-				margin: 2px
-				display: flex
-				align-items: center
-				position: relative
-				&.conflict
-					--main-color: 255, 44, 44
-				&:before
-					content: ""
-					background: rgb(var(--main-color))
-					left: 0px
-					top: 0px
-					width: 2px
-					height: 100%
-					position: absolute
-					transition: all .1s linear
-
-				&:hover
-					padding: 12px 8px
-					padding-right: 0px
-					&:before
-						width: 4px
-				&:active
-					transform: scale(.9)
-	.header,.content
-		display: grid
-		grid-template-columns: 1.25em repeat(5, 1fr)
-		.item
-			min-height: 40px
-			&:first-child
-				background: #f2f2f2
-				font-size: 1.15em
-				display: flex
-				align-items: center
-				justify-content: center
-</style>
+</template> 
 <script>
 import card from './card.vue'
 export default {

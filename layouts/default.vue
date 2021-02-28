@@ -23,7 +23,7 @@
 			<Nuxt />
 		</div>
 		<footer id="footer">
-			<div class="lr-container">
+			<div class="lr-container nowrap">
 				<div class="l">
 					Developed by
 					<a href="https://gnehs.net" target="_blank" style="margin-left: .2em">勝勝</a>
