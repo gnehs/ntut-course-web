@@ -26,7 +26,19 @@
 			<pre>{{onError||'Error'}}</pre>
 		</vs-alert>
 
-		<parse-courses :courses="result" show-timetable :show-conflict-course="showConflictCourse" />
+		<parse-courses
+			v-show="result&&result.length"
+			:courses="result"
+			show-timetable
+			:show-conflict-course="showConflictCourse"
+		/>
+		<vs-alert v-if="result&&!result.length&&classData">
+			<template #title>查無資料</template>
+			資料抓取時似乎沒有抓到這邊的資料（？
+			<br />也許你可以試試看
+			<a :href="'https://aps.ntut.edu.tw/course/tw/'+classData.href" target="_blank">前往原始網頁</a>
+			看看原本的資料
+		</vs-alert>
 	</div>
 </template>
   
@@ -35,6 +47,7 @@ export default {
 	data: () => ({
 		onError: null,
 		result: null,
+		classData: null,
 		classname: '班級',
 		isInMyCouse: false,
 		showConflictCourse: true
@@ -51,9 +64,19 @@ export default {
 		async getCourseByClass() {
 			const loading = this.$vs.loading()
 			try {
+				let { year, sem } = this.$store.state;
 				this.classname = this.$route.params.id
+				//fetch class
+				let departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`)).data
+				departmentData.map(x => {
+					x.class.map(y => {
+						if (y.name == this.classname) {
+							this.classData = y
+						}
+					})
+				})
+				// fetch course
 				let classname = this.classname
-				let { year, sem } = this.$route.query
 				let course = await this.$fetchCourse(year, sem)
 				function detectClass(c) {
 					let d = c.map(x => x.name)
