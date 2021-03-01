@@ -85,7 +85,7 @@ export default {
 			this.departmentVal = this.departmentItems.indexOf(localStorage['data-department'])
 		}
 	},
-	created() {
+	async created() {
 		String.prototype.trimEllip = function (length) {
 			return this.length > length ? this.substring(0, length) + "..." : this;
 		}
@@ -104,7 +104,7 @@ export default {
 					y = localStorage['data-year']
 					s = localStorage['data-sem']
 				}
-				if (!yearData[y] || !yearData[y].includes(s)) {
+				else if (!yearData[y] || !yearData[y].includes(s)) {
 					let yrs = Object.keys(yearData)
 					y = yrs[yrs.length - 1]
 					s = yearData[y][0]
@@ -211,8 +211,8 @@ export default {
 			myCourseData = myCourseData.filter(x => x != id)
 			localStorage[myCourseKey] = JSON.stringify(myCourseData)
 		};
-		this.initYearSem()
-		this.$fetchCourse()
+		await this.initYearSem()
+		await this.$fetchCourse()
 		this.$router.beforeEach((to, from, next) => {
 			this.active = to.path
 			next();
@@ -228,6 +228,7 @@ export default {
 				}
 			}
 			this.yearSemItems = res
+			this.departmentVal = res[0]
 		},
 		parseYearSemVal(v) {
 			let s = v.split('-')
