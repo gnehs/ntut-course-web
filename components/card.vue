@@ -16,6 +16,8 @@
     position: relative
     padding: 6px 8px
     overflow: hidden
+    &[disabled]
+        pointer-events: none
     &:not(.hoverable)
         box-shadow: 0 0px 0px 1px rgba(0,0,0,.05)
     &.borderless

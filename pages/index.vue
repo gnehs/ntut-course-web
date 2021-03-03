@@ -26,6 +26,11 @@
 				<p>查看各班上課時間表</p>
 				<i class="bx bx-time"></i>
 			</card>
+			<card class="hoverable padding" @click.native="$router.push('/standard')">
+				<card-title>課程標準</card-title>
+				<p>查看各系所畢業學分等資訊</p>
+				<i class="bx bxs-graduation"></i>
+			</card>
 			<card class="hoverable padding" @click.native="$router.push('/my-course')">
 				<card-title>我的課程</card-title>
 				<p>查看已儲存的課程</p>
