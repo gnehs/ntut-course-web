@@ -90,7 +90,7 @@ export default {
 	async created() {
 		this.fetchYearsData()
 		if (this.year) {
-			await this.fetchYearData()
+			await this.fetchYearData(this.year)
 		}
 	},
 	data: () => ({
