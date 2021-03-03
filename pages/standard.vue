@@ -33,12 +33,7 @@
 		<template v-if="!year">
 			<h3>選擇入學年度</h3>
 			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
-				<card
-					v-for="item of years"
-					:key="item"
-					class="hoverable padding"
-					@click.native="year=item;fetchYearData()"
-				>
+				<card v-for="item of years" :key="item" class="hoverable padding" @click.native="year=item">
 					<card-title>{{item}}</card-title>
 					<p>年</p>
 				</card>
@@ -117,6 +112,7 @@ export default {
 				let query = Object.assign({}, this.$route.query)
 				if (val) {
 					query.year = val
+					this.fetchYearData(val)
 				}
 				else {
 					delete query.year
@@ -166,9 +162,8 @@ export default {
 				loading.close()
 			}
 		},
-		async fetchYearData() {
+		async fetchYearData(yr) {
 			const loading = this.$vs.loading()
-			const yr = this.year
 			try {
 				this.standardData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`)).data
 				loading.close()
