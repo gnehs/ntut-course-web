@@ -32,8 +32,8 @@
 				<i class="bx bx-user"></i>
 			</card>
 			<card class="hoverable padding" @click.native="$router.push('/api')">
-				<card-title>API 手冊</card-title>
-				<p>探索開放公眾使用的資料</p>
+				<card-title>API 文件</card-title>
+				<p>探索開放公眾使用的 API 文件</p>
 				<i class="bx bx-data"></i>
 			</card>
 			<card class="hoverable padding" @click.native="$router.push('/about')">
