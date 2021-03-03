@@ -1,5 +1,6 @@
 <template>
 	<div v-if="years">
+		<h1>課程標準</h1>
 		<vs-alert v-show="onError">
 			<template #title>發生了錯誤</template>
 			<pre>{{onError||'Error'}}</pre>
