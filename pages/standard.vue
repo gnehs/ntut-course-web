@@ -44,89 +44,116 @@
 				</card>
 			</div>
 		</template>
-		<template v-if="standardData&&!system&&year">
-			<h3>選擇學制</h3>
-			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
-				<card
-					v-for="item of Object.keys(standardData)"
-					:key="item"
-					class="hoverable padding"
-					@click.native="system=item"
-				>
-					<card-title>{{item}}</card-title>
-					<p>學制</p>
-				</card>
-			</div>
-		</template>
-		<template v-if="system&&!department">
-			<h3>選擇系所</h3>
-			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
-				<card
-					v-for="item of Object.keys(standardData[system]).sort((a, b)=>a.localeCompare(b)).sort((a, b)=>a.length-b.length)"
-					:key="item"
-					class="hoverable padding"
-					@click.native="department=item"
-				>
-					<card-title>{{item}}</card-title>
-					<p>系所</p>
-				</card>
-			</div>
-		</template>
-		<template v-if="department">
-			<h3>{{department}}</h3>
-			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
-				<card v-for="item of Object.entries(standardData[system][department].credits)" :key="item[0]">
-					<card-title>{{item[1]}}</card-title>
-					<p>{{item[0]}}</p>
-				</card>
-			</div>
-			<h3>相關規定事項</h3>
-			<ul>
-				<li v-for="item of standardData[system][department].rules" :key="item">{{item}}</li>
-			</ul>
-			<!--<pre>{{standardData[system][department]}}</pre>-->
+		<template v-if="standardData">
+			<template v-if="!system&&year">
+				<h3>選擇學制</h3>
+				<div class="cards" style="--card-row: 5;--card-row-sm: 3">
+					<card
+						v-for="item of Object.keys(standardData)"
+						:key="item"
+						class="hoverable padding"
+						@click.native="system=item"
+					>
+						<card-title>{{item}}</card-title>
+						<p>學制</p>
+					</card>
+				</div>
+			</template>
+			<template v-if="system&&!department">
+				<h3>選擇系所</h3>
+				<div class="cards" style="--card-row: 5;--card-row-sm: 3">
+					<card
+						v-for="item of Object.keys(standardData[system]).sort((a, b)=>a.localeCompare(b)).sort((a, b)=>a.length-b.length)"
+						:key="item"
+						class="hoverable padding"
+						@click.native="department=item"
+					>
+						<card-title>{{item}}</card-title>
+						<p>系所</p>
+					</card>
+				</div>
+			</template>
+			<template v-if="department">
+				<h3>{{department}}</h3>
+				<div class="cards" style="--card-row: 5;--card-row-sm: 3">
+					<card v-for="item of Object.entries(standardData[system][department].credits)" :key="item[0]">
+						<card-title>{{item[1]}}</card-title>
+						<p>{{item[0]}}</p>
+					</card>
+				</div>
+				<h3>相關規定事項</h3>
+				<ul>
+					<li v-for="item of standardData[system][department].rules" :key="item">{{item}}</li>
+				</ul>
+				<!--<pre>{{standardData[system][department]}}</pre>-->
+			</template>
 		</template>
 	</div>
 </template> 
 <script>
 export default {
 	async created() {
-		let { year, system, department } = this.$route.query
-		if (year) {
-			this.year = year
+		this.fetchYearsData()
+		if (this.year) {
 			await this.fetchYearData()
 		}
-		if (system) {
-			this.system = system
-		}
-		if (department) {
-			this.department = department
-		}
-		this.fetchYearsData()
 	},
 	data: () => ({
 		onError: null,
 		years: null,
 		standardData: null,
-		year: null,
-		system: null,
-		department: null
 	}),
 	head() {
 		return {
 			title: '課程標準'
 		}
 	},
-	watch: {
-		year(newCount, oldCount) {
-			this.updateRouter()
+	computed: {
+		year: {
+			get: function () {
+				return this.$route.query.year
+			},
+			set: function (val) {
+				let query = Object.assign({}, this.$route.query)
+				if (val) {
+					query.year = val
+				}
+				else {
+					delete query.year
+				}
+				this.$router.push({ path: "/standard", query }, () => { });
+			}
 		},
-		system(newCount, oldCount) {
-			this.updateRouter()
+		system: {
+			get: function () {
+				return this.$route.query.system
+			},
+			set: function (val) {
+				let query = Object.assign({}, this.$route.query)
+				if (val) {
+					query.system = val
+				}
+				else {
+					delete query.system
+				}
+				this.$router.push({ path: "/standard", query }, () => { });
+			}
 		},
-		department(newCount, oldCount) {
-			this.updateRouter()
-		}
+		department: {
+			get: function () {
+				return this.$route.query.department
+			},
+			set: function (val) {
+				let query = Object.assign({}, this.$route.query)
+				if (val) {
+					query.department = val
+				}
+				else {
+					delete query.department
+				}
+				this.$router.push({ path: "/standard", query }, () => { });
+			}
+		},
 	},
 	methods: {
 		async fetchYearsData() {
@@ -150,28 +177,7 @@ export default {
 				loading.close()
 			}
 		},
-		updateRouter() {
-			let query = Object.assign({}, this.$route.query)
-			if (this.year) {
-				query.year = this.year
-			}
-			else {
-				delete query.year
-			}
-			if (this.system) {
-				query.system = this.system
-			}
-			else {
-				delete query.system
-			}
-			if (this.department) {
-				query.department = this.department
-			}
-			else {
-				delete query.department
-			}
-			this.$router.replace({ path: "/standard", query }, () => { });
-		}
+
 	}
 }
 </script>
