@@ -104,7 +104,7 @@ export default {
 					y = localStorage['data-year']
 					s = localStorage['data-sem']
 				}
-				else if (!yearData[y] || !yearData[y].includes(s)) {
+				else {
 					let yrs = Object.keys(yearData)
 					y = yrs[yrs.length - 1]
 					s = yearData[y][0]
