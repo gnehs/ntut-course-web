@@ -36,6 +36,19 @@
 				target="_blank"
 			>https://github.com/gnehs/ntut-course-crawler-node</a>
 		</p>
+		<h2>Special Thanks</h2>
+
+		<ul>
+			<li>
+				<a href="https://nuxtjs.org/" target="_blank">Nuxt.js</a>
+			</li>
+			<li>
+				<a href="https://vuesax.com/" target="_blank">Vuesax</a>
+			</li>
+			<li>
+				<a href="https://vuejs.org/" target="_blank">Vue.js</a>
+			</li>
+		</ul>
 	</div>
 </template>
   

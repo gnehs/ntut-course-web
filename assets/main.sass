@@ -91,9 +91,10 @@ a
             .course
                 cursor: pointer
                 width: 100%
-                --main-color: 25, 91, 255
-                background: rgba(var(--main-color), 0.15)
-                color: rgb(var(--main-color))
+                --main-color: rgb(25, 91, 255)
+                --main-bg: rgba(25, 91, 255,.15)
+                background: var(--main-bg)
+                color: var(--main-color)
                 padding: 12px 6px
                 padding-right: 2px
                 border-radius: 0 8px 8px 0
@@ -107,7 +108,7 @@ a
                     --main-color: 255, 44, 44
                 &:before
                     content: ""
-                    background: rgb(var(--main-color))
+                    background: var(--main-color)
                     left: 0px
                     top: 0px
                     width: 2px
