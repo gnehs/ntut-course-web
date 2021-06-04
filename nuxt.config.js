@@ -47,6 +47,8 @@ export default {
     '@nuxtjs/pwa',
     // https://www.npmjs.com/package/@nuxtjs/google-gtag
     '@nuxtjs/google-gtag',
+    // https://www.npmjs.com/package/@nuxtjs/markdownit
+    '@nuxtjs/markdownit',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
