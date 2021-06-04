@@ -21,13 +21,13 @@ https://gnehs.github.io/ntut-course-crawler-node/
 # API 清單
 ## 課程
 這裡是與課程相關的 API
-<div class="api-url">
+<div class="white-box">
 
 ### `/main.json` 取得所有可用之年份與學期 
 #### Example
 https://gnehs.github.io/ntut-course-crawler-node/main.json
 
-</div><div class="api-url">
+</div><div class="white-box">
 
 ### `/{year}/{sem}/{system}.json` 取得某學期某學制課程資料 
 #### 注意
@@ -45,7 +45,7 @@ https://gnehs.github.io/ntut-course-crawler-node/109/2/進修部.json
 	- `研究所(日間部、進修部、週末碩士班)`
 	- `進修部`
 
-</div><div class="api-url">
+</div><div class="white-box">
 
 ### `/{year}/{sem}/course/{id}.json` 取得課程詳細資料
 #### Example
@@ -61,7 +61,7 @@ https://gnehs.github.io/ntut-course-crawler-node/109/2/course/281841.json
 
 ## 系所班級
 
-<div class="api-url">
+<div class="white-box">
 
 ### `/{year}/{sem}/department.json` 取得系所班級清單
 #### Example
@@ -75,13 +75,13 @@ https://gnehs.github.io/ntut-course-crawler-node/109/2/department.json
 </div>
 
 ## 課程標準
-<div class="api-url">
+<div class="white-box">
 
 ### `/standards.json` 取得課程標準可用年份
 #### Example
 https://gnehs.github.io/ntut-course-crawler-node/standards.json
 
-</div><div class="api-url">
+</div><div class="white-box">
 
 ### `/{year}/standard.json` 取得當年度入學之課程標準
 #### Example
@@ -98,7 +98,7 @@ img
 h1
 	font-size: 2em
 
-.api-url
+.white-box
 	background: #fff
 	padding: 8px 16px
 	margin: 8px 0
