@@ -104,6 +104,44 @@
         </vs-alert>
         <div v-for="(item, i) in fetchedCourseData" :key="i.toString()">
           <div v-show="chooseClassIndex == i.toString()">
+            <div v-if="item.covid19" class="covid19-info">
+              <h2>因應疫情所致之上課方式</h2>
+              <p>實際實施日期與上課方式，依學校公布之訊息為主</p>
+              <div class="level-block lv1">
+                <div class="level-title">若疫情為<strong>ㄧ級</strong>警戒</div>
+                <div class="level-content">實體授課</div>
+              </div>
+              <div class="level-block lv2">
+                <div class="level-title">若疫情為<strong>二級</strong>警戒</div>
+                <div class="level-content" v-if="item.covid19.lv2Method">{{ item.covid19.lv2Method }}</div>
+                <div class="level-content" v-if="item.covid19.lv2Description">{{ item.covid19.lv2Description }}</div>
+                <div class="level-content" v-if="!item.covid19.lv2Method && !item.covid19.lv2Description">尚無對策</div>
+              </div>
+              <div class="level-block lv3">
+                <div class="level-title">若疫情為<strong>三級</strong>警戒</div>
+                <div class="level-content">遠距授課</div>
+              </div>
+              <template v-if="item.covid19.courseScoreMethod">
+                <h3>評量方式</h3>
+                <p v-html="parseTextarea(item.covid19.courseScoreMethod)" />
+              </template>
+              <template v-if="item.covid19.courseInfo">
+                <h3>課程訊息公告</h3>
+                <p v-html="parseTextarea(item.covid19.courseInfo)" />
+              </template>
+              <template v-if="item.covid19.courseURL">
+                <h3>上課網址</h3>
+                <p v-html="parseTextarea(item.covid19.courseURL)" />
+              </template>
+              <template v-if="item.covid19.contactInfo">
+                <h3>學生加退選簽核及諮詢課程問題管道</h3>
+                <p v-html="parseTextarea(item.covid19.contactInfo)" />
+              </template>
+              <template v-if="item.covid19.additionalInfo">
+                <h3>補充說明資訊</h3>
+                <p v-html="parseTextarea(item.covid19.additionalInfo)" />
+              </template>
+            </div>
             <h3>教師</h3>
             <p>{{ item.name }} {{ item.email }}</p>
             <h3>課程大綱</h3>
@@ -114,10 +152,10 @@
             <p v-html="parseTextarea(item.scorePolicy)" />
             <h3>使用教材、參考書目或其他</h3>
             <p v-html="parseTextarea(item.materials)" />
-            <div v-if="item.remarks">
+            <template v-if="item.remarks">
               <h3>備註</h3>
               <p v-html="parseTextarea(item.remarks)" />
-            </div>
+            </template>
             <h3>使用原文書籍：{{ item.foreignLanguageTextbooks ? '是' : '否' }}</h3>
             <h3>最後更新：{{ item.latestUpdate }}</h3>
           </div>
@@ -126,7 +164,30 @@
     </div>
   </div>
 </template>
-  
+<style lang="sass" scoped>
+.covid19-info
+	border-radius: 16px
+	border: 1px solid #e6e6e6
+	padding: 8px 16px
+	background-color: #fff
+	margin-top: 16px
+	.level-block
+		--border-color: #e6e6e6
+		border-left: 4px solid var(--border-color)
+		padding: 4px 8px
+		margin-bottom: 8px
+		&.lv1
+			--border-color: rgb( 25, 91, 255)
+		&.lv2
+			--border-color: orange
+		&.lv3
+			--border-color: red
+		.level-title
+			font-size: 16px
+		.level-content
+			font-size: 14px
+			opacity: .75
+</style>
 <script>
 export default {
   data: () => ({
