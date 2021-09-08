@@ -9,4 +9,5 @@ npm-debug.log
 
 # Nuxt generate
 dist
-static/sw.js
+static/sw.js 
+.DS_Store
