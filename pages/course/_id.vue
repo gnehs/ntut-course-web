@@ -119,7 +119,7 @@
               </div>
               <div class="level-block lv3">
                 <div class="level-title">若疫情為<strong>三級</strong>警戒</div>
-                <div class="level-content">遠距授課</div>
+                <div class="level-content">遠距上課</div>
               </div>
               <template v-if="item.covid19.courseScoreMethod">
                 <h3>評量方式</h3>
