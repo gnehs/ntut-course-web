@@ -114,7 +114,7 @@
               <div class="level-block lv2">
                 <div class="level-title">若疫情為<strong>二級</strong>警戒</div>
                 <div class="level-content" v-if="item.covid19.lv2Method">{{ item.covid19.lv2Method }}</div>
-                <div class="level-content" v-if="item.covid19.lv2Description">{{ item.covid19.lv2Description }}</div>
+                <div class="level-content" v-if="item.covid19.lv2Description" v-html="parseTextarea(item.covid19.lv2Description)" />
                 <div class="level-content" v-if="!item.covid19.lv2Method && !item.covid19.lv2Description">尚無對策</div>
               </div>
               <div class="level-block lv3">
