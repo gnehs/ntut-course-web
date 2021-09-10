@@ -13,7 +13,7 @@
           class="hoverable padding"
           v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
           :key="tr.id"
-          @click.native="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+          :to="`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`"
         >
           <card-title>{{ tr.courseType }}{{ tr.name.zh }}</card-title>
 
@@ -167,17 +167,17 @@
           <div class="item">{{ time }}</div>
           <div class="item" v-for="date in Object.keys(dateEng2zh).slice(1, 5 + 1)" :key="date">
             <template v-if="$vs.getPage(courses, page, max).filter((x) => x.time[date].includes(time)).length <= 2">
-              <div
+              <router-link
                 class="course"
                 :class="{ conflict: conflictCourseData.includes(item.id) }"
                 v-for="item in $vs
                   .getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)
                   .filter((x) => x.time[date].includes(time))"
                 :key="item.id"
-                @click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
+                :to="`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`"
               >
                 {{ item.name.zh }}
-              </div>
+              </router-link>
             </template>
             <template v-else>
               <div class="course">課程數量過多無法顯示</div>
@@ -217,10 +217,22 @@ export default {
   }),
   mounted() {
     this.checkIsCourseConflict()
+    if (this.$route.query.layout) this.layout = this.$route.query.layout
+    if (this.$route.query.page) this.page = this.$route.query.page
   },
   watch: {
     courses(newCount, oldCount) {
       this.checkIsCourseConflict()
+    },
+    page(newPage, oldPage) {
+      let query = Object.assign({}, this.$route.query)
+      query.page = newPage
+      this.$router.replace({ query }, () => {})
+    },
+    layout(newLayout, oldLayout) {
+      let query = Object.assign({}, this.$route.query)
+      query.layout = newLayout
+      this.$router.replace({ query }, () => {})
     }
   },
   methods: {

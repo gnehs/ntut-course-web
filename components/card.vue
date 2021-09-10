@@ -1,14 +1,23 @@
 <template>
-  <div class="card">
+  <div class="card" :is="to ? 'router-link' : 'div'" :to="to">
     <slot />
   </div>
 </template>
+<script>
+export default {
+  name: 'card',
+  props: {
+    to: {
+      type: String
+    }
+  }
+}
+</script>
 <style lang="sass">
 .card
     background: #fff
     background: rgba(var(--vs-background),1)
     color: #2c3e50
-    color: rgba(var(--vs-text),1)
     width: 100%
     box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
     border-radius: 12px
@@ -16,6 +25,7 @@
     position: relative
     padding: 6px 8px
     overflow: hidden
+    text-decoration: none
     &[disabled]
         pointer-events: none
     &:not(.hoverable)
@@ -34,6 +44,7 @@
         &:hover
             box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
             transform: translate(0, -5px)
+            color: #2c3e50
             &>i
                 opacity: .4
                 transform: none
