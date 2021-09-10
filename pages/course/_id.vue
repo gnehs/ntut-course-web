@@ -208,14 +208,20 @@ export default {
       '▲': '校訂專業必修',
       '★': '專業選修'
     },
-    title: '課程'
+    title: '課程',
+    description: ''
   }),
   created() {
     this.fetchData()
   },
   head() {
     return {
-      title: this.title
+      title: this.title,
+      meta: [
+        { hid: 'og:title', name: 'og:title', content: this.title },
+        { hid: 'og:description', name: 'og:description', content: this.description },
+        { hid: 'description', name: 'description', content: this.description }
+      ]
     }
   },
   methods: {
@@ -226,6 +232,7 @@ export default {
       try {
         let course = await this.$fetchCourse(year, sem)
         this.courseData = course.filter(x => x.id == courseId)[0]
+        this.description = this.courseData.description.zh
         this.title = this.courseData.name.zh
         this.checkCourseInMyCourse()
         this.checkIsCourseConflict()
