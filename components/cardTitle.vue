@@ -1,7 +1,7 @@
 <template>
-	<h3 class="card-title">
-		<slot />
-	</h3>
+  <h3 class="card-title">
+    <slot />
+  </h3>
 </template>
 <style lang="sass" scoped>
 .card-title

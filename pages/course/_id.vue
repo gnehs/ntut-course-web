@@ -166,27 +166,27 @@
 </template>
 <style lang="sass" scoped>
 .covid19-info
-	border-radius: 16px
-	border: 1px solid #e6e6e6
-	padding: 8px 16px
-	background-color: #fff
-	margin-top: 16px
-	.level-block
-		--border-color: #e6e6e6
-		border-left: 4px solid var(--border-color)
-		padding: 4px 8px
-		margin-bottom: 8px
-		&.lv1
-			--border-color: rgb( 25, 91, 255)
-		&.lv2
-			--border-color: orange
-		&.lv3
-			--border-color: red
-		.level-title
-			font-size: 16px
-		.level-content
-			font-size: 14px
-			opacity: .75
+  border-radius: 16px
+  border: 1px solid #e6e6e6
+  padding: 8px 16px
+  background-color: #fff
+  margin-top: 16px
+  .level-block
+    --border-color: #e6e6e6
+    border-left: 4px solid var(--border-color)
+    padding: 4px 8px
+    margin-bottom: 8px
+    &.lv1
+      --border-color: rgb( 25, 91, 255)
+    &.lv2
+      --border-color: orange
+    &.lv3
+      --border-color: red
+    .level-title
+      font-size: 16px
+    .level-content
+      font-size: 14px
+      opacity: .75
 </style>
 <script>
 export default {

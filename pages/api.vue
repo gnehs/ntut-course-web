@@ -106,10 +106,10 @@ h1
 </style>
 <script>
 export default {
-    head() {
-        return {
-            title: 'API 手冊'
-        }
+  head() {
+    return {
+      title: 'API 手冊'
     }
+  }
 }
 </script>

@@ -1,104 +1,111 @@
 <template>
-	<div v-if="filteredDepartmentData">
-		<h1>選擇班級</h1>
-		<div class="cards" style="--card-row: 4;--card-row-sm: 1">
-			<card>
-				<p>輸入關鍵字來篩選</p>
-				<vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
-			</card>
-		</div>
-		<vs-alert v-show="onError">
-			<template #title>搜尋時發生了錯誤</template>
-			<pre>{{onError||'Error'}}</pre>
-		</vs-alert>
-		<div v-for="department in filteredDepartmentData" :key="department.name">
-			<h3>{{department.name}}</h3>
-			<div class="cards" style="--card-row: 5;--card-row-sm: 3">
-				<card
-					v-for="{name} in department.class"
-					:key="name"
-					class="hoverable padding"
-					@click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}&d=${$store.state.department}`)"
-				>
-					<card-title>{{name}}</card-title>
-					<p>{{department.name}}</p>
-				</card>
-			</div>
-		</div>
-	</div>
+  <div v-if="filteredDepartmentData">
+    <h1>選擇班級</h1>
+    <div class="cards" style="--card-row: 4; --card-row-sm: 1">
+      <card>
+        <p>輸入關鍵字來篩選</p>
+        <vs-input v-model="filterDapartmentVal" @input="filterDapartment" />
+      </card>
+    </div>
+    <vs-alert v-show="onError">
+      <template #title>搜尋時發生了錯誤</template>
+      <pre>{{ onError || 'Error' }}</pre>
+    </vs-alert>
+    <div v-for="department in filteredDepartmentData" :key="department.name">
+      <h3>{{ department.name }}</h3>
+      <div class="cards" style="--card-row: 5; --card-row-sm: 3">
+        <card
+          v-for="{ name } in department.class"
+          :key="name"
+          class="hoverable padding"
+          @click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}&d=${$store.state.department}`)"
+        >
+          <card-title>{{ name }}</card-title>
+          <p>{{ department.name }}</p>
+        </card>
+      </div>
+    </div>
+  </div>
 </template> 
 <script>
 export default {
-	created() {
-		this.fetchData()
-	},
-	data: () => ({
-		onError: null,
-		departmentData: null,
-		filteredDepartmentData: null,
-		filterDapartmentVal: null
-	}),
-	head() {
-		return {
-			title: '上課時間表'
-		}
-	},
-	computed: {
-		year() {
-			return this.$store.state.year
-		},
-		sem() {
-			return this.$store.state.sem
-		}
-	},
-	watch: {
-		year(newCount, oldCount) {
-			this.fetchData()
-		},
-		sem(newCount, oldCount) {
-			this.fetchData()
-		}
-	},
-	methods: {
-		async fetchData() {
-			const loading = this.$vs.loading()
-			try {
-				this.departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${this.year}/${this.sem}/department.json`)).data
-				this.filteredDepartmentData = this.departmentData
-				loading.close()
-			} catch (e) {
-				loading.close()
-			}
-		},
-		filterDapartment() {
-			this.onError = null
-			try {
-				let val = this.filterDapartmentVal
-				if (val != '') {
-					this.filteredDepartmentData =
-						this.departmentData
-							.filter(x => x.name.match(val) || x.class.map(a => a.name).join('').match(val))
-							.map(x => {
-								x.class = x.class.filter(y => y.name.match(val))
-								return x
-							})
-							.filter(x => x.class.length)
-				}
-				else {
-					this.filteredDepartmentData = this.departmentData
-				}
-			} catch (e) {
-				this.onError = e
-				this.filteredDepartmentData = []
-			}
-		},
-		generateRandomColor(i, j) {
-			let r, g, b
-			r = i * 929 % 50 + (255 - 40)
-			g = i * 199 % 50 + (255 - 40)
-			b = i * 680 % 50 + (255 - 40)
-			return `rgb(${r},${g},${b})`
-		}
-	}
+  created() {
+    this.fetchData()
+  },
+  data: () => ({
+    onError: null,
+    departmentData: null,
+    filteredDepartmentData: null,
+    filterDapartmentVal: null
+  }),
+  head() {
+    return {
+      title: '上課時間表'
+    }
+  },
+  computed: {
+    year() {
+      return this.$store.state.year
+    },
+    sem() {
+      return this.$store.state.sem
+    }
+  },
+  watch: {
+    year(newCount, oldCount) {
+      this.fetchData()
+    },
+    sem(newCount, oldCount) {
+      this.fetchData()
+    }
+  },
+  methods: {
+    async fetchData() {
+      const loading = this.$vs.loading()
+      try {
+        this.departmentData = (
+          await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${this.year}/${this.sem}/department.json`)
+        ).data
+        this.filteredDepartmentData = this.departmentData
+        loading.close()
+      } catch (e) {
+        loading.close()
+      }
+    },
+    filterDapartment() {
+      this.onError = null
+      try {
+        let val = this.filterDapartmentVal
+        if (val != '') {
+          this.filteredDepartmentData = this.departmentData
+            .filter(
+              x =>
+                x.name.match(val) ||
+                x.class
+                  .map(a => a.name)
+                  .join('')
+                  .match(val)
+            )
+            .map(x => {
+              x.class = x.class.filter(y => y.name.match(val))
+              return x
+            })
+            .filter(x => x.class.length)
+        } else {
+          this.filteredDepartmentData = this.departmentData
+        }
+      } catch (e) {
+        this.onError = e
+        this.filteredDepartmentData = []
+      }
+    },
+    generateRandomColor(i, j) {
+      let r, g, b
+      r = ((i * 929) % 50) + (255 - 40)
+      g = ((i * 199) % 50) + (255 - 40)
+      b = ((i * 680) % 50) + (255 - 40)
+      return `rgb(${r},${g},${b})`
+    }
+  }
 }
 </script>

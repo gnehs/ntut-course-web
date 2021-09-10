@@ -1,7 +1,7 @@
 <template>
-	<div class="card">
-		<slot />
-	</div>
+  <div class="card">
+    <slot />
+  </div>
 </template>
 <style lang="sass">
 .card
