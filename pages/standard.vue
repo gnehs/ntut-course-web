@@ -28,37 +28,34 @@
     </template>
     <template v-if="!year">
       <h3>選擇入學年度</h3>
-      <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-        <card v-for="item of years" :key="item" class="hoverable padding" @click.native="year = item">
-          <card-title>{{ item }}</card-title>
-          <p>年</p>
-        </card>
+      <div class="list">
+        <div class="item" v-for="item of years" :key="item" @click="year = item">
+          {{ item }}
+        </div>
       </div>
     </template>
     <template v-if="standardData">
       <template v-if="!system && year">
         <h3>選擇學制</h3>
-        <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-          <card v-for="item of Object.keys(standardData)" :key="item" class="hoverable padding" @click.native="system = item">
-            <card-title>{{ item }}</card-title>
-            <p>學制</p>
-          </card>
+        <div class="list">
+          <div class="item" v-for="item of Object.keys(standardData)" :key="item" @click="system = item">
+            {{ item }}
+          </div>
         </div>
       </template>
       <template v-if="system && !department">
         <h3>選擇系所</h3>
-        <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-          <card
+        <div class="list">
+          <div
+            class="item"
             v-for="item of Object.keys(standardData[system])
               .sort((a, b) => a.localeCompare(b))
               .sort((a, b) => a.length - b.length)"
             :key="item"
-            class="hoverable padding"
-            @click.native="department = item"
+            @click="department = item"
           >
-            <card-title>{{ item }}</card-title>
-            <p>系所</p>
-          </card>
+            {{ item }}
+          </div>
         </div>
       </template>
       <template v-if="department">
