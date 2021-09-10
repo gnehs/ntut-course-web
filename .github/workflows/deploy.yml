@@ -25,12 +25,7 @@ jobs:
     - name: Install npm packages
       run: npm install
     - name: Generate Pages
-      run: npm run generate
-    - name: Fix 404
-      uses: canastro/copy-file-action@master
-      with:
-        source: "./dist/index.html"
-        target: "./dist/404.html"
+      run: npm run generate 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
