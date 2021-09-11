@@ -102,6 +102,6 @@ export default {
     nativeUI: true
   },
   'google-gtag': {
-    id: 'G-6V6Y6MHKGE'
+    id: 'G-MGGDNFL66Y'
   }
 }
