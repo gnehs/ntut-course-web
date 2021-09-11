@@ -13,7 +13,7 @@
           class="hoverable padding"
           v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
           :key="tr.id"
-          :to="`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`"
+          :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`"
         >
           <card-title>{{ tr.courseType }}{{ tr.name.zh }}</card-title>
 
@@ -135,9 +135,7 @@
               </div>
               <div style="display: flex">
                 <div style="flex: 1" />
-                <vs-button flat @click="$router.push(`/course/${tr.id}?year=${$store.state.year}&sem=${$store.state.sem}`)"
-                  >詳細資料</vs-button
-                >
+                <vs-button flat is="router-link" :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`">詳細資料</vs-button>
               </div>
             </template>
           </vs-tr>
@@ -174,7 +172,7 @@
                   .getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)
                   .filter((x) => x.time[date].includes(time))"
                 :key="item.id"
-                :to="`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`"
+                :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
               >
                 {{ item.name.zh }}
               </router-link>

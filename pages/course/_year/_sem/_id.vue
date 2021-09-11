@@ -23,9 +23,9 @@
         本課程與
         <span v-for="(item, i) in conflictCourseData" :key="item.id">
           <span v-if="i > 0">、</span>
-          <a style="cursor: pointer" @click="$router.push(`/course/${item.id}?year=${$store.state.year}&sem=${$store.state.sem}`)">{{
-            item.name.zh
-          }}</a>
+          <router-link style="cursor: pointer" :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`">
+            {{ item.name.zh }}
+          </router-link>
         </span>
         衝堂！
       </vs-alert>
@@ -227,7 +227,7 @@ export default {
   methods: {
     async fetchData() {
       let courseId = this.$route.params.id
-      let { year, sem } = this.$route.query
+      let { year, sem } = this.$route.params
       const loading = this.$vs.loading()
       try {
         let course = await this.$fetchCourse(year, sem)
