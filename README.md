@@ -1,9 +1,9 @@
 # 🍤 北科課程好朋友
 這裡是北科課程好朋友，提供課程資訊的可愛網站！
-https://gnehs.github.io/ntut-course-web/
+https://ntut-course.gnehs.net/
 
 ## 關於
-https://gnehs.github.io/ntut-course-web/about
+https://ntut-course.gnehs.net/about
 
 ## API 文件
 https://gnehs.github.io/ntut-course-api-doc/index.html

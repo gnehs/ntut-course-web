@@ -95,7 +95,7 @@ export default {
     meta: {
       name: '北科課程好朋友',
       description: '提供臺北科技大學最新課程資訊',
-      ogHost: 'https://gnehs.github.io/ntut-course-web/',
+      ogHost: 'https://ntut-course.gnehs.net/',
       ogImage: 'og.jpg'
     },
     theme_color: '#FFF',
