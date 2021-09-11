@@ -11,7 +11,7 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '北科課程好朋友，提供臺北科技大學最新課程資訊，以友善的介面與衝堂偵測讓選課過程更加輕鬆。' }
+      { hid: 'description', name: 'description', content: '北科課程好朋友，提供臺北科技大學最新課程資訊，以友善的介面與衝堂偵測等功能讓選課過程更加輕鬆。' }
     ],
     link: [
       { rel: 'icon', type: 'image/png', href: '/icon.png' },
@@ -70,7 +70,7 @@ export default {
     manifest: {
       name: '北科課程好朋友',
       short_name: '北科課程好朋友',
-      description: '北科課程好朋友，提供臺北科技大學最新課程資訊，以友善的介面與衝堂偵測讓選課過程更加輕鬆。',
+      description: '北科課程好朋友，提供臺北科技大學最新課程資訊，以友善的介面與衝堂偵測等功能讓選課過程更加輕鬆。',
       lang: 'zh-TW',
       shortcuts: [{
         name: "我的課程",
