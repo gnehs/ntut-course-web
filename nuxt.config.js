@@ -60,9 +60,6 @@ export default {
   generate: {
     fallback: true
   },
-  router: {
-    base: "/ntut-course-web/"
-  },
   pwa: {
     icon: {
       fileName: 'icon-pwa.png'
