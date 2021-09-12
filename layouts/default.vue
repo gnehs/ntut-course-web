@@ -109,7 +109,7 @@ export default {
           loading = this.$vs.loading({
             text: '下載課程清單...'
           })
-          window[dataKey] = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`)).data
+          window[dataKey] = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`).then(x => x.json())
           loading.close()
         }
         this.$store.commit('updateYear', y)
@@ -133,7 +133,7 @@ export default {
       let key = `main_year`
       try {
         if (!localStorage[key]) {
-          let res = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/main.json`)).data
+          let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/main.json`).then(x => x.json())
           localStorage[key] = JSON.stringify(res)
         }
         return JSON.parse(localStorage[key])
@@ -235,31 +235,31 @@ export default {
 </script>
 <style lang="sass">
 body
-    background-color: #f4f7f8
-    margin: 0
+  background-color: #f4f7f8
+  margin: 0
 #app
-    display: flex
-    flex-direction: column
-    min-height: 100vh
-    .container
-        flex: 1
-        padding-top: 74px
-        width: 1024px
-        max-width: 97%
-        margin: 0 auto
+  display: flex
+  flex-direction: column
+  min-height: 100vh
+  .container
+    flex: 1
+    padding-top: 74px
+    width: 1024px
+    max-width: 97%
+    margin: 0 auto
     #footer
-        margin: 0 auto
-        margin-top: 10px
-        text-align: center
-        font-size: .85rem
-        opacity: .7
-        padding: 0 15px
-        width: 100%
-        background: #FFF
+      margin: 0 auto
+      margin-top: 10px
+      text-align: center
+      font-size: .85rem
+      opacity: .7
+      padding: 0 15px
+      width: 100%
+      background: #FFF
 
-        border-radius: 15px 15px 0px 0px
-        box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
+      border-radius: 15px 15px 0px 0px
+      box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
 .datasetDialog-form
-    .vs-select-content
-        max-width: 100%
+  .vs-select-content
+    max-width: 100%
 </style>

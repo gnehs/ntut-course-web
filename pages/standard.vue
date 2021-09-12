@@ -142,7 +142,7 @@ export default {
     async fetchYearsData() {
       const loading = this.$vs.loading()
       try {
-        this.years = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/standards.json`)).data
+        this.years = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/standards.json`).then(x => x.json())
         loading.close()
       } catch (e) {
         this.onError = e
@@ -152,7 +152,7 @@ export default {
     async fetchYearData(yr) {
       const loading = this.$vs.loading()
       try {
-        this.standardData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`)).data
+        this.standardData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`).then(x => x.json())
         loading.close()
       } catch (e) {
         this.onError = e

@@ -236,9 +236,9 @@ export default {
         this.title = this.courseData.name.zh
         this.checkCourseInMyCourse()
         this.checkIsCourseConflict()
-        this.fetchedCourseData = (
-          await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/course/${courseId}.json`)
-        ).data
+        this.fetchedCourseData = await fetch(
+          `https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/course/${courseId}.json`
+        ).then(x => x.json())
         if (this.fetchedCourseData.length > 1) {
           this.chooseClassSelect = true
         }

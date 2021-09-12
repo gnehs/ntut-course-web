@@ -63,9 +63,9 @@ export default {
     async fetchData() {
       const loading = this.$vs.loading()
       try {
-        this.departmentData = (
-          await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${this.year}/${this.sem}/department.json`)
-        ).data
+        this.departmentData = await fetch(
+          `https://gnehs.github.io/ntut-course-crawler-node/${this.year}/${this.sem}/department.json`
+        ).then(x => x.json())
         this.filteredDepartmentData = this.departmentData
         loading.close()
       } catch (e) {

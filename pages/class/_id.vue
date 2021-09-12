@@ -54,7 +54,9 @@ export default {
         let { year, sem } = this.$store.state
         this.classname = this.$route.params.id
         //fetch class
-        let departmentData = (await this.$axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`)).data
+        let departmentData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`).then(x =>
+          x.json()
+        )
         departmentData.map(x => {
           x.class.map(y => {
             if (y.name == this.classname) {
