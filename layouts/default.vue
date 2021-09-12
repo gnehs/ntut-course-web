@@ -247,18 +247,18 @@ body
     width: 1024px
     max-width: 97%
     margin: 0 auto
-    #footer
-      margin: 0 auto
-      margin-top: 10px
-      text-align: center
-      font-size: .85rem
-      opacity: .7
-      padding: 0 15px
-      width: 100%
-      background: #FFF
+  #footer
+    margin: 0 auto
+    margin-top: 10px
+    text-align: center
+    font-size: .85rem
+    opacity: .7
+    padding: 0 15px
+    width: 100%
+    background: #FFF
 
-      border-radius: 15px 15px 0px 0px
-      box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
+    border-radius: 15px 15px 0px 0px
+    box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
 .datasetDialog-form
   .vs-select-content
     max-width: 100%
