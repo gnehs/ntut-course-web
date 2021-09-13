@@ -2,7 +2,7 @@
   <div>
     <h1>搜尋</h1>
     <card>
-      <div class="cards" style="--card-row: 5; --card-row-sm: 2">
+      <div class="cards" style="--card-row: 4; --card-row-sm: 2">
         <card class="borderless">
           <p>課號</p>
           <vs-input v-model="searchCourseId" @input="searchCourse" />
@@ -16,6 +16,10 @@
           <vs-input v-model="searchTeacher" @input="searchCourse" />
         </card>
         <card class="borderless">
+          <p>班級</p>
+          <vs-input v-model="searchClass" @input="searchCourse" />
+        </card>
+        <card class="borderless">
           <p>衝堂</p>
           <vs-checkbox v-model="showConflictCourse">顯示衝堂課程</vs-checkbox>
         </card>
@@ -26,7 +30,7 @@
         </card>
       </div>
       <p style="font-size: 0.85rem">
-        ＊關鍵字與教師欄位支援
+        ＊關鍵字、教師與班級欄位支援
         <a href="https://en.wikipedia.org/wiki/Regular_expression" teaget="_blank">regex</a>！
       </p>
     </card>
@@ -92,6 +96,7 @@ export default {
     searchVal: '',
     searchCourseId: '',
     searchTeacher: '',
+    searchClass: '',
     searchResult: null,
     showConflictCourse: true,
     timetableDialog: false,
@@ -111,10 +116,11 @@ export default {
     }
   },
   created() {
-    let { q, id, teacher, hideConflict } = this.$route.query
+    let { q, id, teacher, classroom, hideConflict } = this.$route.query
     this.searchVal = q || ''
     this.searchCourseId = id || ''
     this.searchTeacher = teacher || ''
+    this.searchClass = classroom || ''
     this.showConflictCourse = Boolean(!hideConflict)
     if (this.$route.query[`time-table`]) {
       this.timetableFilter = JSON.parse(this.$route.query[`time-table`])
@@ -163,6 +169,18 @@ export default {
           query.teacher = searchTeacher
         } else {
           delete query.teacher
+        }
+        if (this.searchClass != '') {
+          let searchClass = this.searchClass
+          course = course.filter(x =>
+            x.class
+              .map(y => y.name)
+              .join('')
+              .match(searchClass)
+          )
+          query.classroom = searchClass
+        } else {
+          delete query.classroom
         }
         if (!this.showConflictCourse) {
           query.hideConflict = true
