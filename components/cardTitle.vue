@@ -7,6 +7,7 @@
 .card-title
   margin: 0
   line-height: 18px
+  margin-bottom: 2px
   width: 100%
   display: flex
   align-items: center
