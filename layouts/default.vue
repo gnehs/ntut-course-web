@@ -2,9 +2,7 @@
   <div id="app">
     <vs-navbar center-collapsed v-model="active" shadow fixed not-line>
       <template #left>
-        <span style="cursor: pointer">
-          <strong @click="$router.push('/')">🍤 北科課程好朋友</strong>
-        </span>
+        <router-link to="/" class="site-title"> 🍤 北科課程好朋友 </router-link>
       </template>
       <vs-navbar-item :active="active == '/'" to="/">首頁</vs-navbar-item>
       <vs-navbar-item :active="active == '/search'" :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`" id="search"

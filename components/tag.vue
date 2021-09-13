@@ -25,4 +25,6 @@ export default {
     border-radius: 0.5em
     font-size: 0.5em
     line-height: 1em
+    min-width: 52px
+    text-align: center
 </style>
