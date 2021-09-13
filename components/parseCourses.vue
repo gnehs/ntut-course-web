@@ -242,6 +242,12 @@ export default {
     },
     async checkIsCourseConflict() {
       this.conflictCourseData = await this.$checkConflictedCourse(this.courses)
+      let length = this.$vs.getLength(
+        this.showConflictCourse ? this.courses : this.courses.filter(x => !this.conflictCourseData.includes(x.id)),
+        this.max
+      )
+
+      if (this.page > length) this.page = 1
     }
   }
 }
