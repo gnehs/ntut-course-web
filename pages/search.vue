@@ -199,7 +199,18 @@ export default {
           return true
         })
         delete query[`time-table`]
-        query[`time-table`] = JSON.stringify(this.timetableFilter)
+        let isTimetableFilterEnabled = false
+        for (let date of Object.keys(this.timetableFilter)) {
+          if (this.timetableFilter[date].length > 0) {
+            isTimetableFilterEnabled = true
+            break
+          }
+        }
+        if (isTimetableFilterEnabled) {
+          query[`time-table`] = JSON.stringify(this.timetableFilter)
+        } else {
+          delete query[`time-table`]
+        }
         //
         this.searchResult = course
         this.$router.replace({ path: '/search', query }, () => {})
