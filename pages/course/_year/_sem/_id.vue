@@ -60,7 +60,18 @@
           <p>課程標準</p>
         </card>
         <card>
-          <card-title>{{ courseData.class.map((x) => x.name).join('、') }}</card-title>
+          <card-title>
+            <template v-for="(classItem, i) of courseData.class.map((x) => x.name)">
+              <span v-if="i > 0" :key="classItem + '_'">、</span>
+              <router-link
+                :to="`/class/${classItem}?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
+                class="class-link"
+                :key="classItem + '_'"
+              >
+                {{ classItem }}
+              </router-link>
+            </template>
+          </card-title>
           <p>班級</p>
         </card>
         <card>
@@ -187,6 +198,12 @@
     .level-content
       font-size: 14px
       opacity: .75
+.class-link
+  color: #2c3e50
+  &:hover
+    opacity: .75
+  &:active
+    opacity: 1
 </style>
 <script>
 export default {
