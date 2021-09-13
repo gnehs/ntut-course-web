@@ -19,7 +19,13 @@ a
     &:hover
         color: #42428f
     &:active
-        color: #34346e
+        color: #34346e 
+h1,h2,h3,h4,h5,h6,p
+    margin: 1em 0
+    line-height: 1.5em
+h1,h2,h3,h4,h5,h6
+    & + p
+        margin-top: -1em
 .vs-input
     width: 100%
 .vs-alert+.vs-alert
@@ -39,19 +45,19 @@ a
         display: flex
         align-items: center
 .cards
-    width: calc(100% + 8px)
+    width: calc(100% + 12px)
     display: flex
     flex-direction: row
     flex-wrap: wrap 
-    margin: 0 -4px  
+    margin: 3px -6px  
     --card-row: 3
     --card-row-sm: 2
     position: relative
     .vs-card-content,&>.card,&>.cards
-        width: calc(100% / var(--card-row) - 8px) 
-        margin: 8px 4px
+        width: calc(100% / var(--card-row) - 12px) 
+        margin: 6px 
         @media screen and (max-width: 768px)
-            width: calc(100% / var(--card-row-sm) - 8px) 
+            width: calc(100% / var(--card-row-sm) - 12px) 
     &>.cards
         width: calc(100% / var(--card-row)) 
         margin: 0 0
