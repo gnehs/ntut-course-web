@@ -10,11 +10,28 @@
       >，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
     </p>
     <br />
+    <h2>課程資源</h2>
     <div class="cards">
       <card class="hoverable padding" :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`">
         <card-title>搜尋課程</card-title>
         <p>依課號、關鍵字或教師搜尋課程</p>
         <i class="bx bx-search"></i>
+      </card>
+      <card
+        class="hoverable padding"
+        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}&classroom=體育`"
+      >
+        <card-title>體育課</card-title>
+        <p>查看本學期開設之所有體育課</p>
+        <i class="bx bx-football"></i>
+      </card>
+      <card
+        class="hoverable padding"
+        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}&classroom=^博雅`"
+      >
+        <card-title>博雅課程</card-title>
+        <p>查看本學期開設之所有通識課</p>
+        <i class="bx bx-library"></i>
       </card>
       <card class="hoverable padding" to="/class">
         <card-title>班級課表</card-title>
@@ -31,6 +48,10 @@
         <p>查看已儲存的課程</p>
         <i class="bx bx-user"></i>
       </card>
+    </div>
+
+    <h2>其他資源</h2>
+    <div class="cards">
       <card class="hoverable padding" to="/api">
         <card-title>API 文件</card-title>
         <p>探索開放公眾使用的 API 文件</p>
