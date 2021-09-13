@@ -5,8 +5,11 @@
 </template>
 <style lang="sass" scoped>
 .card-title
-    padding-bottom: 4px
-    margin: 0
-    line-height: 18px
-    width: 100%
+  margin: 0
+  line-height: 18px
+  width: 100%
+  display: flex
+  align-items: center
+  flex-direction: row
+  justify-content: space-between
 </style> 

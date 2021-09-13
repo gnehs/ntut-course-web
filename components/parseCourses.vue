@@ -15,7 +15,10 @@
           :key="tr.id"
           :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`"
         >
-          <card-title>{{ tr.courseType }}{{ tr.name.zh }}</card-title>
+          <card-title>
+            {{ tr.courseType }}{{ tr.name.zh }}
+            <tag v-if="conflictCourseData.includes(tr.id)" color="red"><i class="bx bxs-error"></i>衝堂</tag>
+          </card-title>
 
           <div class="cards">
             <card class="borderless">
@@ -33,10 +36,6 @@
             <card v-if="!parseTime(tr.time).length" class="borderless">
               <card-title>無資料</card-title>
               <p>上課時間</p>
-            </card>
-            <card v-if="conflictCourseData.includes(tr.id)" class="borderless">
-              <card-title style="color: red">衝堂</card-title>
-              <p>狀態</p>
             </card>
           </div>
           <p>
