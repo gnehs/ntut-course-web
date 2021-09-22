@@ -11,7 +11,12 @@
         </div>
         <div class="run-item-header">
           <div class="run-item-title">{{ parseName(item.name) }}</div>
-          <div class="run-item-time">{{ timeSince(new Date(item.created_at)) }}</div>
+          <div class="run-item-status">
+            <i class="bx bx-calendar" v-if="item.event == 'schedule'" />
+            <i class="bx bx-git-commit" v-else-if="item.event == 'push'" />
+            <i class="bx bx-question-mark" v-else />
+            <span> • </span> {{ timeSince(new Date(item.created_at)) }}前
+          </div>
         </div>
       </a>
     </div>
@@ -45,25 +50,25 @@ export default {
       let interval = seconds / 31536000
 
       if (interval > 1) {
-        return Math.floor(interval) + ' 年前'
+        return Math.floor(interval) + ' 年'
       }
       interval = seconds / 2592000
       if (interval > 1) {
-        return Math.floor(interval) + ' 月前'
+        return Math.floor(interval) + ' 月'
       }
       interval = seconds / 86400
       if (interval > 1) {
-        return Math.floor(interval) + ' 天前'
+        return Math.floor(interval) + ' 天'
       }
       interval = seconds / 3600
       if (interval > 1) {
-        return Math.floor(interval) + ' 小時前'
+        return Math.floor(interval) + ' 小時'
       }
       interval = seconds / 60
       if (interval > 1) {
-        return Math.floor(interval) + ' 分鐘前'
+        return Math.floor(interval) + ' 分鐘'
       }
-      return Math.floor(seconds) + ' 秒前'
+      return Math.floor(seconds) + ' 秒'
     },
     parseName(name) {
       if (name == 'fetch current courses') return '取得本學期課程'
@@ -109,7 +114,7 @@ export default {
         --color: 70,201,58
     .run-item-header
       margin-left: 8px
-      .run-item-time
+      .run-item-status
         font-size: .8em
         opacity: .75
 </style>
