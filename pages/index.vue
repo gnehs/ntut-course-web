@@ -62,6 +62,11 @@
         <p>關於本網站</p>
         <i class="bx bx-info-circle"></i>
       </card>
+      <card class="hoverable padding" to="/status">
+        <card-title>擷取狀態</card-title>
+        <p>查看爬蟲資料擷取狀態</p>
+        <i class="bx bx-terminal"></i>
+      </card>
     </div>
   </div>
 </template>
