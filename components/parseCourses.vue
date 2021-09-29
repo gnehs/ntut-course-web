@@ -81,6 +81,8 @@
           <vs-tr
             :key="tr.id"
             v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
+            @click="$router.push(`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`)"
+            style="cursor: pointer"
             :data="tr"
           >
             <vs-td>{{ tr.id }}</vs-td>
@@ -101,42 +103,6 @@
               <span style="color: red" v-if="conflictCourseData.includes(tr.id)">衝堂</span>
               <span v-else>{{ tr.notes }}</span>
             </vs-td>
-            <template #expand>
-              <div class="cards">
-                <card>
-                  <card-title>{{ tr.classroom.length ? tr.classroom.map((x) => x.name).join('、') : '無資料' }}</card-title>
-                  <p>教室</p>
-                </card>
-                <div class="cards">
-                  <card>
-                    <card-title>{{ tr.credit }}</card-title>
-                    <p>學分</p>
-                  </card>
-                  <card>
-                    <card-title>{{ tr.hours }}</card-title>
-                    <p>時數</p>
-                  </card>
-                  <card>
-                    <card-title>{{ tr.stage }}</card-title>
-                    <p>階段</p>
-                  </card>
-                </div>
-                <div class="cards">
-                  <card v-for="item in parseTime(tr.time)" :key="item.title">
-                    <card-title>{{ item.content }}</card-title>
-                    <p>{{ item.title }}</p>
-                  </card>
-                  <card v-if="!parseTime(tr.time).length">
-                    <card-title>無資料</card-title>
-                    <p>上課時間</p>
-                  </card>
-                </div>
-              </div>
-              <div style="display: flex">
-                <div style="flex: 1" />
-                <vs-button flat is="router-link" :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`">詳細資料</vs-button>
-              </div>
-            </template>
           </vs-tr>
         </template>
         <template #footer>
