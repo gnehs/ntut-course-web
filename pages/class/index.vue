@@ -11,6 +11,16 @@
       <template #title>搜尋時發生了錯誤</template>
       <pre>{{ onError || 'Error' }}</pre>
     </vs-alert>
+    <div v-if="savedClass">
+      <h3>我的班級</h3>
+      <div class="cards" style="--card-row: 5; --card-row-sm: 3">
+        <card class="hoverable padding" :to="`/class/${savedClass}?year=${year}&sem=${sem}&d=${$store.state.department}`">
+          <card-title>{{ savedClass }}</card-title>
+          <p>我的班級</p>
+          <i class="bx bx-star"></i>
+        </card>
+      </div>
+    </div>
     <div v-for="department in filteredDepartmentData" :key="department.name">
       <h3>{{ department.name }}</h3>
       <div class="cards" style="--card-row: 5; --card-row-sm: 3">
@@ -18,7 +28,7 @@
           v-for="{ name } in department.class"
           :key="name"
           class="hoverable padding"
-          @click.native="$router.push(`/class/${name}?year=${year}&sem=${sem}&d=${$store.state.department}`)"
+          :to="`/class/${name}?year=${year}&sem=${sem}&d=${$store.state.department}`"
         >
           <card-title>{{ name }}</card-title>
           <p>{{ department.name }}</p>
@@ -34,6 +44,7 @@ export default {
   },
   data: () => ({
     onError: null,
+    savedClass: null,
     departmentData: null,
     filteredDepartmentData: null,
     filterDapartmentVal: null
@@ -71,6 +82,10 @@ export default {
       } catch (e) {
         loading.close()
       }
+      // show savedClass
+      let { year, sem } = this.$store.state
+      let myCourseClassKey = `my-couse-class-${year}-${sem}`
+      this.savedClass = localStorage[myCourseClassKey]
     },
     filterDapartment() {
       this.onError = null
