@@ -22,7 +22,7 @@
           <a href="https://gnehs.net" target="_blank" style="margin-left: 0.2em">勝勝</a>
         </div>
         <div class="r">
-          <vs-button icon transparent href="https://github.com/gnehs/ntut-course-web" blank color="rgb(33,31,31)">
+          <vs-button icon transparent href="https://github.com/gnehs/ntut-course-web" blank>
             <i class="bx bxl-github"></i>
           </vs-button>
         </div>
@@ -70,6 +70,16 @@ export default {
     }
   },
   async created() {
+    // detect dark mode
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    themeSwitch(darkModeMediaQuery.matches)
+    darkModeMediaQuery.addListener(e => {
+      const darkModeOn = e.matches
+      themeSwitch(darkModeOn)
+    })
+    function themeSwitch(darkModeOn) {
+      document.body.setAttribute('vs-theme', darkModeOn ? 'dark' : 'light')
+    }
     String.prototype.trimEllip = function(length) {
       return this.length > length ? this.substring(0, length) + '...' : this
     }
@@ -232,9 +242,6 @@ export default {
 }
 </script>
 <style lang="sass">
-body
-  background-color: #f4f7f8
-  margin: 0
 #app
   display: flex
   flex-direction: column
@@ -253,8 +260,7 @@ body
     opacity: .7
     padding: 0 15px
     width: 100%
-    background: #FFF
-
+    background: rgba(var(--vs-background), 1)
     border-radius: 15px 15px 0px 0px
     box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, var(--vs-shadow-opacity))
 .datasetDialog-form

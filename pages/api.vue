@@ -103,6 +103,9 @@ h1
 	padding: 8px 16px
 	margin: 8px 0
 	border-radius: 8px
+	//dark
+	@media (prefers-color-scheme: dark)
+		background: #343434
 </style>
 <script>
 export default {

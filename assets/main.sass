@@ -2,24 +2,33 @@
     box-sizing: border-box
 body
     font-family: 'Roboto Condensed', 'Noto Sans TC', sans-serif
+
+    background-color: #f4f7f8
+    margin: 0
+    // dark
+    @media (prefers-color-scheme: dark)
+        background-color: #1d1d1d
+        color: #fff 
 pre,code
     font-family: 'Roboto Mono', 'Noto Sans TC', monospace
 code
-    background: rgba(0,0,0,0.025)
+    background: rgba(var(--vs-text),.01)
     border-radius: 4px
     padding: 0 4px
     line-height: 1.5em
-    border: 1px solid rgba(0,0,0,0.1)
+    border: 1px solid rgba(var(--vs-text),.1)
     font-size: .95em
 hr 
     border: 0
     border-top: 1px solid rgba(0,0,0,0.1)
 a
-    color: #5656b6
+    color: rgba(var(--vs-primary), 1)
+    @media (prefers-color-scheme: dark)
+        --vs-primary: 247, 250, 255
     &:hover
-        color: #42428f
+        color: rgba(var(--vs-primary), .8)
     &:active
-        color: #34346e 
+        color: rgba(var(--vs-primary), .9)
 h1,h2,h3,h4,h5,h6,p
     margin: 1em 0
     line-height: 1.5em
@@ -28,8 +37,10 @@ h1,h2,h3,h4,h5,h6
         margin-top: -1em
 .site-title
     font-weight: bold
-    color: #000
+    color: rgba(var(--vs-text),1)
     text-decoration: none
+    &:hover
+        color: rgba(var(--vs-text),.8) 
 .vs-input
     width: 100%
 .vs-alert+.vs-alert
@@ -99,8 +110,10 @@ h1,h2,h3,h4,h5,h6
         position: sticky
         .item
             padding: 10px 12px
-            background: #f2f2f2
+            background: rgba(var(--vs-text),.05)
             text-align: center
+            &:first-child
+                padding: 0
     .content
         &:nth-child(2n)
             background: rgba(var(--vs-gray-1), 1)
@@ -111,8 +124,8 @@ h1,h2,h3,h4,h5,h6
             .course
                 cursor: pointer
                 width: 100%
-                --main-color: rgb(25, 91, 255)
-                --main-bg: rgba(25, 91, 255,.15)
+                --main-color: rgba(var(--vs-text), .9) 
+                --main-bg: rgba(var(--vs-primary), 0.15)  
                 background: var(--main-bg)
                 color: var(--main-color)
                 padding: 12px 6px
@@ -125,8 +138,8 @@ h1,h2,h3,h4,h5,h6
                 align-items: center
                 position: relative
                 &.conflict
-                    --main-color: rgb(255, 44, 44)
-                    --main-bg: rgb(255, 218, 218)
+                    --main-color: rgba(var(--vs-danger),1)
+                    --main-bg: rgba(var(--vs-danger),.2) 
                 &:before
                     content: ""
                     background: var(--main-color)
@@ -149,7 +162,7 @@ h1,h2,h3,h4,h5,h6
         grid-template-columns: 1.25em repeat(5, 1fr)
         .item
             &:first-child
-                background: #f2f2f2
+                background: rgba(var(--vs-text),.05)
                 font-size: 1.15em
                 display: flex
                 align-items: center
@@ -158,7 +171,7 @@ h1,h2,h3,h4,h5,h6
 .list
     .item
         padding: 10px 12px
-        background: #fff
+        background: rgba(var(--vs-background),1)
         &:first-child
             border-radius: 8px 8px 0 0
         &:last-child
@@ -167,4 +180,4 @@ h1,h2,h3,h4,h5,h6
             background: rgba(var(--vs-gray-1), 1)
             cursor: pointer
         &+.item
-            border-top: 1px solid #e0e0e0
+            border-top: 1px solid rgba(var(--vs-gray-2), 1)

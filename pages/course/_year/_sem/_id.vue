@@ -178,9 +178,9 @@
 <style lang="sass" scoped>
 .covid19-info
   border-radius: 16px
-  border: 1px solid #e6e6e6
+  border: 1px solid rgba(var(--vs-text), .2)
   padding: 8px 16px
-  background-color: #fff
+  background-color: rgba(var(--vs-background), 1)
   margin-top: 16px
   .level-block
     --border-color: #e6e6e6
@@ -199,7 +199,7 @@
       font-size: 14px
       opacity: .75
 .class-link
-  color: #2c3e50
+  color: rgba(var(--vs-text),1)
   &:hover
     opacity: .75
   &:active
