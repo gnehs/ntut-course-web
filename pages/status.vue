@@ -85,7 +85,7 @@ export default {
   .run-item
     padding: 8px
     margin: 8px 0
-    background-color: #fff
+    background-color: rgba(var(--vs-background),1)
     display: flex
     align-items: center
     text-decoration: none
@@ -96,7 +96,7 @@ export default {
     &:hover
       box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
       transform: translate(0, -5px)
-      color: #2c3e50
+      color: rgba(var(--vs-text),.8)
     &:active
       box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0))
       transform: translate(0, 5px)
