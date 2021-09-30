@@ -1,16 +1,17 @@
 <template>
   <div v-if="upcomingCourse.length">
-    <h2>即將到來的課程</h2>
+    <h2>接下來的課程</h2>
     <transition-group name="flip-card" tag="div" class="cards">
       <card
         class="hoverable padding"
         v-for="tr in upcomingCourse"
         :key="tr.id"
         :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`"
+        style="--card-row: 3; --card-row-sm: 1"
       >
         <card-title>
           {{ tr.name.zh }}
-          <tag color="rgb(var(--vs-primary))">
+          <tag color="#f0f2f5" text-color="#606770">
             {{
               tr.classroom
                 .map((y) => y.name)
@@ -51,28 +52,24 @@ export default {
       upcomingCourse: []
     }
   },
-  async created() {
-    let currentDate = new Date()
-    // get my-courses
-    let { year, sem, department } = this.$store.state
-    let myCourseKey = `my-couse-data-${year}-${sem}`
-    if (department != 'main') {
-      myCourseKey += `-${department}`
+  computed: {
+    year() {
+      return this.$store.state.year
+    },
+    sem() {
+      return this.$store.state.sem
     }
-    let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
-    let course = await this.$fetchCourse(year, sem, department)
-    this.myCourses = course.filter(x => courseIds.includes(x.id))
-    // show upcoming course
-    let upcomingCourseIncludes = Object.entries(this.timetable)
-      .filter(([courseId, courseTime]) => {
-        let tempDate = new Date()
-        tempDate.setHours(courseTime.split(':')[0], courseTime.split(':')[1], 0)
-        return tempDate > currentDate
-      })
-      .map(x => x[0])
-    let todayDayOfWeek = Object.keys(this.dateEng2zh)[currentDate.getDay()]
-    this.todayDayOfWeek = todayDayOfWeek
-    this.upcomingCourse = this.myCourses.filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r)))
+  },
+  watch: {
+    year(newCount, oldCount) {
+      this.getUpcomingCourse()
+    },
+    sem(newCount, oldCount) {
+      this.getUpcomingCourse()
+    }
+  },
+  async created() {
+    this.getUpcomingCourse()
   },
   methods: {
     parseTime(t) {
@@ -81,6 +78,29 @@ export default {
         if (i[1].length) result.push({ title: this.dateEng2zh[i[0]], content: i[1].join('、') })
       }
       return result
+    },
+    async getUpcomingCourse() {
+      let currentDate = new Date()
+      // get my-courses
+      let { year, sem, department } = this.$store.state
+      let myCourseKey = `my-couse-data-${year}-${sem}`
+      if (department != 'main') {
+        myCourseKey += `-${department}`
+      }
+      let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
+      let course = await this.$fetchCourse(year, sem, department)
+      this.myCourses = course.filter(x => courseIds.includes(x.id))
+      // show upcoming course
+      let upcomingCourseIncludes = Object.entries(this.timetable)
+        .filter(([courseId, courseTime]) => {
+          let tempDate = new Date()
+          tempDate.setHours(courseTime.split(':')[0], courseTime.split(':')[1], 0)
+          return tempDate > currentDate
+        })
+        .map(x => x[0])
+      let todayDayOfWeek = Object.keys(this.dateEng2zh)[currentDate.getDay()]
+      this.todayDayOfWeek = todayDayOfWeek
+      this.upcomingCourse = this.myCourses.filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r)))
     }
   }
 }
