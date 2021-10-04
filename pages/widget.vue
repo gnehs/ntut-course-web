@@ -11,10 +11,7 @@
     <div class="white-box">
       <pre style="width: 100%; height: 512px; overflow: hidden scroll" id="scriptable-code">
 const courseData = {{ courseData }}
-
-String.prototype.trimEllip = function (length) {
-    return this.length > length ? this.substring(0, length) + '...' : this
-}
+ 
 function getUpcomingCourse() {
     let currentDate = new Date()
     let timetable = {
@@ -44,14 +41,9 @@ function getUpcomingCourse() {
         .map(x => x[0])
     let todayDayOfWeek = Object.keys(dateEng2zh)[currentDate.getDay()]
     return courseData.filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r))).map(x => ({
-        name: x.name.zh,
-        classroom: x.classroom
-            .map((y) => y.name)
-            .join('、')
-            .trimEllip(13),
+        ...x,
         start: timetable[x.time[todayDayOfWeek][0]],
-        length: x.time[todayDayOfWeek].length,
-        link: `https://ntut-course.gnehs.net/course/{{ $store.state.year }}/{{ $store.state.sem }}/${x.id}`
+        length: x.time[todayDayOfWeek].length, 
     }))
 }
 function createWidget() {
@@ -158,8 +150,18 @@ export default {
       }
       let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
       let course = await this.$fetchCourse(year, sem, department)
-      this.courseData = course.filter(x => courseIds.includes(x.id))
-      console.log(this.courseData)
+
+      this.courseData = course
+        .filter(x => courseIds.includes(x.id))
+        .map(x => ({
+          name: x.name.zh,
+          time: x.time,
+          classroom: x.classroom
+            .map(y => y.name)
+            .join('、')
+            .trimEllip(13),
+          link: `https://ntut-course.gnehs.net/course/${year}/${sem}/${x.id}`
+        }))
     }
   }
 }
