@@ -3,7 +3,7 @@
     <h1>iOS 小工具（測試）</h1>
     <p>新增小工具在您的桌面上，隨時檢視接下來的課程！</p>
     <h2><span style="color: blue">Step 0</span> 加入課程</h2>
-    <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong></p>
+    <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong>，如果你新增正確，在首頁可以看到「接下來的課程」</p>
     <h2><span style="color: blue">Step 1</span> 安裝 Scriptable</h2>
     <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a></p>
     <h2><span style="color: blue">Step 2</span> 複製並貼上程式碼</h2>
@@ -71,7 +71,7 @@ function createWidget() {
         courseTxt.font = Font.boldSystemFont(18)
 
         widget.addSpacer(2)
-        if (course.classroom!='') {
+        if (course.classroom != '') {
             let classTxt = widget.addText(course.classroom)
             classTxt.textColor = Color.white()
             classTxt.font = Font.systemFont(18)
@@ -80,7 +80,7 @@ function createWidget() {
         summaryTxt.textColor = Color.white()
         summaryTxt.font = Font.systemFont(18)
         if (config.runsWithSiri) {
-            Speech.speak(`在 ${course.start} 有一堂 ${course.name}`)
+            Speech.speak(` 你在 ${course.start} 有一堂 ${course.name}`)
         } else {
             widget.addSpacer(8)
             // Add button to open documentation
@@ -111,7 +111,7 @@ function createWidget() {
         courseTxt.textColor = Color.white()
         courseTxt.font = Font.boldSystemFont(18)
         if (config.runsWithSiri) {
-            Speech.speak(`好棒，你今天沒課了`)
+            Speech.speak(` 好棒，你今天沒課了`)
         } 
     }
 
@@ -125,7 +125,7 @@ if (config.runsInWidget) {
     widget.presentMedium()
 }
 Script.complete()
-    </pre
+</pre
       >
     </div>
   </div>
