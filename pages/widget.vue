@@ -10,7 +10,7 @@
     <p>建立一個 Script 並貼上以下程式碼即可使用小工具</p>
     <div class="white-box">
       <pre style="width: 100%; height: 512px; overflow: hidden scroll" id="scriptable-code">
-const courseData = {{ courseData }}
+const courseData = {{ JSON.stringify(courseData) }}
  
 function getUpcomingCourse() {
     let currentDate = new Date()
