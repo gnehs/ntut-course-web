@@ -58,8 +58,8 @@ function createWidget() {
     let gradient = new LinearGradient()
     gradient.locations = [0, 1]
     gradient.colors = [
-        new Color("141414"),
-        new Color("13233F")
+        new Color("730555"),
+        new Color("a10677")
     ]
 
     let widget = new ListWidget()
@@ -79,7 +79,11 @@ function createWidget() {
         courseTxt.font = Font.boldSystemFont(18)
 
         widget.addSpacer(2)
-
+        if (course.classroom!='') {
+            let classTxt = widget.addText(course.classroom)
+            classTxt.textColor = Color.white()
+            classTxt.font = Font.systemFont(18)
+        }
         let summaryTxt = widget.addText(`於 ${course.start} 開始，共 ${course.length} 節`)
         summaryTxt.textColor = Color.white()
         summaryTxt.font = Font.systemFont(18)
@@ -90,7 +94,7 @@ function createWidget() {
             let footerStack = widget.addStack()
             let linkStack = footerStack.addStack()
             linkStack.centerAlignContent()
-            linkStack.url = api.url
+            linkStack.url = course.link
             let linkElement = linkStack.addText("詳細資料")
             linkElement.font = Font.mediumSystemFont(13)
             linkElement.textColor = Color.blue()
