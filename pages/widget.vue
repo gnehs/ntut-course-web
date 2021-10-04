@@ -58,8 +58,8 @@ function createWidget() {
     let gradient = new LinearGradient()
     gradient.locations = [0, 1]
     gradient.colors = [
-        new Color("730555"),
-        new Color("a10677")
+        new Color("292929"),
+        new Color("141414")
     ]
 
     let widget = new ListWidget()
@@ -87,7 +87,9 @@ function createWidget() {
         let summaryTxt = widget.addText(`於 ${course.start} 開始，共 ${course.length} 節`)
         summaryTxt.textColor = Color.white()
         summaryTxt.font = Font.systemFont(18)
-        if (!config.runsWithSiri) {
+        if (config.runsWithSiri) {
+            Speech.speak(`在 ${course.start} 有一堂 ${course.name}`)
+        } else {
             widget.addSpacer(8)
             // Add button to open documentation
             let linkSymbol = SFSymbol.named("arrow.up.forward")
@@ -116,6 +118,9 @@ function createWidget() {
         let courseTxt = widget.addText('沒有課程')
         courseTxt.textColor = Color.white()
         courseTxt.font = Font.boldSystemFont(18)
+        if (config.runsWithSiri) {
+            Speech.speak(`好棒，你今天沒課了`)
+        } 
     }
 
     return widget
