@@ -52,6 +52,11 @@
 
     <h2>其他資源</h2>
     <div class="cards">
+      <card class="hoverable padding" to="/widget">
+        <card-title>iOS 小工具（測試）</card-title>
+        <p>在桌面上檢視接下來的課程</p>
+        <i class="bx bx-extension"></i>
+      </card>
       <card class="hoverable padding" to="/api">
         <card-title>API 文件</card-title>
         <p>探索開放公眾使用的 API 文件</p>

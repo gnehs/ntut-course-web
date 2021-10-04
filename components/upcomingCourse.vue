@@ -11,7 +11,7 @@
       >
         <card-title>
           {{ tr.name.zh }}
-          <tag color="#f0f2f5" text-color="#606770">
+          <tag color="#f0f2f5" text-color="#606770" v-if="tr.classroom.length">
             {{
               tr.classroom
                 .map((y) => y.name)
