@@ -10,7 +10,7 @@ export default {
     title: '北科課程好朋友',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0' },
       { hid: 'description', name: 'description', content: '北科課程好朋友，提供臺北科技大學最新課程資訊，以友善的介面與衝堂偵測等功能讓選課過程更加輕鬆。' }
     ],
     link: [
