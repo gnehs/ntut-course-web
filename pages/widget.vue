@@ -8,7 +8,7 @@
     <h2><span style="color: blue">Step 1</span> 安裝 Scriptable</h2>
     <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a></p>
     <h2><span style="color: blue">Step 2</span> 複製並貼上程式碼</h2>
-    <p>建立一個 Script 並貼上以下程式碼即可使用小工具</p>
+    <p>建立一個 Script 並貼上以下程式碼</p>
     <div class="white-box" style="position: relative">
       <div style="position: absolute; right: 0">
         <vs-button @click="doCopy"> <i class="bx bx-clipboard"></i>複製 </vs-button>
@@ -132,6 +132,12 @@ Script.complete()
 </pre
       >
     </div>
+
+    <h2><span style="color: blue">Step 3</span> 新增小工具到桌面</h2>
+    <p>參考此影片建立您的小工具</p>
+    <video loop controls autoplay class="demo-video">
+      <source src="/video/how_to_add_iOS_widget.mp4" type="video/mp4" />
+    </video>
   </div>
 </template>
 
@@ -193,4 +199,10 @@ export default {
   width: 100%
   height: 512px
   overflow: hidden scroll
+.demo-video
+  height: 700px
+  margin: 0 auto
+  display: block
+  border-radius: 16px
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.05)
 </style>
