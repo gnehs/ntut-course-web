@@ -53,7 +53,7 @@
     <h2>其他資源</h2>
     <div class="cards">
       <card class="hoverable padding" to="/widget">
-        <card-title>iOS 小工具（測試）</card-title>
+        <card-title>iOS 小工具 <tag color="blue"> 測試 </tag></card-title>
         <p>在桌面上檢視接下來的課程</p>
         <i class="bx bx-extension"></i>
       </card>

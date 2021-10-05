@@ -2,14 +2,18 @@
   <div>
     <h1>iOS 小工具（測試）</h1>
     <p>新增小工具在您的桌面上，隨時檢視接下來的課程！</p>
+    <p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
     <h2><span style="color: blue">Step 0</span> 加入課程</h2>
     <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong>，如果你新增正確，在首頁可以看到「接下來的課程」</p>
     <h2><span style="color: blue">Step 1</span> 安裝 Scriptable</h2>
     <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a></p>
     <h2><span style="color: blue">Step 2</span> 複製並貼上程式碼</h2>
     <p>建立一個 Script 並貼上以下程式碼即可使用小工具</p>
-    <div class="white-box">
-      <pre style="width: 100%; height: 512px; overflow: hidden scroll" id="scriptable-code">
+    <div class="white-box" style="position: relative">
+      <div style="position: absolute; right: 0">
+        <vs-button @click="doCopy"> <i class="bx bx-clipboard"></i>複製 </vs-button>
+      </div>
+      <pre id="scriptable-code" ref="scriptable-code">
 const courseData = {{ JSON.stringify(courseData) }}
  
 function getUpcomingCourse() {
@@ -68,17 +72,17 @@ function createWidget() {
         let course = upcomingCourse[0]
         let courseTxt = widget.addText(course.name)
         courseTxt.textColor = Color.white()
-        courseTxt.font = Font.boldSystemFont(18)
+        courseTxt.font = Font.boldSystemFont(16)
 
         widget.addSpacer(2)
         if (course.classroom != '') {
             let classTxt = widget.addText(course.classroom)
             classTxt.textColor = Color.white()
-            classTxt.font = Font.systemFont(18)
+            classTxt.font = Font.systemFont(13)
         }
         let summaryTxt = widget.addText(`於 ${course.start} 開始，共 ${course.length} 節`)
         summaryTxt.textColor = Color.white()
-        summaryTxt.font = Font.systemFont(18)
+        summaryTxt.font = Font.systemFont(13)
         if (config.runsWithSiri) {
             Speech.speak(` 你在 ${course.start} 有一堂 ${course.name}`)
         } else {
@@ -98,7 +102,7 @@ function createWidget() {
             linkSymbolElement.tintColor = Color.blue()
             footerStack.addSpacer()
             // Add link to documentation
-            let docsSymbol = SFSymbol.named("book")
+            let docsSymbol = SFSymbol.named("graduationcap")
             let docsElement = footerStack.addImage(docsSymbol.image)
             docsElement.imageSize = new Size(20, 20)
             docsElement.tintColor = Color.white()
@@ -162,10 +166,31 @@ export default {
             .trimEllip(13),
           link: `https://ntut-course.gnehs.net/course/${year}/${sem}/${x.id}`
         }))
+    },
+    doCopy() {
+      this.$copyText(this.$refs['scriptable-code'].textContent).then(
+        e => {
+          this.$vs.notification({
+            title: '已複製',
+            text: '請到 Scriptable 貼上程式碼即可使用小工具'
+          })
+        },
+        e => {
+          this.$vs.notification({
+            title: '複製失敗',
+            color: 'danger',
+            text: '請嘗試手動複製'
+          })
+        }
+      )
     }
   }
 }
 </script>
 
-<style>
+<style lang="sass" scoped>
+#scriptable-code
+  width: 100%
+  height: 512px
+  overflow: hidden scroll
 </style>

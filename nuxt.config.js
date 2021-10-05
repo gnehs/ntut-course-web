@@ -47,6 +47,8 @@ export default {
     '@nuxtjs/google-gtag',
     // https://www.npmjs.com/package/@nuxtjs/markdownit
     '@nuxtjs/markdownit',
+    // https://www.npmjs.com/package/nuxt-clipboard
+    'nuxt-clipboard',
   ],
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
