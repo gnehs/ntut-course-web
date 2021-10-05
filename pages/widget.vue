@@ -14,7 +14,7 @@
         <vs-button @click="doCopy"> <i class="bx bx-clipboard"></i>複製 </vs-button>
       </div>
       <pre id="scriptable-code" ref="scriptable-code">
-const courseData = {{ JSON.stringify(courseData) }}
+const courseData = {{ JSON.stringify(courseData) }};
  
 function getUpcomingCourse() {
     let currentDate = new Date()
@@ -86,7 +86,7 @@ function createWidget() {
         if (config.runsWithSiri) {
             Speech.speak(` 你在 ${course.start} 有一堂 ${course.name}`)
         } else {
-            widget.addSpacer(8)
+            widget.addSpacer()
             // Add button to open documentation
             let linkSymbol = SFSymbol.named("arrow.up.forward")
             let footerStack = widget.addStack()
