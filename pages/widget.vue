@@ -201,6 +201,7 @@ export default {
   overflow: hidden scroll
 .demo-video
   height: 700px
+  max-width: 100%
   margin: 0 auto
   display: block
   border-radius: 16px
