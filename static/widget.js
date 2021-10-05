@@ -1,20 +1,6 @@
-<template>
-  <div>
-    <h1>iOS 小工具（測試）</h1>
-    <p>新增小工具在您的桌面上，隨時檢視接下來的課程！</p>
-    <p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
-    <h2><span style="color: blue">Step 0</span> 加入課程</h2>
-    <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong>，如果你新增正確，在首頁可以看到「接下來的課程」</p>
-    <h2><span style="color: blue">Step 1</span> 安裝 Scriptable</h2>
-    <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a></p>
-    <h2><span style="color: blue">Step 2</span> 複製並貼上程式碼</h2>
-    <p>建立一個 Script 並貼上以下程式碼</p>
-    <div class="white-box" style="position: relative">
-      <div style="position: absolute; right: 0">
-        <vs-button @click="doCopy"> <i class="bx bx-clipboard"></i>複製 </vs-button>
-      </div>
-      <pre id="scriptable-code" ref="scriptable-code">
-const courseData = {{ JSON.stringify(courseData) }};
+
+const courseData = []
+
 function getUpcomingCourse() {
     let currentDate = new Date()
     let timetable = {
@@ -133,81 +119,3 @@ if (config.runsInWidget) {
     widget.presentMedium()
 }
 Script.complete()
-</pre
-      >
-    </div>
-
-    <h2><span style="color: blue">Step 3</span> 新增小工具到桌面</h2>
-    <p>參考此影片建立您的小工具</p>
-    <video loop controls autoplay class="demo-video">
-      <source src="/video/how_to_add_iOS_widget.mp4" type="video/mp4" />
-    </video>
-  </div>
-</template>
-
-<script>
-export default {
-  data() {
-    return {
-      courseData: []
-    }
-  },
-  async created() {
-    await this.getMyCourse()
-  },
-  methods: {
-    async getMyCourse() {
-      let { year, sem, department } = this.$store.state
-      let myCourseKey = `my-couse-data-${year}-${sem}`
-      if (department != 'main') {
-        myCourseKey += `-${department}`
-      }
-      let courseIds = JSON.parse(localStorage[myCourseKey] || '[]')
-      let course = await this.$fetchCourse(year, sem, department)
-
-      this.courseData = course
-        .filter(x => courseIds.includes(x.id))
-        .map(x => ({
-          name: x.name.zh,
-          time: x.time,
-          classroom: x.classroom
-            .map(y => y.name)
-            .join('、')
-            .trimEllip(13),
-          link: `https://ntut-course.gnehs.net/course/${year}/${sem}/${x.id}`
-        }))
-    },
-    doCopy() {
-      this.$copyText(this.$refs['scriptable-code'].textContent).then(
-        e => {
-          this.$vs.notification({
-            title: '已複製',
-            text: '請到 Scriptable 貼上程式碼即可使用小工具'
-          })
-        },
-        e => {
-          this.$vs.notification({
-            title: '複製失敗',
-            color: 'danger',
-            text: '請嘗試手動複製'
-          })
-        }
-      )
-    }
-  }
-}
-</script>
-
-<style lang="sass" scoped>
-#scriptable-code
-  width: 100%
-  height: 512px
-  overflow: hidden scroll
-.demo-video
-  height: 700px
-  max-width: 100%
-  margin: 0 auto
-  display: block
-  border-radius: 16px
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.05)
-</style>
