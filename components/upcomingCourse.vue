@@ -100,7 +100,9 @@ export default {
         .map(x => x[0])
       let todayDayOfWeek = Object.keys(this.dateEng2zh)[currentDate.getDay()]
       this.todayDayOfWeek = todayDayOfWeek
-      this.upcomingCourse = this.myCourses.filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r)))
+      this.upcomingCourse = this.myCourses
+        .filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r)))
+        .sort((a, b) => a.time[todayDayOfWeek][0] - b.time[todayDayOfWeek][0])
     }
   }
 }

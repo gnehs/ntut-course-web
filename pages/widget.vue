@@ -14,7 +14,7 @@
         <vs-button @click="doCopy"> <i class="bx bx-clipboard"></i>複製 </vs-button>
       </div>
       <pre id="scriptable-code" ref="scriptable-code">
-const courseData = {{ JSON.stringify(courseData) }};
+const courseData = {{ JSON.stringify(courseData) }}
 function getUpcomingCourse() {
     let currentDate = new Date()
     let timetable = {
@@ -43,11 +43,13 @@ function getUpcomingCourse() {
         })
         .map(x => x[0])
     let todayDayOfWeek = Object.keys(dateEng2zh)[currentDate.getDay()]
-    return courseData.filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r))).map(x => ({
-        ...x,
-        start: timetable[x.time[todayDayOfWeek][0]],
-        length: x.time[todayDayOfWeek].length,
-    }))
+    return courseData
+        .filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r))).map(x => ({
+            ...x,
+            start: timetable[x.time[todayDayOfWeek][0]],
+            length: x.time[todayDayOfWeek].length,
+        }))
+        .sort((a, b) => a.time[todayDayOfWeek][0] - b.time[todayDayOfWeek][0])
 }
 function createWidget() {
     let gradient = new LinearGradient()
@@ -83,13 +85,6 @@ function createWidget() {
         summaryTxt.textColor = Color.white()
         summaryTxt.font = Font.systemFont(13)
         if (config.runsWithSiri) {
-            widget.addSpacer()
-            let providerText = widget.addText("🍤 北科課程好朋友")
-            providerText.textColor = Color.white()
-            providerText.textOpacity = 0.7
-            providerText.font = Font.mediumSystemFont(13)
-
-
             Speech.speak(` 你在 ${course.start} 有一堂 ${course.name}`)
         } else {
             widget.addSpacer()
@@ -113,7 +108,6 @@ function createWidget() {
             iconElement.font = Font.mediumSystemFont(13)
             iconElement.url = `http://ntut-course.gnehs.net/`
         }
-
     } else {
         let courseTxt = widget.addText('沒有課程')
         courseTxt.textColor = Color.white()
@@ -122,7 +116,16 @@ function createWidget() {
             Speech.speak(` 好棒，你今天沒課了`)
         }
     }
-
+    // add footer
+    if (config.runsWithSiri || !upcomingCourse.length) {
+        widget.addSpacer()
+        let footerStack = widget.addStack()
+        let providerText = footerStack.addText("🍤 北科課程好朋友")
+        providerText.textColor = Color.white()
+        providerText.textOpacity = 0.7
+        providerText.font = Font.mediumSystemFont(13)
+        footerStack.url = `http://ntut-course.gnehs.net/`
+    }
     return widget
 }
 
