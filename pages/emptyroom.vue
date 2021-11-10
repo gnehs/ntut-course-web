@@ -75,6 +75,7 @@
         align-items: center
         border-radius: 50%
         background-color: #f5f5f5
+        font-size: 0.8rem
         &.active
             background-color: red
             color: white
