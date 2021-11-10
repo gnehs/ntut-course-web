@@ -50,13 +50,22 @@
       </card>
     </div>
 
-    <h2>其他資源</h2>
+    <h2>實用工具</h2>
     <div class="cards">
       <card class="hoverable padding" to="/widget">
-        <card-title>iOS 小工具 <tag color="blue"> 測試 </tag></card-title>
+        <card-title>iOS 小工具 </card-title>
         <p>在桌面上檢視接下來的課程</p>
         <i class="bx bx-extension"></i>
       </card>
+      <card class="hoverable padding" to="/emptyroom">
+        <card-title>尋找空教室 </card-title>
+        <p>尋找沒有課程進行的教室</p>
+        <i class="bx bx-ghost"></i>
+      </card>
+    </div>
+
+    <h2>其他資源</h2>
+    <div class="cards">
       <card class="hoverable padding" to="/api">
         <card-title>API 文件</card-title>
         <p>探索開放公眾使用的 API 文件</p>

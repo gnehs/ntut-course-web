@@ -1,0 +1,211 @@
+<template>
+  <div>
+    <vs-alert> 請注意，此功能僅能列出表定無課程進行的教室，教室可能因其他因素，致無法使用。 </vs-alert>
+    <vs-alert>
+      尋找空教室仍在早期開發階段，若有建議或是找到 bug 可以到 GitHub 開
+      <a href="https://github.com/gnehs/ntut-course-web/issues/new" target="_blank">issue</a>。
+    </vs-alert>
+    <h1>尋找空教室</h1>
+    <div v-if="categoryList">
+      <template v-for="category of categoryList">
+        <h3 :key="category">{{ category }}</h3>
+        <div class="cards" :key="category + '_classroom'" style="--card-row: 2; --card-row-sm: 1">
+          <card
+            class="hoverable padding"
+            v-for="classroom of classList.filter((x) => x.category == category)"
+            :key="classroom.name"
+            @click.native="showEmptyroomDetailDialog(classroom)"
+          >
+            <card-title>{{ classroom.name }}</card-title>
+            <div class="course-dots">
+              <div
+                class="course-dot-item"
+                v-for="i of upcomingCourseIncludes"
+                :key="i"
+                :class="{ active: !classroom.timetable.includes(i) }"
+              >
+                {{ i }}
+              </div>
+            </div>
+          </card>
+        </div>
+      </template>
+    </div>
+    <vs-dialog v-model="emptyroomDetailDialog">
+      <template #header>
+        <h4>
+          <span v-if="emptyroomDetailData">「{{ emptyroomDetailData.name }}」</span>詳細上課資訊
+        </h4>
+      </template>
+
+      <div class="list" v-if="emptyroomDetailData">
+        <div
+          class="item"
+          style="display: flex; justify-content: space-between; flex-direction: row"
+          v-for="item of upcomingCourseIncludes"
+          :key="item"
+        >
+          <div>{{ item }} - {{ timetable[item] }}</div>
+          <div>{{ emptyroomDetailData.timetable.includes(item) ? '空堂' : '有課程進行' }}</div>
+        </div>
+        <a
+          class="item"
+          style="display: block; text-align: center"
+          v-if="emptyroomDetailData"
+          :href="`https://aps.ntut.edu.tw/course/tw/${emptyroomDetailData.link}`"
+          target="_blank"
+        >
+          到北科課程網站查看
+        </a>
+      </div>
+    </vs-dialog>
+  </div>
+</template>
+<style lang="sass" scoped>
+.course-dots
+    display: flex
+    gap: 0.5rem
+    margin-top: 0.5rem
+    flex-wrap: wrap
+    .course-dot-item
+        width: 1.5rem
+        height: 1.5rem
+        display: flex
+        justify-content: center
+        align-items: center
+        border-radius: 50%
+        background-color: #f5f5f5
+        &.active
+            background-color: red
+            color: white
+</style>
+<script>
+export default {
+  data: () => ({
+    onError: null,
+    categoryList: [],
+    classList: [],
+    timetable: {
+      '1': '8:10',
+      '2': '9:10',
+      '3': '10:10',
+      '4': '11:10',
+      N: '12:10',
+      '5': '13:10',
+      '6': '14:10',
+      '7': '15:10',
+      '8': '16:10',
+      '9': '17:10',
+      A: '18:30',
+      B: '19:20',
+      C: '20:20',
+      D: '21:10'
+    },
+    upcomingCourseIncludes: [],
+    emptyroomDetailDialog: false,
+    emptyroomDetailData: null
+  }),
+  head() {
+    return {
+      title: '尋找空教室'
+    }
+  },
+  computed: {
+    year() {
+      return this.$store.state.year
+    },
+    sem() {
+      return this.$store.state.sem
+    }
+  },
+  watch: {
+    year(newCount, oldCount) {
+      this.getEmptyClass()
+    },
+    sem(newCount, oldCount) {
+      this.getEmptyClass()
+    }
+  },
+  created() {
+    this.getEmptyClass()
+  },
+  methods: {
+    showEmptyroomDetailDialog(data) {
+      this.emptyroomDetailData = data
+      this.emptyroomDetailDialog = true
+    },
+    async getEmptyClass() {
+      let { year, sem } = this.$store.state
+      let course = [
+        ...(await this.$fetchCourse(year, sem, '研究所(日間部、進修部、週末碩士班)')),
+        ...(await this.$fetchCourse(year, sem, '進修部')),
+        ...(await this.$fetchCourse(year, sem, 'main'))
+      ]
+      // get empty class
+      let currentDate = new Date()
+      let timetable = {
+        '1': '8:10',
+        '2': '9:10',
+        '3': '10:10',
+        '4': '11:10',
+        N: '12:10',
+        '5': '13:10',
+        '6': '14:10',
+        '7': '15:10',
+        '8': '16:10',
+        '9': '17:10',
+        A: '18:30',
+        B: '19:20',
+        C: '20:20',
+        D: '21:10'
+      }
+      // show upcoming course
+      let upcomingCourseIncludes = Object.entries(timetable)
+        .filter(([courseId, courseTime]) => {
+          let tempDate = new Date()
+          tempDate.setHours(courseTime.split(':')[0], courseTime.split(':')[1], 0)
+          //   return tempDate >= currentDate
+          return !0
+        })
+        .map(x => x[0])
+      this.upcomingCourseIncludes = upcomingCourseIncludes
+      // create class list
+      let classList = new Set()
+      let categoryList = new Set()
+      course.map(x => {
+        x.classroom.map(y => {
+          classList.add(y.name)
+        })
+      })
+      classList = Array.from(classList).map(x => {
+        let category = x.match(/^(\D.)/)[1]
+        categoryList.add(category)
+        return {
+          name: x,
+          category,
+          timetable: upcomingCourseIncludes
+        }
+      })
+
+      let dateEng2zh = { sun: '週日', mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六' }
+      let todayDayOfWeek = Object.keys(dateEng2zh)[currentDate.getDay()]
+      course
+        .filter(x => x.classroom.length)
+        .map(x => {
+          x.classroom.map(y => {
+            // remove from classList timetable
+            classList.map(z => {
+              if (z.name == y.name) {
+                z.timetable = z.timetable.filter(i => !x.time[todayDayOfWeek].includes(i))
+                z.link = y.link
+              }
+            })
+          })
+        })
+      classList = classList.sort((a, b) => a.name.localeCompare(b.name)).sort((a, b) => b.timetable.length - a.timetable.length)
+      this.classList = classList
+      this.categoryList = Array.from(categoryList).sort()
+    }
+  }
+}
+</script> 
