@@ -64,18 +64,19 @@
 <style lang="sass" scoped>
 .course-dots
     display: flex
-    gap: 0.5rem
+    gap: 0.25rem
     margin-top: 0.5rem
     flex-wrap: wrap
     .course-dot-item
-        width: 1.5rem
-        height: 1.5rem
+        width: 1.25rem
+        height: 1.25rem
         display: flex
         justify-content: center
         align-items: center
         border-radius: 50%
         background-color: #f5f5f5
-        font-size: 0.8rem
+        font-size: 0.75rem
+        font-family: 'Lato', sans-serif
         &.active
             background-color: red
             color: white
@@ -161,14 +162,14 @@ export default {
         D: '21:10'
       }
       // show upcoming course
-      let upcomingCourseIncludes = Object.entries(timetable)
-        .filter(([courseId, courseTime]) => {
-          let tempDate = new Date()
-          tempDate.setHours(courseTime.split(':')[0], courseTime.split(':')[1], 0)
-          //   return tempDate >= currentDate
-          return !0
-        })
-        .map(x => x[0])
+      //   let upcomingCourseIncludes = Object.entries(timetable)
+      //     .filter(([courseId, courseTime]) => {
+      //       let tempDate = new Date()
+      //       tempDate.setHours(courseTime.split(':')[0], courseTime.split(':')[1], 0)
+      //         return tempDate >= currentDate
+      //     })
+      //     .map(x => x[0])
+      let upcomingCourseIncludes = Object.keys(timetable)
       this.upcomingCourseIncludes = upcomingCourseIncludes
       // create class list
       let classList = new Set()
