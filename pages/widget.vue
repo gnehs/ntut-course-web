@@ -3,8 +3,12 @@
     <h1>iOS 小工具（測試）</h1>
     <p>新增小工具在您的桌面上，隨時檢視接下來的課程！</p>
     <p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
+    <vs-alert color="danger" v-if="!courseData.length">
+      <template #title> 沒有課程資料 </template>
+      請先新增課程資料
+    </vs-alert>
     <h2><span style="color: blue">Step 0</span> 加入課程</h2>
-    <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong>，如果你新增正確，在首頁可以看到「接下來的課程」</p>
+    <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong></p>
     <h2><span style="color: blue">Step 1</span> 安裝 Scriptable</h2>
     <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a></p>
     <h2><span style="color: blue">Step 2</span> 複製並貼上程式碼</h2>
