@@ -58,19 +58,30 @@
           </div>
         </div>
       </template>
-      <template v-if="department">
+      <template v-if="department && currentDepartment">
         <h3>{{ department }}</h3>
         <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-          <card v-for="item of Object.entries(standardData[system][department].credits)" :key="item[0]">
+          <card v-for="item of Object.entries(currentDepartment.credits)" :key="item[0]">
             <card-title>{{ item[1] }}</card-title>
             <p>{{ item[0] }}</p>
           </card>
         </div>
         <h3>相關規定事項</h3>
         <ul>
-          <li v-for="item of standardData[system][department].rules" :key="item">{{ item }}</li>
+          <li v-for="item of currentDepartment.rules" :key="item">{{ item }}</li>
         </ul>
-        <!--<pre>{{standardData[system][department]}}</pre>-->
+        <h3>課程</h3>
+        <div v-for="[year, yearData] of Object.entries(currentDepartment.courses)" :key="year">
+          <div v-for="[sem, items] of Object.entries(yearData)" :key="sem">
+            <h4>{{ year }} 年級{{ sem == '1' ? '上' : '下' }}學期</h4>
+            <div class="list">
+              <div class="item" v-for="item of items" :key="item.name" style="display: flex; justify-content: space-between">
+                <span> {{ item.type }} {{ item.name }} </span>
+                <span> {{ item.credit }} 學分</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
     </template>
   </div>
@@ -82,11 +93,15 @@ export default {
     if (this.year) {
       await this.fetchYearData(this.year)
     }
+    if (this.system && this.department) {
+      this.parseDepartmentData(this.standardData[this.system][this.department])
+    }
   },
   data: () => ({
     onError: null,
     years: null,
-    standardData: null
+    standardData: null,
+    currentDepartment: null
   }),
   head() {
     return {
@@ -131,6 +146,7 @@ export default {
         let query = Object.assign({}, this.$route.query)
         if (val) {
           query.department = val
+          this.parseDepartmentData(this.standardData[this.system][val])
         } else {
           delete query.department
         }
@@ -158,6 +174,16 @@ export default {
         this.onError = e
         loading.close()
       }
+    },
+    parseDepartmentData(data) {
+      let tempCourse = {}
+      data.courses.map(x => {
+        if (!tempCourse[x.year]) tempCourse[x.year] = {}
+        if (!tempCourse[x.year][x.sem]) tempCourse[x.year][x.sem] = []
+        tempCourse[x.year][x.sem].push(x)
+      })
+      data.courses = tempCourse
+      this.currentDepartment = data
     }
   }
 }
