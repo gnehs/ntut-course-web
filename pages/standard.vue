@@ -71,8 +71,8 @@
           <li v-for="item of currentDepartment.rules" :key="item">{{ item }}</li>
         </ul>
         <h3>課程</h3>
-        <div v-for="[year, yearData] of Object.entries(currentDepartment.courses)" :key="year">
-          <div v-for="[sem, items] of Object.entries(yearData)" :key="sem">
+        <div v-for="[year, yearData] of Object.entries(currentDepartment.courses)" :key="year" class="course-items">
+          <div v-for="[sem, items] of Object.entries(yearData)" :key="sem" class="course-item">
             <h4>{{ year }} 年級{{ sem == '1' ? '上' : '下' }}學期</h4>
             <div class="list">
               <div class="item" v-for="item of items" :key="item.name" style="display: flex; justify-content: space-between">
@@ -86,6 +86,17 @@
     </template>
   </div>
 </template> 
+<style lang="sass" scoped>
+.course-items
+  display: flex
+  flex-wrap: wrap
+  gap: 1rem
+  margin-bottom: 1rem
+  @media (max-width: 768px)
+    flex-direction: column
+  .course-item
+    flex: 1
+</style>
 <script>
 export default {
   async created() {
