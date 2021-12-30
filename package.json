@@ -11,15 +11,15 @@
   "dependencies": {
     "@nuxtjs/google-gtag": "^1.0.4",
     "@nuxtjs/markdownit": "^2.0.0",
-    "@nuxtjs/pwa": "^3.0.2",
-    "core-js": "^3.6.5",
-    "nuxt": "^2.14.6",
+    "@nuxtjs/pwa": "^3.3.5",
+    "core-js": "^3.20.1",
+    "nuxt": "^2.15.8",
     "nuxt-clipboard": "0.0.6",
     "vuesax": "^4.0.1-alpha.25"
   },
   "devDependencies": {
     "fibers": "^5.0.0",
-    "node-sass": "^5.0.0",
+    "node-sass": "^6.0.0",
     "sass-loader": "^10.1.0"
   }
 }
