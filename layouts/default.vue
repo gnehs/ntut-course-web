@@ -2,14 +2,19 @@
   <div id="app">
     <vs-navbar center-collapsed v-model="active" shadow fixed not-line>
       <template #left>
-        <router-link to="/" class="site-title"> 🍤 北科課程好朋友 </router-link>
+        <router-link to="/" class="site-title">🍤 北科課程好朋友</router-link>
       </template>
       <vs-navbar-item :active="active == '/'" to="/">首頁</vs-navbar-item>
-      <vs-navbar-item :active="active == '/search'" :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`" id="search"
-        >搜尋</vs-navbar-item
-      >
+      <vs-navbar-item
+        :active="active == '/search'"
+        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`"
+        id="search"
+      >搜尋</vs-navbar-item>
       <template #right>
-        <vs-button @click="datasetDialog = true" :disabled="Boolean($route.query.year)">{{ parseYearSemVal(yearSemVal) }}</vs-button>
+        <vs-button
+          @click="datasetDialog = true"
+          :disabled="Boolean($route.query.year)"
+        >{{ parseYearSemVal(yearSemVal) }}</vs-button>
       </template>
     </vs-navbar>
     <div class="container">
@@ -35,14 +40,26 @@
       <div class="datasetDialog-form">
         <vs-select v-model="yearSemVal" @change="datasetSelected" v-if="yearSemItems" label="學期">
           <vs-option label="選擇學期" value="no" disabled>選擇學期</vs-option>
-          <vs-option v-for="(item, i) in yearSemItems" :label="parseYearSemVal(item)" :value="item" :key="i">{{
-            parseYearSemVal(item)
-          }}</vs-option>
+          <vs-option
+            v-for="(item, i) in yearSemItems"
+            :label="parseYearSemVal(item)"
+            :value="item"
+            :key="i"
+          >
+            {{
+              parseYearSemVal(item)
+            }}
+          </vs-option>
         </vs-select>
         <br />
         <vs-select v-model="departmentVal" @change="datasetSelected" label="學制">
           <vs-option label="選擇學制" value="no" disabled>選擇學制</vs-option>
-          <vs-option v-for="(item, i) in departmentItems" :label="item" :value="i" :key="i">{{ item }}</vs-option>
+          <vs-option
+            v-for="(item, i) in departmentItems"
+            :label="item"
+            :value="i"
+            :key="i"
+          >{{ item }}</vs-option>
         </vs-select>
       </div>
       <template #footer>
@@ -80,7 +97,7 @@ export default {
     function themeSwitch(darkModeOn) {
       document.body.setAttribute('vs-theme', darkModeOn ? 'dark' : 'light')
     }
-    String.prototype.trimEllip = function(length) {
+    String.prototype.trimEllip = function (length) {
       return this.length > length ? this.substring(0, length) + '...' : this
     }
     Vue.prototype.$fetchCourse = async (y, s, department) => {
@@ -140,11 +157,9 @@ export default {
     Vue.prototype.$fetchYearData = async () => {
       let key = `main_year`
       try {
-        if (!localStorage[key]) {
-          let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/main.json`).then(x => x.json())
-          localStorage[key] = JSON.stringify(res)
-        }
-        return JSON.parse(localStorage[key])
+        let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/main.json`).then(x => x.json())
+        sessionStorage[key] = JSON.stringify(res)
+        return JSON.parse(sessionStorage[key])
       } catch (e) {
         this.$vs.notification({
           title: '擷取資料時發生了錯誤',
