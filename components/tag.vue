@@ -32,4 +32,6 @@ export default {
   line-height: 1em
   text-align: center
   white-space: nowrap
+  &+.tag
+    margin-left: 0.5em
 </style>

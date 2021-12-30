@@ -1,9 +1,18 @@
 <template>
   <div v-if="courses">
     <div class="center">
-      <vs-button flat :active="layout == 'table'" @click="layout = 'table'"> <i class="bx bx-table"></i>表格 </vs-button>
-      <vs-button flat :active="layout == 'card'" @click="layout = 'card'"> <i class="bx bx-card"></i>卡片 </vs-button>
-      <vs-button flat :active="layout == 'timetable'" @click="layout = 'timetable'" v-if="showTimetable">
+      <vs-button flat :active="layout == 'table'" @click="layout = 'table'">
+        <i class="bx bx-table"></i>表格
+      </vs-button>
+      <vs-button flat :active="layout == 'card'" @click="layout = 'card'">
+        <i class="bx bx-card"></i>卡片
+      </vs-button>
+      <vs-button
+        flat
+        :active="layout == 'timetable'"
+        @click="layout = 'timetable'"
+        v-if="showTimetable"
+      >
         <i class="bx bx-time"></i>課表
       </vs-button>
     </div>
@@ -17,8 +26,11 @@
         >
           <card-title>
             {{ tr.courseType }}{{ tr.name.zh }}
-            <tag v-if="conflictCourseData.includes(tr.id)" color="red"><i class="bx bxs-error"></i>衝堂</tag>
+            <tag v-if="conflictCourseData.includes(tr.id)" color="red">
+              <i class="bx bxs-error"></i>衝堂
+            </tag>
           </card-title>
+          <general-tags :course-data="tr" />
 
           <div class="cards">
             <card class="borderless">
@@ -87,18 +99,22 @@
           >
             <vs-td>{{ tr.id }}</vs-td>
             <vs-td>{{ tr.courseType }}{{ tr.name.zh }}</vs-td>
-            <vs-td>{{
-              tr.teacher
-                .map((y) => y.name)
-                .join('、')
-                .trimEllip(9)
-            }}</vs-td>
-            <vs-td>{{
-              tr.class
-                .map((x) => x.name)
-                .join('、')
-                .trimEllip(9)
-            }}</vs-td>
+            <vs-td>
+              {{
+                tr.teacher
+                  .map((y) => y.name)
+                  .join('、')
+                  .trimEllip(9)
+              }}
+            </vs-td>
+            <vs-td>
+              {{
+                tr.class
+                  .map((x) => x.name)
+                  .join('、')
+                  .trimEllip(9)
+              }}
+            </vs-td>
             <vs-td>
               <span style="color: red" v-if="conflictCourseData.includes(tr.id)">衝堂</span>
               <span v-else>{{ tr.notes }}</span>
@@ -112,7 +128,9 @@
           />
         </template>
         <template #notFound>
-          <p v-if="!(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id))).length">查無資料</p>
+          <p
+            v-if="!(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id))).length"
+          >查無資料</p>
         </template>
       </vs-table>
     </card>
@@ -129,18 +147,18 @@
         <div class="content" v-for="time in timetable" :key="time">
           <div class="item">{{ time }}</div>
           <div class="item" v-for="date in Object.keys(dateEng2zh).slice(1, 5 + 1)" :key="date">
-            <template v-if="$vs.getPage(courses, page, max).filter((x) => x.time[date].includes(time)).length <= 2">
+            <template
+              v-if="$vs.getPage(courses, page, max).filter((x) => x.time[date].includes(time)).length <= 2"
+            >
               <router-link
                 class="course"
                 :class="{ conflict: conflictCourseData.includes(item.id) }"
                 v-for="item in $vs
-                  .getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)
-                  .filter((x) => x.time[date].includes(time))"
+                .getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)
+                .filter((x) => x.time[date].includes(time))"
                 :key="item.id"
                 :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
-              >
-                {{ item.name.zh }}
-              </router-link>
+              >{{ item.name.zh }}</router-link>
             </template>
             <template v-else>
               <div class="course">課程數量過多無法顯示</div>
@@ -190,12 +208,12 @@ export default {
     page(newPage, oldPage) {
       let query = Object.assign({}, this.$route.query)
       query.page = newPage
-      this.$router.replace({ query }, () => {})
+      this.$router.replace({ query }, () => { })
     },
     layout(newLayout, oldLayout) {
       let query = Object.assign({}, this.$route.query)
       query.layout = newLayout
-      this.$router.replace({ query }, () => {})
+      this.$router.replace({ query }, () => { })
     }
   },
   methods: {
