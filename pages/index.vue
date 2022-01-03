@@ -6,13 +6,15 @@
     </h1>
     <p>
       本站資料擷取自
-      <a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank">國立臺北科技大學課程系統</a
-      >，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
+      <a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank">國立臺北科技大學課程系統</a>，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
     </p>
     <upcoming-course />
     <h2>課程資源</h2>
     <div class="cards">
-      <card class="hoverable padding" :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`">
+      <card
+        class="hoverable padding"
+        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
+      >
         <card-title>搜尋課程</card-title>
         <p>依課號、關鍵字或教師搜尋課程</p>
         <i class="bx bx-search"></i>
@@ -53,14 +55,19 @@
     <h2>實用工具</h2>
     <div class="cards">
       <card class="hoverable padding" to="/widget">
-        <card-title>iOS 小工具 </card-title>
+        <card-title>iOS 小工具</card-title>
         <p>在桌面上檢視接下來的課程</p>
         <i class="bx bx-extension"></i>
       </card>
       <card class="hoverable padding" to="/emptyroom">
-        <card-title>尋找空教室 </card-title>
+        <card-title>尋找空教室</card-title>
         <p>尋找沒有課程進行的教室</p>
         <i class="bx bx-ghost"></i>
+      </card>
+      <card class="hoverable padding" to="/withdrawal">
+        <card-title>退選率</card-title>
+        <p>查看所有教師的退選率</p>
+        <i class="bx bx-user-x"></i>
       </card>
     </div>
 
@@ -88,7 +95,7 @@
 <script>
 export default {
   data: () => ({}),
-  created() {},
+  created() { },
   methods: {}
 }
 </script> 
