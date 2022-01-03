@@ -2,13 +2,19 @@
   <div>
     <h1>退選率</h1>
     <p>這是該學期所有教師的退選率（退選人數/選課人數）的計算結果</p>
-    <div class="teachers">
-      <div class="teacher" v-for="item of data" :key="item.name">
+    <vs-checkbox v-model="showPeopleBelow10">顯示選課人數小於十人的教師</vs-checkbox>
+    <transition-group name="flip-card" tag="div" class="teachers">
+      <div
+        class="teacher"
+        v-for="item of data"
+        :key="item.name"
+        v-show="showPeopleBelow10 || item.people >= 10"
+      >
         <h2 class="name">{{ item.name }}</h2>
         <div class="rate">{{ item.rate_percent }}%</div>
         <div class="people">{{ item.withdraw }} 人退選 / {{ item.people }} 人選課</div>
       </div>
-    </div>
+    </transition-group>
   </div>
 </template>
 <style lang="sass" scoped>
@@ -45,7 +51,8 @@ export default {
   },
   data() {
     return ({
-      data: {}
+      data: {},
+      showPeopleBelow10: true,
     })
   },
   computed: {
