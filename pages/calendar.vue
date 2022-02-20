@@ -6,7 +6,16 @@
       <template #title>沒有課程資料</template>
       請先新增課程資料
     </vs-alert>
-    <h2>請選擇要加入的課程</h2>
+    <h2>
+      <span style="color: blue">Step 0</span> 加入課程
+    </h2>
+    <p>
+      請先將您本學期的課程新增到
+      <strong>北科課程好朋友</strong>
+    </p>
+    <h2>
+      <span style="color: blue">Step 1</span> 請選擇要加入的課程
+    </h2>
     <div class="con-checkbox">
       <vs-checkbox
         :val="item"
@@ -15,9 +24,15 @@
         :key="i"
       >{{ item.name }}</vs-checkbox>
     </div>
-    <h2>下載行事曆檔案</h2>
-    <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">下載</vs-button>
-    <p>建議建立專用的行事曆，並且使用匯入匯出功能來匯入課程，之後要移除的話只要移除該行事曆即可。</p>
+    <h2>
+      <span style="color: blue">Step 2</span> 新增專用行事曆
+    </h2>
+    <p>建議建立專用的行事曆，以免之後移除課程時的麻煩。</p>
+    <h2>
+      <span style="color: blue">Step 3</span> 匯入至行事曆
+    </h2>
+    <p>匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。</p>
+    <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入 / 下載</vs-button>
   </div>
 </template>
 
