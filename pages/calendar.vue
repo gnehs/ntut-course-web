@@ -199,7 +199,7 @@ export default {
       let name = `${originalYear} 學年度${sem == '1' ? '上' : '下'}學期課程`
       let description = `行事曆資訊由北科課程好朋友產生`
       cal = cal.replace('\nBEGIN:VCALENDAR', `BEGIN:VCALENDAR\nVERSION:2.0\nX-WR-CALNAME:${name}\nX-WR-CALDESC:${description}\nX-WR-TIMEZONE:Asia/Taipei`)
-      let blob = new Blob([cal], { type: "text/x-vCalendar;charset=utf-8" });
+      let blob = new Blob([cal], { type: 'text/calendar;charset=utf-8' })
       saveAs(blob, `${originalYear}-${sem}-course.ics`);
     }
   }
