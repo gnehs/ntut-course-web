@@ -146,9 +146,9 @@ export default {
         year += 1
       let until;
       if (sem == '1')
-        until = new Date(year + 1, 1, 30 - 1).toISOString()
+        until = new Date(year + 1, 1 - 1, 30 + 1).toISOString()
       else
-        until = new Date(year, 6, 30 - 1).toISOString()
+        until = new Date(year, 6 - 1, 30 + 1).toISOString()
 
       this.$ics.removeAllEvents()
       for (let item of this.selectedCourse) {
