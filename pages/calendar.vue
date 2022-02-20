@@ -17,7 +17,7 @@
     </div>
     <h2>下載行事曆檔案</h2>
     <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">下載</vs-button>
-    <p>建議建立一個行事曆並使用匯入匯出功能來匯入課程，之後要移除的話只要移除該行事曆即可。</p>
+    <p>建議建立專用的行事曆，並且使用匯入匯出功能來匯入課程，之後要移除的話只要移除該行事曆即可。</p>
   </div>
 </template>
 
