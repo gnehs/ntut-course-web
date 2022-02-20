@@ -27,12 +27,12 @@
     <h2>
       <span style="color: blue">Step 2</span> 新增專用行事曆
     </h2>
-    <p>建議建立專用的行事曆，以免之後移除課程時的麻煩。</p>
+    <p>建議建立專用的行事曆，未來若需移除課程時僅需刪除該行事曆即可。</p>
     <h2>
       <span style="color: blue">Step 3</span> 匯入至行事曆
     </h2>
-    <p>匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。</p>
-    <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入 / 下載</vs-button>
+    <p>輕觸「匯入」按鈕以繼續，匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。</p>
+    <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入</vs-button>
   </div>
 </template>
 
