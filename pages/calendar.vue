@@ -17,6 +17,7 @@
     </div>
     <h2>點擊下方按鈕匯入至行事曆</h2>
     <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入選取的課程</vs-button>
+    <p>如果你使用 Google 行事曆，建議建立一個行事曆並使用匯入匯出功能來匯入課程，之後要移除的話只要移除該行事曆即可</p>
   </div>
 </template>
 
