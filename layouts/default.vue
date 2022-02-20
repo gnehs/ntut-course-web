@@ -117,7 +117,7 @@ export default {
         } else {
           let yrs = Object.keys(yearData)
           y = yrs[yrs.length - 1]
-          s = yearData[y][0]
+          s = yearData[y].length
         }
       }
       if (!department) {
