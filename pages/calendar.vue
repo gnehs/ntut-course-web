@@ -15,13 +15,13 @@
         :key="i"
       >{{ item.name }}</vs-checkbox>
     </div>
-    <h2>請輸入終止日期</h2>
     <h2>點擊下方按鈕匯入至行事曆</h2>
     <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入選取的課程</vs-button>
   </div>
 </template>
 
 <script>
+import { saveAs } from 'file-saver'
 export default {
   head() {
     return {
@@ -193,7 +193,13 @@ export default {
           this.$ics.addEvent(result.language, result.subject, result.description, result.location, result.begin, result.stop, result.url, result.organizer, result.rrule)
         }
       }
-      this.$ics.download(`${year}-${sem}-course.ics`)
+      let { year: originalYear } = this.$store.state
+      let cal = this.$ics.calendar()
+      let name = `${originalYear} 學年度${sem == '1' ? '上' : '下'}學期課程`
+      let description = `行事曆資訊由北科課程好朋友產生`
+      cal = cal.replace('\nBEGIN:VCALENDAR', `BEGIN:VCALENDAR\nVERSION:2.0\nX-WR-CALNAME:${name}\nX-WR-CALDESC:${description}\nX-WR-TIMEZONE:Asia/Taipei`)
+      let blob = new Blob([cal], { type: "text/x-vCalendar;charset=utf-8" });
+      saveAs(blob, `${originalYear}-${sem}-course.ics`);
     }
   }
 }
