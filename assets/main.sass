@@ -1,186 +1,186 @@
 *
-    box-sizing: border-box
+	box-sizing: border-box
 body
-    font-family: 'Roboto Condensed', 'Noto Sans TC', sans-serif
+	font-family: 'Roboto Condensed', 'Noto Sans TC', sans-serif
 
-    background-color: #f4f7f8
-    margin: 0
-    // dark
-    @media (prefers-color-scheme: dark)
-        background-color: #1d1d1d
-        color: #fff 
+	background-color: #f4f7f8
+	margin: 0
+	// dark
+	@media (prefers-color-scheme: dark)
+		background-color: #1d1d1d
+		color: #fff 
 pre,code
-    font-family: 'Roboto Mono', 'Noto Sans TC', monospace
+	font-family: 'Roboto Mono', 'Noto Sans TC', monospace
 code
-    background: rgba(var(--vs-text),.01)
-    border-radius: 4px
-    padding: 0 4px
-    line-height: 1.5em
-    border: 1px solid rgba(var(--vs-text),.1)
-    font-size: .95em
+	background: rgba(var(--vs-text),.01)
+	border-radius: 4px
+	padding: 0 4px
+	line-height: 1.5em
+	border: 1px solid rgba(var(--vs-text),.1)
+	font-size: .95em
 hr 
-    border: 0
-    border-top: 1px solid rgba(0,0,0,0.1)
+	border: 0
+	border-top: 1px solid rgba(0,0,0,0.1)
 a
-    color: rgba(var(--vs-primary), 1)
-    @media (prefers-color-scheme: dark)
-        --vs-primary: 247, 250, 255
-    &:hover
-        color: rgba(var(--vs-primary), .8)
-    &:active
-        color: rgba(var(--vs-primary), .9)
+	color: rgba(var(--vs-primary), 1)
+	@media (prefers-color-scheme: dark)
+		--vs-primary: 247, 250, 255
+	&:hover
+		color: rgba(var(--vs-primary), .8)
+	&:active
+		color: rgba(var(--vs-primary), .9)
 h1,h2,h3,h4,h5,h6,p
-    margin: 1em 0
-    line-height: 1.5em
+	margin: 1em 0
+	line-height: 1.5em
 h1,h2,h3,h4,h5,h6
-    & + p
-        margin-top: -1em
+	& + p
+		margin-top: -1em
 .site-title
-    font-weight: bold
-    color: rgba(var(--vs-text),1)
-    text-decoration: none
-    &:hover
-        color: rgba(var(--vs-text),.8) 
+	font-weight: bold
+	color: rgba(var(--vs-text),1)
+	text-decoration: none
+	&:hover
+		color: rgba(var(--vs-text),.8) 
 .vs-input
-    width: 100%
+	width: 100%
 .vs-alert+.vs-alert
-    margin-top: 8px
+	margin-top: 8px
 .lr-container
-    display: flex
-    align-items: center
-    &:not(.nowrap)
-        @media screen and (max-width: 768px) 
-            display: block
-    .l
-        flex: 1
-    .r
-        text-align: right
-        justify-content: flex-end
-    .l,.r
-        display: flex
-        align-items: center
+	display: flex
+	align-items: center
+	&:not(.nowrap)
+		@media screen and (max-width: 768px) 
+			display: block
+	.l
+		flex: 1
+	.r
+		text-align: right
+		justify-content: flex-end
+	.l,.r
+		display: flex
+		align-items: center
 .cards
-    width: calc(100% + 12px)
-    display: flex
-    flex-direction: row
-    flex-wrap: wrap 
-    margin: 3px -6px  
-    --card-row: 3
-    --card-row-sm: 2
-    position: relative
-    .vs-card-content,&>.card,&>.cards
-        width: calc(100% / var(--card-row) - 12px) 
-        margin: 6px 
-        @media screen and (max-width: 768px)
-            width: calc(100% / var(--card-row-sm) - 12px) 
-    &>.cards
-        width: calc(100% / var(--card-row)) 
-        margin: 0 0
-        flex-wrap: nowrap
-        @media screen and (max-width: 768px)
-            width: calc(100% / var(--card-row-sm)) 
-        &>.card
-            width: 100% 
+	width: calc(100% + 12px)
+	display: flex
+	flex-direction: row
+	flex-wrap: wrap 
+	margin: 3px -6px  
+	--card-row: 3
+	--card-row-sm: 2
+	position: relative
+	.vs-card-content,&>.card,&>.cards
+		width: calc(100% / var(--card-row) - 12px) 
+		margin: 6px 
+		@media screen and (max-width: 768px)
+			width: calc(100% / var(--card-row-sm) - 12px) 
+	&>.cards
+		width: calc(100% / var(--card-row)) 
+		margin: 0 0
+		flex-wrap: nowrap
+		@media screen and (max-width: 768px)
+			width: calc(100% / var(--card-row-sm)) 
+		&>.card
+			width: 100% 
 
-            
+			
   
 .flip-card-move
-    transition: all .4s ease
+	transition: all .4s ease
 
 .flip-card-enter,
 .flip-card-leave-to
-    opacity: 0
-    transform: scale(0)
+	opacity: 0
+	transform: scale(0)
 
 .flip-card-leave-active
-    position: absolute !important 
+	position: absolute !important 
 
 
 
 .center
-    display: flex
-    align-items: center
-    justify-content: center
-    padding: 20px
-    flex-wrap: wrap
+	display: flex
+	align-items: center
+	justify-content: center
+	padding: 20px
+	flex-wrap: wrap
 .timetable
-    font-size: .85em
-    .header
-        top: 0
-        position: sticky
-        .item
-            padding: 10px 12px
-            background: rgba(var(--vs-text),.05)
-            text-align: center
-            &:first-child
-                padding: 0
-    .content
-        &:nth-child(2n)
-            background: rgba(var(--vs-gray-1), 1)
-        .item
-            display: flex
-            padding: 2px
-            height: 60px
-            .course
-                cursor: pointer
-                width: 100%
-                --main-color: rgba(var(--vs-text), .9) 
-                --main-bg: rgba(var(--vs-primary), 0.15)  
-                background: var(--main-bg)
-                color: var(--main-color)
-                padding: 12px 6px
-                padding-right: 2px
-                border-radius: 0 8px 8px 0
-                transition: all .25s ease
-                height: 100%
-                margin: 2px
-                display: flex
-                align-items: center
-                position: relative
-                &.conflict
-                    --main-color: rgba(var(--vs-danger),1)
-                    --main-bg: rgba(var(--vs-danger),.2) 
-                &:before
-                    content: ""
-                    background: var(--main-color)
-                    left: 0px
-                    top: 0px
-                    width: 2px
-                    height: 100%
-                    position: absolute
-                    transition: all .1s linear
+	font-size: .85em
+	.header
+		top: 0
+		position: sticky
+		.item
+			padding: 10px 12px
+			background: rgba(var(--vs-text),.05)
+			text-align: center
+			&:first-child
+				padding: 0
+	.content
+		&:nth-child(2n)
+			background: rgba(var(--vs-gray-1), 1)
+		.item
+			display: flex
+			padding: 2px
+			height: 60px
+			.course
+				cursor: pointer
+				width: 100%
+				--main-color: rgba(var(--vs-text), .9) 
+				--main-bg: rgba(var(--vs-primary), 0.15)  
+				background: var(--main-bg)
+				color: var(--main-color)
+				padding: 12px 6px
+				padding-right: 2px
+				border-radius: 0 8px 8px 0
+				transition: all .25s ease
+				height: 100%
+				margin: 2px
+				display: flex
+				align-items: center
+				position: relative
+				&.conflict
+					--main-color: rgba(var(--vs-danger),1)
+					--main-bg: rgba(var(--vs-danger),.2) 
+				&:before
+					content: ""
+					background: var(--main-color)
+					left: 0px
+					top: 0px
+					width: 2px
+					height: 100%
+					position: absolute
+					transition: all .1s linear
 
-                &:hover
-                    padding: 12px 8px
-                    padding-right: 0px
-                    &:before
-                        width: 4px
-                &:active
-                    transform: scale(.9)
-    .header,.content
-        display: grid
-        grid-template-columns: 1.25em repeat(5, 1fr)
-        .item
-            &:first-child
-                background: rgba(var(--vs-text),.05)
-                font-size: 1.15em
-                display: flex
-                align-items: center
-                justify-content: center 
+				&:hover
+					padding: 12px 8px
+					padding-right: 0px
+					&:before
+						width: 4px
+				&:active
+					transform: scale(.9)
+	.header,.content
+		display: grid
+		grid-template-columns: 1.25em repeat(5, 1fr)
+		.item
+			&:first-child
+				background: rgba(var(--vs-text),.05)
+				font-size: 1.15em
+				display: flex
+				align-items: center
+				justify-content: center 
 
 .list
-    .item
-        padding: 10px 12px
-        background: rgba(var(--vs-background),1)
-        &:first-child
-            border-radius: 8px 8px 0 0
-        &:last-child
-            border-radius: 0 0 8px 8px
-        &:hover
-            background: rgba(var(--vs-gray-1), 1)
-            cursor: pointer
-        &+.item
-            border-top: 1px solid rgba(var(--vs-gray-2), 1)
+	.item
+		padding: 10px 12px
+		background: rgba(var(--vs-background),1)
+		&:first-child
+			border-radius: 8px 8px 0 0
+		&:last-child
+			border-radius: 0 0 8px 8px
+		&:hover
+			background: rgba(var(--vs-gray-1), 1)
+			cursor: pointer
+		&+.item
+			border-top: 1px solid rgba(var(--vs-gray-2), 1)
 
 
 .white-box

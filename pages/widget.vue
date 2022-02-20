@@ -1,21 +1,35 @@
 <template>
   <div>
-    <h1>iOS 小工具（測試）</h1>
+    <h1>iOS 小工具</h1>
     <p>新增小工具在您的桌面上，隨時檢視接下來的課程！</p>
     <p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
     <vs-alert color="danger" v-if="!courseData.length">
-      <template #title> 沒有課程資料 </template>
+      <template #title>沒有課程資料</template>
       請先新增課程資料
     </vs-alert>
-    <h2><span style="color: blue">Step 0</span> 加入課程</h2>
-    <p>請先將您本學期的課程新增到<strong>北科課程好朋友</strong></p>
-    <h2><span style="color: blue">Step 1</span> 安裝 Scriptable</h2>
-    <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a></p>
-    <h2><span style="color: blue">Step 2</span> 複製並貼上程式碼</h2>
+    <h2>
+      <span style="color: blue">Step 0</span> 加入課程
+    </h2>
+    <p>
+      請先將您本學期的課程新增到
+      <strong>北科課程好朋友</strong>
+    </p>
+    <h2>
+      <span style="color: blue">Step 1</span> 安裝 Scriptable
+    </h2>
+    <p>
+      到 App Store 安裝
+      <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a>
+    </p>
+    <h2>
+      <span style="color: blue">Step 2</span> 複製並貼上程式碼
+    </h2>
     <p>建立一個 Script 並貼上以下程式碼</p>
     <div class="white-box" style="position: relative">
       <div style="position: absolute; right: 0">
-        <vs-button @click="doCopy"> <i class="bx bx-clipboard"></i>複製 </vs-button>
+        <vs-button @click="doCopy">
+          <i class="bx bx-clipboard"></i>複製
+        </vs-button>
       </div>
       <pre id="scriptable-code" ref="scriptable-code">
 const courseData = {{ JSON.stringify(courseData) }}
@@ -140,11 +154,12 @@ if (config.runsInWidget) {
     widget.presentMedium()
 }
 Script.complete()
-</pre
-      >
+</pre>
     </div>
 
-    <h2><span style="color: blue">Step 3</span> 新增小工具到桌面</h2>
+    <h2>
+      <span style="color: blue">Step 3</span> 新增小工具到桌面
+    </h2>
     <p>參考此影片建立您的小工具</p>
     <video loop controls autoplay class="demo-video">
       <source src="/video/how_to_add_iOS_widget.mp4" type="video/mp4" />

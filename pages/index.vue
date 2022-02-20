@@ -59,6 +59,11 @@
         <p>在桌面上檢視接下來的課程</p>
         <i class="bx bx-extension"></i>
       </card>
+      <card class="hoverable padding" to="/calendar">
+        <card-title>新增到行事曆</card-title>
+        <p>將已儲存的課程匯入至行事曆</p>
+        <i class="bx bx-calendar"></i>
+      </card>
       <card class="hoverable padding" to="/emptyroom">
         <card-title>尋找空教室</card-title>
         <p>尋找沒有課程進行的教室</p>
