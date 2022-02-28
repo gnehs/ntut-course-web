@@ -51,6 +51,9 @@ export default {
     &:active
       box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0))
       transform: translate(0, 5px)
+      &>i
+        opacity: .4
+        transform: translateY(20%)
   p
     margin: 0
     opacity: 0.8
