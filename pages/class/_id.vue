@@ -5,12 +5,20 @@
         <h1>{{ classname }}</h1>
       </div>
       <div class="r">
-        <vs-button transparent :active="showConflictCourse" @click="showConflictCourse = !showConflictCourse">
+        <vs-button
+          transparent
+          :active="showConflictCourse"
+          @click="showConflictCourse = !showConflictCourse"
+        >
           <i class="bx bx-check" v-if="showConflictCourse"></i>
           <i class="bx bx-x" v-else></i>衝堂課程
         </vs-button>
-        <vs-button flat @click="addCourse2myCourse" v-if="!isInMyCouse"> <i class="bx bx-plus"></i>加入我的課程 </vs-button>
-        <vs-button flat danger @click="removeFromMyCourse" v-else> <i class="bx bx-minus"></i>從我的課程移除 </vs-button>
+        <vs-button flat @click="addCourse2myCourse" v-if="!isInMyCouse">
+          <i class="bx bx-plus"></i>加入我的課程
+        </vs-button>
+        <vs-button flat danger @click="removeFromMyCourse" v-else>
+          <i class="bx bx-minus"></i>從我的課程移除
+        </vs-button>
       </div>
     </div>
     <vs-alert v-show="onError">
@@ -18,12 +26,20 @@
       <pre>{{ onError || 'Error' }}</pre>
     </vs-alert>
 
-    <parse-courses v-show="result && result.length" :courses="result" show-timetable :show-conflict-course="showConflictCourse" />
+    <parse-courses
+      v-show="result && result.length"
+      :courses="result"
+      show-timetable
+      :show-conflict-course="showConflictCourse"
+    />
     <vs-alert v-if="result && !result.length && classData">
       <template #title>查無資料</template>
       資料抓取時似乎沒有抓到這邊的資料（？
       <br />也許你可以試試看
-      <a :href="'https://aps.ntut.edu.tw/course/tw/' + classData.href" target="_blank">前往原始網頁</a>
+      <a
+        :href="'https://aps.ntut.edu.tw/course/tw/' + classData.href"
+        target="_blank"
+      >前往原始網頁</a>
       看看原本的資料
     </vs-alert>
   </div>
@@ -86,6 +102,10 @@ export default {
       this.isInMyCouse = localStorage[myCourseClassKey] == this.classname
     },
     addCourse2myCourse() {
+      // record id
+      let { id } = this.classData
+      localStorage['my-class'] = id
+
       let { year, sem } = this.$store.state
       let myCourseClassKey = `my-couse-class-${year}-${sem}`
       if (localStorage[myCourseClassKey] != this.classname && localStorage[myCourseClassKey]) {

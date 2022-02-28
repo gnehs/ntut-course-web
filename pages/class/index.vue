@@ -11,12 +11,18 @@
       <template #title>搜尋時發生了錯誤</template>
       <pre>{{ onError || 'Error' }}</pre>
     </vs-alert>
-    <div v-if="savedClass">
-      <h3>我的班級</h3>
+    <div v-if="recommendClass.length">
+      <h3>建議</h3>
+      <p>根據您先前儲存的班級所提供的建議</p>
       <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-        <card class="hoverable padding" :to="`/class/${savedClass}?year=${year}&sem=${sem}&d=${$store.state.department}`">
-          <card-title>{{ savedClass }}</card-title>
-          <p>我的班級</p>
+        <card
+          class="hoverable padding"
+          v-for="(item, index) in recommendClass"
+          :key="index"
+          :to="`/class/${item.name}?year=${year}&sem=${sem}&d=${$store.state.department}`"
+        >
+          <card-title>{{ item.name }}</card-title>
+          <p>{{ item.description }}</p>
           <i class="bx bx-star"></i>
         </card>
       </div>
@@ -47,7 +53,8 @@ export default {
     savedClass: null,
     departmentData: null,
     filteredDepartmentData: null,
-    filterDapartmentVal: null
+    filterDapartmentVal: null,
+    recommendClass: [],
   }),
   head() {
     return {
@@ -82,10 +89,38 @@ export default {
       } catch (e) {
         loading.close()
       }
-      // show savedClass
+      // flat map class
+      let classData = this.departmentData.map(x => x.class).flat()
+      // myCourseClassKey
       let { year, sem } = this.$store.state
       let myCourseClassKey = `my-couse-class-${year}-${sem}`
-      this.savedClass = localStorage[myCourseClassKey]
+      // convert savedClass to 'my-class'
+      if (localStorage[myCourseClassKey] && !localStorage['my-class']) {
+        localStorage['my-class'] = classData.filter(x => x.name == localStorage[myCourseClassKey])[0].id
+      }
+      // show recommendClass
+      let classId = localStorage['my-class']
+      if (classId) {
+        this.recommendClass = []
+        let userClass = classData.filter(x => x.id == classId)[0]
+        this.recommendClass.push({ ...userClass, description: '你的班級' })
+        // 取得博雅課程推薦 
+        let classname = userClass.name
+        let course = await this.$fetchCourse(year, sem)
+        function detectClass(c) {
+          let d = c.map(x => x.name)
+          return d.includes(classname)
+        }
+        course = course.filter(x => detectClass(x.class))
+        let generalEducationClass = course.filter(x => x.notes && x.notes.startsWith('請選：通識中心')).map(x => x.notes.replace('請選：通識中心', '').replace(/ |\//g, ''))
+        for (let name of generalEducationClass) {
+          let className = classData.filter(x => x.name.replace(/ |\//g, '') == name)[0]
+          if (className) {
+            this.recommendClass.push({ ...className, description: '博雅課程' })
+          }
+        }
+        console.log(generalEducationClass)
+      }
     },
     filterDapartment() {
       this.onError = null
@@ -114,7 +149,7 @@ export default {
         this.filteredDepartmentData = []
       }
     },
-    generateRandomColor(i, j) {
+    generateRandomColor(i) {
       let r, g, b
       r = ((i * 929) % 50) + (255 - 40)
       g = ((i * 199) % 50) + (255 - 40)

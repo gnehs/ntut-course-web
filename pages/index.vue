@@ -40,11 +40,6 @@
         <p>查看各班上課時間表</p>
         <i class="bx bx-time"></i>
       </card>
-      <card class="hoverable padding" to="/standard">
-        <card-title>課程標準</card-title>
-        <p>查看各系所畢業學分等資訊</p>
-        <i class="bx bxs-graduation"></i>
-      </card>
       <card class="hoverable padding" to="/my-course">
         <card-title>我的課程</card-title>
         <p>查看已儲存的課程</p>
@@ -54,15 +49,10 @@
 
     <h2>實用工具</h2>
     <div class="cards">
-      <card class="hoverable padding" :to="`/widget?year=${$store.state.year}`">
-        <card-title>iOS 小工具</card-title>
-        <p>在桌面上檢視接下來的課程</p>
-        <i class="bx bx-extension"></i>
-      </card>
-      <card class="hoverable padding" :to="`/calendar?year=${$store.state.year}`">
-        <card-title>新增到行事曆</card-title>
-        <p>將已儲存的課程匯入至行事曆</p>
-        <i class="bx bx-calendar"></i>
+      <card class="hoverable padding" to="/standard">
+        <card-title>課程標準</card-title>
+        <p>查看各系所畢業學分等資訊</p>
+        <i class="bx bxs-graduation"></i>
       </card>
       <card class="hoverable padding" to="/emptyroom">
         <card-title>尋找空教室</card-title>
@@ -73,6 +63,16 @@
         <card-title>退選率</card-title>
         <p>查看所有教師的退選率</p>
         <i class="bx bx-user-x"></i>
+      </card>
+      <card class="hoverable padding" :to="`/widget?year=${$store.state.year}`">
+        <card-title>iOS 小工具</card-title>
+        <p>在桌面上檢視接下來的課程</p>
+        <i class="bx bx-extension"></i>
+      </card>
+      <card class="hoverable padding" :to="`/calendar?year=${$store.state.year}`">
+        <card-title>新增到行事曆</card-title>
+        <p>將已儲存的課程匯入至行事曆</p>
+        <i class="bx bx-calendar"></i>
       </card>
     </div>
 
