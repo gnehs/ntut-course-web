@@ -26,12 +26,17 @@
         <card class="borderless">
           <p>篩選</p>
 
-          <vs-button flat @click="timetableDialog = true"> <i class="bx bxs-filter-alt"></i>依時間篩選 </vs-button>
+          <vs-button flat @click="timetableDialog = true">
+            <i class="bx bxs-filter-alt"></i>依時間篩選
+          </vs-button>
         </card>
       </div>
       <p style="font-size: 0.85rem">
         ＊關鍵字、教師與班級欄位支援
-        <a href="https://en.wikipedia.org/wiki/Regular_expression" teaget="_blank">regex</a>！
+        <a
+          href="https://en.wikipedia.org/wiki/Regular_expression"
+          teaget="_blank"
+        >regex</a>！
       </p>
     </card>
     <vs-alert v-show="onError" style="margin-top: 16px">
@@ -73,14 +78,7 @@
             <vs-button block @click="resetTimetable">重置</vs-button>
           </div>
           <div class="r" style="width: 50%">
-            <vs-button
-              block
-              @click="
-                timetableDialog = false
-                searchCourse()
-              "
-              >確定</vs-button
-            >
+            <vs-button block @click="timetableDialog = false; searchCourse()">確定</vs-button>
           </div>
         </div>
       </template>
@@ -146,7 +144,7 @@ export default {
         let course = await this.fetchCourseData()
         let query = Object.assign({}, this.$route.query)
         if (this.searchVal != '') {
-          course = course.filter(x => x.name.zh.match(this.searchVal))
+          course = course.filter(x => x.name.zh.match(this.searchVal) || (x.class.some(x => x.name.match(/體育/))) && x.notes.match(this.searchVal))
           query.q = this.searchVal
         } else {
           delete query.q
@@ -213,7 +211,7 @@ export default {
         }
         //
         this.searchResult = course
-        this.$router.replace({ path: '/search', query }, () => {})
+        this.$router.replace({ path: '/search', query }, () => { })
       } catch (e) {
         this.onError = e
         this.searchResult = []
