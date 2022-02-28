@@ -1,6 +1,9 @@
 <template>
   <div v-if="show">
-    <tag v-for="tag of tags" :key="tag.name" :color="tag.color">{{ tag.name }}</tag>
+    <tag v-for="tag of tags" :key="tag.name" :color="tag.color">
+      <i :class="tag.icon" v-if="tag.icon" />
+      {{ tag.name }}
+    </tag>
   </div>
 </template>
 <script>
@@ -22,13 +25,15 @@ export default {
         return '#03A9F4'
       if (name.match(/社會|法治/))
         return '#2196F3'
-
-      return '#777'
+      return null
     }
-    this.tags = this.courseData.notes.split(/106-108：|。109 \(含\) 後：/).filter(x => x).map(x => ({
-      name: x, color: getcolor(x)
-    }))
-    this.show = this.courseData.class.some(x => x.name.match(/^博雅/)) && this.tags.length
+    // 博雅課程
+    if (this.courseData.class.some(x => x.name.match(/^博雅/))) {
+      this.tags = this.courseData.notes.split(/106-108：|。109 \(含\) 後：/).filter(x => x).map(x => ({
+        name: x, color: getcolor(x) || '#777'
+      }))
+    }
+    this.show = this.tags.length
   }
 }
 </script>

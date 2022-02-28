@@ -25,7 +25,8 @@
           :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`"
         >
           <card-title>
-            {{ tr.courseType }}{{ tr.name.zh }}
+            <sports-title :course-data="tr" v-if="tr.class.some(x => x.name.match(/體育/))" />
+            <span v-else>{{ tr.courseType }}{{ tr.name.zh }}</span>
             <tag v-if="conflictCourseData.includes(tr.id)" color="red">
               <i class="bx bxs-error"></i>衝堂
             </tag>
@@ -174,8 +175,9 @@
 </template> 
 <script>
 import card from './card.vue'
+import SportsTitle from './sportsTitle.vue'
 export default {
-  components: { card },
+  components: { card, SportsTitle },
   name: 'parse-courses',
   props: {
     courses: Array,
