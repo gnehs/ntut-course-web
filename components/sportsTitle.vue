@@ -1,8 +1,8 @@
 <template>
-  <span>
-    <i :class="icon" v-if="icon" />
+  <div style="display: flex;align-items: center;">
+    <i :class="icon" v-if="icon" style="margin-right: 4px" />
     {{ title }}
-  </span>
+  </div>
 </template>
 <script>
 export default {

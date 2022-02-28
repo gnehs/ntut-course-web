@@ -7,15 +7,22 @@
     <div v-if="fetchedCourseData && courseData">
       <div class="lr-container">
         <div class="l">
-          <h2>
+          <h2 v-if="courseData.class.some(x => x.name.match(/體育/))">
+            <sports-title :course-data="courseData" />
+          </h2>
+          <h2 v-else>
             {{ courseData.name.zh }}
             <br />
             {{ courseData.name.en }}
           </h2>
         </div>
         <div class="r">
-          <vs-button flat @click="add2myCourse" v-if="!isInMyCourse"> <i class="bx bx-plus"></i>加入我的課程 </vs-button>
-          <vs-button flat danger @click="removeFromMyCourse" v-else> <i class="bx bx-minus"></i>從我的課程移除 </vs-button>
+          <vs-button flat @click="add2myCourse" v-if="!isInMyCourse">
+            <i class="bx bx-plus"></i>加入我的課程
+          </vs-button>
+          <vs-button flat danger @click="removeFromMyCourse" v-else>
+            <i class="bx bx-minus"></i>從我的課程移除
+          </vs-button>
         </div>
       </div>
       <vs-alert danger v-show="isCourseConflicted">
@@ -23,9 +30,10 @@
         本課程與
         <span v-for="(item, i) in conflictCourseData" :key="item.id">
           <span v-if="i > 0">、</span>
-          <router-link style="cursor: pointer" :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`">
-            {{ item.name.zh }}
-          </router-link>
+          <router-link
+            style="cursor: pointer"
+            :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
+          >{{ item.name.zh }}</router-link>
         </span>
         衝堂！
       </vs-alert>
@@ -67,9 +75,7 @@
                 :to="`/class/${classItem}?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
                 class="class-link"
                 :key="classItem + '_'"
-              >
-                {{ classItem }}
-              </router-link>
+              >{{ classItem }}</router-link>
             </template>
           </card-title>
           <p>班級</p>
@@ -109,8 +115,7 @@
               :label="fetchedCourseData.map((x) => x.name)[i]"
               :value="i.toString()"
               :key="i"
-              >{{ item }}</vs-option
-            >
+            >{{ item }}</vs-option>
           </vs-select>
         </vs-alert>
         <div v-for="(item, i) in fetchedCourseData" :key="i.toString()">
@@ -119,17 +124,36 @@
               <h2>因應疫情所致之上課方式</h2>
               <p>實際實施日期與上課方式，依學校公布之訊息為主</p>
               <div class="level-block lv1">
-                <div class="level-title">若疫情為<strong>ㄧ級</strong>警戒</div>
+                <div class="level-title">
+                  若疫情為
+                  <strong>ㄧ級</strong>警戒
+                </div>
                 <div class="level-content">實體授課</div>
               </div>
               <div class="level-block lv2">
-                <div class="level-title">若疫情為<strong>二級</strong>警戒</div>
-                <div class="level-content" v-if="item.covid19.lv2Method">{{ item.covid19.lv2Method }}</div>
-                <div class="level-content" v-if="item.covid19.lv2Description" v-html="parseTextarea(item.covid19.lv2Description)" />
-                <div class="level-content" v-if="!item.covid19.lv2Method && !item.covid19.lv2Description">尚無對策</div>
+                <div class="level-title">
+                  若疫情為
+                  <strong>二級</strong>警戒
+                </div>
+                <div
+                  class="level-content"
+                  v-if="item.covid19.lv2Method"
+                >{{ item.covid19.lv2Method }}</div>
+                <div
+                  class="level-content"
+                  v-if="item.covid19.lv2Description"
+                  v-html="parseTextarea(item.covid19.lv2Description)"
+                />
+                <div
+                  class="level-content"
+                  v-if="!item.covid19.lv2Method && !item.covid19.lv2Description"
+                >尚無對策</div>
               </div>
               <div class="level-block lv3">
-                <div class="level-title">若疫情為<strong>三級</strong>警戒</div>
+                <div class="level-title">
+                  若疫情為
+                  <strong>三級</strong>警戒
+                </div>
                 <div class="level-content">遠距上課</div>
               </div>
               <template v-if="item.covid19.courseScoreMethod">
