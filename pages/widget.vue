@@ -19,7 +19,10 @@
     </h2>
     <p>
       到 App Store 安裝
-      <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank">Scriptable</a>
+      <a
+        href="https://apps.apple.com/tw/app/scriptable/id1405459188"
+        target="_blank"
+      >Scriptable</a>
     </p>
     <h2>
       <span style="color: blue">Step 2</span> 複製並貼上程式碼
@@ -169,6 +172,11 @@ Script.complete()
 
 <script>
 export default {
+  head() {
+    return {
+      title: 'iOS 小工具',
+    }
+  },
   data() {
     return {
       courseData: []

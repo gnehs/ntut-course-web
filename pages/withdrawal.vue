@@ -46,6 +46,11 @@
 </style>
 <script>
 export default {
+  head() {
+    return {
+      title: '退選率'
+    }
+  },
   created() {
     this.getData()
   },

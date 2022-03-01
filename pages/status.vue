@@ -3,7 +3,13 @@
     <h1>擷取狀態</h1>
     <p>僅顯示最新 50 筆資料</p>
     <div class="run-items">
-      <a class="run-item" v-for="item of workflow_runs" :key="item.id" :href="item.html_url" target="_blank">
+      <a
+        class="run-item"
+        v-for="item of workflow_runs"
+        :key="item.id"
+        :href="item.html_url"
+        target="_blank"
+      >
         <div class="run-item-icon" :class="[item.status]">
           <i class="bx bx-loader bx-spin" v-if="item.status == 'in_progress'" />
           <i class="bx bx-check" v-else-if="item.status == 'completed'" />
@@ -15,7 +21,8 @@
             <i class="bx bx-calendar" v-if="item.event == 'schedule'" />
             <i class="bx bx-git-commit" v-else-if="item.event == 'push'" />
             <i class="bx bx-question-mark" v-else />
-            <span> • </span> {{ timeSince(new Date(item.created_at)) }}前
+            <span>•</span>
+            {{ timeSince(new Date(item.created_at)) }}前
           </div>
         </div>
       </a>
@@ -25,6 +32,11 @@
 
 <script>
 export default {
+  head() {
+    return {
+      title: '擷取狀態'
+    }
+  },
   data() {
     return {
       workflow_runs: []
