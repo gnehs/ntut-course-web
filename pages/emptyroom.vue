@@ -1,9 +1,12 @@
 <template>
   <div>
-    <vs-alert> 請注意，此功能僅能列出表定無課程進行的教室，教室可能因其他因素，致無法使用。 </vs-alert>
+    <vs-alert>請注意，此功能僅能列出表定無課程進行的教室，教室可能因其他因素，致無法使用。</vs-alert>
     <vs-alert>
       尋找空教室仍在早期開發階段，若有建議或是找到 bug 可以到 GitHub 開
-      <a href="https://github.com/gnehs/ntut-course-web/issues/new" target="_blank">issue</a>。
+      <a
+        href="https://github.com/gnehs/ntut-course-web/issues/new"
+        target="_blank"
+      >issue</a>。
     </vs-alert>
     <h1>尋找空教室</h1>
     <div v-if="categoryList">
@@ -23,9 +26,7 @@
                 v-for="i of upcomingCourseIncludes"
                 :key="i"
                 :class="{ active: !classroom.timetable.includes(i) }"
-              >
-                {{ i }}
-              </div>
+              >{{ i }}</div>
             </div>
           </card>
         </div>
@@ -54,32 +55,31 @@
           v-if="emptyroomDetailData"
           :href="`https://aps.ntut.edu.tw/course/tw/${emptyroomDetailData.link}`"
           target="_blank"
-        >
-          到北科課程網站查看
-        </a>
+        >到北科課程網站查看</a>
       </div>
     </vs-dialog>
   </div>
 </template>
 <style lang="sass" scoped>
+
 .course-dots
+  display: flex
+  gap: 0.25rem
+  margin-top: 0.5rem
+  flex-wrap: wrap
+  .course-dot-item
+    width: 1.25rem
+    height: 1.25rem
     display: flex
-    gap: 0.25rem
-    margin-top: 0.5rem
-    flex-wrap: wrap
-    .course-dot-item
-        width: 1.25rem
-        height: 1.25rem
-        display: flex
-        justify-content: center
-        align-items: center
-        border-radius: 50%
-        background-color: #f5f5f5
-        font-size: 0.75rem
-        font-family: 'Lato', sans-serif
-        &.active
-            background-color: red
-            color: white
+    justify-content: center
+    align-items: center
+    border-radius: 50%
+    background-color: rgba(0,0,0,.1)
+    font-size: 0.75rem
+    font-family: 'Lato', sans-serif
+    &.active
+      background-color: red
+      color: white
 </style>
 <script>
 export default {
@@ -204,7 +204,7 @@ export default {
             })
           })
         })
-      classList = classList.sort((a, b) => a.name.localeCompare(b.name)).sort((a, b) => b.timetable.length - a.timetable.length)
+      classList = classList.sort((a, b) => a.name.localeCompare(b.name))
       this.classList = classList
       this.categoryList = Array.from(categoryList).sort()
     }

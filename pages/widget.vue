@@ -8,14 +8,14 @@
       請先新增課程資料
     </vs-alert>
     <h2>
-      <span style="color: blue">Step 0</span> 加入課程
+      <span style="color: rgb(var(--vs-primary))">Step 0</span> 加入課程
     </h2>
     <p>
       請先將您本學期的課程新增到
       <strong>北科課程好朋友</strong>
     </p>
     <h2>
-      <span style="color: blue">Step 1</span> 安裝 Scriptable
+      <span style="color: rgb(var(--vs-primary))">Step 1</span> 安裝 Scriptable
     </h2>
     <p>
       到 App Store 安裝
@@ -25,7 +25,7 @@
       >Scriptable</a>
     </p>
     <h2>
-      <span style="color: blue">Step 2</span> 複製並貼上程式碼
+      <span style="color: rgb(var(--vs-primary))">Step 2</span> 複製並貼上程式碼
     </h2>
     <p>建立一個 Script 並貼上以下程式碼</p>
     <div class="white-box" style="position: relative">
@@ -161,7 +161,7 @@ Script.complete()
     </div>
 
     <h2>
-      <span style="color: blue">Step 3</span> 新增小工具到桌面
+      <span style="color: rgb(var(--vs-primary))">Step 3</span> 新增小工具到桌面
     </h2>
     <p>參考此影片建立您的小工具</p>
     <video loop controls autoplay class="demo-video">

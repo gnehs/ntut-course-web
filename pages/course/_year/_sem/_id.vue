@@ -103,7 +103,7 @@
         <p v-html="parseTextarea(courseData.notes)" />
       </div>
       <div v-if="fetchedCourseData.length">
-        <vs-alert shadow style="background: #fff" v-show="chooseClassSelect">
+        <vs-alert v-show="chooseClassSelect">
           <template #title>含有多項資料</template>
           本課程含有多項資料可供查詢，請使用下拉式選單選取教師來查看資料。
           <br />

@@ -7,14 +7,14 @@
       請先新增課程資料
     </vs-alert>
     <h2>
-      <span style="color: blue">Step 0</span> 加入課程
+      <span style="color: rgb(var(--vs-primary))">Step 0</span> 加入課程
     </h2>
     <p>
       請先將您本學期的課程新增到
       <strong>北科課程好朋友</strong>
     </p>
     <h2>
-      <span style="color: blue">Step 1</span> 請選擇要加入的課程
+      <span style="color: rgb(var(--vs-primary))">Step 1</span> 請選擇要加入的課程
     </h2>
     <div class="con-checkbox">
       <vs-checkbox
@@ -25,11 +25,11 @@
       >{{ item.name }}</vs-checkbox>
     </div>
     <h2>
-      <span style="color: blue">Step 2</span> 新增專用行事曆
+      <span style="color: rgb(var(--vs-primary))">Step 2</span> 新增專用行事曆
     </h2>
     <p>建議建立專用的行事曆，未來若需移除課程時僅需刪除該行事曆即可。</p>
     <h2>
-      <span style="color: blue">Step 3</span> 匯入至行事曆
+      <span style="color: rgb(var(--vs-primary))">Step 3</span> 匯入至行事曆
     </h2>
     <p>輕觸「匯入」按鈕以繼續，匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。</p>
     <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入</vs-button>

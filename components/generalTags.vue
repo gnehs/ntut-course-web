@@ -17,7 +17,7 @@ export default {
   },
   created() {
     function getcolor(name) {
-      if (name.match(/創新與創業/))
+      if (name.match(/創新與創業|創創/))
         return '#FFC107'
       if (name.match(/文化|美學與藝術|人文與藝術/))
         return '#FF5722'
@@ -29,7 +29,7 @@ export default {
     }
     // 博雅課程
     if (this.courseData.class.some(x => x.name.match(/^博雅/))) {
-      this.tags = this.courseData.notes.split(/106-108：|。109 \(含\) 後：/).filter(x => x).map(x => ({
+      this.tags = this.courseData.notes.replace(/◎|\*/g, '').split(/106-108：|。109 \(含\) 後：/).filter(x => x).map(x => ({
         name: x, color: getcolor(x) || '#777'
       }))
     }
