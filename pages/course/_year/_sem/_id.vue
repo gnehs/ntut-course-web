@@ -32,8 +32,7 @@
           <span v-if="i > 0">、</span>
           <router-link
             style="cursor: pointer"
-            :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
-          >{{ item.name.zh }}</router-link>
+            :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`">{{ item.name.zh }}</router-link>
         </span>
         衝堂！
       </vs-alert>
@@ -74,8 +73,7 @@
               <router-link
                 :to="`/class/${classItem}?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
                 class="class-link"
-                :key="classItem + '_'"
-              >{{ classItem }}</router-link>
+                :key="classItem + '_'">{{ classItem }}</router-link>
             </template>
           </card-title>
           <p>班級</p>
@@ -94,6 +92,10 @@
             <p>上課時間</p>
           </card>
         </div>
+      </div>
+      <div v-if="!fetchedCourseData.length">
+        <h3>教師</h3>
+        <p>{{ courseData.teacher.map(({ name }) => name).join('、') }}</p>
       </div>
       <h3>課程概述</h3>
       <p v-html="parseTextarea(courseData.description.zh)" />
@@ -114,8 +116,7 @@
               v-for="(item, i) in fetchedCourseData.map((x) => x.name)"
               :label="fetchedCourseData.map((x) => x.name)[i]"
               :value="i.toString()"
-              :key="i"
-            >{{ item }}</vs-option>
+              :key="i">{{ item }}</vs-option>
           </vs-select>
         </vs-alert>
         <div v-for="(item, i) in fetchedCourseData" :key="i.toString()">
@@ -137,17 +138,14 @@
                 </div>
                 <div
                   class="level-content"
-                  v-if="item.covid19.lv2Method"
-                >{{ item.covid19.lv2Method }}</div>
+                  v-if="item.covid19.lv2Method">{{ item.covid19.lv2Method }}</div>
                 <div
                   class="level-content"
                   v-if="item.covid19.lv2Description"
-                  v-html="parseTextarea(item.covid19.lv2Description)"
-                />
+                  v-html="parseTextarea(item.covid19.lv2Description)" />
                 <div
                   class="level-content"
-                  v-if="!item.covid19.lv2Method && !item.covid19.lv2Description"
-                >尚無對策</div>
+                  v-if="!item.covid19.lv2Method && !item.covid19.lv2Description">尚無對策</div>
               </div>
               <div class="level-block lv3">
                 <div class="level-title">
