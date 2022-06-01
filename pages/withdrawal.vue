@@ -121,7 +121,6 @@
       opacity: .8
     // dark-mode
     @media (prefers-color-scheme: dark)
-      border-color: #333
       background-color: #333
       color: #fff
 .course-items
@@ -141,7 +140,7 @@
     box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
     border-radius: 8px
     transition: all .25s ease
-    border: 1px solid #eee
+    border: 1px solid rgba(var(--vs-text),.1)
     &:hover
       cursor: pointer
       box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
