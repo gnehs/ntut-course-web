@@ -225,7 +225,7 @@ export default {
           .slice(0, period)
           .reverse()
 
-        data = res.map(async ({ year, sem }) => (await this.$fetchCourse(year, sem)).map(x => ({ ...x, year, sem })))
+        data = res.map(async ({ year, sem }) => (await this.$fetchCourse(year, sem, null, false)).map(x => ({ ...x, year, sem })))
         data = await Promise.all(data)
         data = data.flat()
       } else {
