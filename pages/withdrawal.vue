@@ -2,19 +2,85 @@
   <div>
     <h1>退選率</h1>
     <p>這是該學期所有教師的退選率（退選人數/選課人數）的計算結果</p>
-    <vs-checkbox v-model="showPeopleBelow10">顯示選課人數小於十人的教師</vs-checkbox>
-    <transition-group name="flip-card" tag="div" class="teachers">
+    <div style="display:flex; justify-content: space-between;">
+      <vs-checkbox v-model="showPeopleBelow10">顯示選課小於十人的教師</vs-checkbox>
+      <vs-select placeholder="期間" v-model="period" state="dark" @change="getData">
+        <vs-option :label="`僅目前學期`" :value="1">
+          {{ year }} 年{{ sem == '1' ? '上' : '下' }}學期
+        </vs-option>
+        <vs-option label="過去兩年" :value="4">
+          過去兩年
+        </vs-option>
+        <vs-option label="過去五年" :value="10">
+          過去五年
+        </vs-option>
+      </vs-select>
+    </div>
+    <div class="teachers">
       <div
         class="teacher"
         v-for="item of data"
         :key="item.name"
         v-show="showPeopleBelow10 || item.people >= 10"
-      >
+        @click="openDialog(item)">
         <h2 class="name">{{ item.name }}</h2>
         <div class="rate">{{ item.rate_percent }}%</div>
         <div class="people">{{ item.withdraw }} 人退選 / {{ item.people }} 人選課</div>
       </div>
-    </transition-group>
+    </div>
+    <vs-alert color="info" v-if="!data.length">
+      <template #title>沒有資料</template>
+      可能是學期尚未開始或是沒有選課資料，你可以嘗試點選右上角按鈕切換資料集來查看其他學期的資料
+    </vs-alert>
+    <vs-dialog v-model="dialog">
+      <div v-if="dialogData">
+        <h3>{{ dialogData.name }}</h3>
+        <div class="cards" style="--card-row: 4;">
+          <card>
+            <card-title>{{ dialogData.rate_percent }}%</card-title>
+            <p>退選率</p>
+          </card>
+          <card>
+            <card-title>{{ dialogData.withdraw }}</card-title>
+            <p>退選人數</p>
+          </card>
+          <card>
+            <card-title>{{ dialogData.people }}</card-title>
+            <p>選課人數</p>
+          </card>
+          <card>
+            <card-title>{{ dialogData.course.length || 0 }}</card-title>
+            <p>課程數</p>
+          </card>
+        </div>
+        <div class="course-items">
+          <div class="course-item" v-for="course of dialogData.course" :key="course.id"
+            @click="$router.push(`/course/${course.year}/${course.sem}/${course.id}`)">
+            <div class="info">
+              <div class="id">{{ course.id }} </div>
+              <div class="year-sem">{{ course.year }} 年{{ course.sem == '1' ? '上' : '下' }}學期</div>
+            </div>
+            <div class="title">
+              <div class="zh">{{ course.courseType }} {{ course.name.zh }}</div>
+              <div class="en"> {{ course.name.en }}</div>
+            </div>
+
+            <div class="withdraw">
+              <div class="value">
+                {{ course.peopleWithdraw }}
+              </div>
+              <div class="name">退選</div>
+            </div>
+            <div class="people">
+              <div class="value">
+                {{ course.people }}
+              </div>
+              <div class="name">選課</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </vs-dialog>
   </div>
 </template>
 <style lang="sass" scoped>
@@ -26,9 +92,18 @@
   gap: 8px
   .teacher
     padding: 16px
-    border: 1px solid #eee
     border-radius: 5px
     background-color: #fff
+    box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
+    transition: all .25s ease
+    &:hover
+      cursor: pointer
+      box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
+      transform: translate(0, -5px)
+      color: var(--vs-text)
+    &:active
+      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0))
+      transform: translate(0, 5px)
     .name
       font-size: 16px
       margin: 0
@@ -43,6 +118,63 @@
       border-color: #333
       background-color: #333
       color: #fff
+.course-items
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: 12px
+  margin-top: 8px
+  @media (max-width: 768px)
+    grid-template-columns: 1fr
+  .course-item
+    display: grid
+    grid-template-areas: "info title withdraw people"
+    grid-template-columns: auto 1fr auto auto
+    align-items: center
+    gap: 0 8px
+    padding: 8px
+    box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
+    border-radius: 8px
+    transition: all .25s ease
+    border: 1px solid #eee
+    &:hover
+      cursor: pointer
+      box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
+      transform: translate(0, -5px)
+      color: var(--vs-text)
+    &:active
+      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, var(--vs-shadow-opacity,0))
+      transform: translate(0, 5px)
+    .info
+      grid-area: info
+      .id
+        font-size: 16px
+        font-weight: bold
+      .year-sem
+        font-size: 12px
+        opacity: .8
+    .title
+      grid-area: title
+      .zh
+        font-weight: bold
+        font-size: 16px
+      .en
+        font-size: 12px
+        opacity: .8
+    .people
+      grid-area: people
+    .withdraw
+      grid-area: withdraw
+    .withdraw, .people
+      display: flex
+      align-items: center
+      justify-content: center
+      flex-direction: column
+      .value
+        font-weight: bold
+        font-size: 16px
+      .name
+        font-size: 12px
+        opacity: .8
 </style>
 <script>
 export default {
@@ -56,7 +188,10 @@ export default {
   },
   data() {
     return ({
+      period: 1,
       data: {},
+      dialog: false,
+      dialogData: false,
       showPeopleBelow10: true,
     })
   },
@@ -78,8 +213,25 @@ export default {
   },
   methods: {
     async getData() {
-      let { year, sem } = this.$store.state
-      let data = await this.$fetchCourse(year, sem)
+      let period = this.period
+      let data
+
+      if (period > 1) {
+        let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/main.json`).then(x => x.json())
+        res = Object.entries(res)
+          .map(([y, s]) => s.map(x => ({ year: y, sem: x })))
+          .flat()
+          .reverse()
+          .slice(0, period)
+          .reverse()
+
+        data = res.map(async ({ year, sem }) => (await this.$fetchCourse(year, sem)).map(x => ({ ...x, year, sem })))
+        data = await Promise.all(data)
+        data = data.flat()
+      } else {
+        let { year, sem } = this.$store.state
+        data = (await this.$fetchCourse(year, sem)).map(x => ({ ...x, year, sem }))
+      }
       let result = {}
       for (let course of data) {
         for (let teacher of course.teacher) {
@@ -89,13 +241,13 @@ export default {
               name,
               withdraw: 0,
               people: 0,
-              course: 0,
+              course: [],
               rate: -1
             }
-            result[name].withdraw += parseInt(course.peopleWithdraw)
-            result[name].people += parseInt(course.people)
-            result[name].course += 1
           }
+          result[name].withdraw += parseInt(course.peopleWithdraw)
+          result[name].people += parseInt(course.people)
+          result[name].course.push(course)
         }
       }
       // calc rate
@@ -105,8 +257,12 @@ export default {
         // 四捨五入
         item.rate_percent = (item.rate * 100).toFixed(2)
       }
-      // sort by rate  
+      // sort by rate
       this.data = Object.values(result).filter(x => x.people).sort((a, b) => b.rate - a.rate)
+    },
+    openDialog(item) {
+      this.dialogData = item
+      this.dialog = true
     }
   }
 }
