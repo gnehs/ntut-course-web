@@ -24,7 +24,7 @@
           icon
           color="primary"
           flat
-          @click="downloadCsv">
+          @click="downloadDialog = true">
           <i class='bx bx-download'></i>
         </vs-button>
       </div>
@@ -51,6 +51,40 @@
       <template #title>沒有資料</template>
       可能是學期尚未開始或是沒有選課資料，你可以嘗試點選右上角按鈕切換資料集來查看其他學期的資料
     </vs-alert>
+    <vs-dialog overflow-hidden v-model="downloadDialog">
+      <template #header>
+        <h4>下載資料</h4>
+      </template>
+      <p style="margin:0;margin-top: -1rem;font-size: .8em;opacity: .8;">請選擇檔案格式</p>
+      <div style="display:flex;">
+        <vs-button
+          icon
+          color="primary"
+          block
+          flat
+          @click="downloadJson">
+          <i class='bx bxs-file-json'></i>
+          JSON
+        </vs-button>
+        <vs-button
+          icon
+          color="primary"
+          block
+          flat
+          @click="downloadCsv">
+          <i class='bx bxs-file-blank'></i>
+          CSV
+        </vs-button>
+      </div>
+      <p style="margin:0;font-size: .8em;opacity: .8;">若下載的 CSV 檔案在 Excel 中顯示亂碼，請參考 <a
+          href="https://data.customs.gov.tw/News_Content.aspx?n=9530920E31D22F76&sms=34935D25C6F4E5E5&s=FFE80C41B565624B"
+          target="_blank">亂碼處理說明</a></p>
+      <template #footer>
+        <div class="datasetDialog-footer">
+          <vs-button block @click="downloadDialog = false">完成</vs-button>
+        </div>
+      </template>
+    </vs-dialog>
     <vs-dialog overflow-hidden v-model="dialog">
       <div v-if="dialogData">
         <h3>{{ dialogData.name }}</h3>
@@ -213,6 +247,7 @@ export default {
       period: 1,
       data: {},
       dialog: false,
+      downloadDialog: false,
       dialogData: false,
       showPeopleBelow10: true,
       stat: []
@@ -312,6 +347,18 @@ export default {
       this.dialogData = item
       this.dialog = true
     },
+    downloadJson() {
+
+      let data = this.data.map(x => ({
+        '姓名': x.name,
+        '退選率': x.rate_percent,
+        '退選人數': x.withdraw,
+        '選課人數': x.people,
+        '課程數': x.course.length,
+        '課程代碼': x.course.map(x => x.id).join(', ')
+      }))
+      this.downloadFile({ type: 'text/plain;charset=utf-8', data: JSON.stringify(data), ext: 'json' })
+    },
     downloadCsv() {
       let data = this.data.map(x => ({
         '姓名': x.name,
@@ -322,15 +369,19 @@ export default {
         '課程代碼': x.course.map(x => x.id).join(', ')
       }))
       let csv = this.$papa.unparse(data)
-      let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      this.downloadFile({ type: 'text/csv;charset=utf-8;', data: csv, ext: 'csv' })
+    },
+    downloadFile({ type, data, ext }) {
+      let blob = new Blob([data], { type })
       let link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
       if (this.period) {
-        link.download = `過去 ${this.period / 2} 年_退選率.csv`
+        link.download = `過去 ${this.period / 2} 年_退選率.${ext}`
       } else {
-        link.download = `${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.csv`
+        link.download = `${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.${ext}`
       }
       link.click()
+
     }
   }
 }
