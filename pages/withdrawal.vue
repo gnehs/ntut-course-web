@@ -4,8 +4,8 @@
     <p>這是該學期所有教師的退選率（退選人數/選課人數）的計算結果</p>
     <div style="display:flex; justify-content: space-between;">
       <vs-checkbox v-model="showPeopleBelow10">顯示選課小於十人的教師</vs-checkbox>
-      <vs-select placeholder="期間" v-model="period" state="dark" @change="getData">
-        <vs-option :label="`僅目前學期`" :value="1">
+      <vs-select placeholder="期間" v-model="period" state="dark" @change="getData" style="max-width: 100px">
+        <vs-option :label="`目前學期`" :value="1">
           {{ year }} 年{{ sem == '1' ? '上' : '下' }}學期
         </vs-option>
         <vs-option label="過去兩年" :value="4">
@@ -16,7 +16,7 @@
         </vs-option>
       </vs-select>
     </div>
-    <div class="cards" style="--card-row: 2;" v-if="data.length">
+    <div class="cards" style="--card-row: 2;--card-row-sm: 1;" v-if="data.length">
       <card v-for="(item, i) of stat" :key="i">
         <card-title>{{ item.value }}</card-title>
         <p>{{ item.title }}</p>
