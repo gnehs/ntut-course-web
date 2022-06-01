@@ -14,8 +14,8 @@
         <vs-option label="過去五年" :value="10">
           過去五年
         </vs-option>
-        <vs-option :label="`過去 ${i / 2} 年`" :value="i" v-show="false" v-if="i != 4 && i != 10" v-for="i in 40" :key="i">
-          過去 {{ i / 2 }} 年
+        <vs-option :label="`過去 ${period / 2} 年`" v-show="false" v-if="period != 4 && period != 10">
+          過去 {{ period / 2 }} 年
         </vs-option>
       </vs-select>
     </div>
