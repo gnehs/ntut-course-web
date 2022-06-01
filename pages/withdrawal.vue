@@ -291,9 +291,8 @@ export default {
       let q1 = rates[quartiles]
       let q2 = rates[quartiles * 2]
       let q3 = rates[quartiles * 3]
-      let q4 = rates[rates.length - 1]
       this.stat.push({
-        value: q1.toFixed(2) + '% - ' + q2.toFixed(2) + '% - ' + q3.toFixed(2) + '% - ' + q4.toFixed(2) + '%',
+        value: q1.toFixed(2) + '% - ' + q2.toFixed(2) + '% - ' + q3.toFixed(2) + '%',
         title: '退選率分位數'
       })
 
