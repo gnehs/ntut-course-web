@@ -4,20 +4,30 @@
     <p>這是該學期所有教師的退選率（退選人數/選課人數）的計算結果</p>
     <div style="display:flex; justify-content: space-between;">
       <vs-checkbox v-model="showPeopleBelow10">顯示選課小於十人的教師</vs-checkbox>
-      <vs-select placeholder="期間" v-model="period" state="dark" @change="getData" style="max-width: 120px">
-        <vs-option :label="`目前學期`" :value="1">
-          {{ year }} 年{{ sem == '1' ? '上' : '下' }}學期
-        </vs-option>
-        <vs-option label="過去兩年" :value="4">
-          過去兩年
-        </vs-option>
-        <vs-option label="過去五年" :value="10">
-          過去五年
-        </vs-option>
-        <vs-option :label="`過去 ${period / 2} 年`" :value="period" v-show="false" v-if="period != 1 && period != 4 && period != 10">
-          過去 {{ period / 2 }} 年
-        </vs-option>
-      </vs-select>
+      <div style="display:flex;align-items: center;">
+
+        <vs-select placeholder=" 期間" v-model="period" state="dark" @change="getData" style="max-width: 120px">
+          <vs-option :label="`目前學期`" :value="1">
+            {{ year }} 年{{ sem == '1' ? '上' : '下' }}學期
+          </vs-option>
+          <vs-option label="過去兩年" :value="4">
+            過去兩年
+          </vs-option>
+          <vs-option label="過去五年" :value="10">
+            過去五年
+          </vs-option>
+          <vs-option :label="`過去 ${period / 2} 年`" :value="period" v-show="false" v-if="period != 1 && period != 4 && period != 10">
+            過去 {{ period / 2 }} 年
+          </vs-option>
+        </vs-select>
+        <vs-button
+          icon
+          color="primary"
+          flat
+          @click="downloadCsv">
+          <i class='bx bx-download'></i>
+        </vs-button>
+      </div>
     </div>
     <div class="cards" style="--card-row: 2;--card-row-sm: 1;" v-if="data.length">
       <card v-for="(item, i) of stat" :key="i">
@@ -301,6 +311,26 @@ export default {
     openDialog(item) {
       this.dialogData = item
       this.dialog = true
+    },
+    downloadCsv() {
+      let data = this.data.map(x => ({
+        '姓名': x.name,
+        '退選率': x.rate_percent,
+        '退選人數': x.withdraw,
+        '選課人數': x.people,
+        '課程數': x.course.length,
+        '課程代碼': x.course.map(x => x.id).join(', ')
+      }))
+      let csv = this.$papa.unparse(data)
+      let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      let link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      if (this.period) {
+        link.download = `過去 ${this.period / 2} 年_退選率.csv`
+      } else {
+        link.download = `${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.csv`
+      }
+      link.click()
     }
   }
 }

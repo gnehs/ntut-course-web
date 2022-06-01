@@ -16,6 +16,7 @@
     "nuxt": "^2.15.8",
     "nuxt-clipboard": "0.0.6",
     "vue-ics": "^0.1.4",
+    "vue-papa-parse": "^3.0.5",
     "vuesax": "^4.0.1-alpha.25"
   },
   "devDependencies": {
