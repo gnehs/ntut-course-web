@@ -16,6 +16,12 @@
         </vs-option>
       </vs-select>
     </div>
+    <div class="cards" style="--card-row: 2;" v-if="data.length">
+      <card v-for="(item, i) of stat" :key="i">
+        <card-title>{{ item.value }}</card-title>
+        <p>{{ item.title }}</p>
+      </card>
+    </div>
     <div class="teachers">
       <div
         class="teacher"
@@ -184,6 +190,10 @@ export default {
     }
   },
   created() {
+    let query = Object.assign({}, this.$route.query)
+    if (query.period) {
+      this.period = parseInt(query.period)
+    }
     this.getData()
   },
   data() {
@@ -193,6 +203,7 @@ export default {
       dialog: false,
       dialogData: false,
       showPeopleBelow10: true,
+      stat: []
     })
   },
   computed: {
@@ -217,6 +228,9 @@ export default {
       let data
 
       if (period > 1) {
+        // update query
+        this.$router.replace({ path: '/withdrawal', query: { period } }, () => { })
+        //getdata
         let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/main.json`).then(x => x.json())
         res = Object.entries(res)
           .map(([y, s]) => s.map(x => ({ year: y, sem: x })))
@@ -229,10 +243,14 @@ export default {
         data = await Promise.all(data)
         data = data.flat()
       } else {
+        // update query
+        this.$router.replace({ path: '/withdrawal', query: {} }, () => { })
+        //getdata
         let { year, sem } = this.$store.state
         data = (await this.$fetchCourse(year, sem)).map(x => ({ ...x, year, sem }))
       }
       let result = {}
+      let totalPeople = 0, totalWithdraw = 0, totalCourse = 0
       for (let course of data) {
         for (let teacher of course.teacher) {
           let name = teacher.name
@@ -248,6 +266,9 @@ export default {
           result[name].withdraw += parseInt(course.peopleWithdraw)
           result[name].people += parseInt(course.people)
           result[name].course.push(course)
+          totalPeople += parseInt(course.people)
+          totalWithdraw += parseInt(course.peopleWithdraw)
+          totalCourse++
         }
       }
       // calc rate
@@ -257,8 +278,25 @@ export default {
         // 四捨五入
         item.rate_percent = (item.rate * 100).toFixed(2)
       }
+      this.stat = [{
+        value: (totalWithdraw / totalPeople * 100).toFixed(2) + '%',
+        title: '平均退選率',
+      },]
       // sort by rate
       this.data = Object.values(result).filter(x => x.people).sort((a, b) => b.rate - a.rate)
+      // calc quartiles
+      let rates = this.data.sort().map(x => x.rate * 100).reverse()
+      console.log(rates)
+      let quartiles = Math.floor(rates.length / 4)
+      let q1 = rates[quartiles]
+      let q2 = rates[quartiles * 2]
+      let q3 = rates[quartiles * 3]
+      let q4 = rates[rates.length - 1]
+      this.stat.push({
+        value: q1.toFixed(2) + '% - ' + q2.toFixed(2) + '% - ' + q3.toFixed(2) + '% - ' + q4.toFixed(2) + '%',
+        title: '退選率分位數'
+      })
+
     },
     openDialog(item) {
       this.dialogData = item
