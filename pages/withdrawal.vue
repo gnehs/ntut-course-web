@@ -4,7 +4,7 @@
     <p>這是該學期所有教師的退選率（退選人數/選課人數）的計算結果</p>
     <div style="display:flex; justify-content: space-between;">
       <vs-checkbox v-model="showPeopleBelow10">顯示選課小於十人的教師</vs-checkbox>
-      <vs-select placeholder="期間" v-model="period" state="dark" @change="getData" style="max-width: 100px">
+      <vs-select placeholder="期間" v-model="period" state="dark" @change="getData" style="max-width: 120px">
         <vs-option :label="`目前學期`" :value="1">
           {{ year }} 年{{ sem == '1' ? '上' : '下' }}學期
         </vs-option>
@@ -13,6 +13,9 @@
         </vs-option>
         <vs-option label="過去五年" :value="10">
           過去五年
+        </vs-option>
+        <vs-option :label="`過去 ${i / 2} 年`" :value="i" v-show="false" v-if="i != 4 && i != 10" v-for="i in 40" :key="i">
+          過去 {{ i / 2 }} 年
         </vs-option>
       </vs-select>
     </div>
@@ -38,7 +41,7 @@
       <template #title>沒有資料</template>
       可能是學期尚未開始或是沒有選課資料，你可以嘗試點選右上角按鈕切換資料集來查看其他學期的資料
     </vs-alert>
-    <vs-dialog v-model="dialog">
+    <vs-dialog overflow-hidden v-model="dialog">
       <div v-if="dialogData">
         <h3>{{ dialogData.name }}</h3>
         <div class="cards" style="--card-row: 4;">
@@ -238,7 +241,7 @@ export default {
           .slice(0, period)
           .reverse()
 
-        data = res.map(async ({ year, sem }) => (await this.$fetchCourse(year, sem, null, false)).map(x => ({ ...x, year, sem })))
+        data = res.map(async ({ year, sem }) => (await this.$fetchCourse(year, sem, 0, false)).map(x => ({ ...x, year, sem })))
         data = await Promise.all(data)
         data = data.flat()
       } else {
@@ -246,7 +249,7 @@ export default {
         this.$router.replace({ path: '/withdrawal', query: {} }, () => { })
         //getdata
         let { year, sem } = this.$store.state
-        data = (await this.$fetchCourse(year, sem)).map(x => ({ ...x, year, sem }))
+        data = (await this.$fetchCourse(year, sem, 0, false)).map(x => ({ ...x, year, sem }))
       }
       let result = {}
       let totalPeople = 0, totalWithdraw = 0, totalCourse = 0
@@ -285,7 +288,6 @@ export default {
       this.data = Object.values(result).filter(x => x.people).sort((a, b) => b.rate - a.rate)
       // calc quartiles
       let rates = this.data.sort().map(x => x.rate * 100).reverse()
-      console.log(rates)
       let quartiles = Math.floor(rates.length / 4)
       let q1 = rates[quartiles]
       let q2 = rates[quartiles * 2]
