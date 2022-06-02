@@ -360,17 +360,36 @@ export default {
     exportFile(filetype) {
       let data = this.data.map(x => ({
         '姓名': x.name,
-        '退選率': x.rate_percent,
+        '退選率': x.rate,
         '退選人數': x.withdraw,
         '選課人數': x.people,
         '課程數': x.course.length,
         '課程代碼': x.course.map(x => x.id).join(', ')
       }))
       if (filetype == 'xlsx') {
-        let wb = XLSX.utils.book_new()
-        let ws = XLSX.utils.json_to_sheet(data)
-        XLSX.utils.book_append_sheet(wb, ws, '退選率')
-        XLSX.writeFile(wb, '退選率.xlsx')
+        let workbanch = XLSX.utils.book_new()
+        let worksheet = XLSX.utils.json_to_sheet(data)
+        XLSX.utils.book_append_sheet(workbanch, worksheet, '退選率')
+        let courseData = this.data
+          .map(x => x.course)
+          .flat()
+          .map(x => ({
+            '年': x.year,
+            '學期': x.sem,
+            '課程代碼': x.id,
+            '課程類型': x.courseType,
+            '課程名稱': x.name.zh,
+            '英文課程名稱': x.name.en,
+            '教師': x.teacher.map(x => x.name).join(', '),
+            '選課人數': x.people,
+            '退選人數': x.peopleWithdraw,
+            '連結': `${location.origin}/course/${x.year}/${x.sem}/${x.id}`
+          }))
+          .filter((x, i, self) => self.findIndex(y => y.課程代碼 == x.課程代碼) == i)
+          .sort((a, b) => a.課程代碼.localeCompare(b.課程代碼))
+        let worksheet2 = XLSX.utils.json_to_sheet(courseData)
+        XLSX.utils.book_append_sheet(workbanch, worksheet2, '課程')
+        XLSX.writeFile(workbanch, this.getExportFileName('xlsx'))
       } else if (filetype == 'json') {
         this.downloadFile({ type: 'text/plain;charset=utf-8', data: JSON.stringify(this.data), ext: 'json' })
       } else if (filetype == 'csv') {
@@ -378,15 +397,18 @@ export default {
         this.downloadFile({ type: 'text/csv;charset=utf-8;', data: csv, ext: 'csv' })
       }
     },
+    getExportFileName(ext) {
+      return this.period != 1
+        ? `北科課程好朋友_過去 ${this.period / 2} 年_退選率.${ext}`
+        : `北科課程好朋友_${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.${ext}`
+    },
     downloadFile({ type, data, ext }) {
       let blob = new Blob([data], { type })
       let link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      if (this.period) {
-        link.download = `過去 ${this.period / 2} 年_退選率.${ext}`
-      } else {
-        link.download = `${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.${ext}`
-      }
+
+      link.download = this.getExportFileName(ext)
+
       link.click()
     }
   }
