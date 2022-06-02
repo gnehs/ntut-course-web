@@ -62,7 +62,16 @@
           color="primary"
           block
           flat
-          @click="downloadJson">
+          @click="exportFile('csv')">
+          <i class='bx bxs-file-blank'></i>
+          CSV
+        </vs-button>
+        <vs-button
+          icon
+          color="primary"
+          block
+          flat
+          @click="exportFile('json')">
           <i class='bx bxs-file-json'></i>
           JSON
         </vs-button>
@@ -71,9 +80,9 @@
           color="primary"
           block
           flat
-          @click="downloadCsv">
+          @click="exportFile('xlsx')">
           <i class='bx bxs-file-blank'></i>
-          CSV
+          XLSX
         </vs-button>
       </div>
       <p style="margin:0;font-size: .8em;opacity: .8;">若下載的 CSV 檔案在 Excel 中顯示亂碼，請參考 <a
@@ -229,6 +238,7 @@
         opacity: .8
 </style>
 <script>
+import * as XLSX from 'xlsx';
 export default {
   head() {
     return {
@@ -347,8 +357,7 @@ export default {
       this.dialogData = item
       this.dialog = true
     },
-    downloadJson() {
-
+    exportFile(filetype) {
       let data = this.data.map(x => ({
         '姓名': x.name,
         '退選率': x.rate_percent,
@@ -357,19 +366,17 @@ export default {
         '課程數': x.course.length,
         '課程代碼': x.course.map(x => x.id).join(', ')
       }))
-      this.downloadFile({ type: 'text/plain;charset=utf-8', data: JSON.stringify(data), ext: 'json' })
-    },
-    downloadCsv() {
-      let data = this.data.map(x => ({
-        '姓名': x.name,
-        '退選率': x.rate_percent,
-        '退選人數': x.withdraw,
-        '選課人數': x.people,
-        '課程數': x.course.length,
-        '課程代碼': x.course.map(x => x.id).join(', ')
-      }))
-      let csv = this.$papa.unparse(data)
-      this.downloadFile({ type: 'text/csv;charset=utf-8;', data: csv, ext: 'csv' })
+      if (filetype == 'xlsx') {
+        let wb = XLSX.utils.book_new()
+        let ws = XLSX.utils.json_to_sheet(data)
+        XLSX.utils.book_append_sheet(wb, ws, '退選率')
+        XLSX.writeFile(wb, '退選率.xlsx')
+      } else if (filetype == 'json') {
+        this.downloadFile({ type: 'text/plain;charset=utf-8', data: JSON.stringify(this.data), ext: 'json' })
+      } else if (filetype == 'csv') {
+        let csv = this.$papa.unparse(data)
+        this.downloadFile({ type: 'text/csv;charset=utf-8;', data: csv, ext: 'csv' })
+      }
     },
     downloadFile({ type, data, ext }) {
       let blob = new Blob([data], { type })
@@ -381,7 +388,6 @@ export default {
         link.download = `${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.${ext}`
       }
       link.click()
-
     }
   }
 }
