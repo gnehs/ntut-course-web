@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <vs-navbar center-collapsed v-model="active" shadow fixed not-line>
+    <vs-navbar center-collapsed v-model="active" shadow fixed not-line v-if="!isIframe">
       <template #left>
         <router-link to="/" class="site-title">🍤 北科課程好朋友</router-link>
       </template>
@@ -15,10 +15,13 @@
           :disabled="Boolean($route.query.year)">{{ parseYearSemVal(yearSemVal) }}</vs-button>
       </template>
     </vs-navbar>
-    <div class="container">
+    <div class="container" :class="{ isIframe }">
       <Nuxt />
     </div>
-    <footer id="footer">
+    <div class="text-footer">
+      本資料由 <a href="https://ntut-course.gnehs.net/" target="_blank">北科課程好朋友</a> 提供
+    </div>
+    <footer id="footer" v-if="!isIframe">
       <div class="lr-container nowrap">
         <div class="l">
           Developed by
@@ -75,7 +78,8 @@ export default {
     yearSemVal: '-1',
     departmentItems: ['日間部', '進修部', '研究所(日間部、進修部、週末碩士班)'],
     departmentVal: 0,
-    datasetDialog: false
+    datasetDialog: false,
+    isIframe: false,
   }),
   mounted() {
     if (localStorage['data-department'] != 'main') {
@@ -83,6 +87,10 @@ export default {
     }
   },
   async created() {
+    // check isIframe by query string
+    if (this.$route.query.mode == 'iframe') {
+      this.isIframe = true
+    }
     // detect dark mode
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     themeSwitch(darkModeMediaQuery.matches)
@@ -261,10 +269,16 @@ export default {
   min-height: 100vh
   .container
     flex: 1
-    padding-top: 74px
     width: 1024px
     max-width: 97%
     margin: 0 auto
+    &:not(.isIframe)
+      padding-top: 74px
+  .text-footer
+    text-align: center
+    font-size: .75em
+    margin: 16px 0
+    opacity: .75
   #footer
     margin: 0 auto
     margin-top: 10px
