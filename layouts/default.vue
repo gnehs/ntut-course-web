@@ -18,7 +18,7 @@
     <div class="container" :class="{ isIframe }">
       <Nuxt />
     </div>
-    <div class="text-footer">
+    <div class="text-footer" v-if="isIframe">
       本資料由 <a href="https://ntut-course.gnehs.net/" target="_blank">北科課程好朋友</a> 提供
     </div>
     <footer id="footer" v-if="!isIframe">
