@@ -52,6 +52,8 @@ export default {
     '@nuxtjs/markdownit',
     // https://www.npmjs.com/package/nuxt-clipboard
     'nuxt-clipboard',
+    // https://www.npmjs.com/package/nuxtjs-microsoft-clarity
+    'nuxtjs-microsoft-clarity'
   ],
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
@@ -103,5 +105,8 @@ export default {
   },
   'google-gtag': {
     id: 'G-MGGDNFL66Y'
-  }
+  },
+  microsoftClarity: {
+    id: 'd840avsagt'
+  },
 }
