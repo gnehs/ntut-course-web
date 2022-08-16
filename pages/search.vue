@@ -35,8 +35,7 @@
         ＊關鍵字、教師與班級欄位支援
         <a
           href="https://en.wikipedia.org/wiki/Regular_expression"
-          teaget="_blank"
-        >regex</a>！
+          teaget="_blank">regex</a>！
       </p>
     </card>
     <vs-alert v-show="onError" style="margin-top: 16px">
@@ -48,6 +47,9 @@
       <template #header>
         <h4 style="margin: 0">依時間篩選課程</h4>
       </template>
+      <p>
+        Tips: 點擊課表上的星期或節次來一次選取整個行或列，點擊左上角可以一次選取整個課表。
+      </p>
       <div class="timetable">
         <div class="header">
           <div class="item" @click="toggleLesson()"></div>
@@ -64,8 +66,7 @@
               class="course"
               @click="toggleLesson(date, time)"
               :class="{ conflict: timetableFilter[date].includes(time) }"
-              style="justify-content: center; font-size: 2em; padding: 4px 6px"
-            >
+              style="justify-content: center; font-size: 2em; padding: 4px 6px">
               <i class="bx bx-check" v-if="!timetableFilter[date].includes(time)" />
               <i class="bx bx-x" v-else />
             </div>
@@ -85,7 +86,7 @@
     </vs-dialog>
   </div>
 </template>
-  
+
 <script>
 export default {
   data: () => ({
@@ -276,4 +277,4 @@ export default {
     }
   }
 }
-</script> 
+</script>
