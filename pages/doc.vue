@@ -111,7 +111,7 @@ h1
 export default {
 	head() {
 		return {
-			title: 'API 手冊'
+			title: '文件'
 		}
 	}
 }

@@ -78,7 +78,7 @@
       <card class="hoverable padding" to="/doc">
         <card-title>文件</card-title>
         <p>API 文件與嵌入頁面相關功能介紹與說明</p>
-        <i class="bx bx-data"></i>
+        <i class="bx bx-file"></i>
       </card>
       <card class="hoverable padding" to="/about">
         <card-title>關於</card-title>
