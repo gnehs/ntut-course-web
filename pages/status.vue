@@ -8,8 +8,7 @@
         v-for="item of workflow_runs"
         :key="item.id"
         :href="item.html_url"
-        target="_blank"
-      >
+        target="_blank">
         <div class="run-item-icon" :class="[item.status]">
           <i class="bx bx-loader bx-spin" v-if="item.status == 'in_progress'" />
           <i class="bx bx-check" v-else-if="item.status == 'completed'" />
@@ -20,6 +19,7 @@
           <div class="run-item-status">
             <i class="bx bx-calendar" v-if="item.event == 'schedule'" />
             <i class="bx bx-git-commit" v-else-if="item.event == 'push'" />
+            <i class="bx bx-revision" v-else-if="item.event == 'dynamic'" />
             <i class="bx bx-question-mark" v-else />
             <span>•</span>
             {{ timeSince(new Date(item.created_at)) }}前
@@ -86,6 +86,7 @@ export default {
       if (name == 'fetch current courses') return '取得本學期課程'
       if (name == 'fetch current departments') return '取得本學期科系'
       if (name == 'fetch standards') return '取得課程標準'
+      if (name == 'pages build and deployment') return 'API 資料建置與部署'
       return name
     }
   }
