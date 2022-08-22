@@ -1,4 +1,11 @@
 <template lang="md">
+# 嵌入功能
+- 你可以透過嵌入功能，將課程資訊嵌入到你的網站中。
+- 啟用嵌入功能後，導航欄與頁尾將會被隱藏。
+- 在任一網址後方加入 `?mode=iframe` 即可使用嵌入功能。
+- 如：`<iframe src="https://ntut-course.gnehs.net/course/111/1/305013?mode=iframe"></iframe>`，效果如下。
+<iframe src="https://ntut-course.gnehs.net/course/111/1/305013?mode=iframe" width="386px" height="512px" frameborder="0" style="border-radius: 8px;margin: 0 auto;display: block;border: 1px solid rgba(0, 0, 0, 0.1);"></iframe>
+
 # API 文件
 ## 注意
 - 這不是學校官方提供的 API
