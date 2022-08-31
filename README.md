@@ -6,7 +6,7 @@ https://ntut-course.gnehs.net/
 https://ntut-course.gnehs.net/about
 
 ## API 文件
-https://ntut-course.gnehs.net/api
+https://ntut-course.gnehs.net/doc
 
 ## 爬蟲與資料
 https://github.com/gnehs/ntut-course-crawler-node
