@@ -80,6 +80,11 @@
         <p>API 文件與嵌入頁面相關功能介紹與說明</p>
         <i class="bx bx-file"></i>
       </card>
+      <card class="hoverable padding" to="/changelog">
+        <card-title>更新日誌</card-title>
+        <p>查看本站最近的更新日誌</p>
+        <i class='bx bx-history'></i>
+      </card>
       <card class="hoverable padding" to="/about">
         <card-title>關於</card-title>
         <p>關於本網站</p>
