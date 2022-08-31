@@ -12,6 +12,7 @@
     "@nuxtjs/google-gtag": "^1.0.4",
     "@nuxtjs/markdownit": "^2.0.0",
     "@nuxtjs/pwa": "^3.3.5",
+    "caniuse-lite": "^1.0.30001387",
     "core-js": "^3.20.1",
     "nuxt": "^2.15.8",
     "nuxt-clipboard": "0.0.6",
