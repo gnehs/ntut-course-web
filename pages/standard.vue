@@ -49,11 +49,10 @@
           <div
             class="item"
             v-for="item of Object.keys(standardData[system])
-              .sort((a, b) => a.localeCompare(b))
-              .sort((a, b) => a.length - b.length)"
+            .sort((a, b) => a.localeCompare(b))
+            .sort((a, b) => a.length - b.length)"
             :key="item"
-            @click="department = item"
-          >
+            @click="department = item">
             {{ item }}
           </div>
         </div>
@@ -85,7 +84,7 @@
       </template>
     </template>
   </div>
-</template> 
+</template>
 <style lang="sass" scoped>
 .course-items
   display: flex
@@ -121,10 +120,10 @@ export default {
   },
   computed: {
     year: {
-      get: function() {
+      get: function () {
         return this.$route.query.year
       },
-      set: function(val) {
+      set: function (val) {
         let query = Object.assign({}, this.$route.query)
         if (val) {
           query.year = val
@@ -132,36 +131,38 @@ export default {
         } else {
           delete query.year
         }
-        this.$router.push({ path: '/standard', query }, () => {})
+        this.$router.push({ path: '/standard', query }, () => { })
       }
     },
     system: {
-      get: function() {
+      get: function () {
         return this.$route.query.system
       },
-      set: function(val) {
+      set: function (val) {
         let query = Object.assign({}, this.$route.query)
         if (val) {
           query.system = val
         } else {
           delete query.system
         }
-        this.$router.push({ path: '/standard', query }, () => {})
+        this.$router.push({ path: '/standard', query }, () => { })
       }
     },
     department: {
-      get: function() {
+      get: function () {
         return this.$route.query.department
       },
-      set: function(val) {
+      set: function (val) {
         let query = Object.assign({}, this.$route.query)
         if (val) {
           query.department = val
           this.parseDepartmentData(this.standardData[this.system][val])
+          // save query to localStorage
+          localStorage.setItem('data-standard-query', JSON.stringify(query))
         } else {
           delete query.department
         }
-        this.$router.push({ path: '/standard', query }, () => {})
+        this.$router.push({ path: '/standard', query }, () => { })
       }
     }
   },

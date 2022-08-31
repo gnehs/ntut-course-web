@@ -46,7 +46,7 @@
 
     <h2>實用工具</h2>
     <div class="cards">
-      <card class="hoverable padding" to="/standard">
+      <card class="hoverable padding" :to="standardURL">
         <card-title>課程標準</card-title>
         <p>查看各系所畢業學分等資訊</p>
         <i class="bx bxs-graduation"></i>
@@ -106,8 +106,15 @@
 
 <script>
 export default {
-  data: () => ({}),
-  created() { },
+  data: () => ({
+    standardURL: `/standard`
+  }),
+  created() {
+    if (localStorage[`data-standard-query`]) {
+      let query = JSON.parse(localStorage[`data-standard-query`])
+      this.standardURL = `/standard?year=${query.year}&system=${query.system}&department=${query.department}`
+    }
+  },
   methods: {}
 }
 </script>
