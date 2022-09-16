@@ -12,5 +12,5 @@
   display: flex
   align-items: center
   flex-direction: row
-  justify-content: space-between
-</style> 
+  justify-content: flex-start
+</style>
