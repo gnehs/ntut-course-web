@@ -15,7 +15,13 @@
           <p>教師</p>
           <vs-input v-model="searchTeacher" @input="searchCourse" />
         </card>
-        <card class="borderless">
+        <card class="borderless" v-if="searchClass=='^博雅'">
+          <p>博雅</p>
+          <vs-button flat @click="categoryDialog = true">
+            <i class="bx bxs-filter-alt"></i>依博雅類別篩選
+          </vs-button>
+        </card>
+        <card class="borderless" v-else>
           <p>班級</p>
           <vs-input v-model="searchClass" @input="searchCourse" />
         </card>
@@ -25,7 +31,6 @@
         </card>
         <card class="borderless">
           <p>篩選</p>
-
           <vs-button flat @click="timetableDialog = true">
             <i class="bx bxs-filter-alt"></i>依時間篩選
           </vs-button>
@@ -43,6 +48,29 @@
       <pre>{{ onError || 'Error' }}</pre>
     </vs-alert>
     <parse-courses :courses="searchResult" :show-conflict-course="showConflictCourse" />
+    <vs-dialog v-model="categoryDialog">
+      <template #header>
+        <h4 style="margin: 0">依博雅類別篩選課程</h4>
+      </template>
+      <h5>109 (含) 後</h5>
+      <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.new" :key="item">
+        {{item}}
+      </vs-checkbox>
+      <h5>106-108</h5>
+      <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.old" :key="item">
+        {{item}}
+      </vs-checkbox>
+      <template #footer>
+        <div class="lr-container nowrap">
+          <div class="l" style="width: 50%">
+            <vs-button block @click="resetCategory">重置</vs-button>
+          </div>
+          <div class="r" style="width: 50%">
+            <vs-button block @click="categoryDialog = false; searchCourse()">確定</vs-button>
+          </div>
+        </div>
+      </template>
+    </vs-dialog>
     <vs-dialog v-model="timetableDialog">
       <template #header>
         <h4 style="margin: 0">依時間篩選課程</h4>
@@ -99,6 +127,30 @@ export default {
     searchResult: null,
     showConflictCourse: true,
     timetableDialog: false,
+    categoryDialog: false,
+    categoryFilter: [],
+    categoryFilterList: {
+      new: [
+        '創新與創業',
+        '人文與藝術',
+        '社會與法治',
+        '自然與科學',
+      ],
+      old: [
+        '創新與創業核心',
+        '美學與藝術核心',
+        '社會與哲學選修',
+        '社會與哲學核心',
+        '歷史與文化選修',
+        '自然與科學核心',
+        '創新與創業選修',
+        '美學與藝術選修',
+        '歷史與文化核心',
+        '民主與法治核心',
+        '自然與科學選修',
+        '民主與法治選修',
+      ]
+    },
     timetable: ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C'],
     dateEng2zh: { sun: '週日', mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六' },
     timetableFilter: {
@@ -210,6 +262,21 @@ export default {
         } else {
           delete query[`time-table`]
         }
+        // categoryFilter
+        if (this.categoryFilter.length > 0) {
+          course = course.filter(x => {
+            let cat = x.notes.replace(/◎|\*/g, '').split(/106-108：|。109 \(含\) 後：/).filter(x => x)
+            for (let c of cat) {
+              if (this.categoryFilter.includes(c)) {
+                return true
+              }
+            }
+            return false
+          })
+          query.category = JSON.stringify(this.categoryFilter)
+        } else {
+          delete query.category
+        }
         //
         this.searchResult = course
         this.$router.replace({ path: '/search', query }, () => { })
@@ -229,6 +296,9 @@ export default {
         thu: [],
         fri: []
       }
+    },
+    resetCategory() {
+      this.categoryFilter = []
     },
     toggleLesson(date, time) {
       if (date && time) {
