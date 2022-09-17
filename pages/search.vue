@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1>搜尋</h1>
+    <h1 v-if="searchClass=='^博雅'">博雅搜尋</h1>
+    <h1 v-else>搜尋</h1>
     <card>
       <div class="cards" style="--card-row: 4; --card-row-sm: 2">
         <card class="borderless">
@@ -63,10 +64,10 @@
       <template #footer>
         <div class="lr-container nowrap">
           <div class="l" style="width: 50%">
-            <vs-button block @click="resetCategory">重置</vs-button>
           </div>
           <div class="r" style="width: 50%">
-            <vs-button block @click="categoryDialog = false; searchCourse()">確定</vs-button>
+            <vs-button style="min-width: 64px" @click="resetCategory">重置</vs-button>
+            <vs-button style="min-width: 64px" @click="categoryDialog = false">完成</vs-button>
           </div>
         </div>
       </template>
@@ -104,10 +105,10 @@
       <template #footer>
         <div class="lr-container nowrap">
           <div class="l" style="width: 50%">
-            <vs-button block @click="resetTimetable">重置</vs-button>
           </div>
           <div class="r" style="width: 50%">
-            <vs-button block @click="timetableDialog = false; searchCourse()">確定</vs-button>
+            <vs-button style="min-width: 64px" @click="resetTimetable">重置</vs-button>
+            <vs-button style="min-width: 64px" @click="timetableDialog = false; searchCourse()">完成</vs-button>
           </div>
         </div>
       </template>
@@ -181,7 +182,10 @@ export default {
   watch: {
     showConflictCourse(newCount, oldCount) {
       this.searchCourse()
-    }
+    },
+    categoryFilter(newCount, oldCount) {
+      this.searchCourse()
+    },
   },
   methods: {
     async fetchCourseData() {
