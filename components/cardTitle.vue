@@ -1,8 +1,18 @@
 <template>
-  <h3 class="card-title">
+  <h3 class="card-title" :class="{spaceBetween}">
     <slot />
   </h3>
 </template>
+<script>
+export default {
+  props: {
+    spaceBetween: {
+      type: Boolean,
+      default: false
+    }
+  }
+}
+</script>
 <style lang="sass" scoped>
 .card-title
   margin: 0
@@ -13,4 +23,6 @@
   align-items: center
   flex-direction: row
   justify-content: flex-start
+  &.spaceBetween
+    justify-content: space-between
 </style>

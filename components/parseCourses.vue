@@ -11,8 +11,7 @@
         flat
         :active="layout == 'timetable'"
         @click="layout = 'timetable'"
-        v-if="showTimetable"
-      >
+        v-if="showTimetable">
         <i class="bx bx-time"></i>課表
       </vs-button>
     </div>
@@ -22,9 +21,8 @@
           class="hoverable padding"
           v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
           :key="tr.id"
-          :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`"
-        >
-          <card-title>
+          :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`">
+          <card-title space-between>
             <sports-title :course-data="tr" v-if="tr.class.some(x => x.name.match(/體育/))" />
             <span v-else>{{ tr.courseType }}{{ tr.name.zh }}</span>
             <tag v-if="conflictCourseData.includes(tr.id)" color="red">
@@ -53,17 +51,17 @@
           </div>
           <p>
             班級：{{
-              tr.class
-                .map((x) => x.name)
-                .join('、')
-                .trimEllip(9)
+            tr.class
+            .map((x) => x.name)
+            .join('、')
+            .trimEllip(9)
             }}
             <br />
             教師：{{
-              tr.teacher
-                .map((y) => y.name)
-                .join('、')
-                .trimEllip(13)
+            tr.teacher
+            .map((y) => y.name)
+            .join('、')
+            .trimEllip(13)
             }}
             <br />
             備註：{{ tr.notes.trimEllip(15) }}
@@ -76,8 +74,7 @@
       <br />
       <vs-pagination
         v-model="page"
-        :length="$vs.getLength(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), max)"
-      />
+        :length="$vs.getLength(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), max)" />
     </div>
     <card style="padding: 0" v-if="layout == 'table'">
       <vs-table striped>
@@ -96,24 +93,23 @@
             v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
             @click="$router.push(`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`)"
             style="cursor: pointer"
-            :data="tr"
-          >
+            :data="tr">
             <vs-td>{{ tr.id }}</vs-td>
             <vs-td>{{ tr.courseType }}{{ tr.name.zh }}</vs-td>
             <vs-td>
               {{
-                tr.teacher
-                  .map((y) => y.name)
-                  .join('、')
-                  .trimEllip(9)
+              tr.teacher
+              .map((y) => y.name)
+              .join('、')
+              .trimEllip(9)
               }}
             </vs-td>
             <vs-td>
               {{
-                tr.class
-                  .map((x) => x.name)
-                  .join('、')
-                  .trimEllip(9)
+              tr.class
+              .map((x) => x.name)
+              .join('、')
+              .trimEllip(9)
               }}
             </vs-td>
             <vs-td>
@@ -125,13 +121,11 @@
         <template #footer>
           <vs-pagination
             v-model="page"
-            :length="$vs.getLength(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), max)"
-          />
+            :length="$vs.getLength(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), max)" />
         </template>
         <template #notFound>
           <p
-            v-if="!(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id))).length"
-          >查無資料</p>
+            v-if="!(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id))).length">查無資料</p>
         </template>
       </vs-table>
     </card>
@@ -149,8 +143,7 @@
           <div class="item">{{ time }}</div>
           <div class="item" v-for="date in Object.keys(dateEng2zh).slice(1, 5 + 1)" :key="date">
             <template
-              v-if="$vs.getPage(courses, page, max).filter((x) => x.time[date].includes(time)).length <= 2"
-            >
+              v-if="$vs.getPage(courses, page, max).filter((x) => x.time[date].includes(time)).length <= 2">
               <router-link
                 class="course"
                 :class="{ conflict: conflictCourseData.includes(item.id) }"
@@ -158,8 +151,7 @@
                 .getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)
                 .filter((x) => x.time[date].includes(time))"
                 :key="item.id"
-                :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
-              >{{ item.name.zh }}</router-link>
+                :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`">{{ item.name.zh }}</router-link>
             </template>
             <template v-else>
               <div class="course">課程數量過多無法顯示</div>
@@ -172,7 +164,7 @@
     <br />
     <br />
   </div>
-</template> 
+</template>
 <script>
 import card from './card.vue'
 import SportsTitle from './sportsTitle.vue'
