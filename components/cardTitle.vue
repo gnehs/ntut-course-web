@@ -23,6 +23,7 @@ export default {
   align-items: center
   flex-direction: row
   justify-content: flex-start
+  line-height: 1.25
   &.spaceBetween
     justify-content: space-between
 </style>
