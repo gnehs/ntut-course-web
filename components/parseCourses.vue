@@ -1,7 +1,7 @@
 <template>
   <div v-if="courses">
     <div class="center">
-      <vs-button flat :active="layout == 'table'" @click="layout = 'table';$gtag('event', 'toggle_table_view')">
+      <vs-button flat :active="layout == 'table'" @click="layout = 'table';trackBtn()">
         <i class="bx bx-table"></i>表格
       </vs-button>
       <vs-button flat :active="layout == 'card'" @click="layout = 'card'">
@@ -211,6 +211,9 @@ export default {
     }
   },
   methods: {
+    trackBtn() {
+      window.gtag('event', 'toggle_table_view')
+    },
     parseTime(t) {
       let result = []
       for (let i of Object.entries(t)) {
