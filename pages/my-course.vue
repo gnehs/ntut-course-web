@@ -19,6 +19,20 @@
       你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
       <br />若先前加入未在此處，可能是選擇了錯誤的資料集，請嘗試於右上按鈕切換資料集。
     </vs-alert>
+    <h3 v-show="myCourses.length">建議</h3>
+    <div class="cards" style="--card-row: 3; --card-row-sm: 2" v-show="myCourses.length">
+      <card class="hoverable padding" :to="`/widget?year=${$store.state.year}`">
+        <card-title>iOS 小工具</card-title>
+        <p>在桌面上檢視接下來的課程</p>
+        <i class="bx bx-extension"></i>
+      </card>
+      <card class="hoverable padding" :to="`/calendar?year=${$store.state.year}`">
+        <card-title>新增到行事曆</card-title>
+        <p>將我的課程匯入至行事曆</p>
+        <i class="bx bx-calendar"></i>
+      </card>
+    </div>
+    <h3 v-show="myCourses.length">課程</h3>
     <div class="cards" style="--card-row: 3; --card-row-sm: 3" v-show="myCourses.length">
       <card>
         <card-title>{{ myCourseCredit }}</card-title>
