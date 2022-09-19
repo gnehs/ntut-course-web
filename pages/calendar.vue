@@ -178,11 +178,13 @@ export default {
       this.selectedCourse = JSON.parse(JSON.stringify(this.courseData))
     },
     addToCalendar() {
-      window.gtag('event', 'download_calendar', {
-        event_category: 'calendar',
-        event_label: 'download_calendar',
-        value: this.selectedCourse.length
-      })
+      try {
+        window.gtag('event', 'download_calendar', {
+          event_category: 'calendar',
+          event_label: 'download_calendar',
+          value: this.selectedCourse.length
+        })
+      } catch (e) { }
       let { year, sem } = this.$store.state
       year = parseInt(year) + 1911
       if (sem == '2')

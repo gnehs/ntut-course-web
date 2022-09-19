@@ -207,8 +207,9 @@ export default {
         }))
     },
     doCopy() {
-      window.gtag('event', 'copy_ios_widget_code')
-
+      try {
+        window.gtag('event', 'copy_ios_widget_code')
+      } catch (e) { }
       this.$copyText(this.$refs['scriptable-code'].textContent).then(
         e => {
           this.$vs.notification({

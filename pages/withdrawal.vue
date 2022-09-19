@@ -284,12 +284,13 @@ export default {
       let period = this.period
       let data
 
-
-      window.gtag('event', 'view_withdraw_rate', {
-        event_category: 'view',
-        event_label: '退選率',
-        value: period
-      })
+      try {
+        window.gtag('event', 'view_withdraw_rate', {
+          event_category: 'view',
+          event_label: '退選率',
+          value: period
+        })
+      } catch (e) { }
 
       if (period > 1) {
         // update query

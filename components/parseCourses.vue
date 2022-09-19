@@ -212,7 +212,9 @@ export default {
   },
   methods: {
     trackBtn() {
-      window.gtag('event', 'toggle_table_view')
+      try {
+        window.gtag('event', 'toggle_table_view')
+      } catch (e) { }
     },
     parseTime(t) {
       let result = []
