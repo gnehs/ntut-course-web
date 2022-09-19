@@ -21,8 +21,7 @@
       到 App Store 安裝
       <a
         href="https://apps.apple.com/tw/app/scriptable/id1405459188"
-        target="_blank"
-      >Scriptable</a>
+        target="_blank">Scriptable</a>
     </p>
     <h2>
       <span style="color: rgb(var(--vs-primary))">Step 2</span> 複製並貼上程式碼
@@ -123,7 +122,7 @@ function createWidget() {
             linkSymbolElement.imageSize = new Size(13, 13)
             linkSymbolElement.tintColor = Color.blue()
             footerStack.addSpacer()
-            // Add link to open course detail 
+            // Add link to open course detail
             let iconElement = footerStack.addText("🍤")
             iconElement.textOpacity = 0.5
             iconElement.font = Font.mediumSystemFont(13)
@@ -208,6 +207,8 @@ export default {
         }))
     },
     doCopy() {
+      window.gtag('event', 'copy_ios_widget_code')
+
       this.$copyText(this.$refs['scriptable-code'].textContent).then(
         e => {
           this.$vs.notification({
