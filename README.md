@@ -1,6 +1,5 @@
-# 🍤 北科課程好朋友
+# [🍤 北科課程好朋友](https://ntut-course.gnehs.net/)
 這裡是北科課程好朋友，提供課程資訊的可愛網站！
-https://ntut-course.gnehs.net/
 
 ## 關於
 https://ntut-course.gnehs.net/about
