@@ -53,21 +53,35 @@
       <template #header>
         <h4 style="margin: 0">依博雅類別篩選課程</h4>
       </template>
-      <h5>109 (含) 後</h5>
-      <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.new" :key="item">
-        {{item}}
-      </vs-checkbox>
-      <h5>106-108</h5>
-      <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.old" :key="item">
-        {{item}}
-      </vs-checkbox>
+      <div style="display:flex">
+        <vs-button border
+          :active="!showOldCategory"
+          @click="showOldCategory = !showOldCategory">
+          109 (含) 後
+        </vs-button>
+        <vs-button border
+          :active="showOldCategory"
+          @click="showOldCategory = !showOldCategory">
+          106-108
+        </vs-button>
+      </div>
+      <div v-if="!showOldCategory">
+        <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.new" :key="item">
+          {{item}}
+        </vs-checkbox>
+      </div>
+      <div v-else>
+        <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.old" :key="item">
+          {{item}}
+        </vs-checkbox>
+      </div>
       <template #footer>
         <div class="lr-container nowrap">
           <div class="l" style="width: 50%">
           </div>
           <div class="r" style="width: 50%">
             <vs-button style="min-width: 64px" @click="resetCategory">重置</vs-button>
-            <vs-button style="min-width: 64px" @click="categoryDialog = false">完成</vs-button>
+            <vs-button style="min-width: 64px" @click="categoryDialog = false;searchCourse()">完成</vs-button>
           </div>
         </div>
       </template>
@@ -130,6 +144,7 @@ export default {
     timetableDialog: false,
     categoryDialog: false,
     categoryFilter: [],
+    showOldCategory: false,
     categoryFilterList: {
       new: [
         '創新與創業',
@@ -139,16 +154,16 @@ export default {
       ],
       old: [
         '創新與創業核心',
+        '創新與創業選修',
         '美學與藝術核心',
-        '社會與哲學選修',
+        '美學與藝術選修',
         '社會與哲學核心',
+        '社會與哲學選修',
+        '歷史與文化核心',
         '歷史與文化選修',
         '自然與科學核心',
-        '創新與創業選修',
-        '美學與藝術選修',
-        '歷史與文化核心',
-        '民主與法治核心',
         '自然與科學選修',
+        '民主與法治核心',
         '民主與法治選修',
       ]
     },
@@ -177,13 +192,13 @@ export default {
     if (this.$route.query[`time-table`]) {
       this.timetableFilter = JSON.parse(this.$route.query[`time-table`])
     }
+    if (this.$route.query.category) {
+      this.categoryFilter = JSON.parse(this.$route.query.category)
+    }
     this.searchCourse()
   },
   watch: {
     showConflictCourse(newCount, oldCount) {
-      this.searchCourse()
-    },
-    categoryFilter(newCount, oldCount) {
       this.searchCourse()
     },
   },

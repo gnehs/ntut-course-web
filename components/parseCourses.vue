@@ -227,7 +227,6 @@ export default {
         this.showConflictCourse ? this.courses : this.courses.filter(x => !this.conflictCourseData.includes(x.id)),
         this.max
       )
-
       if (this.page > length) this.page = 1
     }
   }
