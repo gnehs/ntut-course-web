@@ -272,7 +272,7 @@ export default {
         let course = await this.$fetchCourse(year, sem)
         this.courseData = course.filter(x => x.id == courseId)[0]
         this.description = this.courseData.description.zh
-        this.title = this.courseData.name.zh
+        this.title = `${courseId} ${this.courseData.name.zh}`
         this.checkCourseInMyCourse()
         this.checkIsCourseConflict()
         this.fetchedCourseData = await fetch(
