@@ -28,7 +28,16 @@
     </h2>
     <p>建議建立專用的行事曆，未來若需移除課程時僅需刪除該行事曆即可。</p>
     <h2>
-      <span style="color: rgb(var(--vs-primary))">Step 3</span> 匯入至行事曆
+      <span style="color: rgb(var(--vs-primary))">Step 3</span> 填寫最後上課日
+    </h2>
+    <p>請填寫最後一次上課的日期，以便設定重複行程終止日期。</p>
+    <card style="max-width: 512px">
+      <p>最後上課日</p>
+      <vs-input v-model="until" type="date">
+      </vs-input>
+    </card>
+    <h2>
+      <span style="color: rgb(var(--vs-primary))">Step 4</span> 匯入至行事曆
     </h2>
     <p>輕觸「匯入」按鈕以繼續，匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。</p>
     <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入</vs-button>
@@ -104,11 +113,30 @@ export default {
           start: '21:10',
           end: '22:00'
         }
-      }
+      },
+      until: null
     }
   },
   async created() {
+
+    let { year, sem } = this.$store.state
+    year = parseInt(year) + 1911
+    if (sem == '2')
+      year += 1
+    let until;
+    if (sem == '1')
+      until = new Date(year + 1, 1 - 1, 30 + 1)
+    else
+      until = new Date(year, 6 - 1, 30 + 1)
+    // 2023-01-15
+    if (year == '2022' && sem == '1')
+      until = new Date(year, 1 - 1, 15 + 1)
+
+    this.until = until.toISOString().split('T')[0]
+
+
     await this.getMyCourse()
+
   },
   methods: {
     async getMyCourse() {
@@ -148,11 +176,7 @@ export default {
       year = parseInt(year) + 1911
       if (sem == '2')
         year += 1
-      let until;
-      if (sem == '1')
-        until = new Date(year + 1, 1 - 1, 30 + 1).toISOString()
-      else
-        until = new Date(year, 6 - 1, 30 + 1).toISOString()
+      let until = this.until
 
       this.$ics.removeAllEvents()
       for (let item of this.selectedCourse) {
