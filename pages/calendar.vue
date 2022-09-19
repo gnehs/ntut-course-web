@@ -141,7 +141,7 @@ export default {
     }
     // 2023-01-15
     if (year == '2022' && sem == '1')
-      until = new Date(year, 1 - 1, 15 + 1)
+      until = new Date(2023, 1 - 1, 15 + 1)
 
     this.until = until.toISOString().split('T')[0]
     this.start = start.toISOString().split('T')[0]
