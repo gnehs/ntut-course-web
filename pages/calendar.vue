@@ -28,14 +28,21 @@
     </h2>
     <p>建議建立專用的行事曆，未來若需移除課程時僅需刪除該行事曆即可。</p>
     <h2>
-      <span style="color: rgb(var(--vs-primary))">Step 3</span> 填寫最後上課日
+      <span style="color: rgb(var(--vs-primary))">Step 3</span> 填寫行程期間
     </h2>
-    <p>請填寫最後一次上課的日期，以便設定重複行程終止日期。</p>
-    <card style="max-width: 512px">
-      <p>最後上課日</p>
-      <vs-input v-model="until" type="date">
-      </vs-input>
-    </card>
+    <p>請填寫開學日與最後一次上課的日期，以便設定重複行程終止日期。</p>
+    <div class="cards">
+      <card>
+        <p>開學日</p>
+        <vs-input v-model="start" type="date">
+        </vs-input>
+      </card>
+      <card>
+        <p>最後上課日</p>
+        <vs-input v-model="until" type="date">
+        </vs-input>
+      </card>
+    </div>
     <h2>
       <span style="color: rgb(var(--vs-primary))">Step 4</span> 匯入至行事曆
     </h2>
@@ -123,17 +130,21 @@ export default {
     year = parseInt(year) + 1911
     if (sem == '2')
       year += 1
-    let until;
-    if (sem == '1')
+    let until, start;
+    if (sem == '1') {
       until = new Date(year + 1, 1 - 1, 30 + 1)
-    else
+      start = new Date(year, 9 - 1, 1 + 1)
+    }
+    else {
       until = new Date(year, 6 - 1, 30 + 1)
+      start = new Date(year, 2 - 1, 1 + 1)
+    }
     // 2023-01-15
     if (year == '2022' && sem == '1')
       until = new Date(year, 1 - 1, 15 + 1)
 
     this.until = until.toISOString().split('T')[0]
-
+    this.start = start.toISOString().split('T')[0]
 
     await this.getMyCourse()
 
@@ -186,8 +197,7 @@ export default {
           let startTime = this.timetable[time[0]].start
           let endTime = this.timetable[time[time.length - 1]].end
 
-          // nearest monday
-          const mon = new Date();
+          const mon = new Date(this.start)
           mon.setDate(mon.getDate() + ((7 - mon.getDay()) % 7 + 1) % 7);
 
           // format: YYYYMMDDTHHMMSS
