@@ -102,7 +102,7 @@ export default {
       this.todayDayOfWeek = todayDayOfWeek
       this.upcomingCourse = this.myCourses
         .filter(x => x.time[todayDayOfWeek].some(r => upcomingCourseIncludes.includes(r)))
-        .sort((a, b) => a.time[todayDayOfWeek][0] - b.time[todayDayOfWeek][0])
+        .sort((a, b) => Object.keys(this.timetable).indexOf(a.time[todayDayOfWeek][0]) - Object.keys(this.timetable).indexOf(b.time[todayDayOfWeek][0]))
     }
   }
 }
