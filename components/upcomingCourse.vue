@@ -9,7 +9,7 @@
         :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`"
         style="--card-row: 3; --card-row-sm: 1"
       >
-        <card-title>
+        <card-title space-between>
           {{ tr.name.zh }}
           <tag color="#f0f2f5" text-color="#606770" v-if="tr.classroom.length">
             {{
@@ -109,4 +109,5 @@ export default {
 </script>
 
 <style>
+
 </style>
