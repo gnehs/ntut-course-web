@@ -21,8 +21,7 @@
         :val="item"
         v-model="selectedCourse"
         v-for="(item, i) of courseData"
-        :key="i"
-      >{{ item.name }}</vs-checkbox>
+        :key="i">{{ item.name }}</vs-checkbox>
     </div>
     <h2>
       <span style="color: rgb(var(--vs-primary))">Step 2</span> 新增專用行事曆
@@ -140,6 +139,11 @@ export default {
       this.selectedCourse = JSON.parse(JSON.stringify(this.courseData))
     },
     addToCalendar() {
+      window.gtag('event', 'download_calendar', {
+        event_category: 'calendar',
+        event_label: 'download_calendar',
+        value: this.selectedCourse.length
+      })
       let { year, sem } = this.$store.state
       year = parseInt(year) + 1911
       if (sem == '2')
