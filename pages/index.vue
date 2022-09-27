@@ -69,7 +69,7 @@
       <card class="hoverable padding" :to="`/calendar?year=${$store.state.year}`">
         <card-title>新增到行事曆</card-title>
         <p>將我的課程匯入至行事曆</p>
-        <i class="bx bx-calendar"></i>
+        <i class='bx bx-calendar-plus'></i>
       </card>
     </div>
 
