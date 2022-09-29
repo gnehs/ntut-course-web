@@ -166,6 +166,59 @@ h1,h2,h3,h4,h5,h6
 				display: flex
 				align-items: center
 				justify-content: center
+.grid-timetable
+	display: grid
+	--gap: 8px
+	gap: var(--gap)
+	.decoration-item
+		background: rgba(var(--vs-text),.05)
+	.decoration-border-item
+		border-top: 1px solid rgba(var(--vs-text),.05)
+		transform: translateY(calc(var(--gap) / -2))
+	.weekday-item
+		text-align: center
+		padding: 8px 16px
+		font-size: .85em
+	.time-item
+		padding: 0 2px
+		font-size: .85em
+		display: flex
+		align-items: center
+		justify-content: center
+		min-height: 3em
+	.course-item
+		cursor: pointer
+		width: 100%
+		--main-color: rgba(var(--vs-text), .9)
+		--main-bg: rgba(var(--vs-primary), 0.15)
+		background: var(--main-bg)
+		color: var(--main-color)
+		padding: 12px 8px
+		border-radius: 8px
+		transition: all .1s ease
+		height: 100%
+		display: flex
+		flex-direction: column
+		align-items: flex-start
+		position: relative
+		justify-content: space-between
+		gap: 4px
+		text-decoration: none
+		backdrop-filter: blur(2px)
+		z-index: 1
+		.course-name
+			font-weight: bold
+		.course-info
+			opacity: .75
+			font-size: .85em
+		&:hover
+			--main-bg: rgba(var(--vs-primary), 0.25)
+		&:active
+			transform: scale(.9)
+		&.course-conflict
+			--main-color: #fff
+			--main-bg: red
+			pointer-events: none
 
 .list
 	.item

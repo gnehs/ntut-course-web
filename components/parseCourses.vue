@@ -4,13 +4,13 @@
       <vs-button flat :active="layout == 'table'" @click="layout = 'table';trackBtn()">
         <i class="bx bx-table"></i>表格
       </vs-button>
-      <vs-button flat :active="layout == 'card'" @click="layout = 'card'">
+      <vs-button flat :active="layout == 'card'" @click="layout = 'card';trackBtn('toggle_card_view')">
         <i class="bx bx-card"></i>卡片
       </vs-button>
       <vs-button
         flat
         :active="layout == 'timetable'"
-        @click="layout = 'timetable'"
+        @click="layout = 'timetable';trackBtn('toggle_timetable_view')"
         v-if="showTimetable">
         <i class="bx bx-time"></i>課表
       </vs-button>
@@ -19,7 +19,7 @@
       <transition-group name="flip-card" tag="div" class="cards">
         <card
           class="hoverable padding"
-          v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
+          v-for="tr in $vs.getPage(filteredCourse, page, max)"
           :key="tr.id"
           :to="`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`">
           <card-title space-between>
@@ -74,7 +74,7 @@
       <br />
       <vs-pagination
         v-model="page"
-        :length="$vs.getLength(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), max)" />
+        :length="$vs.getLength(filteredCourse, max)" />
     </div>
     <card style="padding: 0" v-if="layout == 'table'">
       <vs-table striped>
@@ -90,7 +90,7 @@
         <template #tbody>
           <vs-tr
             :key="tr.id"
-            v-for="tr in $vs.getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)"
+            v-for="tr in $vs.getPage(filteredCourse, page, max)"
             @click="$router.push(`/course/${$store.state.year}/${$store.state.sem}/${tr.id}`)"
             style="cursor: pointer"
             :data="tr">
@@ -121,43 +121,93 @@
         <template #footer>
           <vs-pagination
             v-model="page"
-            :length="$vs.getLength(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), max)" />
+            :length="$vs.getLength(filteredCourse, max)" />
         </template>
         <template #notFound>
           <p
-            v-if="!(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id))).length">查無資料</p>
+            v-if="!filteredCourse.length">查無資料</p>
         </template>
       </vs-table>
     </card>
     <card style="padding: 0; overflow: hidden" v-if="layout == 'timetable'">
-      <div class="timetable">
-        <div class="header">
-          <div class="item"></div>
-          <div class="item">一</div>
-          <div class="item">二</div>
-          <div class="item">三</div>
-          <div class="item">四</div>
-          <div class="item">五</div>
-        </div>
-        <div class="content" v-for="time in timetable" :key="time">
-          <div class="item">{{ time }}</div>
-          <div class="item" v-for="date in Object.keys(dateEng2zh).slice(1, 5 + 1)" :key="date">
-            <template
-              v-if="$vs.getPage(courses, page, max).filter((x) => x.time[date].includes(time)).length <= 2">
-              <router-link
-                class="course"
-                :class="{ conflict: conflictCourseData.includes(item.id) }"
-                v-for="item in $vs
-                .getPage(showConflictCourse ? courses : courses.filter((x) => !conflictCourseData.includes(x.id)), page, max)
-                .filter((x) => x.time[date].includes(time))"
-                :key="item.id"
-                :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`">{{ item.name.zh }}</router-link>
-            </template>
-            <template v-else>
-              <div class="course">課程數量過多無法顯示</div>
-            </template>
+      <div class="grid-timetable"
+        :style="{
+          gridTemplateColumns: ['[🥞time]', 'auto', weekday.map(x=>`[🥞${x}]`).join(' 1fr ') + '1fr', '[🥞end]'].join(' '),
+          gridTemplateRows: ['weekday',...timetable, 'end'].map(x=>`[🥞${x}]`).join(' auto ')
+        }">
+        <!-- decoration -->
+        <div class="decoration-item" style="
+            grid-column-start: 🥞time;
+            grid-column-end: 🥞end;
+            grid-row-start: 🥞weekday;
+        " />
+        <div class="decoration-item" style="
+            grid-column-start: 🥞time;
+            grid-row-start: 🥞weekday;
+            grid-row-end: 🥞end;
+        " />
+        <div class="decoration-border-item"
+          v-for="date in timetable.slice(1)"
+          :key="`decoration-${date}`"
+          :style="`
+            grid-column-start: 🥞一;
+            grid-column-end: 🥞end;
+            grid-row-start: 🥞${date};
+            grid-row-end: 🥞${timetable[timetable.indexOf(date)+1]||'end'};
+          `" />
+        <!-- time -->
+        <div
+          class="time-item"
+          v-for="time of timetable"
+          :style="{
+            'grid-column-start': `🥞time`,
+            'grid-row-start': `🥞${time}`,
+          }"
+          :key="time">
+          <div class="time-item-content">
+            {{ time }}
           </div>
         </div>
+        <!-- weekday -->
+        <div
+          class="weekday-item"
+          v-for="item of weekday"
+          :style="{
+            'grid-column-start': `🥞${item}`,
+            'grid-row-start': `🥞weekday`,
+          }"
+          :key="item">
+          <div class="time-item-content">
+            {{ item }}
+          </div>
+        </div>
+        <!-- course -->
+        <router-link
+          class="course-item"
+          :class="{'course-conflict':item.isConflict}"
+          :style="{...parseCourseStyle(item) }"
+          v-for="item in timetableCourse"
+          :key="item.id"
+          :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
+          :is="item.isConflict?'div':'router-link'">
+          <div class="course-name" v-if="item.isConflict">
+            含有多個課程
+          </div>
+          <div class="course-name" v-else>
+            {{ item.name.zh }}
+          </div>
+          <div class="course-info" v-if="item.isConflict">無法顯示課程，請使用其他模式檢視</div>
+          <div class="course-info" v-else>
+            {{ item.teacher
+            .map((y) => y.name)
+            .join('、')
+            .trimEllip(13) }}<br />
+            {{ item.classroom
+            .map((y) => y.name)
+            .join('、')
+            .trimEllip(13) }}
+          </div>
+        </router-link>
       </div>
     </card>
     <br />
@@ -166,13 +216,13 @@
   </div>
 </template>
 <script>
-import card from './card.vue'
-import SportsTitle from './sportsTitle.vue'
 export default {
-  components: { card, SportsTitle },
   name: 'parse-courses',
   props: {
-    courses: Array,
+    courses: {
+      type: Array,
+      default: null
+    },
     showTimetable: {
       type: Boolean,
       default: false
@@ -190,6 +240,90 @@ export default {
     timetable: ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C'],
     dateEng2zh: { sun: '週日', mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六' }
   }),
+  computed: {
+    weekday() {
+      let res = {
+        sun: false,
+        mon: false,
+        tue: false,
+        wed: false,
+        thu: false,
+        fri: false,
+        sat: false
+      }
+      for (let item of this.courses) {
+        for (let date of Object.keys(res)) {
+          if (item.time[date].length) {
+            res[date] = true
+          }
+        }
+      }
+      res = Object.keys(res).filter((x) => res[x]).map((x) => this.dateEng2zh[x]).map(x => x.slice(1))
+      return res
+    },
+    filteredCourse() {
+      if (!this.courses) return []
+      return this.showConflictCourse ? this.courses : this.courses.filter((x) => !this.conflictCourseData.includes(x.id))
+    },
+    timetableCourse() {
+      let res = []
+      function checkConflict(a, b) {
+        for (let i of Object.entries(a.time)) {
+          for (let j of i[1]) {
+            if (b.time[i[0]].includes(j)) {
+              console.log(a, b)
+              return true
+            }
+          }
+        }
+        return false
+      }
+      // filter conflict
+      let conflictTimetable = {
+        sun: [],
+        mon: [],
+        tue: [],
+        wed: [],
+        thu: [],
+        fri: [],
+        sat: []
+      }
+      let courseData = this.filteredCourse
+      for (let course of courseData) {
+        for (let key of Object.keys(course.time)) {
+          if (course.time[key].length) {
+            let isConflict = courseData
+              .filter(x => course.id != x.id)
+              .some(x => checkConflict(course, x))
+            if (isConflict) {
+              conflictTimetable[key].push(course.time[key])
+            } else {
+              res.push({
+                ...course,
+                date: key,
+                dateTime: course.time[key]
+              })
+            }
+          }
+        }
+      }
+      for (let key of Object.keys(conflictTimetable)) {
+        conflictTimetable[key] = [...new Set(conflictTimetable[key].reduce((a, b) => a.concat(b), []))]
+      }
+      Object.entries(conflictTimetable).map(x => {
+        if (x[1].length) {
+          res.push({
+            id: 'conflict',
+            date: x[0],
+            dateTime: x[1],
+            isConflict: true
+          })
+          console.log(res)
+        }
+      })
+      return res
+    }
+  },
   mounted() {
     this.checkIsCourseConflict()
     if (this.$route.query.layout) this.layout = this.$route.query.layout
@@ -211,9 +345,9 @@ export default {
     }
   },
   methods: {
-    trackBtn() {
+    trackBtn(e = 'toggle_table_view') {
       try {
-        window.gtag('event', 'toggle_table_view')
+        window.gtag('event', e)
       } catch (e) { }
     },
     parseTime(t) {
@@ -230,6 +364,17 @@ export default {
         this.max
       )
       if (this.page > length) this.page = 1
+    },
+    parseCourseStyle(item) {
+      let start = `🥞` + item.dateTime.at(0)
+      let end = `🥞` + this.timetable[this.timetable.indexOf(item.dateTime.at(-1)) + 1]
+      let date = `🥞` + this.dateEng2zh[item.date].slice(1)
+
+      return ({
+        'grid-column-start': date,
+        'grid-row': `${start} / ${end}`,
+      })
+
     }
   }
 }
