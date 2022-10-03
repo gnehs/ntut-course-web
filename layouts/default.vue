@@ -276,7 +276,7 @@ export default {
     })
     // detect firefox private mode
     try {
-      let req = indexedDB.open('inPrivate');
+      let req = indexedDB.open('ntut-course');
       req.onerror = () => {
         this.$vs.notification({
           sticky: true,
@@ -285,6 +285,9 @@ export default {
           color: 'danger',
           duration: 1000 * 60 * 60 * 24
         })
+      }
+      req.onsuccess = () => {
+        req.result.close()
       }
     } catch (e) {
 
