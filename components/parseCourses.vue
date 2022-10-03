@@ -132,7 +132,7 @@
     <card style="padding: 0; overflow: hidden" v-if="layout == 'timetable'">
       <div class="grid-timetable"
         :style="{
-          gridTemplateColumns: ['[🥞time]', 'auto', weekday.map(x=>`[🥞${x}]`).join(' 1fr ') + '1fr', '[🥞end]'].join(' '),
+          gridTemplateColumns: ['[🥞time]', 'auto', weekday.map(x=>`[🥞${x}]`).join(' 1fr ') + '1fr','calc(var(--gap) / 2)', '[🥞end]'].join(' '),
           gridTemplateRows: ['weekday',...timetable, 'end'].map(x=>`[🥞${x}]`).join(' auto ')
         }">
         <!-- decoration -->

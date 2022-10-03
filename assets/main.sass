@@ -170,6 +170,8 @@ h1,h2,h3,h4,h5,h6
 	display: grid
 	--gap: 8px
 	gap: var(--gap)
+	@media screen and (max-width: 700px)
+		--gap: 4px
 	.decoration-item
 		background: rgba(var(--vs-text),.05)
 	.decoration-border-item
@@ -186,6 +188,8 @@ h1,h2,h3,h4,h5,h6
 		align-items: center
 		justify-content: center
 		min-height: 3em
+		@media screen and (max-width: 700px)
+			min-height: 2em
 	.course-item
 		cursor: pointer
 		width: 100%
@@ -207,8 +211,9 @@ h1,h2,h3,h4,h5,h6
 		backdrop-filter: blur(2px)
 		z-index: 1
 		@media screen and (max-width: 700px)
-			padding: 4px 2px
+			padding: 4px
 			font-size: 14px
+			border-radius: 4px
 		.course-name
 			font-weight: bold
 		.course-info
