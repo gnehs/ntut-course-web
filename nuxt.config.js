@@ -33,6 +33,7 @@ export default {
     '@/plugins/ics',
     '@/plugins/vuesax',
     '@/plugins/papaParse',
+    '@/plugins/vlf',
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)

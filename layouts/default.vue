@@ -47,7 +47,7 @@
             :value="item"
             :key="i">
             {{
-                parseYearSemVal(item)
+            parseYearSemVal(item)
             }}
           </vs-option>
         </vs-select>
@@ -104,7 +104,17 @@ export default {
     String.prototype.trimEllip = function (length) {
       return this.length > length ? this.substring(0, length) + '...' : this
     }
+    // localforage
+    this.$vlf.config({
+      name: 'ntut-course',
+      version: 1.0,
+      storeName: 'course',
+      description: 'course data'
+    })
     Vue.prototype.$fetchCourse = async (y, s, department, commit = true) => {
+      let couresStore = this.$vlf.createInstance({
+        storeName: 'course'
+      })
       //replace yr & sem if query seleted
       let { year, sem, d } = this.$route.query
       if (year && sem && d) {
@@ -134,11 +144,22 @@ export default {
 
       let loading
       try {
-        if (!window[dataKey]) {
+        let result = await this.$vlf.getItem(dataKey)
+        let lastUpdate = await this.$vlf.getItem(`${dataKey}_lastUpdate`)
+        if (result && lastUpdate) {
+          let now = new Date()
+          let diff = now.getTime() - lastUpdate.getTime()
+          if (diff > 1000 * 60 * 60 * 24) {
+            result = null
+          }
+        }
+        if (!result) {
           loading = this.$vs.loading({
             text: '下載課程清單...'
           })
-          window[dataKey] = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`).then(x => x.json())
+          result = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`).then(x => x.json())
+          await this.$vlf.setItem(dataKey, result)
+          await this.$vlf.setItem(`${dataKey}_lastUpdate`, new Date())
           loading.close()
         }
         if (commit) {
@@ -146,7 +167,7 @@ export default {
           this.$store.commit('updateSem', s)
           this.$store.commit('updateDepartment', department)
         }
-        return window[dataKey]
+        return result
       } catch (e) {
         this.$vs.notification({
           title: '擷取資料時發生了錯誤',
