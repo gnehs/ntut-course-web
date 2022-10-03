@@ -112,7 +112,15 @@ export default {
       storeName: 'course_compressed',
       description: 'course data'
     })
+    // load all items to memory
+    window.$ntutCourse = {}
+    this.$vlf.iterate((_, key) => {
+      this.$getStore(key)
+    })
     Vue.prototype.$getStore = async (key) => {
+      if (window.$ntutCourse[key]) {
+        return window.$ntutCourse[key]
+      }
       let data = await this.$vlf.getItem(key)
       if (!data) {
         return null
@@ -122,9 +130,11 @@ export default {
       if (data.expiration < Date.now()) {
         return null
       }
+      window.$ntutCourse[key] = data.data
       return data.data
     }
     Vue.prototype.$setStore = async (key, value, expiration = 1) => {
+      window.$ntutCourse[key] = value
       let data = {
         expiration: new Date().getTime() + expiration * 24 * 60 * 60 * 1000,
         data: value
