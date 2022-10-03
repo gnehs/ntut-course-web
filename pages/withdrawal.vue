@@ -245,12 +245,22 @@ export default {
       title: '退選率'
     }
   },
-  created() {
+  async created() {
     let query = Object.assign({}, this.$route.query)
     if (query.period) {
       this.period = parseInt(query.period)
     }
-    this.getData()
+    let lastUpdate = await this.$vlf.getItem(`withdrawal_lastUpdate_${this.period}`)
+    let now = new Date()
+    let diff = now - lastUpdate
+    if (diff > (1000 * 60 * 60 * 24) * 30) {
+      this.getData()
+    } else {
+      let loading = this.$vs.loading()
+      this.data = await this.$vlf.getItem(`withdrawal_data_${this.period}`)
+      this.stat = await this.$vlf.getItem(`withdrawal_stat_${this.period}`)
+      loading.close()
+    }
   },
   data() {
     return ({
@@ -283,7 +293,6 @@ export default {
     async getData() {
       let period = this.period
       let data
-
       try {
         window.gtag('event', 'view_withdraw_rate', {
           event_category: 'view',
@@ -359,7 +368,10 @@ export default {
         value: q1.toFixed(2) + '% - ' + q2.toFixed(2) + '% - ' + q3.toFixed(2) + '%',
         title: '退選率分位數'
       })
-
+      // store
+      await this.$vlf.setItem(`withdrawal_stat_${this.period}`, this.stat)
+      await this.$vlf.setItem(`withdrawal_data_${this.period}`, this.data)
+      await this.$vlf.setItem(`withdrawal_lastUpdate_${this.period}`, Date.now())
     },
     openDialog(item) {
       this.dialogData = item
