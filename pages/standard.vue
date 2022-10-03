@@ -200,7 +200,10 @@ export default {
       }
     },
     parseDepartmentData(data) {
-      if (data.parsed) return
+      if (data.parsed) {
+        this.currentDepartment = data
+        return
+      }
       let tempCourse = {}
       data.parsed = true
       data.courses.map(x => {
