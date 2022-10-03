@@ -200,7 +200,9 @@ export default {
       }
     },
     parseDepartmentData(data) {
+      if (data.parsed) return
       let tempCourse = {}
+      data.parsed = true
       data.courses.map(x => {
         if (!tempCourse[x.year]) tempCourse[x.year] = {}
         if (!tempCourse[x.year][x.sem]) tempCourse[x.year][x.sem] = []
