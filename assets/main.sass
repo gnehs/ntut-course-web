@@ -199,7 +199,7 @@ h1,h2,h3,h4,h5,h6
 		color: var(--main-color)
 		padding: 12px 8px
 		border-radius: 8px
-		transition: all .1s ease
+		transition: background .1s ease
 		height: 100%
 		display: flex
 		flex-direction: column
@@ -210,6 +210,7 @@ h1,h2,h3,h4,h5,h6
 		text-decoration: none
 		backdrop-filter: blur(2px)
 		z-index: 1
+		will-change: background
 		@media screen and (max-width: 700px)
 			padding: 4px
 			font-size: 14px
@@ -220,9 +221,9 @@ h1,h2,h3,h4,h5,h6
 			opacity: .75
 			font-size: .85em
 		&:hover
-			--main-bg: rgba(var(--vs-primary), 0.25)
+			--main-bg: rgba(var(--vs-primary), 0.2)
 		&:active
-			transform: scale(.9)
+			--main-bg: rgba(var(--vs-primary), 0.25)
 		&.course-conflict
 			--main-color: #fff
 			--main-bg: red
