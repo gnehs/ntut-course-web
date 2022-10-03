@@ -22,7 +22,7 @@
         </card>
         <card class="hoverable padding" @click.native="department = null" v-if="department">
           <card-title>{{ department }}</card-title>
-          <p>學制</p>
+          <p>科系</p>
         </card>
       </div>
     </template>
