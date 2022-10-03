@@ -168,20 +168,32 @@ export default {
   },
   methods: {
     async fetchYearsData() {
-      const loading = this.$vs.loading()
+      let loading
       try {
-        this.years = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/standards.json`).then(x => x.json())
-        loading.close()
+        let res = await this.$getStore('standards')
+        if (!res) {
+          loading = this.$vs.loading()
+          res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/standards.json`).then(x => x.json())
+          loading.close()
+        }
+        this.years = structuredClone(res)
+        await this.$setStore('standards', res, 30)
       } catch (e) {
         this.onError = e
         loading.close()
       }
     },
     async fetchYearData(yr) {
-      const loading = this.$vs.loading()
+      let loading
       try {
-        this.standardData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`).then(x => x.json())
-        loading.close()
+        let res = await this.$getStore(`standard_${yr}`)
+        if (!res) {
+          loading = this.$vs.loading()
+          res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`).then(x => x.json())
+          loading.close()
+        }
+        this.standardData = structuredClone(res)
+        await this.$setStore(`standard_${yr}`, res, 30)
       } catch (e) {
         this.onError = e
         loading.close()
