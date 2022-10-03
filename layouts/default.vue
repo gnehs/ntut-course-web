@@ -71,6 +71,7 @@
 </template>
 <script>
 import Vue from 'vue'
+import pako from 'pako'
 export default {
   data: () => ({
     active: '/',
@@ -111,10 +112,28 @@ export default {
       storeName: 'course',
       description: 'course data'
     })
+    Vue.prototype.$getStore = async (key) => {
+      let data = await this.$vlf.getItem(key)
+      if (!data) {
+        return null
+      }
+      data = pako.inflate(data, { level: 6 })
+      data = JSON.parse(new TextDecoder("utf-8").decode(data))
+      if (data.expiration < Date.now()) {
+        return null
+      }
+      return data.data
+    }
+    Vue.prototype.$setStore = async (key, value, expiration = 1) => {
+      let data = {
+        expiration: new Date().getTime() + expiration * 24 * 60 * 60 * 1000,
+        data: value
+      }
+      data = new TextEncoder().encode(JSON.stringify(data));
+      data = pako.deflate(data, { level: 6 })
+      return await this.$vlf.setItem(key, data)
+    }
     Vue.prototype.$fetchCourse = async (y, s, department, commit = true) => {
-      let couresStore = this.$vlf.createInstance({
-        storeName: 'course'
-      })
       //replace yr & sem if query seleted
       let { year, sem, d } = this.$route.query
       if (year && sem && d) {
@@ -144,22 +163,13 @@ export default {
 
       let loading
       try {
-        let result = await this.$vlf.getItem(dataKey)
-        let lastUpdate = await this.$vlf.getItem(`${dataKey}_lastUpdate`)
-        if (result && lastUpdate) {
-          let now = new Date()
-          let diff = now.getTime() - lastUpdate.getTime()
-          if (diff > 1000 * 60 * 60 * 24) {
-            result = null
-          }
-        }
+        let result = await this.$getStore(dataKey)
         if (!result) {
           loading = this.$vs.loading({
             text: '下載課程清單...'
           })
           result = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`).then(x => x.json())
-          await this.$vlf.setItem(dataKey, result)
-          await this.$vlf.setItem(`${dataKey}_lastUpdate`, new Date())
+          await this.$setStore(dataKey, result)
           loading.close()
         }
         if (commit) {

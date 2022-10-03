@@ -17,6 +17,7 @@
     "nuxt": "^2.15.8",
     "nuxt-clipboard": "0.0.6",
     "nuxtjs-microsoft-clarity": "^1.1.5",
+    "pako": "^2.0.4",
     "vlf": "^1.1.0",
     "vue-ics": "^0.1.4",
     "vue-papa-parse": "^3.0.5",

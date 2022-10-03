@@ -250,16 +250,12 @@ export default {
     if (query.period) {
       this.period = parseInt(query.period)
     }
-    let lastUpdate = await this.$vlf.getItem(`withdrawal_lastUpdate_${this.period}`)
-    let now = new Date()
-    let diff = now - lastUpdate
-    if (diff > (1000 * 60 * 60 * 24) * 30) {
-      this.getData()
+    let data = await this.$getStore(`withdrawal_${this.period}`)
+    if (data) {
+      this.data = data.data
+      this.stat = data.stat
     } else {
-      let loading = this.$vs.loading()
-      this.data = await this.$vlf.getItem(`withdrawal_data_${this.period}`)
-      this.stat = await this.$vlf.getItem(`withdrawal_stat_${this.period}`)
-      loading.close()
+      this.getData()
     }
   },
   data() {
@@ -369,9 +365,7 @@ export default {
         title: '退選率分位數'
       })
       // store
-      await this.$vlf.setItem(`withdrawal_stat_${this.period}`, this.stat)
-      await this.$vlf.setItem(`withdrawal_data_${this.period}`, this.data)
-      await this.$vlf.setItem(`withdrawal_lastUpdate_${this.period}`, Date.now())
+      await this.$setStore(`withdrawal_${this.period}`, { stat: this.stat, data: this.data })
     },
     openDialog(item) {
       this.dialogData = item
