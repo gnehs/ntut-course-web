@@ -109,7 +109,7 @@ export default {
     this.$vlf.config({
       name: 'ntut-course',
       version: 1.0,
-      storeName: 'course',
+      storeName: 'course_compressed',
       description: 'course data'
     })
     Vue.prototype.$getStore = async (key) => {
