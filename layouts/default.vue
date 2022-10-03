@@ -2,16 +2,17 @@
   <div id="app">
     <vs-navbar center-collapsed v-model="active" shadow fixed not-line v-if="!isIframe">
       <template #left>
-        <router-link to="/" class="site-title">🍤 北科課程好朋友</router-link>
+        <router-link to="/" class="site-title" @click="trackBtn('nav_logo_click')">🍤 北科課程好朋友</router-link>
       </template>
-      <vs-navbar-item :active="active == '/'" to="/">首頁</vs-navbar-item>
+      <vs-navbar-item :active="active == '/'" to="/" @click="trackBtn('nav_home_link_click')">首頁</vs-navbar-item>
       <vs-navbar-item
         :active="active == '/search'"
         :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`"
-        id="search">搜尋</vs-navbar-item>
+        id="search"
+        @click="trackBtn('nav_search_link_click')">搜尋</vs-navbar-item>
       <template #right>
         <vs-button
-          @click="datasetDialog = true"
+          @click="datasetDialog = true;trackBtn('nav_dataset_click')"
           :disabled="Boolean($route.query.year)">{{ parseYearSemVal(yearSemVal) }}</vs-button>
       </template>
     </vs-navbar>
@@ -294,6 +295,11 @@ export default {
     }
   },
   methods: {
+    trackBtn(e = 'toggle_table_view') {
+      try {
+        window.gtag('event', e)
+      } catch (e) { }
+    },
     async initYearSem() {
       let d = await this.$fetchYearData()
       let res = []
