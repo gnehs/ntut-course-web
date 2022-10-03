@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>iOS 小工具</h1>
-    <p>新增小工具在您的桌面上，隨時檢視接下來的課程！</p>
+    <p>新增小工具在你的桌面上，隨時檢視接下來的課程！</p>
     <p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
     <vs-alert color="danger" v-if="!courseData.length">
       <template #title>沒有課程資料</template>
@@ -11,7 +11,7 @@
       <span style="color: rgb(var(--vs-primary))">Step 0</span> 加入課程
     </h2>
     <p>
-      請先將您本學期的課程新增到
+      請先將你本學期的課程新增到
       <strong>北科課程好朋友</strong>
     </p>
     <h2>
@@ -162,7 +162,7 @@ Script.complete()
     <h2>
       <span style="color: rgb(var(--vs-primary))">Step 3</span> 新增小工具到桌面
     </h2>
-    <p>參考此影片建立您的小工具</p>
+    <p>參考此影片建立你的小工具</p>
     <video loop controls autoplay class="demo-video">
       <source src="/video/how_to_add_iOS_widget.mp4" type="video/mp4" />
     </video>

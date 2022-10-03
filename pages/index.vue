@@ -9,7 +9,7 @@
       <a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank">國立臺北科技大學課程系統</a>，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
     </p>
     <upcoming-course />
-    <h2>課程資源</h2>
+    <h2>課程</h2>
     <div class="cards">
       <card
         class="hoverable padding"
@@ -44,16 +44,16 @@
       </card>
     </div>
 
-    <h2>實用工具</h2>
+    <h2>實用</h2>
     <div class="cards">
       <card class="hoverable padding" :to="standardURL">
         <card-title>課程標準</card-title>
-        <p>查看各系所畢業學分等資訊</p>
+        <p>查看各系所畢業標準等相關資訊</p>
         <i class="bx bxs-graduation"></i>
       </card>
       <card class="hoverable padding" to="/emptyroom">
         <card-title>尋找空教室</card-title>
-        <p>尋找沒有課程進行的教室</p>
+        <p>查看沒有課程進行的教室</p>
         <i class="bx bx-ghost"></i>
       </card>
       <card class="hoverable padding" to="/withdrawal?period=10">
@@ -67,13 +67,13 @@
         <i class="bx bx-extension"></i>
       </card>
       <card class="hoverable padding" :to="`/calendar?year=${$store.state.year}`">
-        <card-title>新增到行事曆</card-title>
+        <card-title>新增課程到行事曆</card-title>
         <p>將我的課程匯入至行事曆</p>
         <i class='bx bx-calendar-plus'></i>
       </card>
     </div>
 
-    <h2>其他資源</h2>
+    <h2>其他</h2>
     <div class="cards">
       <card class="hoverable padding" to="/doc">
         <card-title>文件</card-title>

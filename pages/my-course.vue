@@ -13,11 +13,11 @@
         <vs-button flat @click="importData"> <i class="bx bxs-file-import"></i>匯入 </vs-button>
       </div>
     </div>
-    <p style="margin-top: -1em">你可以在這裡儲存一些課程供未來選課時參考用，且在此處的課程會自動與其他課程比對是否衝堂。</p>
+    <p style="margin-top: -1em">你可以在這裡儲存一些課程供未來選課時參考用，在此處的課程會與其他課程比對並顯示是否衝堂。</p>
     <vs-alert v-if="!myCourses.length" key="noCourses">
       <template #title>尚未儲存任何課程</template>
       你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
-      <br />若先前加入未在此處，可能是選擇了錯誤的資料集，請嘗試於右上按鈕切換資料集。
+      <br />若這裡沒有先前加入的課程，可能是選擇了錯誤的資料集，請嘗試於右上按鈕切換資料集。
     </vs-alert>
     <h3 v-show="myCourses.length">建議</h3>
     <div class="cards" style="--card-row: 3; --card-row-sm: 2" v-show="myCourses.length">

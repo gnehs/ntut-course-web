@@ -109,7 +109,7 @@ export default {
       let { year, sem } = this.$store.state
       let myCourseClassKey = `my-couse-class-${year}-${sem}`
       if (localStorage[myCourseClassKey] != this.classname && localStorage[myCourseClassKey]) {
-        let changeClass = confirm(`您先前已將「${localStorage[myCourseClassKey]}」之課程加入我的課程，此行為會導致課程過多，要繼續嗎？`)
+        let changeClass = confirm(`你先前已將「${localStorage[myCourseClassKey]}」之課程加入我的課程，此行為會導致課程過多，要繼續嗎？`)
         if (!changeClass) {
           return
         }

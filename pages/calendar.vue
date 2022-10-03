@@ -10,7 +10,7 @@
       <span style="color: rgb(var(--vs-primary))">Step 0</span> 加入課程
     </h2>
     <p>
-      請先將您本學期的課程新增到
+      請先將你本學期的課程新增到
       <strong>北科課程好朋友</strong>
     </p>
     <h2>

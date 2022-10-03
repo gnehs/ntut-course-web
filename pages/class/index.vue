@@ -13,7 +13,7 @@
     </vs-alert>
     <div v-if="recommendClass.length">
       <h3>建議</h3>
-      <p>根據您先前儲存的班級所提供的建議</p>
+      <p>根據你先前儲存的班級所提供的建議</p>
       <div class="cards" style="--card-row: 5; --card-row-sm: 3">
         <card
           class="hoverable padding"
