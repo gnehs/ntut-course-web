@@ -274,6 +274,21 @@ export default {
       this.active = to.path
       next()
     })
+    // detect firefox private mode
+    try {
+      let req = indexedDB.open('inPrivate');
+      req.onerror = () => {
+        this.$vs.notification({
+          sticky: true,
+          title: '無法使用 IndexedDB',
+          text: '這可能會造成部分功能無法如常運作，若您正使用 Firefox 且開啟了隱私模式，請關閉隱私模式或使用其他瀏覽器。',
+          color: 'danger',
+          duration: 1000 * 60 * 60 * 24
+        })
+      }
+    } catch (e) {
+
+    }
   },
   methods: {
     async initYearSem() {
