@@ -365,7 +365,7 @@ export default {
         title: '退選率分位數'
       })
       // store
-      await this.$setStore(`withdrawal_${this.period}`, { stat: this.stat, data: this.data })
+      await this.$setStore(`withdrawal_${this.period}`, { stat: this.stat, data: this.data }, 30)
     },
     openDialog(item) {
       this.dialogData = item
