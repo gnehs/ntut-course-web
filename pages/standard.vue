@@ -60,7 +60,7 @@
       <template v-if="department && currentDepartment">
         <h3>{{ department }}</h3>
         <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-          <card v-for="item of Object.entries(currentDepartment.credits)" :key="item[0]">
+          <card v-for="item of Object.entries(currentDepartment.credits)" :key="item[0]" v-show="item[1]!=0">
             <card-title>{{ item[1] }}</card-title>
             <p>{{ item[0] }}</p>
           </card>
