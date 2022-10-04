@@ -40,7 +40,7 @@ export default {
     cursor: pointer
 
     &>i
-      transform: translateY(20%)
+      transform: translateY(25%) scale(0.95)
     &:hover
       box-shadow: 0 10px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
       transform: translate(0, -5px)
