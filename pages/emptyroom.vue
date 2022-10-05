@@ -5,8 +5,7 @@
       尋找空教室仍在早期開發階段，若有建議或是找到 bug 可以到 GitHub 開
       <a
         href="https://github.com/gnehs/ntut-course-web/issues/new"
-        target="_blank"
-      >issue</a>。
+        target="_blank">issue</a>。
     </vs-alert>
     <h1>尋找空教室</h1>
     <div v-if="categoryList">
@@ -17,16 +16,14 @@
             class="hoverable padding"
             v-for="classroom of classList.filter((x) => x.category == category)"
             :key="classroom.name"
-            @click.native="showEmptyroomDetailDialog(classroom)"
-          >
+            @click.native="showEmptyroomDetailDialog(classroom)">
             <card-title>{{ classroom.name }}</card-title>
             <div class="course-dots">
               <div
                 class="course-dot-item"
                 v-for="i of upcomingCourseIncludes"
                 :key="i"
-                :class="{ active: !classroom.timetable.includes(i) }"
-              >{{ i }}</div>
+                :class="{ active: !classroom.timetable.includes(i) }">{{ i }}</div>
             </div>
           </card>
         </div>
@@ -44,8 +41,7 @@
           class="item"
           style="display: flex; justify-content: space-between; flex-direction: row"
           v-for="item of upcomingCourseIncludes"
-          :key="item"
-        >
+          :key="item">
           <div>{{ item }} - {{ timetable[item] }}</div>
           <div>{{ emptyroomDetailData.timetable.includes(item) ? '空堂' : '有課程進行' }}</div>
         </div>
@@ -54,8 +50,7 @@
           style="display: block; text-align: center"
           v-if="emptyroomDetailData"
           :href="`https://aps.ntut.edu.tw/course/tw/${emptyroomDetailData.link}`"
-          target="_blank"
-        >到北科課程網站查看</a>
+          target="_blank">到北科課程網站查看</a>
       </div>
     </vs-dialog>
   </div>
@@ -210,4 +205,4 @@ export default {
     }
   }
 }
-</script> 
+</script>
