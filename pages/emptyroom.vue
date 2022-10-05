@@ -1,13 +1,17 @@
 <template>
   <div>
     <vs-alert>請注意，此功能僅能列出表定無課程進行的教室，教室可能因其他因素，致無法使用。</vs-alert>
-    <vs-alert>
-      尋找空教室仍在早期開發階段，若有建議或是找到 bug 可以到 GitHub 開
-      <a
-        href="https://github.com/gnehs/ntut-course-web/issues/new"
-        target="_blank">issue</a>。
-    </vs-alert>
     <h1>尋找空教室</h1>
+    <div class="center">
+      <vs-button
+        flat
+        :active="todayDayOfWeek == en"
+        @click="todayDayOfWeek = en"
+        v-for="[en,zh] of Object.entries(dateEng2zh)"
+        :key="en">
+        {{ zh.slice(1) }}
+      </vs-button>
+    </div>
     <div v-if="categoryList">
       <template v-for="category of categoryList">
         <h3 :key="category">{{ category }}</h3>
@@ -98,9 +102,11 @@ export default {
       C: '20:20',
       D: '21:10'
     },
+    dateEng2zh: { sun: '週日', mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六' },
     upcomingCourseIncludes: [],
     emptyroomDetailDialog: false,
-    emptyroomDetailData: null
+    emptyroomDetailData: null,
+    todayDayOfWeek: null
   }),
   head() {
     return {
@@ -120,6 +126,9 @@ export default {
       this.getEmptyClass()
     },
     sem(newCount, oldCount) {
+      this.getEmptyClass()
+    },
+    todayDayOfWeek(newCount, oldCount) {
       this.getEmptyClass()
     }
   },
@@ -156,14 +165,6 @@ export default {
         C: '20:20',
         D: '21:10'
       }
-      // show upcoming course
-      //   let upcomingCourseIncludes = Object.entries(timetable)
-      //     .filter(([courseId, courseTime]) => {
-      //       let tempDate = new Date()
-      //       tempDate.setHours(courseTime.split(':')[0], courseTime.split(':')[1], 0)
-      //         return tempDate >= currentDate
-      //     })
-      //     .map(x => x[0])
       let upcomingCourseIncludes = Object.keys(timetable)
       this.upcomingCourseIncludes = upcomingCourseIncludes
       // create class list
@@ -185,7 +186,8 @@ export default {
       })
 
       let dateEng2zh = { sun: '週日', mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六' }
-      let todayDayOfWeek = Object.keys(dateEng2zh)[currentDate.getDay()]
+      let todayDayOfWeek = this.todayDayOfWeek || Object.keys(dateEng2zh)[currentDate.getDay()]
+      this.todayDayOfWeek = todayDayOfWeek
       course
         .filter(x => x.classroom.length)
         .map(x => {
