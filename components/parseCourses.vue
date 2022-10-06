@@ -234,7 +234,7 @@ export default {
   },
   data: () => ({
     layout: 'card',
-    max: 50,
+    max: 54,
     page: 1,
     conflictCourseData: [],
     timetable: ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C'],
