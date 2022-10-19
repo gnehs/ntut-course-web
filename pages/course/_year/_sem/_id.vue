@@ -270,9 +270,11 @@ export default {
       const loading = this.$vs.loading()
       try {
         let course = await this.$fetchCourse(year, sem)
+        let courseNumber = [`𝟬`, `𝟭`, `𝟮`, `𝟯`, `𝟰`, `𝟱`, `𝟲`, `𝟳`, `𝟴`, `𝟵`]
+        let parsedCourseId = courseId.split('').map((c) => courseNumber[c]).join('')
         this.courseData = course.filter(x => x.id == courseId)[0]
         this.description = this.courseData.description.zh
-        this.title = `${courseId} ${this.courseData.name.zh}`
+        this.title = `${parsedCourseId} ${this.courseData.name.zh}`
         this.checkCourseInMyCourse()
         this.checkIsCourseConflict()
         this.fetchedCourseData = await fetch(
