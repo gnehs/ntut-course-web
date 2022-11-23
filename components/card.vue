@@ -20,16 +20,16 @@ export default {
   color: var(--vs-text)
   width: 100%
   box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
-  border-radius: 12px
+  border-radius: 8px
   transition: all .25s ease
   position: relative
-  padding: 6px 8px
+  padding: 8px 12px
   overflow: hidden
   text-decoration: none
   &[disabled]
     pointer-events: none
   &:not(.hoverable)
-    box-shadow: 0 0px 0px 1px rgba(var(--vs-text),.1)
+    box-shadow: 0 0px 0px 1px rgba(var(--vs-text),.05)
   &.borderless
     box-shadow: none
     background: transparent

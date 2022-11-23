@@ -37,97 +37,111 @@
         衝堂！
       </vs-alert>
       <vs-alert v-show="isEarlyEight">該課程為早八，選課前請先三思！</vs-alert>
-      <div class="cards">
-        <div class="cards">
-          <card>
-            <card-title>{{ courseData.id }}</card-title>
-            <p>課號</p>
-          </card>
-          <card>
-            <card-title>{{ courseData.people }}</card-title>
-            <p>人數</p>
-          </card>
-        </div>
-        <div class="cards">
-          <card>
-            <card-title>{{ courseData.credit }}</card-title>
-            <p>學分</p>
-          </card>
-          <card>
-            <card-title>{{ courseData.hours }}</card-title>
-            <p>時數</p>
-          </card>
-          <card>
-            <card-title>{{ courseData.stage }}</card-title>
-            <p>階段</p>
-          </card>
-        </div>
+      <div class="cards" style="--card-row: 3; --card-row-sm: 3">
         <card>
-          <card-title>{{ courseData.courseType }} {{ courseStandard[courseData.courseType] }}</card-title>
-          <p>課程標準</p>
+          <card-title>{{ courseData.id }}</card-title>
+          <p>課號</p>
         </card>
         <card>
-          <card-title>
-            <template v-for="(classItem, i) of courseData.class.map((x) => x.name)">
-              <span v-if="i > 0" :key="classItem + '_'">、</span>
-              <router-link
-                :to="`/class/${classItem}?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
-                class="class-link"
-                :key="classItem + '_'">{{ classItem }}</router-link>
+          <card-title>{{ courseData.credit }}</card-title>
+          <p>學分</p>
+        </card>
+        <card>
+          <vs-tooltip bottom>
+            <card-title>{{ withdrawalRate ? `${withdrawalRate}%` : `無資料` }}</card-title>
+            <p> 退選率 <i class='bx bx-info-circle'></i> </p>
+            <template #tooltip>
+              <div style="text-align: left;">
+                <h4 style="margin:0;"> 什麼是退選率？ </h4>
+                這項資料由教師之退選人數計算而來。
+                <h4 style="margin-bottom:0;"> 退選率如何計算？ </h4>
+                總退選人數 / 總選課人數
+                <h4 style="margin-bottom:0;"> 如果有多名教師，退選率會怎麼顯示？ </h4>
+                若該課程有多名教師，則會顯示最高退選率之教師。
+                <h4 style="margin-bottom:0;"> 退選率多少算高？ </h4>
+                根據近三年的統計資料，有半數教師退選率高於 1.20%；四分之一教師退選率高於 2.91%，也就是說如果你看到退選率超過 3%，你就要小心了！
+              </div>
             </template>
-          </card-title>
-          <p>班級</p>
+          </vs-tooltip>
         </card>
-        <card>
-          <card-title>{{ courseData.classroom.length ? courseData.classroom.map((x) => x.name).join('、') : '無資料' }}</card-title>
-          <p>教室</p>
-        </card>
-        <div class="cards">
-          <card v-for="item in parseTime(courseData.time)" :key="item.title">
-            <card-title>{{ item.content }}</card-title>
-            <p>{{ item.title }}</p>
-          </card>
-          <card v-if="!parseTime(courseData.time).length">
-            <card-title>無資料</card-title>
-            <p>上課時間</p>
-          </card>
-        </div>
-        <div class="cards">
-          <card>
-            <card-title>{{ courseData.peopleWithdraw }}</card-title>
-            <p>退選</p>
-          </card>
-          <card>
-            <vs-tooltip bottom>
-              <card-title>{{ withdrawalRate }}%</card-title>
-              <p> 退選率 <i class='bx bx-info-circle'></i> </p>
-              <template #tooltip>
-                <div style="text-align: left;">
-                  <h4 style="margin:0;"> 什麼是退選率？ </h4>
-                  這項資料由教師之退選人數計算而來。
-                  <h4 style="margin-bottom:0;"> 退選率如何計算？ </h4>
-                  總退選人數 / 總選課人數
-                  <h4 style="margin-bottom:0;"> 如果有多名教師，退選率會怎麼顯示？ </h4>
-                  若該課程有多名教師，則會顯示最高退選率之教師。
-                  <h4 style="margin-bottom:0;"> 退選率多少算高？ </h4>
-                  根據近三年的統計資料，有半數教師退選率高於 1.20%；四分之一教師退選率高於 2.91%，也就是說如果你看到退選率超過 3%，你就要小心了！
-                </div>
-              </template>
-            </vs-tooltip>
-          </card>
-        </div>
       </div>
-      <div v-if="!fetchedCourseData.length">
-        <h3>教師</h3>
-        <p>{{ courseData.teacher.map(({ name }) => name).join('、') }}</p>
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-icon"><i class='bx bx-info-circle'></i></div>
+          <div class="info-card-title">課程資訊</div>
+          <div class="info-data-items">
+            <div class="info-data-item">
+              <div class="info-data-item-title">課程標準</div>
+              <div class="info-data-item-content">{{ courseData.courseType }} {{ courseStandard[courseData.courseType] }}</div>
+            </div>
+            <div class="info-data-item">
+              <div class="info-data-item-title">人數</div>
+              <div class="info-data-item-content">{{ courseData.people }} 人 </div>
+            </div>
+            <div class="info-data-item" v-if="courseData.peopleWithdraw > 0">
+              <div class="info-data-item-title">退選</div>
+              <div class="info-data-item-content">{{ courseData.peopleWithdraw }} 人 </div>
+            </div>
+            <div class="info-data-item">
+              <div class="info-data-item-title">時數</div>
+              <div class="info-data-item-content">{{ courseData.hours }} 小時</div>
+            </div>
+            <div class="info-data-item" v-if="courseData.stage > 1">
+              <div class="info-data-item-title">階段</div>
+              <div class="info-data-item-content">{{ courseData.stage }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><i class='bx bx-user'></i></div>
+          <div class="info-card-title">授課資訊</div>
+          <div class="info-data-items">
+            <div class="info-data-item">
+              <div class="info-data-item-title">教師</div>
+              <div class="info-data-item-content">
+                {{ courseData.teacher.length ? courseData.teacher.map(x => x.name).join('、') : `無資料` }}
+              </div>
+            </div>
+            <div class="info-data-item">
+              <div class="info-data-item-title">班級</div>
+              <div class="info-data-item-content">
+                <template v-for="(classItem, i) of courseData.class.map((x) => x.name)">
+                  <span v-if="i > 0" :key="classItem + '_'">、</span>
+                  <router-link
+                    :to="`/class/${classItem}?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
+                    class="class-link"
+                    :key="classItem + '_'">{{ classItem }}</router-link>
+                </template>
+              </div>
+            </div>
+            <div class="info-data-item">
+              <div class="info-data-item-title">備註</div>
+              <div class="info-data-item-content" v-html="parseTextarea(courseData.notes)" />
+            </div>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-icon"><i class='bx bx-map'></i></div>
+          <div class="info-card-title">上課資訊</div>
+          <div class="info-data-items">
+            <div class="info-data-item">
+              <div class="info-data-item-title">教室</div>
+              <div class="info-data-item-content">{{ courseData.classroom.length ? courseData.classroom.map((x) => x.name).join('、') : '無資料' }}</div>
+            </div>
+            <div class="info-data-item" v-if="!parseTime(courseData.time).length">
+              <div class="info-data-item-title">上課時間</div>
+              <div class="info-data-item-content">尚無資訊</div>
+            </div>
+            <div class="info-data-item" v-for="item in parseTime(courseData.time)" :key="item.title">
+              <div class="info-data-item-title">{{ item.title }}</div>
+              <div class="info-data-item-content">{{ item.content }}</div>
+            </div>
+          </div>
+        </div>
       </div>
       <h3>課程概述</h3>
       <p v-html="parseTextarea(courseData.description.zh)" />
       <p v-html="parseTextarea(courseData.description.en)" />
-      <div v-if="courseData.notes.trim() != ''">
-        <h3>備註</h3>
-        <p v-html="parseTextarea(courseData.notes)" />
-      </div>
       <div v-if="fetchedCourseData.length">
         <vs-alert v-show="chooseClassSelect">
           <template #title>含有多項資料</template>
@@ -217,7 +231,7 @@
               <h3>備註</h3>
               <p v-html="parseTextarea(item.remarks)" />
             </template>
-            <h3>使用原文書籍：{{ item.foreignLanguageTextbooks ? '是' : '否' }}</h3>
+            <h3>使用外文原文書籍：{{ item.foreignLanguageTextbooks ? '是' : '否' }}</h3>
             <h3>最後更新：{{ item.latestUpdate }}</h3>
           </div>
         </div>
@@ -226,6 +240,45 @@
   </div>
 </template>
 <style lang="sass" scoped>
+.info-cards
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  grid-gap: 12px
+  @media (max-width: 768px)
+    overflow-y: auto
+  .info-card
+    background: rgba(var(--vs-background),1)
+    color: var(--vs-text)
+    border-radius: 8px
+    padding: 8px 12px
+    border: 1px solid rgba(var(--vs-text), 0.1)
+    min-width: 220px
+    line-height: 1.5
+    .info-card-icon
+      font-size: 24px
+    .info-card-title
+      font-size: 16px
+      font-weight: bold
+      margin-bottom: 8px
+    .info-data-items
+      @media (min-width: 769px)
+        display: grid
+        grid-template-columns: repeat(2, 1fr)
+        gap: 8px
+    .info-data-item
+      @media (max-width: 768px)
+        display: flex
+        justify-content: space-between
+        gap: 1em
+      .info-data-item-title
+        font-size: 14px
+        font-weight: bold
+        white-space: nowrap
+      .info-data-item-content
+        font-size: 14px
+        opacity: 0.75
+        @media (max-width: 768px)
+          text-align: right
 .covid19-info
   border-radius: 16px
   border: 1px solid rgba(var(--vs-text), .2)
@@ -314,8 +367,8 @@ export default {
         }
 
         let withdrawalRate = await this.$getWithdrawalRate()
-        let calcedWithdrawalRate = Math.max(...this.fetchedCourseData.map(x => x.name).map(x => withdrawalRate[x] ?? null).filter(x => x))
-        this.withdrawalRate = calcedWithdrawalRate ?? null
+        let calcedWithdrawalRate = Math.max(...this.fetchedCourseData.map(x => x.name).map(x => withdrawalRate[x] ?? null).filter(x => x), -1)
+        this.withdrawalRate = calcedWithdrawalRate > 0 ? calcedWithdrawalRate : null
       } catch (e) {
         this.onError = e
         loading.close()
