@@ -99,7 +99,14 @@
             <div class="info-data-item">
               <div class="info-data-item-title">教師</div>
               <div class="info-data-item-content">
-                {{ courseData.teacher.length ? courseData.teacher.map(x => x.name).join('、') : `無資料` }}
+                <template v-for="(name, i) of courseData.teacher.map(x => x.name)">
+                  <span v-if="i > 0" :key="name + '_'">、</span>
+                  <router-link
+                    :to="`/teacher/${name}`"
+                    class="class-link"
+                    :key="name + '_'">{{ name }}</router-link>
+                </template>
+                <template v-if="!courseData.teacher.length">無資料</template>
               </div>
             </div>
             <div class="info-data-item">
@@ -251,7 +258,7 @@
     color: var(--vs-text)
     border-radius: 8px
     padding: 8px 12px
-    border: 1px solid rgba(var(--vs-text), 0.1)
+    border: 1px solid rgba(var(--vs-text),.1)
     min-width: 220px
     line-height: 1.5
     .info-card-icon

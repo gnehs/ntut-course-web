@@ -29,9 +29,11 @@ export default {
   &[disabled]
     pointer-events: none
   &:not(.hoverable)
-    box-shadow: 0 0px 0px 1px rgba(var(--vs-text),.05)
+    border: 1px solid rgba(var(--vs-text),.1)
+    box-shadow: none
   &.borderless
     box-shadow: none
+    border: none
     background: transparent
     padding: 4px 0px
   &.padding
