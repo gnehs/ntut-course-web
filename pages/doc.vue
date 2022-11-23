@@ -122,13 +122,13 @@ https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recen
 
 ### `/analytics/withdrawal-recent-5-years.json` 近五年退選率資料
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-recent-3-years.json
+https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-recent-5-years.json
 
 </div><div class="white-box">
 
 ### `/analytics/withdrawal-rate-recent-5-years.json` 近五年退選率資料（僅比率）
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recent-3-years.json
+https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recent-5-years.json
 
 </div>
 
