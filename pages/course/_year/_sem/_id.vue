@@ -100,6 +100,10 @@
       <h3>課程概述</h3>
       <p v-html="parseTextarea(courseData.description.zh)" />
       <p v-html="parseTextarea(courseData.description.en)" />
+      <div v-if="courseData.consultation">
+        <h3>課程諮詢管道</h3>
+        <p v-html="consultation" />
+      </div>
       <div v-if="courseData.notes.trim() != ''">
         <h3>備註</h3>
         <p v-html="parseTextarea(courseData.notes)" />
