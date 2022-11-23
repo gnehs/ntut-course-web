@@ -6,7 +6,7 @@
     </vs-alert>
     <div v-if="fetchedCourseData && courseData">
       <div class="lr-container">
-        <div class="l">
+        <div class="l" style="display:block;">
           <h2 v-if="courseData.class.some(x => x.name.match(/體育/))">
             <sports-title :course-data="courseData" />
           </h2>
@@ -46,24 +46,6 @@
           <card>
             <card-title>{{ courseData.people }}</card-title>
             <p>人數</p>
-          </card>
-          <card>
-            <vs-tooltip bottom>
-              <card-title>{{ withdrawalRate }}%</card-title>
-              <p> 退選率 <i class='bx bx-info-circle'></i> </p>
-              <template #tooltip>
-                <div style="text-align: left;">
-                  <h4 style="margin:0;"> 什麼是退選率？ </h4>
-                  這項資料由教師之退選人數計算而來。
-                  <h4 style="margin-bottom:0;"> 退選率如何計算？ </h4>
-                  總退選人數 / 總選課人數
-                  <h4 style="margin-bottom:0;"> 如果有多名教師，退選率會怎麼顯示？ </h4>
-                  若該課程有多名教師，則會顯示最高退選率之教師。
-                  <h4 style="margin-bottom:0;"> 退選率多少算高？ </h4>
-                  根據近三年的統計資料，有半數教師退選率高於 1.20%；四分之一教師退選率高於 2.91%，也就是說如果你看到退選率超過 3%，你就要小心了！
-                </div>
-              </template>
-            </vs-tooltip>
           </card>
         </div>
         <div class="cards">
@@ -108,6 +90,30 @@
           <card v-if="!parseTime(courseData.time).length">
             <card-title>無資料</card-title>
             <p>上課時間</p>
+          </card>
+        </div>
+        <div class="cards">
+          <card>
+            <card-title>{{ courseData.peopleWithdraw }}</card-title>
+            <p>退選</p>
+          </card>
+          <card>
+            <vs-tooltip bottom>
+              <card-title>{{ withdrawalRate }}%</card-title>
+              <p> 退選率 <i class='bx bx-info-circle'></i> </p>
+              <template #tooltip>
+                <div style="text-align: left;">
+                  <h4 style="margin:0;"> 什麼是退選率？ </h4>
+                  這項資料由教師之退選人數計算而來。
+                  <h4 style="margin-bottom:0;"> 退選率如何計算？ </h4>
+                  總退選人數 / 總選課人數
+                  <h4 style="margin-bottom:0;"> 如果有多名教師，退選率會怎麼顯示？ </h4>
+                  若該課程有多名教師，則會顯示最高退選率之教師。
+                  <h4 style="margin-bottom:0;"> 退選率多少算高？ </h4>
+                  根據近三年的統計資料，有半數教師退選率高於 1.20%；四分之一教師退選率高於 2.91%，也就是說如果你看到退選率超過 3%，你就要小心了！
+                </div>
+              </template>
+            </vs-tooltip>
           </card>
         </div>
       </div>
