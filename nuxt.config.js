@@ -32,7 +32,6 @@ export default {
   plugins: [
     '@/plugins/ics',
     '@/plugins/vuesax',
-    '@/plugins/papaParse',
     '@/plugins/vlf',
   ],
 

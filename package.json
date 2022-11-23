@@ -20,9 +20,7 @@
     "pako": "^2.0.4",
     "vlf": "^1.1.0",
     "vue-ics": "^0.1.4",
-    "vue-papa-parse": "^3.0.5",
-    "vuesax": "^4.0.1-alpha.25",
-    "xlsx": "^0.18.5"
+    "vuesax": "^4.0.1-alpha.25"
   },
   "devDependencies": {
     "fibers": "^5.0.0",
