@@ -104,6 +104,7 @@ https://gnehs.github.io/ntut-course-crawler-node/110/standard.json
 ## 退選率
 提供自民國 90 年來的退選率統計資料，因檔案大小較大，另提供僅教師名稱與比率之資料。
 <div class="white-box">
+
 ### `/analytics/withdrawal-recent-3-years.json` 近三年退選率資料
 #### Example
 https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-recent-3-years.json
@@ -122,6 +123,7 @@ https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal.json
 ### `/analytics/withdrawal.json` 所有年度退選率資料（僅比率）
 #### Example
 https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json
+
 </div>
 </template>
 <style scoped lang="sass">
