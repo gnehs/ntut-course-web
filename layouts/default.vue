@@ -269,6 +269,14 @@ export default {
       myCourseData = myCourseData.filter(x => x != id)
       localStorage[myCourseKey] = JSON.stringify(myCourseData)
     }
+    Vue.prototype.$getWithdrawalRate = async () => {
+      let res =await this.$getStore('withdrawalRate')
+      if(!res){
+        res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json`).then(x => x.json())
+        await this.$setStore('withdrawalRate', res, 30)
+      }
+      return res
+    }
     await this.initYearSem()
     await this.$fetchCourse()
     this.$router.beforeEach((to, from, next) => {
