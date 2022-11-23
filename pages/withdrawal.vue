@@ -1,41 +1,32 @@
 <template>
   <div>
     <h1>退選率</h1>
-    <p>這是該學期所有教師的退選率（退選人數/選課人數）的計算結果</p>
+    <p>這是期間中所有教師的退選率統計頁面</p>
     <div style="display:flex; justify-content: space-between;">
-      <vs-checkbox v-model="showPeopleBelow10">顯示選課小於十人的教師</vs-checkbox>
+      <div></div>
       <div style="display:flex;align-items: center;">
-
         <vs-select placeholder=" 期間" v-model="period" state="dark" @change="getData" style="max-width: 120px">
-          <vs-option :label="`目前學期`" :value="1">
-            {{ year }} 年{{ sem == '1' ? '上' : '下' }}學期
+          <vs-option label="過去三年" value="-recent-3-years">
+            過去三年
           </vs-option>
-          <vs-option label="過去兩年" :value="4">
-            過去兩年
-          </vs-option>
-          <vs-option label="過去五年" :value="10">
+          <vs-option label="過去五年" value="-recent-5-years">
             過去五年
           </vs-option>
-          <vs-option :label="`過去 ${period / 2} 年`" :value="period" v-show="false" v-if="period != 1 && period != 4 && period != 10">
-            過去 {{ period / 2 }} 年
+          <vs-option label="所有期間" value="all">
+            所有期間
           </vs-option>
         </vs-select>
-        <vs-button
-          icon
-          color="primary"
-          flat
-          @click="downloadDialog = true">
-          <i class='bx bx-download'></i>
-        </vs-button>
       </div>
     </div>
-    <div class="cards" style="--card-row: 2;--card-row-sm: 1;" v-if="data.length">
+    <loader v-if="!data" />
+
+    <div class="cards" style="--card-row: 2;--card-row-sm: 1;" v-if="stat">
       <card v-for="(item, i) of stat" :key="i">
         <card-title>{{ item.value }}</card-title>
         <p>{{ item.title }}</p>
       </card>
     </div>
-    <div class="teachers">
+    <div class="teachers" v-if="data">
       <div
         class="teacher"
         v-for="item of data"
@@ -47,53 +38,6 @@
         <div class="people">{{ item.withdraw }} 人退選 / {{ item.people }} 人選課</div>
       </div>
     </div>
-    <vs-alert color="info" v-if="!data.length">
-      <template #title>沒有資料</template>
-      可能是學期尚未開始或是沒有選課資料，你可以嘗試點選右上角按鈕切換資料集來查看其他學期的資料
-    </vs-alert>
-    <vs-dialog overflow-hidden v-model="downloadDialog">
-      <template #header>
-        <h4>下載資料</h4>
-      </template>
-      <p style="margin:0;margin-top: -1rem;font-size: .8em;opacity: .8;">請選擇檔案格式</p>
-      <div style="display:flex;">
-        <vs-button
-          icon
-          color="primary"
-          block
-          flat
-          @click="exportFile('csv')">
-          <i class='bx bxs-file-blank'></i>
-          CSV
-        </vs-button>
-        <vs-button
-          icon
-          color="primary"
-          block
-          flat
-          @click="exportFile('json')">
-          <i class='bx bxs-file-json'></i>
-          JSON
-        </vs-button>
-        <vs-button
-          icon
-          color="primary"
-          block
-          flat
-          @click="exportFile('xlsx')">
-          <i class='bx bxs-file-blank'></i>
-          XLSX
-        </vs-button>
-      </div>
-      <p style="margin:0;font-size: .8em;opacity: .8;">若下載的 CSV 檔案在 Excel 中顯示亂碼，請參考 <a
-          href="https://data.customs.gov.tw/News_Content.aspx?n=9530920E31D22F76&sms=34935D25C6F4E5E5&s=FFE80C41B565624B"
-          target="_blank">亂碼處理說明</a></p>
-      <template #footer>
-        <div class="datasetDialog-footer">
-          <vs-button block @click="downloadDialog = false">完成</vs-button>
-        </div>
-      </template>
-    </vs-dialog>
     <vs-dialog overflow-hidden v-model="dialog">
       <div v-if="dialogData">
         <h3>{{ dialogData.name }}</h3>
@@ -145,6 +89,42 @@
     </vs-dialog>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return ({
+      showPeopleBelow10: true,
+      period: '-recent-3-years',
+      data: null,
+      stat: null,
+      // dialog
+      dialog: false,
+      dialogData: null,
+    })
+  },
+  mounted() {
+    this.getData()
+  },
+  methods: {
+    async getData() {
+      let period = this.period == 'all' ? '' : this.period
+      this.stat = null
+      this.data = null
+      let withdrawalData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal${period}.json`)
+        .then(res => res.json())
+      this.stat = withdrawalData.stat
+      this.data = withdrawalData.data
+    },
+    openDialog(item) {
+      this.dialogData = item
+      console.log(item)
+      this.dialog = true
+    },
+  }
+}
+</script>
+
 <style lang="sass" scoped>
 
 .teachers
@@ -237,194 +217,3 @@
         font-size: 12px
         opacity: .8
 </style>
-<script>
-import * as XLSX from 'xlsx';
-export default {
-  head() {
-    return {
-      title: '退選率'
-    }
-  },
-  async created() {
-    let query = Object.assign({}, this.$route.query)
-    if (query.period) {
-      this.period = parseInt(query.period)
-    }
-    let data = await this.$getStore(`withdrawal_${this.period}`)
-    if (data) {
-      this.data = data.data
-      this.stat = data.stat
-    } else {
-      this.getData()
-    }
-  },
-  data() {
-    return ({
-      period: 1,
-      data: {},
-      dialog: false,
-      downloadDialog: false,
-      dialogData: false,
-      showPeopleBelow10: true,
-      stat: []
-    })
-  },
-  computed: {
-    year() {
-      return this.$store.state.year
-    },
-    sem() {
-      return this.$store.state.sem
-    }
-  },
-  watch: {
-    year(newCount, oldCount) {
-      this.getData()
-    },
-    sem(newCount, oldCount) {
-      this.getData()
-    }
-  },
-  methods: {
-    async getData() {
-      let period = this.period
-      let data
-      try {
-        window.gtag('event', 'view_withdraw_rate', {
-          event_category: 'view',
-          event_label: '退選率',
-          value: period
-        })
-      } catch (e) { }
-
-      if (period > 1) {
-        // update query
-        this.$router.replace({ path: '/withdrawal', query: { period } }, () => { })
-        //getdata
-        let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/main.json`).then(x => x.json())
-        res = Object.entries(res)
-          .map(([y, s]) => s.map(x => ({ year: y, sem: x })))
-          .flat()
-          .reverse()
-          .slice(0, period)
-          .reverse()
-
-        data = res.map(async ({ year, sem }) => (await this.$fetchCourse(year, sem, 0, false)).map(x => ({ ...x, year, sem })))
-        data = await Promise.all(data)
-        data = data.flat()
-      } else {
-        // update query
-        this.$router.replace({ path: '/withdrawal', query: {} }, () => { })
-        //getdata
-        let { year, sem } = this.$store.state
-        data = (await this.$fetchCourse(year, sem, 0, false)).map(x => ({ ...x, year, sem }))
-      }
-      let result = {}
-      let totalPeople = 0, totalWithdraw = 0, totalCourse = 0
-      for (let course of data) {
-        for (let teacher of course.teacher) {
-          let name = teacher.name
-          if (!result[name]) {
-            result[name] = {
-              name,
-              withdraw: 0,
-              people: 0,
-              course: [],
-              rate: -1
-            }
-          }
-          result[name].withdraw += parseInt(course.peopleWithdraw)
-          result[name].people += parseInt(course.people)
-          result[name].course.push(course)
-          totalPeople += parseInt(course.people)
-          totalWithdraw += parseInt(course.peopleWithdraw)
-          totalCourse++
-        }
-      }
-      // calc rate
-      for (let name in result) {
-        let item = result[name]
-        item.rate = item.withdraw / item.people
-        // 四捨五入
-        item.rate_percent = (item.rate * 100).toFixed(2)
-      }
-      this.stat = [{
-        value: (totalWithdraw / totalPeople * 100).toFixed(2) + '%',
-        title: '平均退選率',
-      },]
-      // sort by rate
-      this.data = Object.values(result).filter(x => x.people).sort((a, b) => b.rate - a.rate)
-      // calc quartiles
-      let rates = this.data.sort().map(x => x.rate * 100).reverse()
-      let quartiles = Math.floor(rates.length / 4)
-      let q1 = rates[quartiles]
-      let q2 = rates[quartiles * 2]
-      let q3 = rates[quartiles * 3]
-      this.stat.push({
-        value: q1.toFixed(2) + '% - ' + q2.toFixed(2) + '% - ' + q3.toFixed(2) + '%',
-        title: '退選率分位數'
-      })
-      // store
-      await this.$setStore(`withdrawal_${this.period}`, { stat: this.stat, data: this.data }, 30)
-    },
-    openDialog(item) {
-      this.dialogData = item
-      this.dialog = true
-    },
-    exportFile(filetype) {
-      let data = this.data.map(x => ({
-        '姓名': x.name,
-        '退選率': x.rate,
-        '退選人數': x.withdraw,
-        '選課人數': x.people,
-        '課程數': x.course.length,
-        '課程代碼': x.course.map(x => x.id).join(', ')
-      }))
-      if (filetype == 'xlsx') {
-        let workbanch = XLSX.utils.book_new()
-        let worksheet = XLSX.utils.json_to_sheet(data)
-        XLSX.utils.book_append_sheet(workbanch, worksheet, '退選率')
-        let courseData = this.data
-          .map(x => x.course)
-          .flat()
-          .map(x => ({
-            '年': x.year,
-            '學期': x.sem,
-            '課程代碼': x.id,
-            '課程類型': x.courseType,
-            '課程名稱': x.name.zh,
-            '英文課程名稱': x.name.en,
-            '教師': x.teacher.map(x => x.name).join(', '),
-            '選課人數': x.people,
-            '退選人數': x.peopleWithdraw,
-            '連結': `${location.origin}/course/${x.year}/${x.sem}/${x.id}`
-          }))
-          .filter((x, i, self) => self.findIndex(y => y.課程代碼 == x.課程代碼) == i)
-          .sort((a, b) => a.課程代碼.localeCompare(b.課程代碼))
-        let worksheet2 = XLSX.utils.json_to_sheet(courseData)
-        XLSX.utils.book_append_sheet(workbanch, worksheet2, '課程')
-        XLSX.writeFile(workbanch, this.getExportFileName('xlsx'))
-      } else if (filetype == 'json') {
-        this.downloadFile({ type: 'text/plain;charset=utf-8', data: JSON.stringify(this.data), ext: 'json' })
-      } else if (filetype == 'csv') {
-        let csv = this.$papa.unparse(data)
-        this.downloadFile({ type: 'text/csv;charset=utf-8;', data: csv, ext: 'csv' })
-      }
-    },
-    getExportFileName(ext) {
-      return this.period != 1
-        ? `北科課程好朋友_過去 ${this.period / 2} 年_退選率.${ext}`
-        : `北科課程好朋友_${this.year} 年${this.sem == '1' ? '上' : '下'}學期_退選率.${ext}`
-    },
-    downloadFile({ type, data, ext }) {
-      let blob = new Blob([data], { type })
-      let link = document.createElement('a')
-      link.href = URL.createObjectURL(blob)
-
-      link.download = this.getExportFileName(ext)
-
-      link.click()
-    }
-  }
-}
-</script>

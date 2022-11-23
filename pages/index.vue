@@ -56,7 +56,7 @@
         <p>查看沒有課程進行的教室</p>
         <i class="bx bx-ghost"></i>
       </card>
-      <card class="hoverable padding" to="/withdrawal?period=10">
+      <card class="hoverable padding" to="/withdrawal">
         <card-title>退選率</card-title>
         <p>查看所有教師的退選率</p>
         <i class="bx bx-user-x"></i>
