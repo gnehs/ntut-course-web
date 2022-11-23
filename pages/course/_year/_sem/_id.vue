@@ -100,10 +100,6 @@
       <h3>課程概述</h3>
       <p v-html="parseTextarea(courseData.description.zh)" />
       <p v-html="parseTextarea(courseData.description.en)" />
-      <div v-if="courseData.consultation">
-        <h3>課程諮詢管道</h3>
-        <p v-html="courseData.consultation" />
-      </div>
       <div v-if="courseData.notes.trim() != ''">
         <h3>備註</h3>
         <p v-html="parseTextarea(courseData.notes)" />
@@ -189,6 +185,10 @@
             <p v-html="parseTextarea(item.scorePolicy)" />
             <h3>使用教材、參考書目或其他</h3>
             <p v-html="parseTextarea(item.materials)" />
+            <div v-if="item.consultation">
+              <h3>課程諮詢管道</h3>
+              <p v-html="item.consultation" />
+            </div>
             <template v-if="item.remarks">
               <h3>備註</h3>
               <p v-html="parseTextarea(item.remarks)" />
