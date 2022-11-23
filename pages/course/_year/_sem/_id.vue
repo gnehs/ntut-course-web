@@ -314,8 +314,8 @@ export default {
         }
 
         let withdrawalRate = await this.$getWithdrawalRate()
-        let clacedWithdrawalRate = Math.max(this.fetchedCourseData.map(x => x.name).map(x => withdrawalRate[x] ?? null).filter(x => x != undefined))
-        this.withdrawalRate = clacedWithdrawalRate ?? null
+        let calcedWithdrawalRate = Math.max(...this.fetchedCourseData.map(x => x.name).map(x => withdrawalRate[x] ?? null).filter(x => x))
+        this.withdrawalRate = calcedWithdrawalRate ?? null
       } catch (e) {
         this.onError = e
         loading.close()
