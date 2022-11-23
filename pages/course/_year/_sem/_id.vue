@@ -102,7 +102,7 @@
       <p v-html="parseTextarea(courseData.description.en)" />
       <div v-if="courseData.consultation">
         <h3>課程諮詢管道</h3>
-        <p v-html="consultation" />
+        <p v-html="courseData.consultation" />
       </div>
       <div v-if="courseData.notes.trim() != ''">
         <h3>備註</h3>
