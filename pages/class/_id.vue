@@ -8,8 +8,7 @@
         <vs-button
           transparent
           :active="showConflictCourse"
-          @click="showConflictCourse = !showConflictCourse"
-        >
+          @click="showConflictCourse = !showConflictCourse">
           <i class="bx bx-check" v-if="showConflictCourse"></i>
           <i class="bx bx-x" v-else></i>衝堂課程
         </vs-button>
@@ -30,21 +29,19 @@
       v-show="result && result.length"
       :courses="result"
       show-timetable
-      :show-conflict-course="showConflictCourse"
-    />
+      :show-conflict-course="showConflictCourse" />
     <vs-alert v-if="result && !result.length && classData">
       <template #title>查無資料</template>
-      資料抓取時似乎沒有抓到這邊的資料（？
-      <br />也許你可以試試看
+      你是非日間部的學生嗎？請點選右上角的按鈕來選擇學制。
+      <br />或是
       <a
         :href="'https://aps.ntut.edu.tw/course/tw/' + classData.href"
-        target="_blank"
-      >前往原始網頁</a>
+        target="_blank">前往原始網頁</a>
       看看原本的資料
     </vs-alert>
   </div>
 </template>
-  
+
 <script>
 export default {
   data: () => ({

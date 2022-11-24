@@ -30,19 +30,19 @@
       </div>
       <div class="r">
         <vs-button
-          transparent
+          flat
           :active="selectedDepartment == 'main'"
           @click="selectedDepartment = 'main'">
           日間部
         </vs-button>
         <vs-button
-          transparent
+          flat
           :active="selectedDepartment == '進修部'"
           @click="selectedDepartment = '進修部'">
           進修部
         </vs-button>
         <vs-button
-          transparent
+          flat
           :active="selectedDepartment == '研究所(日間部、進修部、週末碩士班)'"
           @click="selectedDepartment = '研究所(日間部、進修部、週末碩士班)'">
           研究所
