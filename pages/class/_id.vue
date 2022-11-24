@@ -32,7 +32,7 @@
       :show-conflict-course="showConflictCourse" />
     <vs-alert v-if="result && !result.length && classData">
       <template #title>查無資料</template>
-      你是非日間部的學生嗎？請點選右上角的按鈕來選擇學制。
+      請點選右上角的按鈕來切換學制看看。
       <br />或是
       <a
         :href="'https://aps.ntut.edu.tw/course/tw/' + classData.href"
