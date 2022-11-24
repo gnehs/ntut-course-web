@@ -24,9 +24,33 @@
         <p>{{ item.name }}</p>
       </card>
     </div>
-    <h3 v-if="teacher">課程</h3>
-    <div class="course-items" v-if="teacher">
-      <div class="course-item" v-for="course of teacher.course" :key="course.id"
+    <div class="lr-container" v-if="teacher">
+      <div class="l" style="display:block;">
+        <h3 v-if="teacher">課程</h3>
+      </div>
+      <div class="r">
+        <vs-button
+          transparent
+          :active="selectedDepartment == 'main'"
+          @click="selectedDepartment = 'main'">
+          日間部
+        </vs-button>
+        <vs-button
+          transparent
+          :active="selectedDepartment == '進修部'"
+          @click="selectedDepartment = '進修部'">
+          進修部
+        </vs-button>
+        <vs-button
+          transparent
+          :active="selectedDepartment == '研究所(日間部、進修部、週末碩士班)'"
+          @click="selectedDepartment = '研究所(日間部、進修部、週末碩士班)'">
+          研究所
+        </vs-button>
+      </div>
+    </div>
+    <div class="course-items" v-if="courses">
+      <div class="course-item" v-for="course of courses" :key="course.id"
         @click="$router.push(`/course/${course.year}/${course.sem}/${course.id}`)">
         <div class="info">
           <div class="id">{{ course.id }} </div>
@@ -51,6 +75,9 @@
         </div>
       </div>
     </div>
+    <div v-if="courses && !courses.length">
+      <p>尚無課程，請選擇其他分類</p>
+    </div>
   </div>
 </template>
 
@@ -69,8 +96,17 @@ export default {
   data() {
     return {
       teacher: null,
+      courses: null,
+      isCourseFiltered: false,
       stats: [],
       onError: null,
+      selectedDepartment: localStorage.getItem('data-department') || 'main',
+    }
+  },
+  watch: {
+    selectedDepartment() {
+      localStorage.setItem('data-department', this.selectedDepartment)
+      this.getTeacher()
     }
   },
   mounted() {
@@ -91,6 +127,10 @@ export default {
         return
       }
       this.teacher = withdrawalData.data.filter(x => x.name === this.name)[0]
+      this.courses = this.teacher.course.filter(x => x.department === this.selectedDepartment)
+      if (this.courses.length != this.teacher.course.length) {
+        this.isCourseFiltered = true
+      }
       this.stats = [
         {
           name: `近三年退選率`,
