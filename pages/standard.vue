@@ -60,7 +60,7 @@
       <template v-if="department && currentDepartment">
         <h3>{{ department }}</h3>
         <div class="cards" style="--card-row: 5; --card-row-sm: 3">
-          <card v-for="item of Object.entries(currentDepartment.credits)" :key="item[0]" v-show="item[1]!=0">
+          <card v-for="item of Object.entries(currentDepartment.credits)" :key="item[0]" v-show="item[1] != 0">
             <card-title>{{ item[1] }}</card-title>
             <p>{{ item[0] }}</p>
           </card>
@@ -83,7 +83,9 @@
         </div>
       </template>
     </template>
+    <loader v-else />
   </div>
+  <loader v-else />
 </template>
 <style lang="sass" scoped>
 .course-items
@@ -168,35 +170,29 @@ export default {
   },
   methods: {
     async fetchYearsData() {
-      let loading
       try {
+        this.years = null
         let res = await this.$getStore('standards')
         if (!res) {
-          loading = this.$vs.loading()
           res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/standards.json`).then(x => x.json())
-          loading.close()
         }
         this.years = structuredClone(res)
         await this.$setStore('standards', res, 30)
       } catch (e) {
         this.onError = e
-        loading.close()
       }
     },
     async fetchYearData(yr) {
-      let loading
+      this.standardData = null
       try {
         let res = await this.$getStore(`standard_${yr}`)
         if (!res) {
-          loading = this.$vs.loading()
           res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`).then(x => x.json())
-          loading.close()
         }
         this.standardData = structuredClone(res)
         await this.$setStore(`standard_${yr}`, res, 30)
       } catch (e) {
         this.onError = e
-        loading.close()
       }
     },
     parseDepartmentData(data) {
