@@ -13,7 +13,7 @@
   height: 100%
   margin-top: 64px
 .loader
-  border: 4px solid rgba(var(--vs-gray-4), 1)
+  border: 4px solid rgba(var(--vs-text), .1)
   border-radius: 50%
   border-top: 4px solid rgba(var(--vs-primary), 1)
   width: 48px
