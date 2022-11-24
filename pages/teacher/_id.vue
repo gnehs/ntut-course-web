@@ -106,7 +106,7 @@ export default {
   watch: {
     selectedDepartment() {
       localStorage.setItem('data-department', this.selectedDepartment)
-      this.getTeacher()
+      this.filterCourse()
     }
   },
   mounted() {
@@ -127,7 +127,7 @@ export default {
         return
       }
       this.teacher = withdrawalData.data.filter(x => x.name === this.name)[0]
-      this.courses = this.teacher.course.filter(x => x.department === this.selectedDepartment)
+      this.filterCourse()
       if (this.courses.length != this.teacher.course.length) {
         this.isCourseFiltered = true
       }
@@ -146,6 +146,9 @@ export default {
         }
       ]
     },
+    filterCourse() {
+      this.courses = this.teacher.course.filter(x => x.department === this.selectedDepartment)
+    }
   },
 }
 </script>
