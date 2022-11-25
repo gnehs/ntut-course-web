@@ -263,6 +263,7 @@ export default {
     pointer-events: none
     @media screen and (max-width: 768px)
       max-height: calc(100vh - 192px)
+      max-height: calc(100svh - 192px)
     .search-autocomplete-item
       display: flex
       align-items: center
