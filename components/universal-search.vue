@@ -3,7 +3,7 @@
     <div class="search-box">
       <input
         type="text"
-        placeholder="輸入課號、課程名稱、教師、班級等關鍵字⋯"
+        placeholder="搜尋課程、教師或是班級⋯"
         ref="searchInput"
         v-model="searchInput"
         @input="searchInputChange"
