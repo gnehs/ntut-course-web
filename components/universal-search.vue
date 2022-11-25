@@ -250,6 +250,7 @@ export default {
     border-radius: 8px
     background-color: rgba(var(--vs-gray-1), .95)
     backdrop-filter: blur(8px)
+    -webkit-backdrop-filter: blur(8px)
     width: 100%
     margin-top: 8px
     box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-background-opacity,.02))
@@ -262,8 +263,7 @@ export default {
     transform: translateY(-8px)
     pointer-events: none
     @media screen and (max-width: 768px)
-      max-height: calc(100vh - 192px)
-      max-height: calc(100svh - 192px)
+      max-height: 256px
     .search-autocomplete-item
       display: flex
       align-items: center
@@ -271,6 +271,8 @@ export default {
       overflow: hidden
       &:not(:first-child)
         border-top: 1px solid rgba(var(--vs-gray-4), 1)
+        @media (prefers-color-scheme: dark)
+          border-top: 1px solid rgba(var(--vs-text), .1)
       &.focus
         background: rgba(var(--vs-text), .05)
         .search-autocomplete-item-icon
