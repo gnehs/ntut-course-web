@@ -213,13 +213,13 @@ export default {
     display: flex
     border-radius: 8px
     background: rgba(var(--vs-text), .1)
-    border: 1px solid rgba(var(--vs-gray-4), 0)
+    border: 1px solid rgba(var(--vs-text), 0)
     transition: all .2s ease
     &:hover
       background: rgba(var(--vs-text), .05)
     &:has(input:focus)
       background: rgba(var(--vs-gray-1), 1)
-      border: 1px solid rgba(var(--vs-gray-4), 1)
+      border: 1px solid rgba(var(--vs-text), .05)
       box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
     input,
     button
@@ -228,6 +228,7 @@ export default {
       padding: 16px 24px
       background-color: transparent
       font-size: 16px
+      color: rgba(var(--vs-text), 1)
     input
       flex: 1
     button
