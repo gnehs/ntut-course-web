@@ -88,7 +88,7 @@ export default {
               .map(course => ({
                 id: genRandomId(),
                 type: 'course',
-                to: `/course/${course.year}/${course.sem}/${course.id}`,
+                to: `/course/${year}/${sem}/${course.id}`,
                 category: course.id,
                 text: course.name.zh,
                 //course,
