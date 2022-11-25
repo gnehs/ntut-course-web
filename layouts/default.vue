@@ -191,8 +191,8 @@ export default {
         })
         loading.close()
 
-        this.$store.commit('updateYear', '109')
-        this.$store.commit('updateSem', '2')
+        this.$store.commit('updateYear', '111')
+        this.$store.commit('updateSem', '1')
         this.$store.commit('updateDepartment', 'main')
       }
     }
