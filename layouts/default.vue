@@ -4,12 +4,6 @@
       <template #left>
         <router-link to="/" class="site-title" @click="trackBtn('nav_logo_click')">🍤 北科課程好朋友</router-link>
       </template>
-      <vs-navbar-item :active="active == '/'" to="/" @click="trackBtn('nav_home_link_click')">首頁</vs-navbar-item>
-      <vs-navbar-item
-        :active="active == '/search'"
-        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}`"
-        id="search"
-        @click="trackBtn('nav_search_link_click')">搜尋</vs-navbar-item>
       <template #right>
         <vs-button
           @click="datasetDialog = true;trackBtn('nav_dataset_click')"

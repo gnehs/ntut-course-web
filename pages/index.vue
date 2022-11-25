@@ -1,5 +1,6 @@
 <template>
   <div>
+    <universal-search />
     <h1>
       {{ `${$store.state.year} 年${$store.state.sem == '1' ? '上' : '下'}學期` }} -
       {{ $store.state.department == 'main' ? '日間部' : $store.state.department }}
@@ -14,8 +15,8 @@
       <card
         class="hoverable padding"
         :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`">
-        <card-title>搜尋課程</card-title>
-        <p>依課號、關鍵字或教師搜尋課程</p>
+        <card-title>進階搜尋</card-title>
+        <p>透過進階條件搜尋課程</p>
         <i class="bx bx-search"></i>
       </card>
       <card
@@ -105,7 +106,9 @@
 </template>
 
 <script>
+import universalSearch from '~/components/universal-search.vue'
 export default {
+  components: { universalSearch },
   data: () => ({
     standardURL: `/standard`
   }),
