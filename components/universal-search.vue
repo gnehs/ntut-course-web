@@ -215,12 +215,19 @@ export default {
     background: rgba(var(--vs-text), .1)
     border: 1px solid rgba(var(--vs-text), 0)
     transition: all .2s ease
+    @media (prefers-color-scheme: dark)
+      background: rgba(var(--vs-text), .05)
     &:hover
       background: rgba(var(--vs-text), .05)
+      @media (prefers-color-scheme: dark)
+        background: rgba(var(--vs-text), .075)
     &:has(input:focus)
       background: rgba(var(--vs-gray-1), 1)
-      border: 1px solid rgba(var(--vs-text), .05)
+      border: 1px solid rgba(var(--vs-gray-4), 1)
       box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-shadow-opacity,.05))
+      @media (prefers-color-scheme: dark)
+        background-color: rgba(var(--vs-background), 1)
+        border: 1px solid rgba(var(--vs-text), .05)
     input,
     button
       border: none
@@ -248,9 +255,7 @@ export default {
   .search-autocomplete-items
     position: absolute
     border-radius: 8px
-    background-color: rgba(var(--vs-gray-1), .95)
-    backdrop-filter: blur(8px)
-    -webkit-backdrop-filter: blur(8px)
+    background-color: rgba(var(--vs-background), 1)
     width: 100%
     margin-top: 8px
     box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-background-opacity,.02))
