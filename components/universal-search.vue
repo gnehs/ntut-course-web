@@ -15,7 +15,10 @@
         @keydown.esc.prevent="onEsc"
         @mouseenter="currentSelectionIndex = -1"
         autocomplete="off" />
-      <button>
+      <button v-if="searchInput.length" @click="searchInput = ''">
+        <i class='bx bx-x'></i>
+      </button>
+      <button v-else>
         <i class='bx bx-loader-alt bx-spin' v-if="loading"></i>
         <i class='bx bx-search' v-else></i>
       </button>
@@ -53,7 +56,7 @@
 export default {
   data() {
     return {
-      searchInput: null,
+      searchInput: '',
       searchAutocompleteItems: [],
       currentSelectionIndex: -1,
       loading: false,
