@@ -35,7 +35,13 @@
             {{ item.text }}
           </div>
         </div>
-        <div class="search-autocomplete-item-icon"><i class='bx bx-right-arrow-alt'></i></div>
+        <div class="search-autocomplete-item-icon" v-if="item.history">
+          <i class='bx bx-right-arrow-alt' v-if="currentSelectionIndex == i" />
+          <i class='bx bx-history' v-else />
+        </div>
+        <div class="search-autocomplete-item-icon" v-else>
+          <i class='bx bx-right-arrow-alt' />
+        </div>
       </div>
     </div>
   </div>
@@ -58,6 +64,9 @@ export default {
     }
   },
   methods: {
+    loadSearchHistory() {
+      this.searchAutocompleteItems = JSON.parse(localStorage[`search-history`] || '[]').reverse()
+    },
     async fetchCourseData() {
       if (!this.courseData) {
         this.courseData = await this.$fetchCourse()
@@ -155,6 +164,8 @@ export default {
           .sort((a, b) => keywords.some(x => a.text.toLowerCase().includes(x)) ? -1 : 1)
           .slice(0, 20)
         )
+      } else {
+        this.loadSearchHistory()
       }
       this.searchAutocompleteItems = searchAutocompleteItems.slice(0, 50)
       this.currentSelectionIndex = -1
@@ -195,6 +206,10 @@ export default {
       }
     },
     selectItem(item) {
+      let searchHistory = JSON.parse(localStorage[`search-history`] || '[]')
+      searchHistory.push({ ...item, history: true })
+      searchHistory = searchHistory.slice(-10)
+      localStorage[`search-history`] = JSON.stringify(searchHistory)
       if (item.to) {
         this.$router.push(item.to)
       }
