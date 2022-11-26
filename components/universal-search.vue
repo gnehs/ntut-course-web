@@ -15,7 +15,7 @@
         @keydown.esc.prevent="onEsc"
         @mouseenter="currentSelectionIndex = -1"
         autocomplete="off" />
-      <button v-if="searchInput.length" @click="searchInput = ''">
+      <button v-if="searchInput.length" @click="searchInput = ''; searchInputChange()">
         <i class='bx bx-x'></i>
       </button>
       <button v-else>
@@ -195,7 +195,7 @@ export default {
       this.currentSelectionIndex = -1
       this.$refs.searchInput.scrollIntoView({
         behavior: 'smooth',
-        block: 'nearest',
+        block: 'start',
         inline: 'nearest',
       });
     },
@@ -253,8 +253,11 @@ export default {
   position: relative
   width: 100%
   margin: 0 auto
+  --margin-top: 8px
+  --padding: calc(var(--margin-top) * 2) calc(var(--margin-top) * 3)
   &.navbar
     width: 512px
+    --margin-top: 4px
     @media screen and (max-width: 768px)
       width: 324px
   .search-box
@@ -280,12 +283,13 @@ export default {
     button
       border: none
       outline: none
-      padding: 16px 24px
+      padding: var(--padding)
       background-color: transparent
       font-size: 16px
       color: rgba(var(--vs-text), 1)
     input
       flex: 1
+      scroll-margin-top: 50px
     button
       cursor: pointer
       color: rgba(var(--vs-text), .8)
@@ -303,15 +307,12 @@ export default {
   &.navbar
     .search-box
       margin: 4px 0
-      input,
-      button
-        padding: 8px 16px
   .search-autocomplete-items
     position: absolute
     border-radius: 8px
     background-color: rgba(var(--vs-background), 1)
     width: 100%
-    margin-top: 8px
+    margin-top: var(--margin-top)
     box-shadow: 0 20px 20px 0 rgba(0,0,0,var(--vs-background-opacity,.02))
     max-height: 512px
     overflow-y: auto
@@ -338,7 +339,7 @@ export default {
           transform: translateX(3px)
       .search-autocomplete-item-content
         flex: 1
-        padding: 16px 24px
+        padding: var(--padding)
         .search-autocomplete-item-category
           font-size: 12px
           opacity: .8
@@ -346,7 +347,7 @@ export default {
           font-size: 16px
           font-weight: bold
       .search-autocomplete-item-icon
-        padding: 16px 24px
+        padding: var(--padding)
         transition: all .2s ease
         i
           font-size: 24px
