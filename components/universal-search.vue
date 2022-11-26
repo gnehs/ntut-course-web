@@ -98,7 +98,7 @@ export default {
             ...courses
               .filter(course => course.id.includes(val))
               .map(course => ({
-                id: genRandomId(),
+                id: `${year}/${sem}/${course.id}`,
                 type: 'course',
                 to: `/course/${year}/${sem}/${course.id}`,
                 category: course.id,
@@ -118,7 +118,7 @@ export default {
             )
           )
             .map(x => ({
-              id: genRandomId(),
+              id: `${x}?year=${year}&sem=${sem}&d=${department}`,
               type: 'class',
               to: `/class/${x}?year=${year}&sem=${sem}&d=${department}`,
               category: `班級`,
@@ -137,7 +137,7 @@ export default {
             )
           )
             .map(x => ({
-              id: genRandomId(),
+              id: `teacher/${x}`,
               type: 'teacher',
               to: `/teacher/${x}`,
               category: `教師`,
@@ -157,7 +157,7 @@ export default {
         }
         searchAutocompleteItems.push(...autocompleteCourses
           .map(course => ({
-            id: genRandomId(),
+            id: `${year}/${sem}/${course.id}`,
             type: 'course',
             to: `/course/${year}/${sem}/${course.id}`,
             category: `${course.id} ${course.teacher.map(x => x.name).join(' ')}`,
@@ -212,7 +212,7 @@ export default {
     selectItem(item) {
       let searchHistory = JSON.parse(localStorage[`search-history`] || '[]')
       searchHistory.push({ ...item, history: true })
-      searchHistory = searchHistory.slice(-10)
+      searchHistory = searchHistory.slice(-10).reverse().filter((x, i, a) => a.findIndex(y => y.id === x.id) === i).reverse()
       localStorage[`search-history`] = JSON.stringify(searchHistory)
       if (item.to) {
         this.$router.push(item.to)
