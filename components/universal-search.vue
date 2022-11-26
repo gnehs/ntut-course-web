@@ -1,5 +1,5 @@
 <template>
-  <div class="search-box-container">
+  <div class="search-box-container" :class="{ navbar }">
     <div class="search-box">
       <input
         type="text"
@@ -13,9 +13,11 @@
         @keydown.up.prevent="onArrowUp"
         @keydown.enter.tab.prevent="selectCurrentSelection"
         @keydown.esc.prevent="onEsc"
+        @mouseenter="currentSelectionIndex = -1"
         autocomplete="off" />
       <button>
-        <i class='bx bx-search'></i>
+        <i class='bx bx-loader-alt bx-spin' v-if="loading"></i>
+        <i class='bx bx-search' v-else></i>
       </button>
     </div>
     <div class="search-autocomplete-items">
@@ -54,6 +56,7 @@ export default {
       searchInput: null,
       searchAutocompleteItems: [],
       currentSelectionIndex: -1,
+      loading: false,
     }
   },
   mounted() {
@@ -64,6 +67,18 @@ export default {
       if (this.currentSelectionIndex >= 0) {
         this.scrollSelectionIntoView()
       }
+    },
+    year(newCount, oldCount) {
+      this.fetchCourseData()
+    },
+    sem(newCount, oldCount) {
+      this.fetchCourseData()
+    }
+  },
+  props: {
+    navbar: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -71,9 +86,11 @@ export default {
       this.searchAutocompleteItems = JSON.parse(localStorage[`search-history`] || '[]').reverse()
     },
     async fetchCourseData() {
+      this.loading = true
       if (!this.courseData) {
         this.courseData = await this.$fetchCourse()
       }
+      this.loading = false
       return this.courseData
     },
     async searchInputChange() {
@@ -216,6 +233,7 @@ export default {
       localStorage[`search-history`] = JSON.stringify(searchHistory)
       if (item.to) {
         this.$router.push(item.to)
+        this.onEsc()
       }
     }
   },
@@ -228,6 +246,10 @@ export default {
   width: 100%
   max-width: 512px
   margin: 0 auto
+  &.navbar
+    width: 512px
+    @media screen and (max-width: 768px)
+      width: 324px
   .search-box
     display: flex
     border-radius: 8px
@@ -271,13 +293,19 @@ export default {
       &:active
         transform: scale(.9)
 
+  &.navbar
+    .search-box
+      margin: 4px 0
+      input,
+      button
+        padding: 8px 16px
   .search-autocomplete-items
     position: absolute
     border-radius: 8px
     background-color: rgba(var(--vs-background), 1)
     width: 100%
     margin-top: 8px
-    box-shadow: 0 5px 20px 0 rgba(0,0,0,var(--vs-background-opacity,.02))
+    box-shadow: 0 20px 20px 0 rgba(0,0,0,var(--vs-background-opacity,.02))
     max-height: 512px
     overflow-y: auto
     transition: all .2s ease

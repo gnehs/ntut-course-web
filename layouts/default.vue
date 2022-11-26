@@ -4,9 +4,10 @@
       <template #left>
         <router-link to="/" class="site-title" @click="trackBtn('nav_logo_click')">🍤 北科課程好朋友</router-link>
       </template>
+      <universal-search navbar />
       <template #right>
         <vs-button
-          @click="datasetDialog = true;trackBtn('nav_dataset_click')"
+          @click="datasetDialog = true; trackBtn('nav_dataset_click')"
           :disabled="Boolean($route.query.year)">{{ parseYearSemVal(yearSemVal) }}</vs-button>
       </template>
     </vs-navbar>
@@ -42,7 +43,7 @@
             :value="item"
             :key="i">
             {{
-            parseYearSemVal(item)
+                parseYearSemVal(item)
             }}
           </vs-option>
         </vs-select>
@@ -264,8 +265,8 @@ export default {
       localStorage[myCourseKey] = JSON.stringify(myCourseData)
     }
     Vue.prototype.$getWithdrawalRate = async () => {
-      let res =await this.$getStore('withdrawalRate')
-      if(!res){
+      let res = await this.$getStore('withdrawalRate')
+      if (!res) {
         res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json`).then(x => x.json())
         await this.$setStore('withdrawalRate', res, 30)
       }
