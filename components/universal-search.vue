@@ -193,6 +193,11 @@ export default {
         this.loadSearchHistory()
       }
       this.currentSelectionIndex = -1
+      this.$refs.searchInput.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      });
     },
     scrollSelectionIntoView() {
       this.$nextTick(() => {

@@ -128,7 +128,7 @@ export default {
   .title
     font-weight: bold
   .department
-    color: #666
+    color: rgba(var(--vs-text), .75)
     font-weight: 400
     font-size: .5em
     display: inline-block
