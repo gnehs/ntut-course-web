@@ -56,6 +56,9 @@ export default {
       currentSelectionIndex: -1,
     }
   },
+  mounted() {
+    this.loadSearchHistory()
+  },
   watch: {
     currentSelectionIndex() {
       if (this.currentSelectionIndex >= 0) {
@@ -164,10 +167,11 @@ export default {
           .sort((a, b) => keywords.some(x => a.text.toLowerCase().includes(x)) ? -1 : 1)
           .slice(0, 20)
         )
+
+        this.searchAutocompleteItems = searchAutocompleteItems.slice(0, 50)
       } else {
         this.loadSearchHistory()
       }
-      this.searchAutocompleteItems = searchAutocompleteItems.slice(0, 50)
       this.currentSelectionIndex = -1
     },
     scrollSelectionIntoView() {
