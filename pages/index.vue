@@ -1,10 +1,10 @@
 <template>
   <div>
-    <universal-search class="universal-search" />
     <div class="header">
       <div class="department"> {{ $store.state.department == 'main' ? '日間部' : $store.state.department }}</div>
       <div class="title"> {{ `${$store.state.year} 年${$store.state.sem == '1' ? '上' : '下'}學期` }}</div>
     </div>
+    <universal-search class="universal-search" />
     <upcoming-course />
     <h2>課程</h2>
     <div class="cards">
@@ -137,6 +137,6 @@ export default {
     border: 1px solid rgba(var(--vs-text), .25)
 .universal-search
   display: none
-  @media screen and (max-width: 678.9px)
+  @media screen and (max-width: 900px)
     display: block
 </style>

@@ -244,7 +244,6 @@ export default {
 .search-box-container
   position: relative
   width: 100%
-  max-width: 512px
   margin: 0 auto
   &.navbar
     width: 512px
