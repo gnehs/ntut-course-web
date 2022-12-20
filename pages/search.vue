@@ -32,6 +32,12 @@
         </card>
         <card class="borderless">
           <p>篩選</p>
+          <vs-button flat @click="courseStandardDialog = true">
+            <i class="bx bxs-filter-alt"></i>依課程標準篩選
+          </vs-button>
+        </card>
+        <card class="borderless">
+          <p>篩選</p>
           <vs-button flat @click="timetableDialog = true">
             <i class="bx bxs-filter-alt"></i>依時間篩選
           </vs-button>
@@ -82,6 +88,26 @@
           <div class="r" style="width: 50%">
             <vs-button style="min-width: 64px" @click="resetCategory">重置</vs-button>
             <vs-button style="min-width: 64px" @click="categoryDialog = false; searchCourse()">完成</vs-button>
+          </div>
+        </div>
+      </template>
+    </vs-dialog>
+    <vs-dialog v-model="courseStandardDialog">
+      <template #header>
+        <h4 style="margin: 0">依課程標準篩選課程</h4>
+      </template>
+      <div>
+        <vs-checkbox v-model="courseStandardFilter[symbol]" v-for="[symbol, text] of Object.entries(courseStandard)" :key="item">
+          {{ symbol }} {{ text }}
+        </vs-checkbox>
+      </div>
+      <template #footer>
+        <div class="lr-container nowrap">
+          <div class="l" style="width: 50%">
+          </div>
+          <div class="r" style="width: 50%">
+            <vs-button style="min-width: 64px" @click="resetStandardDialog">重置</vs-button>
+            <vs-button style="min-width: 64px" @click="courseStandardDialog = false; searchCourse()">完成</vs-button>
           </div>
         </div>
       </template>
@@ -175,7 +201,24 @@ export default {
       wed: [],
       thu: [],
       fri: []
-    }
+    },
+    courseStandard: {
+      '○': '部訂共同必修',
+      '△': '校訂共同必修',
+      '☆': '共同選修',
+      '●': '部訂專業必修',
+      '▲': '校訂專業必修',
+      '★': '專業選修'
+    },
+    courseStandardDialog: false,
+    courseStandardFilter: {
+      '○': true,
+      '△': true,
+      '☆': true,
+      '●': true,
+      '▲': true,
+      '★': true
+    },
   }),
   head() {
     return {
@@ -293,6 +336,12 @@ export default {
         } else {
           delete query.category
         }
+        // courseStandardFilter
+        for (let standard of Object.keys(this.courseStandardFilter)) {
+          if (!this.courseStandardFilter[standard]) {
+            course = course.filter(x => x.courseType !== standard)
+          }
+        }
         //
         this.searchResult = course
         this.$router.replace({ path: '/search', query }, () => { })
@@ -315,6 +364,16 @@ export default {
     },
     resetCategory() {
       this.categoryFilter = []
+    },
+    resetStandardDialog() {
+      this.courseStandardFilter = {
+        '○': true,
+        '△': true,
+        '☆': true,
+        '●': true,
+        '▲': true,
+        '★': true
+      }
     },
     toggleLesson(date, time) {
       if (date && time) {
