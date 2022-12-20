@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 v-if="searchClass=='^博雅'">博雅搜尋</h1>
+    <h1 v-if="searchClass == '^博雅'">博雅搜尋</h1>
     <h1 v-else>搜尋</h1>
     <card>
       <div class="cards" style="--card-row: 4; --card-row-sm: 2">
@@ -16,7 +16,7 @@
           <p>教師</p>
           <vs-input v-model="searchTeacher" @input="searchCourse" />
         </card>
-        <card class="borderless" v-if="searchClass=='^博雅'">
+        <card class="borderless" v-if="searchClass == '^博雅'">
           <p>博雅</p>
           <vs-button flat @click="categoryDialog = true">
             <i class="bx bxs-filter-alt"></i>依博雅類別篩選
@@ -67,12 +67,12 @@
       </div>
       <div v-if="!showOldCategory">
         <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.new" :key="item">
-          {{item}}
+          {{ item }}
         </vs-checkbox>
       </div>
       <div v-else>
         <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.old" :key="item">
-          {{item}}
+          {{ item }}
         </vs-checkbox>
       </div>
       <template #footer>
@@ -81,7 +81,7 @@
           </div>
           <div class="r" style="width: 50%">
             <vs-button style="min-width: 64px" @click="resetCategory">重置</vs-button>
-            <vs-button style="min-width: 64px" @click="categoryDialog = false;searchCourse()">完成</vs-button>
+            <vs-button style="min-width: 64px" @click="categoryDialog = false; searchCourse()">完成</vs-button>
           </div>
         </div>
       </template>
@@ -284,11 +284,8 @@ export default {
         // categoryFilter
         if (this.categoryFilter.length > 0) {
           course = course.filter(x => {
-            let cat = x.notes.replace(/◎|\*/g, '').split(/106-108：|。109 \(含\) 後：/).filter(x => x)
-            for (let c of cat) {
-              if (this.categoryFilter.includes(c)) {
-                return true
-              }
+            for (let cat of this.categoryFilter) {
+              if (x.notes.includes(cat)) return true
             }
             return false
           })
