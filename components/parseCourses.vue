@@ -1,16 +1,16 @@
 <template>
   <div v-if="courses">
     <div class="center">
-      <vs-button flat :active="layout == 'table'" @click="layout = 'table';trackBtn()">
+      <vs-button flat :active="layout == 'table'" @click="layout = 'table'; trackBtn()">
         <i class="bx bx-table"></i>表格
       </vs-button>
-      <vs-button flat :active="layout == 'card'" @click="layout = 'card';trackBtn('toggle_card_view')">
+      <vs-button flat :active="layout == 'card'" @click="layout = 'card'; trackBtn('toggle_card_view')">
         <i class="bx bx-card"></i>卡片
       </vs-button>
       <vs-button
         flat
         :active="layout == 'timetable'"
-        @click="layout = 'timetable';trackBtn('toggle_timetable_view')"
+        @click="layout = 'timetable'; trackBtn('toggle_timetable_view')"
         v-if="showTimetable">
         <i class="bx bx-time"></i>課表
       </vs-button>
@@ -51,17 +51,17 @@
           </div>
           <p>
             班級：{{
-            tr.class
-            .map((x) => x.name)
-            .join('、')
-            .trimEllip(9)
+                tr.class
+                  .map((x) => x.name)
+                  .join('、')
+                  .trimEllip(9)
             }}
             <br />
             教師：{{
-            tr.teacher
-            .map((y) => y.name)
-            .join('、')
-            .trimEllip(13)
+                tr.teacher
+                  .map((y) => y.name)
+                  .join('、')
+                  .trimEllip(13)
             }}
             <br />
             備註：{{ tr.notes.trimEllip(15) }}
@@ -98,18 +98,18 @@
             <vs-td>{{ tr.courseType }}{{ tr.name.zh }}</vs-td>
             <vs-td>
               {{
-              tr.teacher
-              .map((y) => y.name)
-              .join('、')
-              .trimEllip(9)
+                  tr.teacher
+                    .map((y) => y.name)
+                    .join('、')
+                    .trimEllip(9)
               }}
             </vs-td>
             <vs-td>
               {{
-              tr.class
-              .map((x) => x.name)
-              .join('、')
-              .trimEllip(9)
+                  tr.class
+                    .map((x) => x.name)
+                    .join('、')
+                    .trimEllip(9)
               }}
             </vs-td>
             <vs-td>
@@ -132,8 +132,8 @@
     <card style="padding: 0; overflow: hidden" v-if="layout == 'timetable'">
       <div class="grid-timetable"
         :style="{
-          gridTemplateColumns: ['[🥞time]', 'auto', weekday.map(x=>`[🥞${x}]`).join(' 1fr ') + '1fr','calc(var(--gap) / 2)', '[🥞end]'].join(' '),
-          gridTemplateRows: ['weekday',...timetable, 'end'].map(x=>`[🥞${x}]`).join(' auto ')
+          gridTemplateColumns: ['[🥞time]', 'auto', weekday.map(x => `[🥞${x}]`).join(' 1fr ') + '1fr', 'calc(var(--gap) / 2)', '[🥞end]'].join(' '),
+          gridTemplateRows: ['weekday', ...timetable, 'end'].map(x => `[🥞${x}]`).join(' auto ')
         }">
         <!-- decoration -->
         <div class="decoration-item" style="
@@ -153,7 +153,7 @@
             grid-column-start: 🥞一;
             grid-column-end: 🥞end;
             grid-row-start: 🥞${date};
-            grid-row-end: 🥞${timetable[timetable.indexOf(date)+1]||'end'};
+            grid-row-end: 🥞${timetable[timetable.indexOf(date) + 1] || 'end'};
           `" />
         <!-- time -->
         <div
@@ -184,12 +184,12 @@
         <!-- course -->
         <router-link
           class="course-item"
-          :class="{'course-conflict':item.isConflict}"
-          :style="{...parseCourseStyle(item) }"
+          :class="{ 'course-conflict': item.isConflict }"
+          :style="{ ...parseCourseStyle(item) }"
           v-for="item in timetableCourse"
           :key="item.id"
           :to="`/course/${$store.state.year}/${$store.state.sem}/${item.id}`"
-          :is="item.isConflict?'div':'router-link'">
+          :is="item.isConflict ? 'div' : 'router-link'">
           <div class="course-name" v-if="item.isConflict">
             含有多個課程
           </div>
@@ -199,13 +199,15 @@
           <div class="course-info" v-if="item.isConflict">無法顯示課程，請使用其他模式檢視</div>
           <div class="course-info" v-else>
             {{ item.teacher
-            .map((y) => y.name)
-            .join('、')
-            .trimEllip(13) }}<br />
+                .map((y) => y.name)
+                .join('、')
+                .trimEllip(13)
+            }}<br />
             {{ item.classroom
-            .map((y) => y.name)
-            .join('、')
-            .trimEllip(13) }}
+                .map((y) => y.name)
+                .join('、')
+                .trimEllip(13)
+            }}
           </div>
         </router-link>
       </div>
