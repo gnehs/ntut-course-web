@@ -173,10 +173,10 @@ export default {
     showOldCategory: false,
     categoryFilterList: {
       new: [
-        '創新與創業',
+        '創創',
         '人文與藝術',
         '社會與法治',
-        '自然與科學',
+        '自然',
       ],
       old: [
         '創新與創業核心',
