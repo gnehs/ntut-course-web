@@ -21,7 +21,7 @@ export default {
         return '#FFC107'
       if (name.match(/文化|美學與藝術|人文與藝術/))
         return '#FF5722'
-      if (name.match(/自然與科學/))
+      if (name.match(/自然與科學|自然向度/))
         return '#03A9F4'
       if (name.match(/社會|法治/))
         return '#2196F3'
