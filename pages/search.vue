@@ -59,28 +59,9 @@
       <template #header>
         <h4 style="margin: 0">依博雅類別篩選課程</h4>
       </template>
-      <div style="display:flex">
-        <vs-button border
-          :active="!showOldCategory"
-          @click="showOldCategory = !showOldCategory">
-          109 (含) 後
-        </vs-button>
-        <vs-button border
-          :active="showOldCategory"
-          @click="showOldCategory = !showOldCategory">
-          106-108
-        </vs-button>
-      </div>
-      <div v-if="!showOldCategory">
-        <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.new" :key="item">
-          {{ item }}
-        </vs-checkbox>
-      </div>
-      <div v-else>
-        <vs-checkbox :val="item" v-model="categoryFilter" v-for="item of categoryFilterList.old" :key="item">
-          {{ item }}
-        </vs-checkbox>
-      </div>
+      <vs-checkbox :val="val" v-model="categoryFilter" v-for="[key, val] of Object.entries(categoryFilterList)" :key="val">
+        {{ key }}
+      </vs-checkbox>
       <template #footer>
         <div class="lr-container nowrap">
           <div class="l" style="width: 50%">
@@ -170,28 +151,11 @@ export default {
     timetableDialog: false,
     categoryDialog: false,
     categoryFilter: [],
-    showOldCategory: false,
     categoryFilterList: {
-      new: [
-        '創創',
-        '人文與藝術',
-        '社會與法治',
-        '自然',
-      ],
-      old: [
-        '創新與創業核心',
-        '創新與創業選修',
-        '美學與藝術核心',
-        '美學與藝術選修',
-        '社會與哲學核心',
-        '社會與哲學選修',
-        '歷史與文化核心',
-        '歷史與文化選修',
-        '自然與科學核心',
-        '自然與科學選修',
-        '民主與法治核心',
-        '民主與法治選修',
-      ]
+      '創新與創業': `創創`,
+      '人文與藝術': `人文與藝術`,
+      '社會與法治': `社會與法治`,
+      '自然向度': `自然`,
     },
     timetable: ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C'],
     dateEng2zh: { sun: '週日', mon: '週一', tue: '週二', wed: '週三', thu: '週四', fri: '週五', sat: '週六' },
