@@ -105,13 +105,19 @@
     </div>
     <div class="search-result">
       <div class="search-result-header">
+        <vs-button
+          class="sidebar-toggle"
+          to="/">
+          <i class='bx bx-arrow-back' style="margin-right: 4px;"></i>
+          返回
+        </vs-button>
         <h2>進階搜尋</h2>
         <vs-button
-          icon
           class="sidebar-toggle"
           :active="sidebarOpen"
           @click="sidebarOpen = !sidebarOpen">
-          <i class='bx bx-menu'></i>
+          <i class='bx bx-filter-alt' style="margin-right: 4px;"></i>
+          選項
         </vs-button>
       </div>
       <loader v-if="searchResult === null" />
@@ -138,7 +144,7 @@ export default {
       departmentData: null,
       recommandKeyword: ['體育', '博雅'],
       // page state
-      sidebarOpen: true,
+      sidebarOpen: false,
       searchCourseKeyword: '',
       searchResult: null,
       // sort
