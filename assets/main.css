@@ -1,0 +1,19 @@
+body {
+  --text-color-value: var(--vs-text);
+  --text-color: rgba(var(--text-color-value), 1);
+  --border-color: rgba(var(--text-color-value), .1);
+  --border-focus-color: rgba(var(--text-color-value), .2);
+  --border-width: 1px;
+  --transition: 0.15s ease;
+  --padding: 8px;
+  --primary-color: #007bff;
+}
+
+@media (perfer-color-scheme: dark) {
+  body {
+    --text-color-value: var(--vs-text);
+    --border-color: rgba(var(--text-color-value), .1);
+    --border-focus-color: rgba(var(--text-color-value), .2);
+    --primary-color: #7eb5f0;
+  }
+}

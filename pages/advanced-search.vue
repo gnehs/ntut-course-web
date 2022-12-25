@@ -343,7 +343,8 @@ export default {
           year,
           sem,
           d,
-          q
+          q,
+          t: new Date().getTime().toString().slice(-4)
         }
       })
     },
