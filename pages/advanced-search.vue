@@ -192,13 +192,14 @@ export default {
     },
   },
   watch: {
-    showPlaceholder() { this.searchCourse() },
-    searchCourseKeyword() { this.searchCourse() },
-    sortBy() { this.searchCourse() },
-    categoryFilter: { handler() { this.searchCourse() }, deep: true },
-    courseStandardFilter: { handler() { this.searchCourse() }, deep: true },
-    timetableFilter: { handler() { this.searchCourse() }, deep: true },
-    academyFilter: { handler() { this.searchCourse() }, deep: true },
+    showPlaceholder() { !this.sidebarOpen && this.searchCourse() },
+    searchCourseKeyword() { !this.sidebarOpen && this.searchCourse() },
+    sortBy() { !this.sidebarOpen && this.searchCourse() },
+    categoryFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
+    courseStandardFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
+    timetableFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
+    academyFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
+    sidebarOpen(_, newVal) { newVal && this.searchCourse() }
   },
   mounted() {
     // restore from query
