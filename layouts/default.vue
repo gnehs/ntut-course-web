@@ -78,10 +78,9 @@ export default {
   }),
   computed: {
     isAdvancedSearch() {
-      return this.$route.name == 'advanced-search'
+      return this.$route.name == 'advanced-search' && window.matchMedia(`(min-width: 769px)`).matches
     },
   },
-
   mounted() {
     if (localStorage['data-department'] != 'main') {
       this.departmentVal = this.departmentItems.indexOf(localStorage['data-department'])

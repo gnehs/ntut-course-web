@@ -105,12 +105,6 @@
     </div>
     <div class="search-result">
       <div class="search-result-header">
-        <vs-button
-          class="sidebar-toggle"
-          to="/">
-          <i class='bx bx-arrow-back' style="margin-right: 4px;"></i>
-          返回
-        </vs-button>
         <h2>進階搜尋</h2>
         <vs-button
           class="sidebar-toggle"
@@ -120,11 +114,10 @@
           搜尋
         </vs-button>
       </div>
-      <p class="sidebar-toggle" style="text-align: center;font-size: .75em;opacity: .75;"><strong>第一次來嗎？</strong>使用右上角按鈕進行搜尋</p>
+      <p class="sidebar-toggle" style="opacity: .75;"><strong>第一次來嗎？</strong>使用右上角按鈕進行搜尋</p>
       <loader v-if="searchResult === null" />
       <parse-courses v-if="searchResult" :courses="searchResult" :show-conflict-course="showConflictCourse" />
       <p style="text-align: center;font-size: .75em;opacity: .75;">
-
         <router-link :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"> 回到舊版搜尋</router-link>
       </p>
     </div>
@@ -485,8 +478,12 @@ export default {
       max-width: 400px
       z-index: 999
       transition: transform .3s ease
+      padding-top: 56px
       &:not(.open)
         transform: translateX(-100%)
+      .logo a
+        opacity: 0
+        pointer-events: none
     .search-result
       overflow-y: initial
       height: initial
