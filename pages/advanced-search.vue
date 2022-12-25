@@ -488,6 +488,7 @@ export default {
     .search-result
       overflow-y: initial
       height: initial
+      padding: 0
 @media screen and (min-width: 769px)
   .search-sidebar-backdrop
     display: none
