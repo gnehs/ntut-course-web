@@ -16,7 +16,7 @@
       </vs-button>
     </div>
     <div v-if="layout == 'card'">
-      <transition-group name="flip-card" tag="div" class="cards">
+      <transition-group name="flip-card" tag="div" class="grid-cards">
         <card
           class="hoverable padding"
           v-for="tr in $vs.getPage(filteredCourse, page, max)"
@@ -204,9 +204,9 @@
                 .trimEllip(13)
             }}<br />
             {{ item.classroom
-                .map((y) => y.name)
-                .join('、')
-                .trimEllip(13)
+    .map((y) => y.name)
+    .join('、')
+    .trimEllip(13)
             }}
           </div>
         </router-link>

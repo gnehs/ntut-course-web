@@ -7,27 +7,17 @@
     <universal-search class="universal-search" />
     <upcoming-course />
     <h2>課程</h2>
+    <vs-alert>
+      <template #title>進階搜尋大更新！</template>
+      新增了多種篩選器，也可以更輕鬆的設定各種條件，此外博雅與體育搜尋也移到「進階搜尋」頁面了。
+    </vs-alert>
     <div class="cards">
       <card
         class="hoverable padding"
-        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`">
+        :to="`/advanced-search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`">
         <card-title>進階搜尋</card-title>
-        <p>透過進階條件搜尋課程</p>
+        <p>依條件搜尋課程</p>
         <i class="bx bx-search"></i>
-      </card>
-      <card
-        class="hoverable padding"
-        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}&classroom=^博雅`">
-        <card-title>博雅課程</card-title>
-        <p>透過篩選器來篩選特定類別的博雅</p>
-        <i class="bx bx-library"></i>
-      </card>
-      <card
-        class="hoverable padding"
-        :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}&classroom=體育`">
-        <card-title>體育課</card-title>
-        <p>查看本學期開設之所有體育課</p>
-        <i class="bx bx-football"></i>
       </card>
       <card class="hoverable padding" to="/class">
         <card-title>班級課表</card-title>

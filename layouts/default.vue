@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <vs-navbar center-collapsed v-model="active" shadow fixed not-line v-if="!isIframe">
+    <vs-navbar center-collapsed v-model="active" shadow fixed not-line v-if="!isIframe&&!isAdvancedSearch">
       <template #left>
-        <router-link to="/" class="site-title" @click="trackBtn('nav_logo_click')">🍤 北科課程好朋友</router-link>
+        <router-link to="/" class="site-title" @click="trackBtn('nav_logo_click')">🍤 北科課程好朋友 </router-link>
       </template>
       <universal-search navbar />
       <template #right>
@@ -11,13 +11,13 @@
           :disabled="Boolean($route.query.year)">{{ parseYearSemVal(yearSemVal) }}</vs-button>
       </template>
     </vs-navbar>
-    <div class="container" :class="{ isIframe }">
+    <div :class="{ 'container': !isAdvancedSearch, isIframe }">
       <Nuxt />
     </div>
-    <div class="text-footer" v-if="isIframe">
+    <div class="text-footer" v-if="isIframe && !isAdvancedSearch">
       本資料由 <a href="https://ntut-course.gnehs.net/" target="_blank">北科課程好朋友</a> 提供
     </div>
-    <footer id="footer" v-if="!isIframe">
+    <footer id="footer" v-if="!isIframe && !isAdvancedSearch">
       <div class="lr-container nowrap">
         <div class="l">
           Developed by
@@ -42,9 +42,7 @@
             :label="parseYearSemVal(item)"
             :value="item"
             :key="i">
-            {{
-                parseYearSemVal(item)
-            }}
+            {{ parseYearSemVal(item) }}
           </vs-option>
         </vs-select>
         <br />
@@ -78,6 +76,12 @@ export default {
     datasetDialog: false,
     isIframe: false,
   }),
+  computed: {
+    isAdvancedSearch() {
+      return this.$route.name == 'advanced-search'
+    },
+  },
+
   mounted() {
     if (localStorage['data-department'] != 'main') {
       this.departmentVal = this.departmentItems.indexOf(localStorage['data-department'])

@@ -1,10 +1,28 @@
 *
 	box-sizing: border-box
+\:root
+  --background-layer-1: #fff
+  --background-layer-2: #f2f2f2
+  --text-color-value: 51,51,51
+  --text-color: rgba(var(--text-color-value), 1)
+  --border-color: rgba(var(--text-color-value), .1)
+  --border-focus-color: rgba(var(--text-color-value), .2)
+  --border-width: 1px
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05)
+  --transition: 0.15s ease
+  --primary-color: #007bff
+  // --pattern-color-1: #00abd0
+  // --pattern-color-2: #f5b904
+  // --pattern-color-3: #f50058
+  --min-card-width: 128px
+  --border-radius: 12px
+  --padding: 8px
 body
 	font-family: 'Roboto Condensed', 'Noto Sans TC', sans-serif
 
 	background-color: #f4f7f8
 	margin: 0
+
 	// dark
 	@media (prefers-color-scheme: dark)
 		background-color: #1d1d1d
@@ -82,6 +100,13 @@ h1,h2,h3,h4,h5,h6
 		&>.card
 			width: 100%
 
+.grid-cards
+	display: grid
+	gap: 12px
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))
+	@media screen and (max-width: 768px)
+		grid-template-columns: repeat(2, 1fr)
+
 
 // flip-card
 .flip-card-move
@@ -94,7 +119,18 @@ h1,h2,h3,h4,h5,h6
 
 .flip-card-leave-active
 	position: absolute !important
-
+//fade-slide-up
+.search-detail-enter-active
+	max-height: 500px
+.search-detail-enter-active,
+.search-detail-leave-active
+	transition: all 0.3s linear
+.search-detail-enter,
+.search-detail-leave-to
+	opacity: 0
+	height: 0
+	overflow: hidden
+	transform: translateY(-20px)
 
 .center
 	display: flex
@@ -107,9 +143,12 @@ h1,h2,h3,h4,h5,h6
 	.header
 		top: 0
 		.item
-			padding: 10px 12px
+			padding: 4px 12px
 			background: rgba(var(--vs-text),.05)
 			text-align: center
+			cursor: pointer
+			&:hover
+				background: rgba(var(--vs-text),.1)
 			&:first-child
 				padding: 0
 	.content
@@ -117,8 +156,7 @@ h1,h2,h3,h4,h5,h6
 			background: rgba(var(--vs-gray-1), 1)
 		.item
 			display: flex
-			padding: 2px
-			height: 60px
+			height: 40px
 			.course
 				cursor: pointer
 				width: 100%
@@ -128,33 +166,23 @@ h1,h2,h3,h4,h5,h6
 				color: var(--main-color)
 				padding: 12px 6px
 				padding-right: 2px
-				border-radius: 0 8px 8px 0
 				transition: all .25s ease
 				height: 100%
-				margin: 2px
 				display: flex
 				align-items: center
 				position: relative
+				&:hover
+					--main-bg: rgba(var(--vs-primary), 0.2)
+					border: 1px solid rgba(var(--vs-primary), 0.2)
+				&:active
+					--main-bg: rgba(var(--vs-primary), 0.25)
 				&.conflict
 					--main-color: rgba(var(--vs-danger),1)
 					--main-bg: rgba(var(--vs-danger),.2)
-				&:before
-					content: ""
-					background: var(--main-color)
-					left: 0px
-					top: 0px
-					width: 2px
-					height: 100%
-					position: absolute
-					transition: all .1s linear
-
-				&:hover
-					padding: 12px 8px
-					padding-right: 0px
-					&:before
-						width: 4px
-				&:active
-					transform: scale(.9)
+					&:hover
+						--main-bg: rgba(var(--vs-danger),.25)
+					&:active
+						--main-bg: rgba(var(--vs-danger),.3)
 	.header,.content
 		display: grid
 		grid-template-columns: 1.25em repeat(5, 1fr)
@@ -165,6 +193,9 @@ h1,h2,h3,h4,h5,h6
 				display: flex
 				align-items: center
 				justify-content: center
+				cursor: pointer
+				&:hover
+					background: rgba(var(--vs-text),.1)
 .grid-timetable
 	display: grid
 	--gap: 8px
