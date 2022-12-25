@@ -369,6 +369,7 @@ export default {
         thu: [],
         fri: []
       }
+      this.sortBy = 'default'
     },
     toggleLesson(date, time) {
       if (date && time) {
