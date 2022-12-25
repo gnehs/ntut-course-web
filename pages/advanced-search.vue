@@ -470,6 +470,7 @@ export default {
   .advanced-search
     display: block
     position: relative
+    height: initial
     .search-sidebar
       position: fixed
       top: 0
