@@ -116,10 +116,11 @@
           class="sidebar-toggle"
           :active="sidebarOpen"
           @click="sidebarOpen = !sidebarOpen">
-          <i class='bx bx-filter-alt' style="margin-right: 4px;"></i>
-          選項
+          <i class='bx bx-search' style="margin-right: 4px;"></i>
+          搜尋
         </vs-button>
       </div>
+      <p class="sidebar-toggle" style="text-align: center;font-size: .75em;opacity: .75;"><strong>第一次來嗎？</strong>使用右上角按鈕進行搜尋</p>
       <loader v-if="searchResult === null" />
       <parse-courses v-if="searchResult" :courses="searchResult" :show-conflict-course="showConflictCourse" />
       <p style="text-align: center;font-size: .75em;opacity: .75;">
@@ -476,16 +477,19 @@ export default {
     display: block
     position: relative
     .search-sidebar
-      position: absolute
+      position: fixed
       top: 0
       left: 0
       bottom: 0
       width: calc(100vw - 40px)
       max-width: 400px
-      z-index: 2
+      z-index: 999
       transition: transform .3s ease
       &:not(.open)
         transform: translateX(-100%)
+    .search-result
+      overflow-y: initial
+      height: initial
 @media screen and (min-width: 769px)
   .search-sidebar-backdrop
     display: none
