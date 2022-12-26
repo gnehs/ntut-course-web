@@ -317,7 +317,7 @@ export default {
     max-height: 512px
     overflow-y: auto
     transition: all .2s ease
-    z-index: 1
+    z-index: 999
 
     opacity: 0
     transform: translateY(-8px)
