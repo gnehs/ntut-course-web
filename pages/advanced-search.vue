@@ -63,7 +63,7 @@
           </vs-checkbox>
         </template>
       </search-detail>
-      <search-detail :enabled="academyFilter.length != academyList.length">
+      <search-detail :enabled="academyFilter.length">
         <template #header>依學院篩選</template>
         <template #body>
           <vs-checkbox :val="val" v-model="academyFilter" v-for="val of academyList" :key="val">
@@ -153,27 +153,27 @@ export default {
       // 博雅
       categoryFilter: [],
       categoryFilterList: {
-        '創新與創業': `創創`,
+        '創新與創業': `創新與創業`,
         '人文與藝術': `人文與藝術`,
         '社會與法治': `社會與法治`,
         '自然向度': `自然`,
       },
       // 課程標準
       courseStandard: {
-        '○': '部訂共同必修',
+        // '○': '部訂共同必修',
         '△': '校訂共同必修',
         '☆': '共同選修',
-        '●': '部訂專業必修',
+        // '●': '部訂專業必修',
         '▲': '校訂專業必修',
         '★': '專業選修'
       },
       courseStandardFilter: {
-        '○': true,
-        '△': true,
-        '☆': true,
-        '●': true,
-        '▲': true,
-        '★': true
+        '○': false,
+        '△': false,
+        '☆': false,
+        '●': false,
+        '▲': false,
+        '★': false
       },
       // 學院
       academyList: [],
@@ -192,7 +192,7 @@ export default {
   },
   computed: {
     courseStandardFilterEnabled() {
-      return Object.values(this.courseStandardFilter).some(x => !x)
+      return Object.values(this.courseStandardFilter).some(x => x)
     },
   },
   watch: {
@@ -203,30 +203,31 @@ export default {
     courseStandardFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
     timetableFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
     academyFilter: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
+    showConflictCourse: { handler() { !this.sidebarOpen && this.searchCourse() }, deep: true },
     sidebarOpen(_, newVal) { newVal && this.searchCourse() }
   },
   mounted() {
     // restore from query
     if (this.$route.query?.q) {
-      let q = this.$route.query.q
-      q = new Uint8Array(q.split(','))
-      q = pako.inflate(q, { level: 6 })
-      q = JSON.parse(new TextDecoder("utf-8").decode(q))
-
-      if (q.searchCourseKeyword) this.searchCourseKeyword = q.searchCourseKeyword
-      if (q.showConflictCourse) this.showConflictCourse = q.showConflictCourse
-      if (q.categoryFilter) this.categoryFilter = q.categoryFilter
-      if (q.courseStandardFilter) this.courseStandardFilter = q.courseStandardFilter
-      if (q.academyFilter) this.academyFilter = q.academyFilter
-      if (q.timetableFilter) this.timetableFilter = q.timetableFilter
-      if (q.sortBy) this.sortBy = q.sortBy
-      if (q.showPlaceholder) this.showPlaceholder = q.showPlaceholder
+      try {
+        let q = this.$route.query.q
+        q = JSON.parse(q)
+        if (q.k) this.searchCourseKeyword = q.k
+        if (q.c) this.showConflictCourse = q.c
+        if (q.cf) this.categoryFilter = q.cf
+        if (q.csf) q.csf.split(',').map(x => this.courseStandardFilter[x] = true)
+        if (q.sb) this.sortBy = q.sb
+        if (q.tf) this.timetableFilter = q.tf
+        if (q.af) this.academyFilter = q.af.split(',')
+        if (q.sph) this.showPlaceholder = q.sph
+      } catch (e) {
+        console.error(e)
+      }
     }
     // get data
     this.fetchDepartmentData()
     this.searchCourse()
     this.getWithdrawalRate()
-
   },
   methods: {
     async getWithdrawalRate() {
@@ -249,7 +250,7 @@ export default {
         // update academyList
         let categoryList = [...new Set(res.map(x => x.category))]
         this.academyList = categoryList
-        this.academyFilter = this.academyFilter.length ? this.academyFilter : structuredClone(this.academyList)
+        this.academyFilter = this.academyFilter.length ? this.academyFilter : []
         // update keyword
         let classID = localStorage[`my-class`]
         let className = res.map(x => x.class).flat().filter(x => x.id == classID)[0]?.name
@@ -302,7 +303,7 @@ export default {
         return true
       })
       // 學院 academyFilter
-      if (this.academyFilter.length != this.academyList.length) {
+      if (this.academyFilter.length) {
         let filterOutAcademy = this.academyList.filter(x => !this.academyFilter.includes(x))
         let filterOutClass = this.departmentData.filter(x => filterOutAcademy.includes(x.category)).map(x => x.class).flat().map(x => x.name)
         result = result.filter(course => !course.class.map(x => x.name).some(x => filterOutClass.includes(x)))
@@ -331,25 +332,24 @@ export default {
       this.searchResult = result
       // set query
       let { year, sem, d } = this.$route.query
-      let q = JSON.stringify({
-        searchCourseKeyword: this.searchCourseKeyword,
-        showConflictCourse: this.showConflictCourse,
-        categoryFilter: this.categoryFilter,
-        courseStandardFilter: this.courseStandardFilter,
-        academyFilter: this.academyFilter,
-        timetableFilter: this.timetableFilter,
-        sortBy: this.sortBy,
-        showPlaceholder: this.showPlaceholder
-      })
-      q = new TextEncoder().encode(q);
-      q = pako.deflate(q, { level: 6 })
+      let q = {}
+      if (this.searchCourseKeyword !== '') q.k = this.searchCourseKeyword
+      if (!this.showConflictCourse) q.c = this.showConflictCourse
+      if (this.courseStandardFilterEnabled) q.csf = Object.entries(this.courseStandardFilter).filter(x => x[1]).map(x => x[0]).join(',')
+      if (this.categoryFilter.length) q.cf = this.categoryFilter
+      if (this.sortBy !== 'default') q.sb = this.sortBy
+      if (Object.values(this.timetableFilter).some(x => x.length)) q.tf = JSON.stringify(this.timetableFilter)
+      if (this.academyFilter.length) q.af = this.academyFilter.join(',')
+      if (this.showPlaceholder) q.sph = this.showPlaceholder
+      q = JSON.stringify(q);
+      if (q === '{}') q = ''
       this.$router.replace({
         query: {
           year,
           sem,
           d,
           q,
-          t: new Date().getTime().toString().slice(-4)
+          t: new Date().getTime().toString().slice(-2)
         }
       })
     },
@@ -358,14 +358,14 @@ export default {
       this.showConflictCourse = true
       this.categoryFilter = []
       this.courseStandardFilter = {
-        '○': true,
-        '△': true,
-        '☆': true,
-        '●': true,
-        '▲': true,
-        '★': true
+        '○': false,
+        '△': false,
+        '☆': false,
+        '●': false,
+        '▲': false,
+        '★': false
       }
-      this.academyFilter = structuredClone(this.academyList)
+      this.academyFilter = []
       this.timetableFilter = {
         mon: [],
         tue: [],
