@@ -88,6 +88,9 @@
         <i class="bx bx-terminal"></i>
       </card>
     </div>
+
+    <adsbygoogle />
+
     <p style="text-align: center;font-size: .75em;opacity: .75;">
       本站資料擷取自
       <a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank">國立臺北科技大學課程系統</a>，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。

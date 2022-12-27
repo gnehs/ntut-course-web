@@ -54,7 +54,9 @@ export default {
     // https://www.npmjs.com/package/nuxt-clipboard
     'nuxt-clipboard',
     // https://www.npmjs.com/package/nuxtjs-microsoft-clarity
-    'nuxtjs-microsoft-clarity'
+    'nuxtjs-microsoft-clarity',
+    // https://github.com/nuxt-modules/google-adsense
+    '@nuxtjs/google-adsense'
   ],
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
@@ -110,4 +112,7 @@ export default {
   microsoftClarity: {
     id: 'd840avsagt'
   },
+  'google-adsense': {
+    id: 'ca-pub-6834090314855499'
+  }
 }
