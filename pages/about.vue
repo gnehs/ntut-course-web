@@ -7,18 +7,15 @@
     </p>
     <h2>功能</h2>
     <ul>
-      <li>快速響應的搜尋功能</li>
-      <li>提供隱藏衝堂課程選項</li>
+      <li>能依條件篩選且快速響應的搜尋功能</li>
+      <li>自動偵測衝堂課程</li>
       <li>記錄課程供選課參考</li>
       <li>
         提供
         <router-link to="/doc">API</router-link>
         <span>供公眾使用</span>
       </li>
-      <li>比學校網站更為精細的時間表篩選</li>
     </ul>
-    <h2>開發動機</h2>
-    <p>由於學校課程系統對人類不友善，我希望能有美觀介面與快速響應的課程系統，便製作了此網站。</p>
     <h2>技術細節</h2>
     <p>
       本站資料擷取自
@@ -37,6 +34,9 @@
     <h2>Special Thanks</h2>
 
     <ul>
+      <li>
+        <a href="https://boxicons.com/" target="_blank">Boxicons</a>
+      </li>
       <li>
         <a href="https://nuxtjs.org/" target="_blank">Nuxt.js</a>
       </li>
