@@ -89,6 +89,7 @@
       </card>
     </div>
 
+    <h2>贊助商廣告</h2>
     <adsbygoogle />
 
     <p style="text-align: center;font-size: .75em;opacity: .75;">
