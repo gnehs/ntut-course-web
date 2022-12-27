@@ -39,6 +39,9 @@
         target="_blank">前往原始網頁</a>
       看看原本的資料
     </vs-alert>
+
+    <h3>贊助商廣告</h3>
+    <adsbygoogle />
   </div>
 </template>
 
