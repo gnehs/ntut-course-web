@@ -9,7 +9,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@nuxtjs/google-adsense": "^2.1.0",
+    "@nuxtjs/google-adsense": "2.0.0",
     "@nuxtjs/google-gtag": "^1.0.4",
     "@nuxtjs/markdownit": "^2.0.0",
     "@nuxtjs/pwa": "^3.3.5",
