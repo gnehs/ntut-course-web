@@ -91,6 +91,15 @@ export default {
     if (this.$route.query.mode == 'iframe') {
       this.isIframe = true
     }
+    // clear google adsence injected style
+    var appContainer = document.getElementById(`app`)
+    const observer = new MutationObserver(function (mutations, observer) {
+      appContainer.style.height = "";
+    });
+    observer.observe(appContainer, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
     // detect dark mode
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     themeSwitch(darkModeMediaQuery.matches)
