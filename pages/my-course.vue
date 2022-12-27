@@ -51,6 +51,8 @@
       </card>
     </div>
     <parse-courses :courses="myCourses" showTimetable v-if="myCourses.length" />
+    <h3>贊助商廣告</h3>
+    <adsbygoogle />
   </div>
 </template>
 

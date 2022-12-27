@@ -117,6 +117,10 @@
       <p class="sidebar-toggle" style="opacity: .75;"><strong>第一次來嗎？</strong>使用右上角按鈕進行搜尋</p>
       <loader v-if="searchResult === null" />
       <parse-courses v-if="searchResult" :courses="searchResult" :show-conflict-course="showConflictCourse" />
+
+      <h3 style="margin-top: 18px;">贊助商廣告</h3>
+      <adsbygoogle />
+
       <p style="text-align: center;font-size: .75em;opacity: .75;">
         <router-link :to="`/search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"> 回到舊版搜尋</router-link>
       </p>

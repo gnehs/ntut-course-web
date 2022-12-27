@@ -243,6 +243,9 @@
           </div>
         </div>
       </div>
+
+      <h3>贊助商廣告</h3>
+      <adsbygoogle />
     </div>
   </div>
 </template>

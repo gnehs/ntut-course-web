@@ -78,6 +78,8 @@
     <div v-if="courses && !courses.length">
       <p>尚無課程，請選擇其他分類</p>
     </div>
+    <h3>贊助商廣告</h3>
+    <adsbygoogle />
   </div>
 </template>
 
