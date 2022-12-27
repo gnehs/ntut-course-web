@@ -75,10 +75,11 @@ export default {
     departmentVal: 0,
     datasetDialog: false,
     isIframe: false,
+    isMobile: false,
   }),
   computed: {
     isAdvancedSearch() {
-      return this.$route.name == 'advanced-search' && window.matchMedia(`(min-width: 769px)`).matches
+      return this.$route.name == 'advanced-search' && !this.isMobile
     },
   },
   mounted() {
@@ -97,6 +98,12 @@ export default {
         document.getElementById(`app`).style = ''
       } catch (e) { }
     }, 1000)
+    // watch isMobile
+    const mobileMediaQuery = window.matchMedia('(max-width: 768px)')
+    this.isMobile = mobileMediaQuery.matches
+    mobileMediaQuery.addListener(e => {
+      this.isMobile = e.matches
+    })
     // detect dark mode
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     themeSwitch(darkModeMediaQuery.matches)
