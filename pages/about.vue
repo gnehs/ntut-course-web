@@ -12,7 +12,7 @@
       <li>記錄課程供選課參考</li>
       <li>
         提供
-        <router-link to="/api">API</router-link>
+        <router-link to="/doc">API</router-link>
         <span>供公眾使用</span>
       </li>
       <li>比學校網站更為精細的時間表篩選</li>
