@@ -74,9 +74,7 @@
       <search-detail :enabled="Object.values(timetableFilter).some(x => x.length)">
         <template #header>依時間篩選</template>
         <template #body>
-          <p>
-            Tips: 點擊課表上的星期或節次來一次選取整個行或列，點擊左上角可以一次選取整個課表。
-          </p>
+          <mini-notify>點擊課表上的星期或節次來一次選取整個行或列，點擊左上角可以一次選取整個課表。</mini-notify>
           <div class="timetable" style="margin: 0 -16px;">
             <div class="header">
               <div class="item" @click="toggleLesson()"></div>
@@ -114,7 +112,7 @@
           搜尋
         </vs-button>
       </div>
-      <p class="sidebar-toggle" style="opacity: .75;"><strong>第一次來嗎？</strong>使用右上角按鈕進行搜尋</p>
+      <mini-notify class="sidebar-toggle"><strong>第一次來嗎？</strong> 使用右上角按鈕進行搜尋</mini-notify>
       <loader v-if="searchResult === null" />
       <parse-courses v-if="searchResult" :courses="searchResult" :show-conflict-course="showConflictCourse" />
 
