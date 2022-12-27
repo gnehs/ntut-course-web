@@ -92,6 +92,10 @@ export default {
     if (this.$route.query.mode == 'iframe') {
       this.isIframe = true
     }
+    // openDatasetDialog
+    Vue.prototype.$openDatasetDialog = () => {
+      this.datasetDialog = true
+    }
     // clear google adsence injected style
     setInterval(() => {
       try {

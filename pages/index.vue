@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="header">
-      <div class="department"> {{ $store.state.department == 'main' ? '日間部' : $store.state.department }}</div>
+      <div class="department" @click="$openDatasetDialog"> {{ $store.state.department == 'main' ? '日間部' : $store.state.department }}</div>
       <div class="title"> {{ `${$store.state.year} 年${$store.state.sem == '1' ? '上' : '下'}學期` }}</div>
     </div>
     <universal-search class="universal-search" />
@@ -129,6 +129,11 @@ export default {
     border-radius: 100em
     padding: .25em .75em
     border: 1px solid rgba(var(--vs-text), .25)
+    cursor: pointer
+    &:hover
+      background-color: rgba(var(--vs-text), .05)
+    &:active
+      background-color: rgba(var(--vs-text), .1)
 .universal-search
   display: none
   @media screen and (max-width: 900px)
