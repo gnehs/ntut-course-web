@@ -139,10 +139,9 @@ export default {
       until = new Date(year, 6 - 1, 30 + 1)
       start = new Date(year, 2 - 1, 1 + 1)
     }
-    // 2023-01-15
-    if (year == '2022' && sem == '1') {
-      start = new Date(year, 9 - 1, 12 + 1)
-      until = new Date(2023, 1 - 1, 15 + 1)
+    if (year == '2023' && sem == '2') {
+      start = new Date(year, 2 - 1, 20 + 1)
+      until = new Date(2023, 6 - 1, 21 + 1)
     }
 
     this.until = until.toISOString().split('T')[0]
