@@ -87,6 +87,9 @@ export default {
       if (name == 'fetch current departments') return '取得本學期科系'
       if (name == 'fetch standards') return '取得課程標準'
       if (name == 'pages build and deployment') return 'API 資料建置與部署'
+      if (name == 'Run Analytics & Fatch calendar') return '分析課程資料與取得行事曆'
+      if (name == 'Run Analytics & Fatch calendar') return '分析課程資料與取得行事曆'
+      if (name == 'Run Analytics') return '分析課程資料'
       return name
     }
   }
