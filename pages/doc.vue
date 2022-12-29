@@ -146,6 +146,14 @@ https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal.json
 https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json
 
 </div>
+
+## 行事曆
+<div class="white-box">
+
+### `/calendar.json` 取得行事曆
+#### Example
+https://gnehs.github.io/ntut-course-crawler-node/calendar.json
+</div>
 </template>
 <style scoped lang="sass">
 img

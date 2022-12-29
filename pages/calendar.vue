@@ -30,7 +30,7 @@
     <h2>
       <span style="color: rgb(var(--vs-primary))">Step 3</span> 填寫行程期間
     </h2>
-    <p>請填寫開學日與最後一次上課的日期，以便設定重複行程終止日期。</p>
+    <p>這裡通常會自動填上開學日與最後上課日，若有誤請自行修改。</p>
     <div class="cards">
       <card>
         <p>開學日</p>
@@ -125,32 +125,34 @@ export default {
     }
   },
   async created() {
-
-    let { year, sem } = this.$store.state
-    year = parseInt(year) + 1911
-    if (sem == '2')
-      year += 1
-    let until, start;
-    if (sem == '1') {
-      until = new Date(year + 1, 1 - 1, 30 + 1)
-      start = new Date(year, 9 - 1, 1 + 1)
-    }
-    else {
-      until = new Date(year, 6 - 1, 30 + 1)
-      start = new Date(year, 2 - 1, 1 + 1)
-    }
-    if (year == '2023' && sem == '2') {
-      start = new Date(year, 2 - 1, 20 + 1)
-      until = new Date(2023, 6 - 1, 21 + 1)
-    }
-
-    this.until = until.toISOString().split('T')[0]
-    this.start = start.toISOString().split('T')[0]
-
     await this.getMyCourse()
-
+    await this.getCalendar()
   },
   methods: {
+    async getCalendar() {
+      let calendarData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/calendar.json`).then(x => x.json())
+      let startDays = calendarData.filter(x => x.summary.includes('開學')).map(x => x.start)
+      let endDays = calendarData.filter(x => x.summary == '期末考試').map(x => x.end)
+
+      let { year, sem } = this.$store.state
+      year = parseInt(year) + 1911
+      if (sem == '2') year += 1
+
+      let until, start;
+      if (sem == '1') {
+        start = new Date(year, 8 - 1, 1 + 1)
+        until = new Date(year + 1, 1 - 1, 1 + 1)
+      } else {
+        start = new Date(year, 1 - 1, 1 + 1)
+        until = new Date(year, 5 - 1, 30 + 1)
+      }
+      // find start day & end day
+      start = startDays.find(x => new Date(x) >= start)
+      until = endDays.find(x => new Date(x) >= until)
+
+      this.start = start.split('T')[0]
+      this.until = until.split('T')[0]
+    },
     async getMyCourse() {
       let { year, sem, department } = this.$store.state
       let myCourseKey = `my-couse-data-${year}-${sem}`
