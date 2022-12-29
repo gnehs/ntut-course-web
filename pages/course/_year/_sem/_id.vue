@@ -239,7 +239,8 @@
               <p v-html="parseTextarea(item.remarks)" />
             </template>
             <h3>使用外文原文書籍：{{ item.foreignLanguageTextbooks ? '是' : '否' }}</h3>
-            <h3>最後更新：{{ item.latestUpdate }}</h3>
+            <h3>最後更新</h3>
+            <p>{{ timeSince(new Date(item.latestUpdate)) }}前 <small>{{ item.latestUpdate }}</small></p>
           </div>
         </div>
       </div>
@@ -429,7 +430,33 @@ export default {
         title: '已移除',
         text: `已將「${this.courseData.name.zh}」從我的課程中移除`
       })
-    }
+    },
+
+    timeSince(date) {
+      let seconds = Math.floor((new Date() - date) / 1000)
+      let interval = seconds / 31536000
+
+      if (interval > 1) {
+        return Math.floor(interval) + ' 年'
+      }
+      interval = seconds / 2592000
+      if (interval > 1) {
+        return Math.floor(interval) + ' 月'
+      }
+      interval = seconds / 86400
+      if (interval > 1) {
+        return Math.floor(interval) + ' 天'
+      }
+      interval = seconds / 3600
+      if (interval > 1) {
+        return Math.floor(interval) + ' 小時'
+      }
+      interval = seconds / 60
+      if (interval > 1) {
+        return Math.floor(interval) + ' 分鐘'
+      }
+      return Math.floor(seconds) + ' 秒'
+    },
   }
 }
 </script>
