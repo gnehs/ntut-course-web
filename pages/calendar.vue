@@ -81,7 +81,7 @@ export default {
 <style lang="sass" scoped>
 .calendar-items
   border-radius: 4px
-  border: 1px solid #ccc
+  border: 1px solid rgba(var(--vs-text),.1)
   overflow: hidden
   position: relative
   .calendar-item
@@ -89,15 +89,15 @@ export default {
     display: flex
     align-items: center
     gap: 8px
-    background-color: #fff
+    background: rgba(var(--vs-background),1)
     &:not(:first-child)
-      border-top: 1px solid #ccc
+      border-top: 1px solid rgba(var(--vs-text),.1)
     .calendar-icon
       --size: 48px
       width: var(--size)
       height: var(--size)
       border-radius: calc(var(--size) / 12)
-      border: 1px solid #ccc
+      border: 1px solid rgba(var(--vs-text),.1)
       text-align: center
       font-family: 'Noto Sans TC', sans-serif
       display: flex
