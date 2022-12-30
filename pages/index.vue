@@ -50,7 +50,7 @@
         <p>在桌面上檢視接下來的課程</p>
         <i class="bx bx-extension"></i>
       </card>
-      <card class="hoverable padding" :to="`/calendar?year=${$store.state.year}`">
+      <card class="hoverable padding" :to="`/add-calendar?year=${$store.state.year}`">
         <card-title>新增課程到行事曆</card-title>
         <p>將我的課程匯入至行事曆</p>
         <i class='bx bx-calendar-plus'></i>
