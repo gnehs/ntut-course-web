@@ -45,6 +45,11 @@
         <p>查看所有教師的退選率</p>
         <i class="bx bx-user-x"></i>
       </card>
+      <card class="hoverable padding" to="/calendar">
+        <card-title>行事曆</card-title>
+        <p>查看學校行事曆</p>
+        <i class='bx bx-calendar'></i>
+      </card>
       <card class="hoverable padding" :to="`/widget?year=${$store.state.year}`">
         <card-title>iOS 小工具</card-title>
         <p>在桌面上檢視接下來的課程</p>
