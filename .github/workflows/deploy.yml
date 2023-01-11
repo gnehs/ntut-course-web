@@ -1,0 +1,36 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set timezone to Asia/Taipei
+      uses: szenius/set-timezone@v1.0
+      with:
+        timezoneLinux: "Asia/Taipei"
+        timezoneMacos: "Asia/Taipei"
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 14
+        cache: 'npm'
+    - name: Install npm packages
+      run: npm i
+    - name: Generate Pages
+      run: npm run generate
+    - name: Fixed index.html
+      run: |
+        cp ./dist/200.html ./dist/404.html
+    - name: Generate Preview
+      run: node generateCoursePreview.mjs
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: dist
+        force_orphan: true
