@@ -7,7 +7,7 @@ import { JSDOM } from "jsdom";
 let now = new Date()
 
 let indexHTML = fs.readFileSync('./dist/200.html')
-let dom = new JSDOM(indexHTML)
+let dom = await JSDOM.fromFile('./dist/200.html')
 let document = dom.window.document
 
 let yearSems = await axios.get('https://gnehs.github.io/ntut-course-crawler-node/main.json')
@@ -50,7 +50,7 @@ let tasks = Object.entries(yearSems.data)
       setMeta('twitter:card', 'summary_large_image')
       document.querySelector('title').textContent = title
 
-      fs.writeFileSync(`./dist/course/${year}/${sem}/${course.id}.html`, dom.serialize())
+      fs.writeFileSync(`./dist/course/${year}/${sem}/${course.id}.html`, dom.serialize().replace(/&amp;/g, '&'))
     })
   })
 await Promise.all(tasks)
