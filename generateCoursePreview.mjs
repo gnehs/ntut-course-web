@@ -6,7 +6,6 @@ import { JSDOM } from "jsdom";
 
 let now = new Date()
 
-let indexHTML = fs.readFileSync('./dist/200.html')
 let dom = await JSDOM.fromFile('./dist/200.html')
 let document = dom.window.document
 
@@ -14,7 +13,7 @@ let yearSems = await axios.get('https://gnehs.github.io/ntut-course-crawler-node
 let tasks = Object.entries(yearSems.data)
   .map((([year, sems]) => sems.map(sem => ({ year, sem }))))
   .flat()
-  .slice(-6)
+  // .slice(-6)
   .map(async ({ year, sem }) => {
     let courses = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/main.json`)
     console.log(`Generate routes: ${year}/${sem} ${courses.data.length}`)
