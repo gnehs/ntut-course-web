@@ -26,6 +26,7 @@ let tasks = Object.entries(yearSems.data)
       let parsedCourseId = course.id.split('').map((c) => courseNumber[c]).join('')
       let title = `${parsedCourseId} ${course.name.zh}`
       let description = `${course.description.zh}`
+      let image = `https://ntut-course-og.gnehs.net/api?year=${year}&sem=${sem}&id=${course.id}`
 
 
       function setMeta(name, content) {
@@ -40,12 +41,12 @@ let tasks = Object.entries(yearSems.data)
       }
       setMeta('og:title', title)
       setMeta('og:description', description)
-      setMeta('og:url', `https://ntut-course.gnehs.net/course/${year}/${sem}/${course.id}.html`)
-      setMeta('og:image', `https://ntut-course.gnehs.net/og.jpg`)
+      setMeta('og:url', `https://ntut-course.gnehs.net/course/${year}/${sem}/${course.id}`)
+      setMeta('og:image', image)
       setMeta('description', description)
       setMeta('twitter:title', title)
       setMeta('twitter:description', description)
-      setMeta('twitter:image', `https://ntut-course.gnehs.net/og.jpg`)
+      setMeta('twitter:image', image)
       setMeta('twitter:card', 'summary_large_image')
       document.querySelector('title').textContent = title
 
