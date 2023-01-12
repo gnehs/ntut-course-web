@@ -10,17 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set timezone to Asia/Taipei
-      uses: szenius/set-timezone@v1.0
-      with:
-        timezoneLinux: "Asia/Taipei"
-        timezoneMacos: "Asia/Taipei"
     - uses: actions/setup-node@v3
       with:
         node-version: 14
         cache: 'npm'
     - name: Install npm packages
-      run: npm i
+      run: npm ci
     - name: Generate Pages
       run: npm run generate
     - name: Fixed index.html
