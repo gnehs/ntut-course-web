@@ -66,8 +66,8 @@ fs.mkdirSync(`./dist/teacher/`, { recursive: true })
 tasks.push(...withdrawal.data.map(x => {
   let title = x.name
   let description = `在北科好朋友上查看教師「${x.name}」的資訊，包含${x.course.slice(0, 3).map(x => x.name.zh).join('、')}等課程與選課人數等相關資訊`
-  let image = `https://ntut-course-og.gnehs.net/api/teacher?name=${x.name}`
-  let url = `https://ntut-course.gnehs.net/teacher/${x.name}`
+  let image = `https://ntut-course-og.gnehs.net/api/teacher?name=${encodeURIComponent(x.name)}`
+  let url = `https://ntut-course.gnehs.net/teacher/${encodeURIComponent(x.name)}`
   updateTags({ title, description, image, url })
 
   fs.writeFileSync(`./dist/teacher/${x.name}.html`, dom.serialize().replace(/&amp;/g, '&'))
