@@ -4,6 +4,8 @@ on:
   push:
     branches: 蹦蹦
   workflow_dispatch:
+  schedule:
+    - cron:  '0 0 */1 * *'
 
 jobs:
   deploy:
