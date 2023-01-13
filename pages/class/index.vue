@@ -42,7 +42,7 @@
       </div>
     </div>
   </div>
-</template> 
+</template>
 <script>
 export default {
   created() {
@@ -103,8 +103,10 @@ export default {
       if (classId) {
         this.recommendClass = []
         let userClass = classData.filter(x => x.id == classId)[0]
-        this.recommendClass.push({ ...userClass, description: '你的班級' })
-        // 取得博雅課程推薦 
+        if(userClass){
+          this.recommendClass.push({ ...userClass, description: '你的班級' })
+        }
+        // 取得博雅課程推薦
         let classname = userClass.name
         let course = await this.$fetchCourse(year, sem)
         function detectClass(c) {
