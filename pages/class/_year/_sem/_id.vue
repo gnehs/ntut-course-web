@@ -67,12 +67,11 @@ export default {
     async getCourseByClass() {
       const loading = this.$vs.loading()
       try {
-        let { year, sem } = this.$store.state
+        let { year, sem } = this.$route.params
         this.classname = this.$route.params.id
         //fetch class
-        let departmentData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`).then(x =>
-          x.json()
-        )
+        let departmentData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`)
+        .then(x =>x.json())
         departmentData.map(x => {
           x.class.map(y => {
             if (y.name == this.classname) {
@@ -97,7 +96,7 @@ export default {
       loading.close()
     },
     checkIsInMyCourse() {
-      let { year, sem } = this.$store.state
+      let { year, sem } = this.$route.params
       let myCourseClassKey = `my-couse-class-${year}-${sem}`
       this.isInMyCouse = localStorage[myCourseClassKey] == this.classname
     },
@@ -106,7 +105,7 @@ export default {
       let { id } = this.classData
       localStorage['my-class'] = id
 
-      let { year, sem } = this.$store.state
+      let { year, sem } = this.$route.params
       let myCourseClassKey = `my-couse-class-${year}-${sem}`
       if (localStorage[myCourseClassKey] != this.classname && localStorage[myCourseClassKey]) {
         let changeClass = confirm(`你先前已將「${localStorage[myCourseClassKey]}」之課程加入我的課程，此行為會導致課程過多，要繼續嗎？`)
@@ -125,7 +124,7 @@ export default {
       })
     },
     removeFromMyCourse() {
-      let { year, sem } = this.$store.state
+      let { year, sem } = this.$route.params
       for (let course of this.result) {
         this.$removeCourse(course.id)
       }

@@ -19,8 +19,7 @@
           class="hoverable padding"
           v-for="(item, index) in recommendClass"
           :key="index"
-          :to="`/class/${item.name}?year=${year}&sem=${sem}&d=${$store.state.department}`"
-        >
+          :to="`/class/${year}/${sem}/${item.name}?d=${$store.state.department}`">
           <card-title>{{ item.name }}</card-title>
           <p>{{ item.description }}</p>
           <i class="bx bx-star"></i>
@@ -34,8 +33,7 @@
           v-for="{ name } in department.class"
           :key="name"
           class="hoverable padding"
-          :to="`/class/${name}?year=${year}&sem=${sem}&d=${$store.state.department}`"
-        >
+          :to="`/class/${year}/${sem}/${name}?d=${$store.state.department}`">
           <card-title>{{ name }}</card-title>
           <p>{{ department.name }}</p>
         </card>

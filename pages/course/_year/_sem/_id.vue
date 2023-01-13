@@ -115,7 +115,7 @@
                 <template v-for="(classItem, i) of courseData.class.map((x) => x.name)">
                   <span v-if="i > 0" :key="classItem + '_'">、</span>
                   <router-link
-                    :to="`/class/${classItem}?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
+                    :to="`/class/${$store.state.year}/${$store.state.sem}/${classItem}?d=${$store.state.department}`"
                     class="class-link"
                     :key="classItem + '_'">{{ classItem }}</router-link>
                 </template>

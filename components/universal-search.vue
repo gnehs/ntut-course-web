@@ -138,9 +138,9 @@ export default {
             )
           )
             .map(x => ({
-              id: `${x}?year=${year}&sem=${sem}&d=${department}`,
+              id: `/class/${year}/${sem}/${x}?d=${department}`,
               type: 'class',
-              to: `/class/${x}?year=${year}&sem=${sem}&d=${department}`,
+              to: `/class/${year}/${sem}/${x}?d=${department}`,
               category: `班級`,
               text: x,
             }))
