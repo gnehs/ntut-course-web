@@ -66,7 +66,7 @@ tasks.push(...Object.entries(yearSems)
         let courseData = courses.filter(y => y.class.some(z => z.name == x.name))
 
         let title = x.name
-        let description = `在北科好朋友上查看課程「${x.name}」的資訊，包含${[...new Set(courseData.map(x => x.name.zh))].slice(0, 3).join('、')}等課程、博雅、必選修等課程資訊`
+        let description = `在北科好朋友上查看課程「${x.name}」的資訊`
         if (courseData.length) {
           description += `，包含${[...new Set(courseData.map(x => x.name.zh))].slice(0, 3).join('、')}課程與博雅、必選修等相關資訊`
         } else {
