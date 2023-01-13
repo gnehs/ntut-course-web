@@ -103,7 +103,7 @@ export default {
       if (classId) {
         this.recommendClass = []
         let userClass = classData.filter(x => x.id == classId)[0]
-        if(userClass){
+        if (userClass) {
           this.recommendClass.push({ ...userClass, description: '你的班級' })
         }
         // 取得博雅課程推薦
