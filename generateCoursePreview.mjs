@@ -73,10 +73,10 @@ tasks.push(...Object.entries(yearSems)
           description += `，如必選修課程、博雅等相關課程資訊`
         }
         let image = `https://ntut-course-og.gnehs.net/api/class?year=${year}&sem=${sem}&id=${x.id}`
-        let url = `https://ntut-course.gnehs.net/class/${year}/${sem}/${x.id}`
+        let url = `https://ntut-course.gnehs.net/class/${year}/${sem}/${encodeURIComponent(x.name)}`
 
         updateTags({ title, description, image, url })
-        fs.writeFileSync(`./dist/class/${year}/${sem}/${x.id}.html`, dom.serialize().replace(/&amp;/g, '&'))
+        fs.writeFileSync(`./dist/class/${year}/${sem}/${x.name}.html`, dom.serialize().replace(/&amp;/g, '&'))
         sitemapUrls.push(url)
       })
     })
