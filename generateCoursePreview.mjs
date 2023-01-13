@@ -42,10 +42,12 @@ tasks.push(...Object.entries(yearSems)
   .map((([year, sems]) => sems.map(sem => ({ year, sem }))))
   .flat()
   .map(async ({ year, sem }) => {
-    let courses = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/main.json`)
+    let courses = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/main.json`).then(x => x.data)
+    let departments = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`).then(x => x.data)
     fs.mkdirSync(`./dist/course/${year}/${sem}/`, { recursive: true })
+    fs.mkdirSync(`./dist/class/${year}/${sem}/`, { recursive: true })
 
-    courses.data.map(course => {
+    courses.map(course => {
       let courseNumber = [`𝟬`, `𝟭`, `𝟮`, `𝟯`, `𝟰`, `𝟱`, `𝟲`, `𝟳`, `𝟴`, `𝟵`]
       let parsedCourseId = course.id.split('').map((c) => courseNumber[c]).join('')
 
@@ -58,8 +60,29 @@ tasks.push(...Object.entries(yearSems)
       fs.writeFileSync(`./dist/course/${year}/${sem}/${course.id}.html`, dom.serialize().replace(/&amp;/g, '&'))
       sitemapUrls.push(url)
     })
+    console.log(`Generate routes: ${year}/${sem} for ${courses.length} courses`)
+    departments.map(department => {
+      department.class.map(x => {
+        let courseData = courses.filter(y => y.class.some(z => z.name == x.name))
 
-    console.log(`Generate routes: ${year}/${sem} ${courses.data.length}`)
+        let title = x.name
+        let description = `在北科好朋友上查看課程「${x.name}」的資訊，包含${[...new Set(courseData.map(x => x.name.zh))].slice(0, 3).join('、')}等課程、博雅、必選修等課程資訊`
+        if (courseData.length) {
+          description += `，包含${[...new Set(courseData.map(x => x.name.zh))].slice(0, 3).join('、')}課程與博雅、必選修等相關資訊`
+        } else {
+          description += `，如必選修課程、博雅等相關課程資訊`
+        }
+        let image = `https://ntut-course-og.gnehs.net/api/class?year=${year}&sem=${sem}&id=${x.id}`
+        let url = `https://ntut-course.gnehs.net/class/${year}/${sem}/${x.id}`
+
+        updateTags({ title, description, image, url })
+        fs.writeFileSync(`./dist/class/${year}/${sem}/${x.id}.html`, dom.serialize().replace(/&amp;/g, '&'))
+        sitemapUrls.push(url)
+      })
+    })
+
+    console.log(`Generate routes: ${year}/${sem} for ${departments.map(x => x.class).flat().length} classes`)
+
   })
 )
 fs.mkdirSync(`./dist/teacher/`, { recursive: true })
