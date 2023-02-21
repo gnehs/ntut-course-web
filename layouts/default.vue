@@ -159,6 +159,10 @@ export default {
       data = pako.deflate(data, { level: 6 })
       return await this.$vlf.setItem(key, data)
     }
+    Vue.prototype.$cleanStore = async () => {
+      window.$ntutCourse = {}
+      return await this.$vlf.clear()
+    }
     Vue.prototype.$fetchCourse = async (y, s, department, commit = true) => {
       //replace yr & sem if query seleted
       let { year, sem, d } = this.$route.query

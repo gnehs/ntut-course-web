@@ -89,6 +89,11 @@
         <p>查看爬蟲資料擷取狀態</p>
         <i class="bx bx-terminal"></i>
       </card>
+      <card class="hoverable padding" to="/settings">
+        <card-title>設定</card-title>
+        <p>課程資料庫、資料匯出等</p>
+        <i class="bx bx-cog"></i>
+      </card>
     </div>
 
     <h2>贊助商廣告</h2>
