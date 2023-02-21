@@ -336,7 +336,7 @@ export default {
       if (this.courseStandardFilterEnabled) q.csf = Object.entries(this.courseStandardFilter).filter(x => x[1]).map(x => x[0]).join(',')
       if (this.categoryFilter.length) q.cf = this.categoryFilter
       if (this.sortBy !== 'default') q.sb = this.sortBy
-      if (Object.values(this.timetableFilter).some(x => x.length)) q.tf = JSON.stringify(this.timetableFilter)
+      if (Object.values(this.timetableFilter).some((x) => x.length)) q.tf = this.timetableFilter
       if (this.academyFilter.length) q.af = this.academyFilter.join(',')
       if (this.showPlaceholder) q.sph = this.showPlaceholder
       q = JSON.stringify(q);
