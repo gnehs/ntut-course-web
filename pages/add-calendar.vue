@@ -21,7 +21,8 @@
         :val="item"
         v-model="selectedCourse"
         v-for="(item, i) of courseData"
-        :key="i">{{ item.name }}</vs-checkbox>
+        :key="i"
+      >{{ item.name }}</vs-checkbox>
     </div>
     <h2>
       <span style="color: rgb(var(--vs-primary))">Step 2</span> 新增專用行事曆
@@ -34,13 +35,11 @@
     <div class="cards">
       <card>
         <p>開學日</p>
-        <vs-input v-model="start" type="date">
-        </vs-input>
+        <vs-input v-model="start" type="date"></vs-input>
       </card>
       <card>
         <p>最後上課日</p>
-        <vs-input v-model="until" type="date">
-        </vs-input>
+        <vs-input v-model="until" type="date"></vs-input>
       </card>
     </div>
     <h2>
@@ -48,6 +47,8 @@
     </h2>
     <p>輕觸「匯入」按鈕以繼續，匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。</p>
     <vs-button @click="addToCalendar" :disabled="!selectedCourse.length" color="primary">匯入</vs-button>
+    <h2>已知問題</h2>
+    <p>目前尚未撰寫跳過連假的功能，因此遇到連假時行事曆上仍會有課程。</p>
   </div>
 </template>
 
