@@ -316,11 +316,7 @@ export default {
       }
       if (!this.showPlaceholder) {
         result = result.filter(x => {
-          if (x.name?.zh.includes('學院指定向度'))
-            return false
-          if (x.name?.zh.includes('學生自選向度'))
-            return false
-          if (x.name?.zh.includes('多元英文'))
+          if (['學院指定向度', '學生自選向度', '博雅選修課程', '多元英文'].some(y => x.name?.zh.includes(y)))
             return false
           if (x.name?.zh.includes('體育') && !x.teacher.length)
             return false
