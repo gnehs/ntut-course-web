@@ -149,23 +149,23 @@ export default {
       ]
       // get empty class
       let currentDate = new Date()
-      let timetable = {
-        '1': '8:10',
-        '2': '9:10',
-        '3': '10:10',
-        '4': '11:10',
-        N: '12:10',
-        '5': '13:10',
-        '6': '14:10',
-        '7': '15:10',
-        '8': '16:10',
-        '9': '17:10',
-        A: '18:30',
-        B: '19:20',
-        C: '20:20',
-        D: '21:10'
-      }
-      let upcomingCourseIncludes = Object.keys(timetable)
+      let timetable = new Map([
+        [1, '8:10'],
+        [2, '9:10'],
+        [3, '10:10'],
+        [4, '11:10'],
+        ['N', '12:10'],
+        [5, '13:10'],
+        [6, '14:10'],
+        [7, '15:10'],
+        [8, '16:10'],
+        [9, '17:10'],
+        ['A', '18:30'],
+        ['B', '19:20'],
+        ['C', '20:20'],
+        ['D', '21:10']
+      ])
+      let upcomingCourseIncludes = [...timetable.keys()]
       this.upcomingCourseIncludes = upcomingCourseIncludes
       // create class list
       let classList = new Set()
