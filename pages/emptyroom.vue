@@ -145,9 +145,9 @@ export default {
     async getEmptyClass() {
       let { year, sem } = this.$store.state
       let course = [
-        ...(await this.$fetchCourse(year, sem, '研究所(日間部、進修部、週末碩士班)')),
-        ...(await this.$fetchCourse(year, sem, '進修部')),
-        ...(await this.$fetchCourse(year, sem, 'main'))
+        ...(await this.$fetchCourse(year, sem, '研究所(日間部、進修部、週末碩士班)', false)),
+        ...(await this.$fetchCourse(year, sem, '進修部', false)),
+        ...(await this.$fetchCourse(year, sem, 'main', false))
       ]
       // get empty class
       let currentDate = new Date()
@@ -197,7 +197,7 @@ export default {
             // remove from classList timetable
             classList.map(z => {
               if (z.name == y.name) {
-                z.timetable = z.timetable.filter(i => !x.time[todayDayOfWeek].includes(i))
+                z.timetable = z.timetable.filter(i => !x.time[todayDayOfWeek].includes(i.toString()))
                 z.link = y.link
               }
             })
