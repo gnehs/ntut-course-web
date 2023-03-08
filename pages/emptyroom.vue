@@ -8,9 +8,8 @@
         :active="todayDayOfWeek == en"
         @click="todayDayOfWeek = en"
         v-for="[en,zh] of Object.entries(dateEng2zh)"
-        :key="en">
-        {{ zh.slice(1) }}
-      </vs-button>
+        :key="en"
+      >{{ zh.slice(1) }}</vs-button>
     </div>
     <div v-if="categoryList">
       <template v-for="category of categoryList">
@@ -20,14 +19,16 @@
             class="hoverable padding"
             v-for="classroom of classList.filter((x) => x.category == category)"
             :key="classroom.name"
-            @click.native="showEmptyroomDetailDialog(classroom)">
+            @click.native="showEmptyroomDetailDialog(classroom)"
+          >
             <card-title>{{ classroom.name }}</card-title>
             <div class="course-dots">
               <div
                 class="course-dot-item"
                 v-for="i of upcomingCourseIncludes"
                 :key="i"
-                :class="{ active: !classroom.timetable.includes(i) }">{{ i }}</div>
+                :class="{ active: !classroom.timetable.includes(i) }"
+              >{{ i }}</div>
             </div>
           </card>
         </div>
@@ -45,7 +46,8 @@
           class="item"
           style="display: flex; justify-content: space-between; flex-direction: row"
           v-for="item of upcomingCourseIncludes"
-          :key="item">
+          :key="item"
+        >
           <div>{{ item }} - {{ timetable[item] }}</div>
           <div>{{ emptyroomDetailData.timetable.includes(item) ? '空堂' : '有課程進行' }}</div>
         </div>
@@ -54,13 +56,13 @@
           style="display: block; text-align: center"
           v-if="emptyroomDetailData"
           :href="`https://aps.ntut.edu.tw/course/tw/${emptyroomDetailData.link}`"
-          target="_blank">到北科課程網站查看</a>
+          target="_blank"
+        >到北科課程網站查看</a>
       </div>
     </vs-dialog>
   </div>
 </template>
 <style lang="sass" scoped>
-
 .course-dots
   display: flex
   gap: 0.25rem
