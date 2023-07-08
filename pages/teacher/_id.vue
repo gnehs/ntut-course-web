@@ -123,6 +123,9 @@ export default {
     },
   },
   mounted() {
+    if (this.name === "朴維鎮") {
+      this.$router.push(`/not-found`);
+    }
     this.getTeacher();
   },
   methods: {

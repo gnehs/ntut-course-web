@@ -431,6 +431,9 @@ export default {
           .map((c) => courseNumber[c])
           .join("");
         this.courseData = course.filter((x) => x.id == courseId)[0];
+        if (this.courseData.teacher.some((x) => x.name === "朴維鎮")) {
+          this.$router.push(`/not-found`);
+        }
         this.description = this.courseData.description.zh;
         this.title = `${parsedCourseId} ${this.courseData.name.zh}`;
         this.checkCourseInMyCourse();
