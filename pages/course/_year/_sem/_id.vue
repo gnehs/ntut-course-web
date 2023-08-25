@@ -187,6 +187,8 @@
           </div>
         </div>
       </div>
+      <h3>贊助商廣告</h3>
+      <adsbygoogle />
       <h3>課程概述</h3>
       <p v-html="parseTextarea(courseData.description.zh)" />
       <p v-html="parseTextarea(courseData.description.en)" />
@@ -303,8 +305,7 @@
         </div>
       </div>
 
-      <h3>贊助商廣告</h3>
-      <adsbygoogle />
+      <share-preview />
     </div>
   </div>
 </template>
