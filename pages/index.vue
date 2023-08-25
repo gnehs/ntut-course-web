@@ -1,17 +1,25 @@
 <template>
   <div>
     <div class="header">
-      <div class="department" @click="$openDatasetDialog"> {{ $store.state.department == 'main' ? '日間部' : $store.state.department }}</div>
-      <div class="title"> {{ `${$store.state.year} 年${$store.state.sem == '1' ? '上' : '下'}學期` }}</div>
+      <div class="department" @click="$openDatasetDialog">
+        {{
+          $store.state.department == "main" ? "日間部" : $store.state.department
+        }}
+      </div>
+      <div class="title">
+        {{
+          `${$store.state.year} 年${$store.state.sem == "1" ? "上" : "下"}學期`
+        }}
+      </div>
     </div>
     <universal-search class="universal-search" />
     <upcoming-course />
     <h2>課程</h2>
-    <mini-notify><strong>進階搜尋大更新！</strong> 新增了多種篩選器，也可以更輕鬆的設定各種條件，此外博雅與體育搜尋也移到「進階搜尋」頁面了。</mini-notify>
     <div class="cards">
       <card
         class="hoverable padding"
-        :to="`/advanced-search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`">
+        :to="`/advanced-search?year=${$store.state.year}&sem=${$store.state.sem}&d=${$store.state.department}`"
+      >
         <card-title>進階搜尋</card-title>
         <p>依條件搜尋課程</p>
         <i class="bx bx-search"></i>
@@ -48,17 +56,20 @@
       <card class="hoverable padding" to="/calendar">
         <card-title>行事曆</card-title>
         <p>查看學校行事曆</p>
-        <i class='bx bx-calendar'></i>
+        <i class="bx bx-calendar"></i>
       </card>
       <card class="hoverable padding" :to="`/widget?year=${$store.state.year}`">
         <card-title>iOS 小工具</card-title>
         <p>在桌面上檢視接下來的課程</p>
         <i class="bx bx-extension"></i>
       </card>
-      <card class="hoverable padding" :to="`/add-calendar?year=${$store.state.year}`">
+      <card
+        class="hoverable padding"
+        :to="`/add-calendar?year=${$store.state.year}`"
+      >
         <card-title>新增課程到行事曆</card-title>
         <p>將我的課程匯入至行事曆</p>
-        <i class='bx bx-calendar-plus'></i>
+        <i class="bx bx-calendar-plus"></i>
       </card>
     </div>
 
@@ -72,7 +83,7 @@
       <card class="hoverable padding" to="/changelog">
         <card-title>更新日誌</card-title>
         <p>查看本站最近的更新日誌</p>
-        <i class='bx bx-history'></i>
+        <i class="bx bx-history"></i>
       </card>
       <card class="hoverable padding" to="/about">
         <card-title>關於</card-title>
@@ -99,28 +110,30 @@
     <h2>贊助商廣告</h2>
     <adsbygoogle />
 
-    <p style="text-align: center;font-size: .75em;opacity: .75;">
+    <p style="text-align: center; font-size: 0.75em; opacity: 0.75">
       本站資料擷取自
-      <a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank">國立臺北科技大學課程系統</a>，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
+      <a href="https://aps.ntut.edu.tw/course/tw/course.jsp" target="_blank"
+        >國立臺北科技大學課程系統</a
+      >，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
     </p>
   </div>
 </template>
 
 <script>
-import universalSearch from '~/components/universal-search.vue'
+import universalSearch from "~/components/universal-search.vue";
 export default {
   components: { universalSearch },
   data: () => ({
-    standardURL: `/standard`
+    standardURL: `/standard`,
   }),
   created() {
     if (localStorage[`data-standard-query`]) {
-      let query = JSON.parse(localStorage[`data-standard-query`])
-      this.standardURL = `/standard?year=${query.year}&system=${query.system}&department=${query.department}`
+      let query = JSON.parse(localStorage[`data-standard-query`]);
+      this.standardURL = `/standard?year=${query.year}&system=${query.system}&department=${query.department}`;
     }
   },
-  methods: {}
-}
+  methods: {},
+};
 </script>
 <style lang="sass" scoped>
 .header
