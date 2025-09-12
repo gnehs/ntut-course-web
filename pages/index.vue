@@ -29,6 +29,11 @@
         <p>查看各班上課時間表</p>
         <i class="bx bx-time"></i>
       </card>
+      <card class="hoverable padding" to="/mprogram">
+        <card-title>微學程</card-title>
+        <p>查詢微學程課程</p>
+        <i class="bx bx-book-content"></i>
+      </card>
       <card class="hoverable padding" to="/my-course">
         <card-title>我的課程</card-title>
         <p>查看已儲存的課程</p>

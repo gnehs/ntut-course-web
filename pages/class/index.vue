@@ -80,7 +80,7 @@ export default {
       const loading = this.$vs.loading()
       try {
         this.departmentData = await fetch(
-          `https://gnehs.github.io/ntut-course-crawler-node/${this.year}/${this.sem}/department.json`
+          this.$api(`/${this.year}/${this.sem}/department.json`)
         ).then(x => x.json())
         this.filteredDepartmentData = this.departmentData
         loading.close()

@@ -63,7 +63,7 @@ export default {
       let period = this.period == 'all' ? '' : this.period
       this.stat = null
       this.data = null
-      let withdrawalData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal${period}.json`)
+      let withdrawalData = await fetch(this.$api(`/analytics/withdrawal${period}.json`))
         .then(res => res.json())
       this.stat = withdrawalData.stat
       this.data = withdrawalData.data
