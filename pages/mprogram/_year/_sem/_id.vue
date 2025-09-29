@@ -2,7 +2,7 @@
   <div>
     <div class="lr-container">
       <div class="l">
-        <h1>{{ classname }}</h1>
+        <h1>{{ programname }}</h1>
       </div>
       <div class="r">
         <vs-button
@@ -30,12 +30,10 @@
       :courses="result"
       show-timetable
       :show-conflict-course="showConflictCourse" />
-    <vs-alert v-if="result && !result.length && classData">
+    <vs-alert v-if="result && !result.length && programData">
       <template #title>查無資料</template>
-      請點選右上角的按鈕來切換學制看看。
-      <br />或是
       <a
-        :href="'https://aps.ntut.edu.tw/course/tw/' + classData.href"
+        :href="'https://aps.ntut.edu.tw/course/tw/' + programData.href"
         target="_blank">前往原始網頁</a>
       看看原本的資料
     </vs-alert>
@@ -50,43 +48,39 @@ export default {
   data: () => ({
     onError: null,
     result: null,
-    classData: null,
-    classname: '班級',
+    programData: null,
+    programname: '微學程',
     isInMyCouse: false,
     showConflictCourse: true
   }),
   head() {
     return {
-      title: this.classname
+      title: this.programname
     }
   },
   created() {
-    this.getCourseByClass()
+    this.getCourseByProgram()
   },
   methods: {
-    async getCourseByClass() {
+    async getCourseByProgram() {
       const loading = this.$vs.loading()
       try {
-        let { year, sem } = this.$route.params
-        this.classname = this.$route.params.id
-        //fetch class
-        let departmentData = await fetch(this.$api(`/${year}/${sem}/department.json`))
-        .then(x =>x.json())
-        departmentData.map(x => {
-          x.class.map(y => {
-            if (y.name == this.classname) {
-              this.classData = y
-            }
-          })
-        })
-        // fetch course
-        let classname = this.classname
-        let course = await this.$fetchCourse(year, sem)
-        function detectClass(c) {
-          let d = c.map(x => x.name)
-          return d.includes(classname)
+        let { year, sem, id } = this.$route.params
+        // fetch program list
+        let programList = await fetch(
+          this.$api(`/${year}/${sem}/mprogram.json`)
+        ).then(x => x.json())
+        this.programData = programList.find(x => x.id == id)
+        if (this.programData) {
+          this.programname = this.programData.name
         }
-        course = course.filter(x => detectClass(x.class))
+        // fetch courses
+        let course = await this.$fetchCourse(year, sem)
+        if (this.programData && this.programData.course) {
+          course = course.filter(x => this.programData.course.includes(x.id))
+        } else {
+          course = []
+        }
         this.result = course
         this.checkIsInMyCourse()
       } catch (e) {
@@ -97,30 +91,26 @@ export default {
     },
     checkIsInMyCourse() {
       let { year, sem } = this.$route.params
-      let myCourseClassKey = `my-couse-class-${year}-${sem}`
-      this.isInMyCouse = localStorage[myCourseClassKey] == this.classname
+      let key = `my-couse-mprogram-${year}-${sem}`
+      this.isInMyCouse = localStorage[key] == this.programname
     },
     addCourse2myCourse() {
-      // record id
-      let { id } = this.classData
-      localStorage['my-class'] = id
-
       let { year, sem } = this.$route.params
-      let myCourseClassKey = `my-couse-class-${year}-${sem}`
-      if (localStorage[myCourseClassKey] != this.classname && localStorage[myCourseClassKey]) {
-        let changeClass = confirm(`你先前已將「${localStorage[myCourseClassKey]}」之課程加入我的課程，此行為會導致課程過多，要繼續嗎？`)
-        if (!changeClass) {
+      let key = `my-couse-mprogram-${year}-${sem}`
+      if (localStorage[key] != this.programname && localStorage[key]) {
+        let change = confirm(`你先前已將「${localStorage[key]}」之課程加入我的課程，此行為會導致課程過多，要繼續嗎？`)
+        if (!change) {
           return
         }
       }
-      localStorage[myCourseClassKey] = this.classname
+      localStorage[key] = this.programname
       for (let course of this.result) {
         this.$addCourse(course.id)
       }
       this.isInMyCouse = true
       this.$vs.notification({
         title: '加入完成！',
-        text: `已將「${this.classname}」加入到我的課程`
+        text: `已將「${this.programname}」加入到我的課程`
       })
     },
     removeFromMyCourse() {
@@ -128,11 +118,11 @@ export default {
       for (let course of this.result) {
         this.$removeCourse(course.id)
       }
-      localStorage.removeItem(`my-couse-class-${year}-${sem}`)
+      localStorage.removeItem(`my-couse-mprogram-${year}-${sem}`)
       this.isInMyCouse = false
       this.$vs.notification({
         title: '已移除',
-        text: `已將「${this.classname}」從我的課程中移除`
+        text: `已將「${this.programname}」從我的課程中移除`
       })
     }
   }

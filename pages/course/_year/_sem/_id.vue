@@ -440,7 +440,7 @@ export default {
         this.checkCourseInMyCourse();
         this.checkIsCourseConflict();
         this.fetchedCourseData = await fetch(
-          `https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/course/${courseId}.json`
+          this.$api(`/${year}/${sem}/course/${courseId}.json`)
         ).then((x) => x.json());
         if (this.fetchedCourseData.length > 1) {
           this.chooseClassSelect = true;

@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     getCalendarData() {
-      fetch(`https://gnehs.github.io/ntut-course-crawler-node/calendar.json`)
+      fetch(this.$api('/calendar.json'))
         .then(response => response.json())
         .then(response => {
           this.calendarData = response

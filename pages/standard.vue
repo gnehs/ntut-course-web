@@ -174,7 +174,7 @@ export default {
         this.years = null
         let res = await this.$getStore('standards')
         if (!res) {
-          res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/standards.json`).then(x => x.json())
+          res = await fetch(this.$api('/standards.json')).then(x => x.json())
         }
         this.years = structuredClone(res)
         await this.$setStore('standards', res, 30)
@@ -187,7 +187,7 @@ export default {
       try {
         let res = await this.$getStore(`standard_${yr}`)
         if (!res) {
-          res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${yr}/standard.json`).then(x => x.json())
+          res = await fetch(this.$api(`/${yr}/standard.json`)).then(x => x.json())
         }
         this.standardData = structuredClone(res)
         await this.$setStore(`standard_${yr}`, res, 30)

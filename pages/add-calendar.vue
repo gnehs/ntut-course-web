@@ -131,7 +131,7 @@ export default {
   },
   methods: {
     async getCalendar() {
-      let calendarData = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/calendar.json`).then(x => x.json())
+      let calendarData = await fetch(this.$api('/calendar.json')).then(x => x.json())
       let startDays = calendarData.filter(x => x.summary.includes('開學')).map(x => x.start)
       let endDays = calendarData.filter(x => x.summary == '期末考試').map(x => x.end)
 

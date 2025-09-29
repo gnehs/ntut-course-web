@@ -31,6 +31,7 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
+    '@/plugins/api',
     '@/plugins/ics',
     '@/plugins/vuesax',
     '@/plugins/vlf',
@@ -58,6 +59,10 @@ export default {
     // https://github.com/nuxt-modules/google-adsense
     '@nuxtjs/google-adsense'
   ],
+
+  publicRuntimeConfig: {
+    apiBase: process.env.BASE_URL || 'https://gnehs.github.io/ntut-course-crawler-node'
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {

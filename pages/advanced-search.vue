@@ -230,7 +230,7 @@ export default {
   methods: {
     async getWithdrawalRate() {
       if (!this.withdrawalRate) {
-        let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json`)
+        let res = await fetch(this.$api('/analytics/withdrawal-rate.json'))
           .then(x => x.json())
         this.withdrawalRate = res
       }
@@ -242,7 +242,7 @@ export default {
     async fetchDepartmentData() {
       if (!this.departmentData) {
         let { year, sem } = this.$route.query
-        let res = await fetch(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`)
+        let res = await fetch(this.$api(`/${year}/${sem}/department.json`))
           .then(x => x.json())
         this.departmentData = res
         // update academyList

@@ -131,16 +131,16 @@ export default {
   methods: {
     async getTeacher() {
       let withdrawalRateData = await fetch(
-        `https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json`
+        this.$api('/analytics/withdrawal-rate.json')
       ).then((res) => res.json());
       let withdrawalRateData_3y = await fetch(
-        `https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recent-3-years.json`
+        this.$api('/analytics/withdrawal-rate-recent-3-years.json')
       ).then((res) => res.json());
       let withdrawalRateData_5y = await fetch(
-        `https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recent-5-years.json`
+        this.$api('/analytics/withdrawal-rate-recent-5-years.json')
       ).then((res) => res.json());
       let withdrawalData = await fetch(
-        `https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal.json`
+        this.$api('/analytics/withdrawal.json')
       ).then((res) => res.json());
       if (!withdrawalRateData[this.name]) {
         this.onError = "找不到教師";

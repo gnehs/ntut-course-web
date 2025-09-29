@@ -1,7 +1,8 @@
 import axios from "axios";
 import fs from "fs";
 import { JSDOM } from "jsdom";
-
+import createApi from "./utils/api.js";
+const { apiUrl } = createApi(process.env.BASE_URL || 'https://gnehs.github.io/ntut-course-crawler-node');
 
 
 let now = new Date()
@@ -33,8 +34,8 @@ function updateTags({ title, description, image, url }) {
   document.querySelector('title').textContent = title
 }
 console.log('Generate course preview')
-let yearSems = await axios.get('https://gnehs.github.io/ntut-course-crawler-node/main.json').then((res) => res.data);
-let withdrawal = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal.json`).then((res) => res.data);
+let yearSems = await axios.get(apiUrl('/main.json')).then((res) => res.data);
+let withdrawal = await axios.get(apiUrl('/analytics/withdrawal.json')).then((res) => res.data);
 console.log(`Data fetched`)
 
 let tasks = []
@@ -42,8 +43,8 @@ tasks.push(...Object.entries(yearSems)
   .map((([year, sems]) => sems.map(sem => ({ year, sem }))))
   .flat()
   .map(async ({ year, sem }) => {
-    let courses = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/main.json`).then(x => x.data)
-    let departments = await axios.get(`https://gnehs.github.io/ntut-course-crawler-node/${year}/${sem}/department.json`).then(x => x.data)
+    let courses = await axios.get(apiUrl(`/${year}/${sem}/main.json`)).then(x => x.data)
+    let departments = await axios.get(apiUrl(`/${year}/${sem}/department.json`)).then(x => x.data)
     fs.mkdirSync(`./dist/course/${year}/${sem}/`, { recursive: true })
     fs.mkdirSync(`./dist/class/${year}/${sem}/`, { recursive: true })
 

@@ -243,7 +243,7 @@ export default {
             text: "下載課程清單...",
           });
           result = await fetch(
-            `https://gnehs.github.io/ntut-course-crawler-node/${y}/${s}/${department}.json`
+            this.$api(`/${y}/${s}/${department}.json`)
           ).then((x) => x.json());
           await this.$setStore(dataKey, result);
           loading.close();
@@ -271,7 +271,7 @@ export default {
       let key = `main_year`;
       try {
         let res = await fetch(
-          `https://gnehs.github.io/ntut-course-crawler-node/main.json`
+          this.$api('/main.json')
         ).then((x) => x.json());
         sessionStorage[key] = JSON.stringify(res);
         return JSON.parse(sessionStorage[key]);
@@ -348,7 +348,7 @@ export default {
       let res = await this.$getStore("withdrawalRate");
       if (!res) {
         res = await fetch(
-          `https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json`
+          this.$api('/analytics/withdrawal-rate.json')
         ).then((x) => x.json());
         await this.$setStore("withdrawalRate", res, 30);
       }

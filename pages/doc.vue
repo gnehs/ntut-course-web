@@ -12,7 +12,7 @@
 - 這份文件非即時更新，可能會有 API 失效
 - 資料擷取自 [國立臺北科技大學課程系統](https://aps.ntut.edu.tw/course/tw/course.jsp)，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。
 ## 來試試看吧！
-你可以使用 [Hoppscotch](https://hoppscotch.io/?method=GET&url=https://gnehs.github.io&path=/ntut-course-crawler-node/main.json) 或 [Postman](https://www.postman.com/) 來發起請求。
+你可以使用 [Hoppscotch](https://hoppscotch.io) 或 [Postman](https://www.postman.com/) 來發起請求。
 
 ## 相關連結
 [使用了北科課程好朋友 API 的專案](https://github.com/gnehs/ntut-course-crawler-node/issues/1)
@@ -21,11 +21,11 @@
 
 ## API Endpoint
 ### Endpoint
-https://gnehs.github.io/ntut-course-crawler-node/
+{{$api('')}}/
 ### 說明
 如果你想取得 `/main.json` 的資料，請將 `Endpoint` 加在其前方。
 
-就像這樣：`https://gnehs.github.io/ntut-course-crawler-node/main.json`
+就像這樣：<code>{{ $api('/main.json') }}</code>
 
 -------
 # API 清單
@@ -35,7 +35,7 @@ https://gnehs.github.io/ntut-course-crawler-node/
 
 ### `/main.json` 取得所有可用之年份與學期
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/main.json
+<a :href="$api('/main.json')">{{ $api('/main.json') }}</a>
 
 </div><div class="white-box">
 
@@ -43,7 +43,7 @@ https://gnehs.github.io/ntut-course-crawler-node/main.json
 #### 注意
 該檔案非常大，可能有機會無法解析
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/109/2/進修部.json
+<a :href="$api('/109/2/進修部.json')">{{ $api('/109/2/進修部.json') }}</a>
 #### 參數
 - `year` 民國年
 - `sem` 學期
@@ -59,7 +59,7 @@ https://gnehs.github.io/ntut-course-crawler-node/109/2/進修部.json
 
 ### `/{year}/{sem}/course/{id}.json` 取得課程詳細資料
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/109/2/course/281841.json
+<a :href="$api('/109/2/course/281841.json')">{{ $api('/109/2/course/281841.json') }}</a>
 #### 參數
 - `year` 民國年
 - `sem` 學期
@@ -75,7 +75,7 @@ https://gnehs.github.io/ntut-course-crawler-node/109/2/course/281841.json
 
 ### `/{year}/{sem}/department.json` 取得系所班級清單
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/109/2/department.json
+<a :href="$api('/109/2/department.json')">{{ $api('/109/2/department.json') }}</a>
 #### 參數
 - `year` 民國年
 - `sem` 學期
@@ -89,13 +89,13 @@ https://gnehs.github.io/ntut-course-crawler-node/109/2/department.json
 
 ### `/standards.json` 取得課程標準可用年份
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/standards.json
+<a :href="$api('/standards.json')">{{ $api('/standards.json') }}</a>
 
 </div><div class="white-box">
 
 ### `/{year}/standard.json` 取得當年度入學之課程標準
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/110/standard.json
+<a :href="$api('/110/standard.json')">{{ $api('/110/standard.json') }}</a>
 #### 參數
 - `year` 民國年
 </div>
@@ -107,13 +107,13 @@ https://gnehs.github.io/ntut-course-crawler-node/110/standard.json
 
 ### `/analytics/withdrawal-recent-3-years.json` 近三年退選率資料
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-recent-3-years.json
+<a :href="$api('/analytics/withdrawal-recent-3-years.json')">{{ $api('/analytics/withdrawal-recent-3-years.json') }}</a>
 
 </div><div class="white-box">
 
 ### `/analytics/withdrawal-rate-recent-3-years.json` 近三年退選率資料（僅比率）
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recent-3-years.json
+<a :href="$api('/analytics/withdrawal-rate-recent-3-years.json')">{{ $api('/analytics/withdrawal-rate-recent-3-years.json') }}</a>
 
 </div>
 
@@ -122,13 +122,13 @@ https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recen
 
 ### `/analytics/withdrawal-recent-5-years.json` 近五年退選率資料
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-recent-5-years.json
+<a :href="$api('/analytics/withdrawal-recent-5-years.json')">{{ $api('/analytics/withdrawal-recent-5-years.json') }}</a>
 
 </div><div class="white-box">
 
 ### `/analytics/withdrawal-rate-recent-5-years.json` 近五年退選率資料（僅比率）
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recent-5-years.json
+<a :href="$api('/analytics/withdrawal-rate-recent-5-years.json')">{{ $api('/analytics/withdrawal-rate-recent-5-years.json') }}</a>
 
 </div>
 
@@ -137,13 +137,13 @@ https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate-recen
 
 ### `/analytics/withdrawal.json` 所有年度退選率資料
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal.json
+<a :href="$api('/analytics/withdrawal.json')">{{ $api('/analytics/withdrawal.json') }}</a>
 
 </div><div class="white-box">
 
 ### `/analytics/withdrawal.json` 所有年度退選率資料（僅比率）
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json
+<a :href="$api('/analytics/withdrawal-rate.json')">{{ $api('/analytics/withdrawal-rate.json') }}</a>
 
 </div>
 
@@ -152,7 +152,7 @@ https://gnehs.github.io/ntut-course-crawler-node/analytics/withdrawal-rate.json
 
 ### `/calendar.json` 取得行事曆
 #### Example
-https://gnehs.github.io/ntut-course-crawler-node/calendar.json
+<a :href="$api('/calendar.json')">{{ $api('/calendar.json') }}</a>
 </div>
 </template>
 <style scoped lang="sass">
