@@ -354,8 +354,44 @@ export default {
     },
     parseTime(t) {
       let result = []
-      for (let i of Object.entries(t)) {
-        if (i[1].length) result.push({ title: this.dateEng2zh[i[0]], content: i[1].join('、') })
+      for (let [day, times] of Object.entries(t)) {
+        if (times.length) {
+          const sortedTimes = [...times].sort((a, b) => {
+            if (a === 'N') return -1
+            if (b === 'N') return 1
+            return a.localeCompare(b)
+          })
+
+          const mergedTimes = []
+          let start = sortedTimes[0]
+          let prev = start
+
+          for (let i = 1; i <= sortedTimes.length; i++) {
+            const current = sortedTimes[i]
+            
+            if (i === sortedTimes.length || 
+                current === 'N' || 
+                prev === 'N' || 
+                parseInt(current) !== parseInt(prev) + 1) {
+              
+              if (start === 'N' || start === prev) {
+                mergedTimes.push(start)
+              } else {
+                mergedTimes.push(`${start}~${prev}`)
+              }
+              
+              if (i < sortedTimes.length) {
+                start = current
+              }
+            }
+            prev = current
+          }
+          
+          result.push({
+            title: this.dateEng2zh[day],
+            content: mergedTimes.join('、')
+          })
+        }
       }
       return result
     },
