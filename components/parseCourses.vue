@@ -269,6 +269,28 @@ export default {
     },
     timetableCourse() {
       let res = []
+      // Group contiguous time slots
+      const groupContiguous = (times) => {
+        if (!times || !times.length) return []
+        const order = this.timetable
+        const sorted = [...times].sort((a, b) => order.indexOf(a) - order.indexOf(b))
+        const groups = []
+        let current = [sorted[0]]
+        
+        for (let i = 1; i < sorted.length; i++) {
+          const prevIdx = order.indexOf(sorted[i - 1])
+          const idx = order.indexOf(sorted[i])
+          if (idx === prevIdx + 1) {
+            current.push(sorted[i])
+          } else {
+            groups.push([...current])
+            current = [sorted[i]]
+          }
+        }
+        if (current.length) groups.push(current)
+        return groups
+      }
+
       function checkConflict(a, b) {
         for (let i of Object.entries(a.time)) {
           for (let j of i[1]) {
@@ -300,11 +322,16 @@ export default {
             if (isConflict) {
               conflictTimetable[key].push(course.time[key])
             } else {
-              res.push({
-                ...course,
-                date: key,
-                dateTime: course.time[key]
-              })
+              // Split non-contiguous time slots into groups
+              const groups = groupContiguous(course.time[key])
+              for (const group of groups) {
+                res.push({
+                  ...course,
+                  id: group.length > 1 ? `${course.id}-${group[0]}-${group[group.length-1]}` : `${course.id}-${group[0]}`,
+                  date: key,
+                  dateTime: group
+                })
+              }
             }
           }
         }
@@ -312,13 +339,16 @@ export default {
       for (let key of Object.keys(conflictTimetable)) {
         conflictTimetable[key] = [...new Set(conflictTimetable[key].reduce((a, b) => a.concat(b), []))]
       }
-      Object.entries(conflictTimetable).map(x => {
-        if (x[1].length) {
-          res.push({
-            id: 'conflict',
-            date: x[0],
-            dateTime: x[1],
-            isConflict: true
+      Object.entries(conflictTimetable).forEach(([key, times]) => {
+        if (times.length) {
+          const groups = groupContiguous(times)
+          groups.forEach((group, i) => {
+            res.push({
+              id: `conflict-${key}-${i}`,
+              date: key,
+              dateTime: group,
+              isConflict: true
+            })
           })
           console.log(res)
         }
@@ -404,37 +434,16 @@ export default {
       if (this.page > length) this.page = 1
     },
     parseCourseStyle(item) {
-      // normalize dateTime to array
-      const times = Array.isArray(item.dateTime) ? [...item.dateTime] : [item.dateTime]
-      const order = this.timetable
-      if (!times.length) {
-        return {
-          'grid-column-start': `🥞${this.dateEng2zh[item.date].slice(1)}`,
-        }
-      }
-      // sort by timetable order
-      const sorted = times.sort((a, b) => order.indexOf(a) - order.indexOf(b))
-      // find the first contiguous block starting from the earliest time
-      let startIdx = order.indexOf(sorted[0])
-      if (startIdx === -1) startIdx = 0
-      let endIdx = startIdx
-      for (let i = 1; i < sorted.length; i++) {
-        const idx = order.indexOf(sorted[i])
-        if (idx === endIdx + 1) {
-          endIdx = idx
-        } else {
-          // stop at the first gap to avoid spanning across non-contiguous slots
-          break
-        }
-      }
-      const start = `🥞` + order[startIdx]
-      const end = `🥞` + (order[endIdx + 1] || 'end')
-      const date = `🥞` + this.dateEng2zh[item.date].slice(1)
-
-      return ({
+      const first = item.dateTime[0]
+      const last = item.dateTime[item.dateTime.length - 1]
+      const start = `🥞${first}`
+      const end = `🥞${this.timetable[this.timetable.indexOf(last) + 1] || 'end'}`
+      const date = `🥞${this.dateEng2zh[item.date].slice(1)}`
+      
+      return {
         'grid-column-start': date,
         'grid-row': `${start} / ${end}`,
-      })
+      }
 
     }
   }
