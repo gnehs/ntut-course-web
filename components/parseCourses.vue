@@ -327,7 +327,6 @@ export default {
               for (const group of groups) {
                 res.push({
                   ...course,
-                  id: group.length > 1 ? `${course.id}-${group[0]}-${group[group.length-1]}` : `${course.id}-${group[0]}`,
                   date: key,
                   dateTime: group
                 })
