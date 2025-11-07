@@ -404,9 +404,32 @@ export default {
       if (this.page > length) this.page = 1
     },
     parseCourseStyle(item) {
-      let start = `🥞` + item.dateTime.at(0)
-      let end = `🥞` + this.timetable[this.timetable.indexOf(item.dateTime.at(-1)) + 1]
-      let date = `🥞` + this.dateEng2zh[item.date].slice(1)
+      // normalize dateTime to array
+      const times = Array.isArray(item.dateTime) ? [...item.dateTime] : [item.dateTime]
+      const order = this.timetable
+      if (!times.length) {
+        return {
+          'grid-column-start': `🥞${this.dateEng2zh[item.date].slice(1)}`,
+        }
+      }
+      // sort by timetable order
+      const sorted = times.sort((a, b) => order.indexOf(a) - order.indexOf(b))
+      // find the first contiguous block starting from the earliest time
+      let startIdx = order.indexOf(sorted[0])
+      if (startIdx === -1) startIdx = 0
+      let endIdx = startIdx
+      for (let i = 1; i < sorted.length; i++) {
+        const idx = order.indexOf(sorted[i])
+        if (idx === endIdx + 1) {
+          endIdx = idx
+        } else {
+          // stop at the first gap to avoid spanning across non-contiguous slots
+          break
+        }
+      }
+      const start = `🥞` + order[startIdx]
+      const end = `🥞` + (order[endIdx + 1] || 'end')
+      const date = `🥞` + this.dateEng2zh[item.date].slice(1)
 
       return ({
         'grid-column-start': date,
