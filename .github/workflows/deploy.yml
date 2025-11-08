@@ -1,5 +1,9 @@
 name: Deploy to GitHub Pages
 
+env:
+  BASE_URL: ${{ vars.BASE_URL }}
+  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+
 on:
   push:
     branches: 蹦蹦
