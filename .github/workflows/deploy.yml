@@ -32,4 +32,4 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: dist
         force_orphan: true
-        cname: ${{ env.DOMAIN_NAME || 'ntut-course.gnehs.net' }}
+        cname: daoyoucourse.duckdns.org
