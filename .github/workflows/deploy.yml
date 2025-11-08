@@ -10,9 +10,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: 14
         cache: 'npm'
@@ -26,9 +27,9 @@ jobs:
     - name: Generate Preview
       run: node generateCoursePreview.mjs
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: dist
         force_orphan: true
-        cname: daoyoucourse.duckdns.org
+        cname: ${{ env.DOMAIN_NAME || 'ntut-course.gnehs.net' }}
