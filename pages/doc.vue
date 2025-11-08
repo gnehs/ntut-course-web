@@ -21,7 +21,7 @@
 
 ## API Endpoint
 ### Endpoint
-{{$api('')}}/
+{{$api('')}}
 ### 說明
 如果你想取得 `/main.json` 的資料，請將 `Endpoint` 加在其前方。
 
