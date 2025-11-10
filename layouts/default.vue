@@ -33,7 +33,7 @@
     </div>
     <div class="text-footer" v-if="isIframe && !isAdvancedSearch">
       本資料由
-      <a href="https://ntut-course.gnehs.net/" target="_blank"
+      <a :href="`https://${$config.domainName}/`" target="_blank"
         >北科課程好朋友</a
       >
       提供

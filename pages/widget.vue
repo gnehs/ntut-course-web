@@ -126,7 +126,7 @@ function createWidget() {
             let iconElement = footerStack.addText("🍤")
             iconElement.textOpacity = 0.5
             iconElement.font = Font.mediumSystemFont(13)
-            iconElement.url = `http://ntut-course.gnehs.net/`
+            iconElement.url = `http://{{ $config.domainName }}/`
         }
     } else {
         let courseTxt = widget.addText('沒有課程')
@@ -144,7 +144,7 @@ function createWidget() {
         providerText.textColor = Color.white()
         providerText.textOpacity = 0.7
         providerText.font = Font.mediumSystemFont(13)
-        footerStack.url = `http://ntut-course.gnehs.net/`
+        footerStack.url = `http://{{ $config.domainName }}/`
     }
     return widget
 }
@@ -203,7 +203,7 @@ export default {
             .map(y => y.name)
             .join('、')
             .trimEllip(13),
-          link: `https://ntut-course.gnehs.net/course/${year}/${sem}/${x.id}`
+          link: `https://${this.$config.domainName}/course/${year}/${sem}/${x.id}`
         }))
     },
     doCopy() {

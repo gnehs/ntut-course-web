@@ -3,6 +3,7 @@ import fs from "fs";
 import { JSDOM } from "jsdom";
 import createApi from "./utils/api.js";
 const { apiUrl } = createApi(process.env.BASE_URL || 'https://gnehs.github.io/ntut-course-crawler-node');
+const domainName = process.env.DOMAIN_NAME || 'ntut-course.gnehs.net';
 
 
 let now = new Date()
@@ -55,7 +56,7 @@ tasks.push(...Object.entries(yearSems)
       let title = `${parsedCourseId} ${course.name.zh}`
       let description = `${course.description.zh}`
       let image = `https://ntut-course-og.gnehs.net/api?year=${year}&sem=${sem}&id=${course.id}`
-      let url = `https://ntut-course.gnehs.net/course/${year}/${sem}/${course.id}`
+      let url = `https://${domainName}/course/${year}/${sem}/${course.id}`
       updateTags({ title, description, image, url })
 
       fs.writeFileSync(`./dist/course/${year}/${sem}/${course.id}.html`, dom.serialize().replace(/&amp;/g, '&'))
@@ -74,7 +75,7 @@ tasks.push(...Object.entries(yearSems)
           description += `，如必選修課程、博雅等相關課程資訊`
         }
         let image = `https://ntut-course-og.gnehs.net/api/class?year=${year}&sem=${sem}&id=${x.id}`
-        let url = `https://ntut-course.gnehs.net/class/${year}/${sem}/${encodeURIComponent(x.name)}`
+        let url = `https://${domainName}/class/${year}/${sem}/${encodeURIComponent(x.name)}`
 
         updateTags({ title, description, image, url })
         fs.writeFileSync(`./dist/class/${year}/${sem}/${x.name}.html`, dom.serialize().replace(/&amp;/g, '&'))
@@ -91,7 +92,7 @@ tasks.push(...withdrawal.data.map(x => {
   let title = x.name
   let description = `在北科好朋友上查看教師「${x.name}」的資訊，包含${[...new Set(x.course.map(x => x.name.zh))].slice(0, 3).join('、')}等課程與選課人數等相關資訊`
   let image = `https://ntut-course-og.gnehs.net/api/teacher?name=${encodeURIComponent(x.name)}`
-  let url = `https://ntut-course.gnehs.net/teacher/${encodeURIComponent(x.name)}`
+  let url = `https://${domainName}/teacher/${encodeURIComponent(x.name)}`
   updateTags({ title, description, image, url })
 
   fs.writeFileSync(`./dist/teacher/${x.name}.html`, dom.serialize().replace(/&amp;/g, '&'))
