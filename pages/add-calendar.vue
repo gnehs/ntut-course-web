@@ -177,7 +177,7 @@ export default {
             .map(y => y.name)
             .join('、')
             .trimEllip(13),
-          link: `https://ntut-course.gnehs.net/course/${year}/${sem}/${x.id}`,
+          link: `https://${this.$config.domainName}/course/${year}/${sem}/${x.id}`,
         }))
       this.selectedCourse = JSON.parse(JSON.stringify(this.courseData))
     },
@@ -198,16 +198,34 @@ export default {
       this.$ics.removeAllEvents()
       for (let item of this.selectedCourse) {
         for (let w of Object.keys(item.time)) {
-          let time = item.time[w]
-          if (time.length == 0) continue
-          let startTime = this.timetable[time[0]].start
-          let endTime = this.timetable[time[time.length - 1]].end
+          const time = item.time[w]
+          if (!time || time.length === 0) continue
+
+          const timetableKeys = Object.keys(this.timetable)
+          const slots = time.map(s => String(s))
+            .filter(s => timetableKeys.includes(s))
+            .sort((a, b) => timetableKeys.indexOf(a) - timetableKeys.indexOf(b))
+
+          const groups = []
+          let currentGroup = []
+          for (let i = 0; i < slots.length; i++) {
+            const s = slots[i]
+            if (currentGroup.length === 0) {
+              currentGroup.push(s)
+            } else {
+              const prev = currentGroup[currentGroup.length - 1]
+              if (timetableKeys.indexOf(s) === timetableKeys.indexOf(prev) + 1) {
+                currentGroup.push(s)
+              } else {
+                groups.push(currentGroup)
+                currentGroup = [s]
+              }
+            }
+          }
+          if (currentGroup.length) groups.push(currentGroup)
 
           const mon = new Date(this.start)
-          mon.setDate(mon.getDate() + ((7 - mon.getDay()) % 7 + 1) % 7);
-
-          // format: YYYYMMDDTHHMMSS
-          // auto add zero padding
+          mon.setDate(mon.getDate() + ((7 - mon.getDay()) % 7 + 1) % 7)
           let weekDays = {
             mon: mon,
             tue: new Date(mon.getTime() + 1000 * 60 * 60 * 24),
@@ -218,39 +236,45 @@ export default {
             sun: new Date(mon.getTime() + 1000 * 60 * 60 * 24 * 6)
           }
 
+          for (const group of groups) {
+            const startSlot = group[0]
+            const endSlot = group[group.length - 1]
+            const startTime = this.timetable[startSlot].start
+            const endTime = this.timetable[endSlot].end
 
+            let beginTime = new Date(
+              year,
+              weekDays[w].getMonth(),
+              weekDays[w].getDate(),
+              startTime.split(':')[0],
+              startTime.split(':')[1]
+            )
+            let stopTime = new Date(
+              year,
+              weekDays[w].getMonth(),
+              weekDays[w].getDate(),
+              endTime.split(':')[0],
+              endTime.split(':')[1]
+            )
 
-          let beginTime = new Date(
-            year,
-            weekDays[w].getMonth(),
-            weekDays[w].getDate(),
-            startTime.split(':')[0],
-            startTime.split(':')[1]
-          )
-          let stopTime = new Date(
-            year,
-            weekDays[w].getMonth(),
-            weekDays[w].getDate(),
-            endTime.split(':')[0],
-            endTime.split(':')[1]
-          )
-          // to ics time format
-          let result = {
-            language: 'zh-TW',
-            subject: item.name,
-            description: item.description,
-            location: item.classroom,
-            begin: beginTime.toISOString(),
-            stop: stopTime.toISOString(),
-            url: item.link,
-            organizer: { name: '北科課程好朋友' },
-            rrule: {
-              freq: 'WEEKLY',
-              until,
-              interval: 1
+            // to ics time format
+            let result = {
+              language: 'zh-TW',
+              subject: item.name,
+              description: item.description,
+              location: item.classroom,
+              begin: beginTime.toISOString(),
+              stop: stopTime.toISOString(),
+              url: item.link,
+              organizer: { name: '北科課程好朋友' },
+              rrule: {
+                freq: 'WEEKLY',
+                until,
+                interval: 1
+              }
             }
+            this.$ics.addEvent(result.language, result.subject, result.description, result.location, result.begin, result.stop, result.url, result.organizer, result.rrule)
           }
-          this.$ics.addEvent(result.language, result.subject, result.description, result.location, result.begin, result.stop, result.url, result.organizer, result.rrule)
         }
       }
       let { year: originalYear } = this.$store.state

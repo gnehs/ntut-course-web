@@ -20,6 +20,9 @@ https://github.com/gnehs/ntut-course-crawler-node
 BASE_URL=https://example.com npm run dev
 ```
 
+透過 `production/DOMAIN_NAME` 環境變數可指定 Github Pages 發行時的 CNAME。
+未設定時預設為 `ntut-course.gnehs.net`，若無法適用，將降級為 Github 預設。
+
 ## Build Setup
 
 ```bash
