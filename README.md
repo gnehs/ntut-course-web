@@ -12,32 +12,33 @@ https://github.com/gnehs/ntut-course-crawler-node
 
 ## 環境變數
 
-可透過 `BASE_URL` 環境變數指定 API 進入點，
-未設定時預設為 `https://gnehs.github.io/ntut-course-crawler-node/`。
+可透過 `VITE_API_BASE` 環境變數指定 API 進入點，
+未設定時預設為 `https://gnehs.github.io/ntut-course-crawler-node`。
 
 ```bash
 # 使用自訂的 API 進入點啟動開發伺服器
-BASE_URL=https://example.com npm run dev
+VITE_API_BASE=https://example.com pnpm dev
 ```
 
-透過 `production/DOMAIN_NAME` 環境變數可指定 Github Pages 發行時的 CNAME。
-未設定時預設為 `ntut-course.gnehs.net`，若無法適用，將降級為 Github 預設。
+Vite 只會把 `VITE_` 前綴的變數暴露給前端程式碼。
 
 ## Build Setup
 
 ```bash
 # install dependencies
-$ npm install
+$ pnpm install
 
-# serve with hot reload at localhost:3000
-$ npm run dev
+# serve with hot reload at localhost:7190
+$ pnpm dev
 
 # build for production and launch server
-$ npm run build
-$ npm run start
+$ pnpm build
+$ pnpm start
 
-# generate static project
-$ npm run generate
+# run tests
+$ pnpm test
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+## 技術棧
+
+本站目前使用 React、Vite、Tailwind CSS 與 TanStack Router 建置。靜態資產放在 `static/`，應用程式入口在 `src/main.jsx`，路由定義在 `src/router.jsx`。

@@ -1,0 +1,396 @@
+import { Link, useRouterState } from '@tanstack/react-router'
+import { useEffect, useMemo, useState } from 'react'
+import { Checkbox } from '../components/ui/checkbox.jsx'
+import { AdsByGoogle } from '../components/AdsByGoogle.jsx'
+import { CourseList } from '../components/CourseList.jsx'
+import { TimetableSelector } from '../components/TimetableSelector.jsx'
+import { Alert, Button, Field, Input, Loader, MiniNotify, Select } from '../components/UI.jsx'
+import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils.js'
+import { fetchDepartment, fetchWithdrawalRate } from '../lib/courseApi.js'
+import { createSearchParams, replaceQuery } from '../lib/urlState.js'
+import { useApp } from '../state/AppContext.jsx'
+
+const emptyTimetableFilter = { mon: [], tue: [], wed: [], thu: [], fri: [] }
+const emptyStandardFilter = {
+  '○': false,
+  '△': false,
+  '☆': false,
+  '●': false,
+  '▲': false,
+  '★': false,
+}
+
+export function AdvancedSearchPage() {
+  const { location } = useRouterState()
+  const { dataset, getCourses } = useApp()
+  const params = useMemo(() => createSearchParams(globalThis.location?.search || location.search), [location.search])
+  const restoredQuery = useMemo(() => safeParseJson(params.get('q'), {}), [location.search])
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [searchCourseKeyword, setSearchCourseKeyword] = useState(restoredQuery.k || '')
+  const [showConflictCourse, setShowConflictCourse] = useState(restoredQuery.c ?? true)
+  const [showPlaceholder, setShowPlaceholder] = useState(restoredQuery.sph ?? false)
+  const [sortBy, setSortBy] = useState(restoredQuery.sb || 'default')
+  const [categoryFilter, setCategoryFilter] = useState(restoredQuery.cf || [])
+  const [courseStandardFilter, setCourseStandardFilter] = useState(() => {
+    const next = { ...emptyStandardFilter }
+    for (const key of String(restoredQuery.csf || '').split(',').filter(Boolean)) next[key] = true
+    return next
+  })
+  const [academyFilter, setAcademyFilter] = useState(restoredQuery.af ? String(restoredQuery.af).split(',') : [])
+  const [timetableFilter, setTimetableFilter] = useState(restoredQuery.tf || structuredClone(emptyTimetableFilter))
+  const [allCourses, setAllCourses] = useState(null)
+  const [departmentData, setDepartmentData] = useState(null)
+  const [withdrawalRate, setWithdrawalRate] = useState(null)
+  const [onError, setOnError] = useState(null)
+  const [recommandKeyword, setRecommandKeyword] = useState(['體育', '博雅'])
+
+  const year = params.get('year') || dataset.year
+  const sem = params.get('sem') || dataset.sem
+  const department = params.get('d') || dataset.department
+
+  const academyList = useMemo(() => [...new Set((departmentData || []).map((item) => item.category))], [departmentData])
+  const courseStandardFilterEnabled = useMemo(() => Object.values(courseStandardFilter).some((item) => item), [courseStandardFilter])
+
+  useEffect(() => {
+    setSearchCourseKeyword(restoredQuery.k || '')
+    setShowConflictCourse(restoredQuery.c ?? true)
+    setShowPlaceholder(restoredQuery.sph ?? false)
+    setSortBy(restoredQuery.sb || 'default')
+    setCategoryFilter(restoredQuery.cf || [])
+    setCourseStandardFilter(() => {
+      const next = { ...emptyStandardFilter }
+      for (const key of String(restoredQuery.csf || '').split(',').filter(Boolean)) next[key] = true
+      return next
+    })
+    setAcademyFilter(restoredQuery.af ? String(restoredQuery.af).split(',') : [])
+    setTimetableFilter(restoredQuery.tf || structuredClone(emptyTimetableFilter))
+  }, [restoredQuery])
+
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      try {
+        setAllCourses(null)
+        setDepartmentData(null)
+        const [departments, rate, courses] = await Promise.all([
+          fetchDepartment(year, sem),
+          fetchWithdrawalRate(''),
+          getCourses({ year, sem, department }),
+        ])
+        if (cancelled) return
+        setDepartmentData(departments)
+        setWithdrawalRate(rate)
+        setAllCourses(courses)
+        const classData = departments.map((item) => item.class).flat()
+        const classID = localStorage.getItem('my-class')
+        const className = classData.find((item) => item.id === classID)?.name
+        if (className) {
+          setRecommandKeyword((items) => (items.includes(className) ? items : [...items, className]))
+        }
+      } catch (e) {
+        if (!cancelled) setOnError(e)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [year, sem, department, getCourses])
+
+  const searchResult = useMemo(() => {
+    if (!allCourses) return null
+    try {
+      let filtered = [...allCourses]
+
+      if (searchCourseKeyword.length) {
+        if (!Number.isNaN(Number(searchCourseKeyword)) && searchCourseKeyword.length >= 3) {
+          filtered = filtered.filter((course) => String(course.id || '').includes(searchCourseKeyword))
+        } else {
+          for (const keyword of searchCourseKeyword.split(' ').map((item) => item.toLowerCase()).filter(Boolean)) {
+            filtered = filtered.filter((course) =>
+              String(course.name?.zh || '').toLowerCase().includes(keyword) ||
+              String(course.name?.en || '').toLowerCase().includes(keyword) ||
+              (course.teacher || []).map((item) => item.name).join(' ').toLowerCase().includes(keyword) ||
+              (course.class || []).map((item) => item.name).join(' ').toLowerCase().includes(keyword)
+            )
+            if (keyword === '體育') {
+              filtered = filtered.filter((course) => (course.class || []).map((item) => item.name).join(' ').toLowerCase().includes(keyword))
+            }
+          }
+        }
+      }
+
+      if (courseStandardFilterEnabled) {
+        const standardList = Object.keys(courseStandardFilter).filter((item) => courseStandardFilter[item])
+        filtered = filtered.filter((course) => standardList.includes(course.courseType))
+      }
+
+      if (categoryFilter.length) {
+        filtered = filtered.filter((course) => (course.class || []).map((item) => item.name).join('').includes('博雅') && categoryFilter.some((item) => String(course.notes || '').includes(item)))
+      }
+
+      filtered = filtered.filter((course) => {
+        for (const date of Object.keys(timetableFilter)) {
+          for (const slot of timetable) {
+            if (timetableFilter[date].includes(slot) && course.time?.[date]?.includes(slot)) return false
+          }
+        }
+        return true
+      })
+
+      if (academyFilter.length && departmentData) {
+        const filterOutAcademy = academyList.filter((item) => !academyFilter.includes(item))
+        const filterOutClass = departmentData.filter((item) => filterOutAcademy.includes(item.category)).map((item) => item.class).flat().map((item) => item.name)
+        filtered = filtered.filter((course) => !(course.class || []).map((item) => item.name).some((item) => filterOutClass.includes(item)))
+      }
+
+      if (sortBy === 'withdrawal' && withdrawalRate) {
+        filtered = filtered.map((course) => ({
+          ...course,
+          withdrawalRate: Math.max(...(course.teacher || []).map((item) => withdrawalRate[item.name] || 0).filter((item) => item), 0),
+        })).sort((a, b) => a.withdrawalRate - b.withdrawalRate)
+      }
+
+      if (!showPlaceholder) {
+        filtered = filtered.filter((course) => {
+          if (['學院指定向度', '學生自選向度', '博雅選修課程', '多元英文'].some((item) => String(course.name?.zh || '').includes(item))) return false
+          if (String(course.name?.zh || '').includes('體育') && !(course.teacher || []).length) return false
+          return true
+        })
+      }
+
+      setOnError(null)
+      return filtered
+    } catch (e) {
+      setOnError(e)
+      return []
+    }
+  }, [allCourses, searchCourseKeyword, courseStandardFilterEnabled, courseStandardFilter, categoryFilter, timetableFilter, academyFilter, departmentData, academyList, sortBy, withdrawalRate, showPlaceholder])
+
+  useEffect(() => {
+    const q = {}
+    if (searchCourseKeyword !== '') q.k = searchCourseKeyword
+    if (!showConflictCourse) q.c = showConflictCourse
+    if (courseStandardFilterEnabled) q.csf = Object.entries(courseStandardFilter).filter((item) => item[1]).map((item) => item[0]).join(',')
+    if (categoryFilter.length) q.cf = categoryFilter
+    if (sortBy !== 'default') q.sb = sortBy
+    if (Object.values(timetableFilter).some((items) => items.length)) q.tf = timetableFilter
+    if (academyFilter.length) q.af = academyFilter.join(',')
+    if (showPlaceholder) q.sph = showPlaceholder
+    replaceQuery('/advanced-search', {
+      year,
+      sem,
+      d: department,
+      ...(Object.keys(q).length ? { q: JSON.stringify(q) } : {}),
+    })
+  }, [year, sem, department, searchCourseKeyword, showConflictCourse, showPlaceholder, sortBy, categoryFilter, courseStandardFilter, academyFilter, timetableFilter, courseStandardFilterEnabled])
+
+  function reset() {
+    setSearchCourseKeyword('')
+    setShowConflictCourse(true)
+    setShowPlaceholder(false)
+    setSortBy('default')
+    setCategoryFilter([])
+    setCourseStandardFilter({ ...emptyStandardFilter })
+    setAcademyFilter([])
+    setTimetableFilter(structuredClone(emptyTimetableFilter))
+  }
+
+  function toggleLesson(date, slot) {
+    setTimetableFilter((current) => {
+      const next = structuredClone(current)
+      if (date && slot) {
+        next[date] = toggleArrayValue(next[date], slot)
+      } else if (date) {
+        next[date] = next[date].length ? [] : timetable.slice(0, -1)
+      } else if (slot) {
+        const checkBlocks = Object.values(next).reduce((sum, items) => sum + (items.includes(slot) ? 1 : 0), 0)
+        for (const key of Object.keys(next)) {
+          next[key] = checkBlocks ? next[key].filter((item) => item !== slot) : [...next[key], slot]
+        }
+      } else {
+        const checkBlocks = Object.values(next).reduce((sum, items) => sum + items.length, 0)
+        for (const key of Object.keys(next)) {
+          next[key] = checkBlocks ? [] : timetable.slice(0, -1)
+        }
+      }
+      return next
+    })
+  }
+
+  if (!searchResult) return <Loader />
+
+  return (
+    <div className="advanced-search">
+      <button type="button" aria-label="關閉搜尋側欄" className={`search-sidebar-backdrop ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
+      <aside className={`search-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <AdvancedSearchSidebarContent
+          academyFilter={academyFilter}
+          academyList={academyList}
+          categoryFilter={categoryFilter}
+          courseStandardFilter={courseStandardFilter}
+          courseStandardFilterEnabled={courseStandardFilterEnabled}
+          onClose={() => setSidebarOpen(false)}
+          onKeywordChange={setSearchCourseKeyword}
+          onReset={reset}
+          onToggleAcademy={(item) => setAcademyFilter((items) => toggleArrayValue(items, item))}
+          onToggleCategory={(value) => setCategoryFilter((items) => toggleArrayValue(items, value))}
+          onTogglePlaceholder={(checked) => setShowPlaceholder(Boolean(checked))}
+          onToggleStandard={(symbol, checked) => setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) }))}
+          onToggleTimetable={toggleLesson}
+          onToggleConflict={(checked) => setShowConflictCourse(Boolean(checked))}
+          recommandKeyword={recommandKeyword}
+          searchCourseKeyword={searchCourseKeyword}
+          showCloseButton
+          showConflictCourse={showConflictCourse}
+          showPlaceholder={showPlaceholder}
+          sortBy={sortBy}
+          timetableFilter={timetableFilter}
+          setSortBy={setSortBy}
+        />
+      </aside>
+      <main className="search-result">
+        <div className="search-result-header">
+          <div>
+            <h2 className="m-0">進階搜尋</h2>
+          </div>
+          <Button className="sidebar-toggle" active={sidebarOpen} onClick={() => setSidebarOpen((value) => !value)}><i className="bx bx-search" />搜尋</Button>
+        </div>
+        <MiniNotify className="sidebar-toggle"><strong>第一次來嗎？</strong> 使用右上角按鈕進行搜尋</MiniNotify>
+        {onError ? <Alert danger><strong>搜尋時發生錯誤</strong><pre>{String(onError.message || onError || 'Error')}</pre></Alert> : null}
+        <CourseList courses={searchResult} showConflictCourse={showConflictCourse} />
+        <div className="grid gap-3">
+          <h3 className="m-0">贊助商廣告</h3>
+          <AdsByGoogle />
+          <p className="m-0 text-center text-xs opacity-75">
+            <Link to={`/search?year=${year}&sem=${sem}&d=${department}`}>回到舊版搜尋</Link>
+          </p>
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function AdvancedSearchSidebarContent({
+  academyFilter,
+  academyList,
+  categoryFilter,
+  courseStandardFilter,
+  courseStandardFilterEnabled,
+  onClose,
+  onKeywordChange,
+  onReset,
+  onToggleAcademy,
+  onToggleCategory,
+  onToggleConflict,
+  onTogglePlaceholder,
+  onToggleStandard,
+  onToggleTimetable,
+  recommandKeyword,
+  searchCourseKeyword,
+  setSortBy,
+  showCloseButton,
+  showConflictCourse,
+  showPlaceholder,
+  sortBy,
+  timetableFilter,
+}) {
+  return (
+    <div className="grid gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <Link to="/" className="font-bold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]">🍤 北科課程好朋友</Link>
+        <div className="flex items-center gap-1">
+          <Button className="m-0" onClick={onReset}>重設</Button>
+          {showCloseButton ? <Button icon className="m-0" onClick={onClose}><i className="bx bx-x" /></Button> : null}
+        </div>
+      </div>
+      <Field label="搜尋關鍵字">
+        <Input value={searchCourseKeyword} onChange={(event) => onKeywordChange(event.target.value)} placeholder="課程名稱、教師、課號、班級" />
+      </Field>
+      <div className="flex flex-wrap items-center gap-1 text-sm">
+        <span className="opacity-75">建議：</span>
+        {recommandKeyword.map((keyword) => (
+          <Button key={keyword} active={searchCourseKeyword === keyword} className="m-0" onClick={() => onKeywordChange(keyword)}>{keyword}</Button>
+        ))}
+      </div>
+      <SearchSection title="顯示與排序" open>
+        <label className="search-filter-option">
+          <Checkbox checked={showConflictCourse} onCheckedChange={onToggleConflict} />
+          顯示衝堂課程
+        </label>
+        <label className="search-filter-option">
+          <Checkbox checked={showPlaceholder} onCheckedChange={onTogglePlaceholder} />
+          顯示佔位課程
+        </label>
+        <Field label="排序依照">
+          <Select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+            <option value="default">預設</option>
+            <option value="withdrawal">退選率（由低到高）</option>
+          </Select>
+        </Field>
+      </SearchSection>
+      <SearchSection title="依課程標準篩選" open={courseStandardFilterEnabled}>
+        {Object.entries(courseStandard).map(([symbol, text]) => (
+          <label key={symbol} className="search-filter-option">
+            <Checkbox checked={Boolean(courseStandardFilter[symbol])} onCheckedChange={(checked) => onToggleStandard(symbol, checked)} />
+            <span>{symbol} {text}</span>
+          </label>
+        ))}
+      </SearchSection>
+      <SearchSection title="依博雅類別篩選課程" open={categoryFilter.length > 0}>
+        {Object.entries(categoryFilterList).map(([key, value]) => (
+          <label key={value} className="search-filter-option">
+            <Checkbox checked={categoryFilter.includes(value)} onCheckedChange={() => onToggleCategory(value)} />
+            <span>{key}</span>
+          </label>
+        ))}
+      </SearchSection>
+      <SearchSection title="依學院篩選" open={academyFilter.length > 0}>
+        {academyList.map((item) => (
+          <label key={item} className="search-filter-option">
+            <Checkbox checked={academyFilter.includes(item)} onCheckedChange={() => onToggleAcademy(item)} />
+            <span>{item}</span>
+          </label>
+        ))}
+      </SearchSection>
+      <SearchSection title="依時間篩選" open={Object.values(timetableFilter).some((items) => items.length)}>
+        <MiniNotify>點擊星期或節次可一次選取整個行或列，左上角可一次切換整張課表。</MiniNotify>
+        <TimetableSelector value={timetableFilter} onToggle={onToggleTimetable} />
+      </SearchSection>
+    </div>
+  )
+}
+
+function SearchSection({ title, open = false, children }) {
+  const [expanded, setExpanded] = useState(open)
+
+  useEffect(() => {
+    if (open) setExpanded(true)
+  }, [open])
+
+  return (
+    <section className="border-t border-[rgba(var(--vs-text),0.08)] pt-3">
+      <button
+        type="button"
+        className="flex w-full cursor-pointer items-center justify-between gap-2 border-0 bg-transparent p-0 text-left font-bold text-[rgb(var(--vs-text))]"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        <span>{title}</span>
+        <i className={`bx bx-chevron-down transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      {expanded ? <div className="mt-3 grid gap-2">{children}</div> : null}
+    </section>
+  )
+}
+
+function toggleArrayValue(values, value) {
+  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value]
+}
+
+function safeParseJson(text, fallback) {
+  if (!text) return fallback
+  try {
+    return JSON.parse(text)
+  } catch {
+    return fallback
+  }
+}

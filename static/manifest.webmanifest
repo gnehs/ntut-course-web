@@ -1,0 +1,34 @@
+{
+  "name": "北科課程好朋友",
+  "short_name": "北科課程好朋友",
+  "description": "北科課程好朋友，提供臺北科技大學最新課程資訊，以友善的介面與衝堂偵測等功能讓選課過程更加輕鬆。",
+  "lang": "zh-TW",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icon-pwa.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "我的課程",
+      "url": "/my-course?utm_source=homescreen",
+      "icons": [{ "src": "/img/user.png", "type": "image/png", "sizes": "512x512" }]
+    },
+    {
+      "name": "上課時間表",
+      "url": "/class?utm_source=homescreen",
+      "icons": [{ "src": "/img/table.png", "type": "image/png", "sizes": "512x512" }]
+    },
+    {
+      "name": "搜尋",
+      "url": "/search?utm_source=homescreen",
+      "icons": [{ "src": "/img/search.png", "type": "image/png", "sizes": "512x512" }]
+    }
+  ]
+}
