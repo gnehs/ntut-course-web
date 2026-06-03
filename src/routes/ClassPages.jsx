@@ -72,7 +72,7 @@ export function ClassIndexPage() {
   return (
     <div>
       <h1>選擇班級</h1>
-      <div className="cards" style={{ '--card-row': 4, '--card-row-sm': 1 }}>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
         <Card>
           <p>輸入關鍵字來篩選</p>
           <Input value={filter} onChange={(event) => setFilter(event.target.value)} />
@@ -83,9 +83,9 @@ export function ClassIndexPage() {
         <>
           <h3>建議</h3>
           <p>根據你先前儲存的班級所提供的建議</p>
-          <div className="cards" style={{ '--card-row': 5, '--card-row-sm': 3 }}>
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
             {recommendClass.map((item, index) => (
-              <Card className="hoverable padding" key={`${item.id}-${index}`} to={`/class/${dataset.year}/${dataset.sem}/${item.name}?d=${dataset.department}`}>
+              <Card className="px-4 py-3" key={`${item.id}-${index}`} to={`/class/${dataset.year}/${dataset.sem}/${item.name}?d=${dataset.department}`}>
                 <CardTitle>{item.name}</CardTitle>
                 <p>{item.description}</p>
                 <i className="bx bx-star" />
@@ -97,9 +97,9 @@ export function ClassIndexPage() {
       {(filteredDepartmentData || []).map((department) => (
         <div key={department.name}>
           <h3>{department.name}</h3>
-          <div className="cards" style={{ '--card-row': 5, '--card-row-sm': 3 }}>
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
             {(department.class || []).map(({ name }) => (
-              <Card className="hoverable padding" key={name} to={`/class/${dataset.year}/${dataset.sem}/${name}?d=${dataset.department}`}>
+              <Card className="px-4 py-3" key={name} to={`/class/${dataset.year}/${dataset.sem}/${name}?d=${dataset.department}`}>
                 <CardTitle>{name}</CardTitle>
                 <p>{department.name}</p>
               </Card>

@@ -91,22 +91,22 @@ export function EmptyRoomPage() {
         {categoryList.map((category) => (
           <section key={category}>
             <h3>{category}</h3>
-            <div className="cards" style={{ '--card-row': 2, '--card-row-sm': 1 }}>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {roomList.filter((room) => room.category === category).map((room) => (
                 <Card
                   key={room.name}
-                  className="hoverable padding"
+                  className="px-4 py-3"
                   onClick={() => {
                     setEmptyroomDetailData(room)
                     setEmptyroomDetailDialog(true)
                   }}
                 >
                   <CardTitle>{room.name}</CardTitle>
-                  <div className="course-dots">
+                  <div className="mt-2 flex flex-wrap gap-1">
                     {timetableSlots.map((slot) => (
                       <div
                         key={slot}
-                        className={`course-dot-item ${room.timetable.includes(slot) ? '' : 'active'}`}
+                        className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${room.timetable.includes(slot) ? 'bg-black/10' : 'bg-red-600 text-white'}`}
                       >
                         {slot}
                       </div>

@@ -219,9 +219,14 @@ export function AdvancedSearchPage() {
   if (!searchResult) return <Loader />
 
   return (
-    <div className="advanced-search">
-      <button type="button" aria-label="關閉搜尋側欄" className={`search-sidebar-backdrop ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
-      <aside className={`search-sidebar ${sidebarOpen ? 'open' : ''}`}>
+    <div className="grid gap-[18px] lg:grid-cols-[340px_1fr]">
+      <button
+        type="button"
+        aria-label="關閉搜尋側欄"
+        className={`fixed inset-0 z-[29] transition-colors duration-200 lg:hidden ${sidebarOpen ? 'pointer-events-auto bg-black/20' : 'pointer-events-none bg-transparent'}`}
+        onClick={() => setSidebarOpen(false)}
+      />
+      <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[min(340px,90vw)] overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:w-auto lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-[105%]'}`}>
         <AdvancedSearchSidebarContent
           academyFilter={academyFilter}
           academyList={academyList}
@@ -247,14 +252,14 @@ export function AdvancedSearchPage() {
           setSortBy={setSortBy}
         />
       </aside>
-      <main className="search-result">
-        <div className="search-result-header">
+      <main className="px-3 pb-10 pt-[74px] lg:px-0 lg:pb-10 lg:pt-0">
+        <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="m-0">進階搜尋</h2>
           </div>
-          <Button className="sidebar-toggle" active={sidebarOpen} onClick={() => setSidebarOpen((value) => !value)}><i className="bx bx-search" />搜尋</Button>
+          <Button className="m-0 inline-flex lg:hidden" active={sidebarOpen} onClick={() => setSidebarOpen((value) => !value)}><i className="bx bx-search" />搜尋</Button>
         </div>
-        <MiniNotify className="sidebar-toggle"><strong>第一次來嗎？</strong> 使用右上角按鈕進行搜尋</MiniNotify>
+        <MiniNotify className="mt-3 lg:hidden"><strong>第一次來嗎？</strong> 使用右上角按鈕進行搜尋</MiniNotify>
         {onError ? <Alert danger><strong>搜尋時發生錯誤</strong><pre>{String(onError.message || onError || 'Error')}</pre></Alert> : null}
         <CourseList courses={searchResult} showConflictCourse={showConflictCourse} />
         <div className="grid gap-3">
@@ -312,11 +317,11 @@ function AdvancedSearchSidebarContent({
         ))}
       </div>
       <SearchSection title="顯示與排序" open>
-        <label className="search-filter-option">
+        <label className="flex min-h-7 cursor-pointer items-center gap-2">
           <Checkbox checked={showConflictCourse} onCheckedChange={onToggleConflict} />
           顯示衝堂課程
         </label>
-        <label className="search-filter-option">
+        <label className="flex min-h-7 cursor-pointer items-center gap-2">
           <Checkbox checked={showPlaceholder} onCheckedChange={onTogglePlaceholder} />
           顯示佔位課程
         </label>
@@ -329,7 +334,7 @@ function AdvancedSearchSidebarContent({
       </SearchSection>
       <SearchSection title="依課程標準篩選" open={courseStandardFilterEnabled}>
         {Object.entries(courseStandard).map(([symbol, text]) => (
-          <label key={symbol} className="search-filter-option">
+          <label key={symbol} className="flex min-h-7 cursor-pointer items-center gap-2">
             <Checkbox checked={Boolean(courseStandardFilter[symbol])} onCheckedChange={(checked) => onToggleStandard(symbol, checked)} />
             <span>{symbol} {text}</span>
           </label>
@@ -337,7 +342,7 @@ function AdvancedSearchSidebarContent({
       </SearchSection>
       <SearchSection title="依博雅類別篩選課程" open={categoryFilter.length > 0}>
         {Object.entries(categoryFilterList).map(([key, value]) => (
-          <label key={value} className="search-filter-option">
+          <label key={value} className="flex min-h-7 cursor-pointer items-center gap-2">
             <Checkbox checked={categoryFilter.includes(value)} onCheckedChange={() => onToggleCategory(value)} />
             <span>{key}</span>
           </label>
@@ -345,7 +350,7 @@ function AdvancedSearchSidebarContent({
       </SearchSection>
       <SearchSection title="依學院篩選" open={academyFilter.length > 0}>
         {academyList.map((item) => (
-          <label key={item} className="search-filter-option">
+          <label key={item} className="flex min-h-7 cursor-pointer items-center gap-2">
             <Checkbox checked={academyFilter.includes(item)} onCheckedChange={() => onToggleAcademy(item)} />
             <span>{item}</span>
           </label>

@@ -5,7 +5,7 @@ import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/co
 import { animateRouteSurface, isReducedMotion } from '../lib/motion.js'
 import { createSearchParams } from '../lib/urlState.js'
 import { useApp } from '../state/AppContext.jsx'
-import { Button, Dialog, Field, Select } from './UI.jsx'
+import { Button, ContentSurface, Dialog, Field, Select } from './UI.jsx'
 import { UniversalSearch } from './UniversalSearch.jsx'
 
 export function Layout() {
@@ -42,23 +42,23 @@ export function Layout() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#f4f7f8] text-black dark:bg-[#1d1d1d] dark:text-white">
       {!isIframe && !isAdvancedSearch ? (
         <nav
           ref={navRef}
-          className="fixed inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[1fr_minmax(250px,430px)_1fr] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px]"
+          className="fixed inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]"
           style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
         >
-          <Link to="/" className="font-bold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]">🍤 北科課程好朋友</Link>
+          <Link to="/" className="block min-w-0 truncate whitespace-nowrap font-bold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]">🍤 北科課程好朋友</Link>
           <div className="hidden md:block"><UniversalSearch navbar /></div>
           <div className="flex justify-end">
-            <Button className="m-0" onClick={() => setDatasetDialogOpen(true)}>{yearSemLabel}</Button>
+            <Button className="m-0 whitespace-nowrap" onClick={() => setDatasetDialogOpen(true)}>{yearSemLabel}</Button>
           </div>
         </nav>
       ) : null}
-      <main ref={mainRef} className={`${isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 pt-[74px]' } ${isIframe ? 'pt-0' : ''}`}>
+      <ContentSurface as="main" ref={mainRef} className={`${isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 pt-[74px]' } ${isIframe ? 'pt-0' : ''}`}>
         <Outlet />
-      </main>
+      </ContentSurface>
       {isIframe && !isAdvancedSearch ? (
         <div className="my-4 text-center text-[0.75em] opacity-75">本資料由 <a href="https://ntut-course.gnehs.net/" target="_blank" rel="noreferrer">北科課程好朋友</a> 提供</div>
       ) : null}

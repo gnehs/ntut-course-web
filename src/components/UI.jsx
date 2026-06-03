@@ -1,8 +1,36 @@
 import { Link } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useRef } from 'react'
 import { Dialog as ShadcnDialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { bindInteractiveCard } from '@/lib/motion'
+
+export const ContentSurface = forwardRef(function ContentSurface({ as: Component = 'div', children, className = '', ...props }, ref) {
+  return (
+    <Component
+      ref={ref}
+      className={cn(
+        'text-[rgb(var(--vs-text))]',
+        "[font-family:'Roboto_Condensed','Noto_Sans_TC',sans-serif]",
+        "[&_a]:text-[rgb(var(--vs-primary))] [&_a]:underline [&_a:hover]:text-[rgba(var(--vs-primary),0.8)] [&_a:active]:text-[rgba(var(--vs-primary),0.9)]",
+        "[&_code]:rounded-[4px] [&_code]:border [&_code]:border-[rgba(var(--vs-text),0.1)] [&_code]:bg-[rgba(var(--vs-text),0.01)] [&_code]:px-1 [&_code]:text-[0.95em] [&_code]:leading-[1.5em]",
+        "[&_code]:[font-family:'Roboto_Mono','Noto_Sans_TC',monospace] [&_pre]:[font-family:'Roboto_Mono','Noto_Sans_TC',monospace]",
+        '[&_hr]:border-0 [&_hr]:border-t [&_hr]:border-black/10',
+        '[&_h1]:my-[1em] [&_h1]:text-[2em] [&_h1]:font-bold [&_h1]:leading-[1.5em]',
+        '[&_h2]:my-[1em] [&_h2]:text-[1.5em] [&_h2]:font-bold [&_h2]:leading-[1.5em]',
+        '[&_h3]:my-[1em] [&_h3]:text-[1.17em] [&_h3]:font-bold [&_h3]:leading-[1.5em]',
+        '[&_h4]:my-[1em] [&_h4]:text-[1em] [&_h4]:font-bold [&_h4]:leading-[1.5em]',
+        '[&_h5]:my-[1em] [&_h5]:text-[0.83em] [&_h5]:font-bold [&_h5]:leading-[1.5em]',
+        '[&_h6]:my-[1em] [&_h6]:text-[0.67em] [&_h6]:font-bold [&_h6]:leading-[1.5em]',
+        '[&_p]:my-[1em] [&_p]:leading-[1.5em]',
+        '[&_h1+p]:mt-[-1em] [&_h2+p]:mt-[-1em] [&_h3+p]:mt-[-1em] [&_h4+p]:mt-[-1em] [&_h5+p]:mt-[-1em] [&_h6+p]:mt-[-1em]',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </Component>
+  )
+})
 
 export function Button({ as: Component = 'button', className = '', active = false, icon = false, danger = false, primary = false, type = 'button', ...props }) {
   const classes = cn(
@@ -32,10 +60,6 @@ export function Card({ to, className = '', children, ...props }) {
   const isInteractive = isHoverable || Boolean(to)
   const normalizedClassName = normalizeCardClassName(className, isInteractive)
   const classes = cn(
-    'card',
-    isInteractive && 'hoverable',
-    isPadding && 'padding',
-    isBorderless && 'borderless',
     'relative w-full overflow-hidden rounded-[8px] !text-black !no-underline transition-colors duration-200 dark:!text-white',
     '[&_p]:!m-0 [&_p]:!text-[0.85rem] [&_p]:!opacity-80 [&_p+p]:!mt-2',
     '[&>i]:absolute [&>i]:bottom-0 [&>i]:right-[0.1em] [&>i]:m-auto [&>i]:origin-bottom-right [&>i]:text-[48px] [&>i]:opacity-20',
@@ -118,7 +142,6 @@ export function Alert({ children, danger = false, className = '' }) {
     <div
       role="alert"
       className={cn(
-        'alert',
         'rounded-[8px] border px-4 py-3',
         danger
           ? 'border-[rgba(var(--vs-danger),0.28)] bg-[rgba(var(--vs-danger),0.08)] text-[rgb(var(--vs-danger))]'

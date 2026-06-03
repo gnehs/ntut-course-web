@@ -54,9 +54,9 @@ export function MyCoursePage() {
           請注意，本資料僅儲存在瀏覽器中，可能會隨時消失！
         </Alert>
       ) : null}
-      <div className="lr-container nowrap">
-        <div className="l"><h1>我的課程</h1></div>
-        <div className="r">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div><h1>我的課程</h1></div>
+        <div className="flex flex-wrap justify-end">
           <Button onClick={exportData}><i className="bx bxs-file-export" />匯出</Button>
           <Button onClick={importData}><i className="bx bxs-file-import" />匯入</Button>
         </div>
@@ -73,20 +73,20 @@ export function MyCoursePage() {
       {courses.length ? (
         <>
           <h3>建議</h3>
-          <div className="cards" style={{ '--card-row': 3, '--card-row-sm': 2 }}>
-            <Card className="hoverable padding" to={`/widget?year=${dataset.year}`}>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Card className="px-4 py-3" to={`/widget?year=${dataset.year}`}>
               <CardTitle>iOS 小工具</CardTitle>
               <p>在桌面上檢視接下來的課程</p>
               <i className="bx bx-extension" />
             </Card>
-            <Card className="hoverable padding" to={`/add-calendar?year=${dataset.year}`}>
+            <Card className="px-4 py-3" to={`/add-calendar?year=${dataset.year}`}>
               <CardTitle>新增到行事曆</CardTitle>
               <p>將我的課程匯入至行事曆</p>
               <i className="bx bx-calendar" />
             </Card>
           </div>
           <h3>課程</h3>
-          <div className="cards" style={{ '--card-row': 3, '--card-row-sm': 3 }}>
+          <div className="grid grid-cols-3 gap-3">
             <Card><CardTitle>{credit}</CardTitle><p>學分</p><i className="bx bx-book" /></Card>
             <Card><CardTitle>{hours}</CardTitle><p>時數</p><i className="bx bx-time" /></Card>
             <Card><CardTitle>{courses.length}</CardTitle><p>課程數</p><i className="bx bx-category-alt" /></Card>

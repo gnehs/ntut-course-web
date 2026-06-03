@@ -63,10 +63,10 @@ export function StandardPage() {
       {year ? (
         <>
           <h3>已選擇的項目 <span style={{ fontSize: '.8em', opacity: .7, fontWeight: 'normal' }}>點擊來取消</span></h3>
-          <div className="cards" style={{ '--card-row': 5, '--card-row-sm': 3 }}>
-            <Card className="hoverable padding" onClick={() => setQuery({ year: '', system: '', department: '' })}><CardTitle>{formatRocYear(year)}</CardTitle><p>年</p></Card>
-            {system ? <Card className="hoverable padding" onClick={() => setQuery({ system: '', department: '' })}><CardTitle>{system}</CardTitle><p>學制</p></Card> : null}
-            {department ? <Card className="hoverable padding" onClick={() => setQuery({ department: '' })}><CardTitle>{department}</CardTitle><p>科系</p></Card> : null}
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
+            <Card className="px-4 py-3" onClick={() => setQuery({ year: '', system: '', department: '' })}><CardTitle>{formatRocYear(year)}</CardTitle><p>年</p></Card>
+            {system ? <Card className="px-4 py-3" onClick={() => setQuery({ system: '', department: '' })}><CardTitle>{system}</CardTitle><p>學制</p></Card> : null}
+            {department ? <Card className="px-4 py-3" onClick={() => setQuery({ department: '' })}><CardTitle>{department}</CardTitle><p>科系</p></Card> : null}
           </div>
         </>
       ) : null}
@@ -110,7 +110,7 @@ export function StandardPage() {
       {department && current ? (
         <>
           <h3>{department}</h3>
-          <div className="cards" style={{ '--card-row': 5, '--card-row-sm': 3 }}>
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
             {Object.entries(current.credits || {}).filter(([, value]) => value !== 0).map(([key, value]) => <Card key={key}><CardTitle>{value}</CardTitle><p>{key}</p></Card>)}
           </div>
           <h3>相關規定事項</h3>
