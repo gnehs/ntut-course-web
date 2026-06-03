@@ -5,7 +5,11 @@ import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/co
 import { animateRouteSurface, isReducedMotion } from '../lib/motion.js'
 import { createSearchParams } from '../lib/urlState.js'
 import { useApp } from '../state/AppContext.jsx'
-import { Button, ContentSurface, Dialog, Field, Select } from './UI.jsx'
+import { Button } from './ui-kit/Button.jsx'
+import { ContentSurface } from './ui-kit/ContentSurface.jsx'
+import { Dialog } from './ui-kit/Dialog.jsx'
+import { Field } from './ui-kit/Field.jsx'
+import { Select } from './ui-kit/Select.jsx'
 import { UniversalSearch } from './UniversalSearch.jsx'
 
 export function Layout() {

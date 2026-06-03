@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
-import { Card, CardTitle, Loader, Select } from '../components/UI.jsx'
+import { Card } from '../components/ui-kit/Card.jsx'
+import { CardTitle } from '../components/ui-kit/CardTitle.jsx'
+import { Loader } from '../components/ui-kit/Loader.jsx'
+import { Select } from '../components/ui-kit/Select.jsx'
 import { fetchWithdrawal } from '../lib/courseApi.js'
 
 export function WithdrawalPage() {

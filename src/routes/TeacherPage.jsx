@@ -1,7 +1,11 @@
 import { AdsByGoogle } from '../components/AdsByGoogle.jsx'
 import { Link, useParams } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { Alert, Button, Card, CardTitle, Loader } from '../components/UI.jsx'
+import { Alert } from '../components/ui-kit/Alert.jsx'
+import { Button } from '../components/ui-kit/Button.jsx'
+import { Card } from '../components/ui-kit/Card.jsx'
+import { CardTitle } from '../components/ui-kit/CardTitle.jsx'
+import { Loader } from '../components/ui-kit/Loader.jsx'
 import { fetchWithdrawal, fetchWithdrawalRate } from '../lib/courseApi.js'
 
 export function TeacherPage() {

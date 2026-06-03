@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, CardTitle, Loader } from '../components/UI.jsx'
+import { Button } from '../components/ui-kit/Button.jsx'
+import { Card } from '../components/ui-kit/Card.jsx'
+import { CardTitle } from '../components/ui-kit/CardTitle.jsx'
+import { Loader } from '../components/ui-kit/Loader.jsx'
 import { fetchCalendar } from '../lib/courseApi.js'
 
 export function CalendarPage() {

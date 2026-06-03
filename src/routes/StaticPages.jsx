@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Alert, Button, Loader } from '../components/UI.jsx'
+import { Alert } from '../components/ui-kit/Alert.jsx'
+import { Button } from '../components/ui-kit/Button.jsx'
+import { Loader } from '../components/ui-kit/Loader.jsx'
 import { cleanStore } from '../lib/storage.js'
 
 export function AboutPage() {

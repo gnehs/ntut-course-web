@@ -14,7 +14,11 @@ import {
   trimEllip,
 } from '../lib/courseUtils.js'
 import { useApp } from '../state/AppContext.jsx'
-import { Button, Card, CardTitle, Pagination, Tag } from './UI.jsx'
+import { Button } from './ui-kit/Button.jsx'
+import { Card } from './ui-kit/Card.jsx'
+import { CardTitle } from './ui-kit/CardTitle.jsx'
+import { Pagination } from './ui-kit/Pagination.jsx'
+import { Tag } from './ui-kit/Tag.jsx'
 
 const PAGE_SIZE = 54
 

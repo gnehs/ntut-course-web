@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, CardTitle, Loader } from '../components/UI.jsx'
+import { Alert } from '../components/ui-kit/Alert.jsx'
+import { Button } from '../components/ui-kit/Button.jsx'
+import { Card } from '../components/ui-kit/Card.jsx'
+import { CardTitle } from '../components/ui-kit/CardTitle.jsx'
+import { Loader } from '../components/ui-kit/Loader.jsx'
 import { trimEllip } from '../lib/courseUtils.js'
 import { useApp } from '../state/AppContext.jsx'
 

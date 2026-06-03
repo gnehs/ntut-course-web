@@ -5,7 +5,8 @@ import { displayDepartment } from '../lib/courseUtils.js'
 import { animatePageIntro } from '../lib/motion.js'
 import { useApp } from '../state/AppContext.jsx'
 import { UniversalSearch } from '../components/UniversalSearch.jsx'
-import { Card, CardTitle } from '../components/UI.jsx'
+import { Card } from '../components/ui-kit/Card.jsx'
+import { CardTitle } from '../components/ui-kit/CardTitle.jsx'
 
 function useStandardUrl() {
   const [url, setUrl] = useState('/standard')

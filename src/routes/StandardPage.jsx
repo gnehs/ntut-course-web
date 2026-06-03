@@ -1,6 +1,9 @@
 import { useRouterState } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
-import { Alert, Card, CardTitle, Loader } from '../components/UI.jsx'
+import { Alert } from '../components/ui-kit/Alert.jsx'
+import { Card } from '../components/ui-kit/Card.jsx'
+import { CardTitle } from '../components/ui-kit/CardTitle.jsx'
+import { Loader } from '../components/ui-kit/Loader.jsx'
 import { fetchStandards, fetchStandardYear } from '../lib/courseApi.js'
 import { createSearchParams, pushQuery } from '../lib/urlState.js'
 
