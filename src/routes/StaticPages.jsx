@@ -188,9 +188,26 @@ export function SettingsPage() {
 
 export function StatusPage() {
   const [runs, setRuns] = useState(null)
+  const [error, setError] = useState(false)
+
   useEffect(() => {
     let cancelled = false
-    fetch('https://api.github.com/repos/gnehs/ntut-course-crawler-node/actions/runs').then((res) => res.json()).then((data) => !cancelled && setRuns(data.workflow_runs?.slice(0, 50) || [])).catch(() => !cancelled && setRuns([]))
+    fetch('https://api.github.com/repos/gnehs/ntut-course-crawler-node/actions/runs')
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+        return res.json()
+      })
+      .then((data) => {
+        if (cancelled) return
+        const workflowRuns = Array.isArray(data.workflow_runs) ? data.workflow_runs : []
+        setRuns(workflowRuns.slice(0, 50))
+        setError(false)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setRuns([])
+        setError(true)
+      })
     return () => { cancelled = true }
   }, [])
   if (!runs) return <Loader />
@@ -198,6 +215,16 @@ export function StatusPage() {
     <div>
       <h1>擷取狀態</h1>
       <p>僅顯示最新 50 筆資料</p>
+      {error ? (
+        <Alert danger className="mb-3">
+          無法取得擷取狀態，請稍後再試。
+        </Alert>
+      ) : null}
+      {!error && runs.length === 0 ? (
+        <Alert className="mb-3">
+          目前沒有擷取紀錄。
+        </Alert>
+      ) : null}
       <div className="space-y-2">
         {runs.map((run) => (
           <a
@@ -233,4 +260,25 @@ function parseName(name) {
   if (name === 'Run Analytics & Fatch calendar') return '分析課程資料與取得行事曆'
   if (name === 'Run Analytics') return '分析課程資料'
   return name
+}
+
+function timeSince(date) {
+  const timestamp = date.getTime()
+  if (!Number.isFinite(timestamp)) return '未知時間'
+
+  const seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
+  const units = [
+    ['年', 60 * 60 * 24 * 365],
+    ['個月', 60 * 60 * 24 * 30],
+    ['天', 60 * 60 * 24],
+    ['小時', 60 * 60],
+    ['分鐘', 60],
+  ]
+
+  for (const [label, size] of units) {
+    const value = Math.floor(seconds / size)
+    if (value >= 1) return `${value} ${label}`
+  }
+
+  return '剛剛'
 }
