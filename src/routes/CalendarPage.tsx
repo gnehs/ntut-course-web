@@ -49,20 +49,20 @@ export function CalendarPage() {
 						className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
 					>
 						<div
-							className='flex size-12 shrink-0 flex-col overflow-hidden rounded-[8px] bg-gradient-to-b from-white to-[rgba(var(--vs-text),0.04)] text-center shadow-md'
+							className='flex size-12 shrink-0 flex-col overflow-hidden rounded-lg bg-gradient-to-b from-white to-[rgba(var(--vs-text),0.04)] text-center shadow-md'
 							style={{
 								opacity: index > 0 && sameCalendarDay(rows[index - 1]?.start, item.start) ? 0 : 1,
 							}}
 						>
-							<div className='flex h-5 w-full items-center justify-center bg-gradient-to-b from-[rgb(255,124,124)] to-[rgb(220,62,63)] text-[10px] leading-none font-bold text-white'>
+							<div className='flex h-5 w-full items-center justify-center bg-gradient-to-b from-[rgb(255,124,124)] to-[rgb(220,62,63)] text-[10px] leading-none font-semibold text-white'>
 								{calendarDate(item.start).getMonth() + 1} 月
 							</div>
-							<div className='flex flex-1 items-center justify-center text-xl leading-none font-bold text-[rgb(var(--vs-text))]'>
+							<div className='flex flex-1 items-center justify-center text-xl leading-none font-semibold text-[rgb(var(--vs-text))]'>
 								{calendarDate(item.start).getDate()}
 							</div>
 						</div>
 						<div className='min-w-0 flex-1'>
-							<div className='text-[1.2em] font-bold'>{item.summary}</div>
+							<div className='text-[1.2em] font-semibold'>{item.summary}</div>
 							<div className='opacity-75'>
 								{calendarDate(item.start).toLocaleDateString()} ~{' '}
 								{calendarDate(item.end).toLocaleDateString()}

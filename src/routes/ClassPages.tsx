@@ -95,7 +95,7 @@ export function ClassIndexPage() {
 	if (!departments) return <ClassIndexSkeleton />;
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>選擇班級</h1>
 			<Input
 				value={filter}
@@ -128,7 +128,7 @@ export function ClassIndexPage() {
 				</>
 			) : null}
 			{(filteredDepartmentData || []).map((department) => (
-				<div key={department.name}>
+				<div key={department.name} className='space-y-2'>
 					<h3>{department.name}</h3>
 					<div className='grid grid-cols-3 gap-3 lg:grid-cols-5'>
 						{(department.class || []).map(({ name }) => (
@@ -205,7 +205,7 @@ export function ClassDetailPage() {
 	const courseGroups = groupClassCourses(courses);
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			<div className='flex flex-wrap items-center justify-between gap-2'>
 				<div>
 					<h1>{id}</h1>
@@ -223,13 +223,15 @@ export function ClassDetailPage() {
 				</div>
 			</div>
 			{!courses.length && classData ? <Alert>此班級目前沒有課程。</Alert> : null}
-			{courseGroups.map((group) => (
-				<section key={group.title}>
-					<h3>{group.title}</h3>
-					<CourseList courses={group.courses} showTimetable year={year} sem={sem} />
-				</section>
-			))}
-			<h3>贊助商廣告</h3>
+			<div className='divide-y divide-[rgba(var(--vs-text),0.1)]'>
+				{courseGroups.map((group) => (
+					<section key={group.title} className='py-8'>
+						<h3 className='text-2xl font-semibold'>{group.title}</h3>
+						<CourseList courses={group.courses} showTimetable year={year} sem={sem} />
+					</section>
+				))}
+			</div>
+			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />
 		</div>
 	);

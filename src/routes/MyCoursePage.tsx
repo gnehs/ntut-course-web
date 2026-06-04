@@ -60,7 +60,7 @@ export function MyCoursePage() {
 	if (!courses) return <ClassDetailSkeleton />;
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			{courses.length ? (
 				<Alert>
 					<strong>提醒</strong>
@@ -72,7 +72,7 @@ export function MyCoursePage() {
 				<div>
 					<h1>我的課程</h1>
 				</div>
-				<div className='flex flex-wrap justify-end'>
+				<div className='flex flex-wrap justify-end gap-2'>
 					<Button onClick={exportData}>
 						<i className='bx bxs-file-export' />
 						匯出
@@ -138,7 +138,7 @@ export function MyCoursePage() {
 					{message}
 				</Alert>
 			) : null}
-			<h3>贊助商廣告</h3>
+			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />
 		</div>
 	);

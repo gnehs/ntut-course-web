@@ -35,17 +35,13 @@ export function WithdrawalPage() {
 	}, [suffix]);
 	const rows = useMemo(() => data || [], [data]);
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>退選率</h1>
 			<p>這是期間中所有教師的退選率統計頁面</p>
 			<div className='flex items-center justify-between gap-2'>
 				<div />
 				<div className='flex items-center'>
-					<Select
-						value={period}
-						onChange={(value) => setPeriod(value)}
-						className='max-w-[120px]'
-					>
+					<Select value={period} onChange={(value) => setPeriod(value)} className='max-w-[120px]'>
 						<SelectOption value='-recent-3-years'>過去三年</SelectOption>
 						<SelectOption value='-recent-5-years'>過去五年</SelectOption>
 						<SelectOption value='all'>所有期間</SelectOption>
@@ -81,7 +77,7 @@ export function WithdrawalPage() {
 								key={item.name}
 							>
 								<h2 className='m-0 text-base'>{item.name}</h2>
-								<div className='text-lg font-bold'>{item.rate_percent ?? item.rate}%</div>
+								<div className='text-lg font-semibold'>{item.rate_percent ?? item.rate}%</div>
 								<div className='text-xs opacity-80'>
 									{item.withdraw} 人退選 / {item.people} 人選課
 								</div>

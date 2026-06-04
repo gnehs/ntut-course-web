@@ -17,10 +17,7 @@ import { errorMessage } from '../lib/error';
 export function StandardPage() {
 	const { location } = useRouterState();
 	const navigate = useNavigate();
-	const params = useMemo(
-		() => createSearchParams(location.search),
-		[location.search],
-	);
+	const params = useMemo(() => createSearchParams(location.search), [location.search]);
 	const [years, setYears] = useState<string[] | null>(null);
 	const [error, setError] = useState<unknown>(null);
 	const [year, setYear] = useState(params.get('year') || '');
@@ -83,7 +80,7 @@ export function StandardPage() {
 		void navigate({ to: '/standard', search: createSearchObject(query) });
 	}
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>課程標準</h1>
 			{error ? (
 				<Alert danger>
@@ -124,7 +121,7 @@ export function StandardPage() {
 			{years && !year ? (
 				<>
 					<h3>選擇入學年度</h3>
-					<div className='overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.1)]'>
+					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
 						{yearItems.map((item, index) => (
 							<div
 								key={item}
@@ -141,7 +138,7 @@ export function StandardPage() {
 			{standardData && !system ? (
 				<>
 					<h3>選擇學制</h3>
-					<div className='overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.1)]'>
+					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
 						{systems.map((item, index) => (
 							<div
 								key={item}
@@ -157,7 +154,7 @@ export function StandardPage() {
 			{standardData && system && !department ? (
 				<>
 					<h3>選擇系所</h3>
-					<div className='overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.1)]'>
+					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
 						{departments.map((item, index) => (
 							<div
 								key={item}
@@ -198,11 +195,15 @@ export function StandardPage() {
 						{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
 							<div key={courseYear} className='flex-1'>
 								{(Object.entries(yearData) as [string, StandardCourse[]][]).map(([sem, items]) => (
-									<div key={`${courseYear}-${sem}`} style={{ marginBottom: '1rem' }}>
+									<div
+										key={`${courseYear}-${sem}`}
+										style={{ marginBottom: '1rem' }}
+										className='space-y-2'
+									>
 										<h4>
 											{courseYear} 年級{sem === '1' ? '上' : '下'}學期
 										</h4>
-										<div className='overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.1)]'>
+										<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
 											{items.map((item, index) => (
 												<div
 													className={`flex items-center justify-between gap-2 px-4 py-3 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}

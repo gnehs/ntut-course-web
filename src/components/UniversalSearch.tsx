@@ -119,7 +119,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 		>
 			<div
 				className={cn(
-					'flex rounded-[8px] border transition-all duration-200',
+					'flex rounded-lg border transition-all duration-200',
 					focused
 						? 'border-[rgba(var(--vs-gray-2),1)] bg-[rgb(var(--vs-gray-1))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
 						: 'border-transparent bg-[rgba(var(--vs-text),0.1)] hover:bg-[rgba(var(--vs-text),0.05)]',
@@ -173,7 +173,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				ref={resultsRef}
 				data-search-results
 				className={cn(
-					'absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto rounded-[8px] bg-[rgb(var(--vs-background))] shadow-[0_20px_20px_0_rgba(0,0,0,var(--vs-background-opacity,0.02))] transition-all duration-200',
+					'absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto rounded-lg bg-[rgb(var(--vs-background))] shadow-[0_20px_20px_0_rgba(0,0,0,var(--vs-background-opacity,0.02))] transition-all duration-200',
 					focused
 						? 'pointer-events-auto opacity-100'
 						: 'pointer-events-none -translate-y-2 opacity-0',
@@ -201,7 +201,9 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 								<div className='text-xs opacity-80'>
 									{item.category || (item.history ? '歷史' : '')}
 								</div>
-								<div className='text-base font-bold'>{item.text || item.label || item.name}</div>
+								<div className='text-base font-semibold'>
+									{item.text || item.label || item.name}
+								</div>
 								{item.description ? (
 									<div className='text-xs opacity-70'>{item.description}</div>
 								) : null}

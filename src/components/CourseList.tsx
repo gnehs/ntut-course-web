@@ -118,11 +118,7 @@ export function CourseList({
 					卡片
 				</Button>
 				{showTimetable ? (
-					<Button
-						active={layout === 'timetable'}
-						className='m-0'
-						onClick={() => changeLayout('timetable')}
-					>
+					<Button active={layout === 'timetable'} onClick={() => changeLayout('timetable')}>
 						<i className='bx bx-time' />
 						課表
 					</Button>
@@ -362,7 +358,7 @@ function TimetableCourses({
 							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
 							to={`/course/${year}/${sem}/${item.id}`}
 							className={cn(
-								'relative z-[1] flex h-full w-full flex-col justify-between gap-1 rounded-[8px] px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
+								'relative z-[1] flex h-full w-full flex-col justify-between gap-1 rounded-lg px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
 								item.isConflict
 									? 'pointer-events-none bg-red-600 text-white'
 									: 'bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
@@ -372,7 +368,7 @@ function TimetableCourses({
 								gridRow: `slot${start} / slot${end}`,
 							}}
 						>
-							<div className='font-bold'>
+							<div className='font-semibold'>
 								{item.isConflict ? '含有多個課程' : item.name?.zh || '未命名課程'}
 							</div>
 							<div className='text-[0.85em] opacity-75'>

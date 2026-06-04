@@ -60,22 +60,20 @@ export function MProgramIndexPage() {
 			</div>
 		);
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>選擇微學程</h1>
-
 			<Input
 				value={filter}
 				onChange={(event) => setFilter(event.target.value)}
 				placeholder='輸入關鍵字來篩選...'
 			/>
-
 			{error ? (
 				<Alert danger>
 					<strong>搜尋時發生了錯誤</strong>
 					<pre>{errorMessage(error)}</pre>
 				</Alert>
 			) : null}
-			<div className='mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-5'>
+			<div className='grid gap-3 sm:grid-cols-3 lg:grid-cols-5'>
 				{filteredPrograms.map((program) => (
 					<Card
 						className='cursor-pointer p-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
@@ -156,12 +154,12 @@ export function MProgramDetailPage() {
 
 	if (!courses) return <ClassDetailSkeleton />;
 	return (
-		<div>
+		<div className='space-y-4'>
 			<div className='flex flex-wrap items-center justify-between gap-2'>
 				<div>
 					<h1>{programName}</h1>
 				</div>
-				<div className='flex flex-wrap justify-end'>
+				<div className='flex flex-wrap justify-end gap-2'>
 					<Button
 						active={showConflictCourse}
 						onClick={() => setShowConflictCourse((value) => !value)}

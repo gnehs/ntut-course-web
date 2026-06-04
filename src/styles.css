@@ -8,15 +8,16 @@
 	--vs-gray-2: 228, 233, 236;
 	--vs-danger: 234, 84, 85;
 	--vs-shadow-opacity: 0.05;
+	--font-sans: 'Inter Tight', 'Noto Sans TC', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
 		--vs-primary: 247, 250, 255;
 		--vs-text: 255, 255, 255;
-		--vs-background: 29, 29, 29;
-		--vs-gray-1: 38, 38, 38;
-		--vs-gray-2: 55, 55, 55;
+		--vs-background: 16, 16, 16;
+		--vs-gray-1: 32, 32, 32;
+		--vs-gray-2: 48, 48, 48;
 		--vs-shadow-opacity: 0.18;
 	}
 }

@@ -51,7 +51,7 @@ export function WidgetPage() {
 	const code = useMemo(() => createScriptableCode(courses || []), [courses]);
 	if (!courses) return <StepsPageSkeleton codeBlock />;
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>iOS 小工具</h1>
 			<p>新增小工具在你的桌面上，隨時檢視接下來的課程！</p>
 			<p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
@@ -85,7 +85,7 @@ export function WidgetPage() {
 				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 2</span> 複製並貼上程式碼
 			</h2>
 			<p>建立一個 Script 並貼上以下程式碼</p>
-			<div className='relative rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3'>
+			<div className='relative rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3'>
 				<div className='absolute top-2 right-2'>
 					<Button
 						className='m-0'

@@ -18,7 +18,7 @@ export function Card({ to, className = '', children, ...props }: CardProps) {
 	const isInteractive = isHoverable || Boolean(to);
 	const normalizedClassName = normalizeCardClassName(className, isInteractive);
 	const classes = cn(
-		'relative w-full overflow-hidden rounded-[8px] !text-black !no-underline transition-colors duration-200 dark:!text-white',
+		'relative w-full overflow-hidden rounded-lg !text-black !no-underline transition-colors duration-200 dark:!text-white',
 		'[&_p]:!m-0 [&_p]:!text-[0.85rem] [&_p]:!opacity-80 [&_p+p]:!mt-2',
 		'[&>i]:absolute [&>i]:bottom-0 [&>i]:right-[0.1em] [&>i]:m-auto [&>i]:origin-bottom-right [&>i]:text-[48px] [&>i]:opacity-20',
 		isBorderless ? 'border-0 bg-transparent shadow-none' : 'bg-[rgb(var(--vs-background))]',

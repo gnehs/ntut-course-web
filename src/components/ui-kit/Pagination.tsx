@@ -4,12 +4,12 @@ export function Pagination({ page, length, onChange }) {
 	if (length <= 1) return null;
 	const items = getPaginationItems(page, length);
 	return (
-		<div className='flex flex-wrap items-center justify-center gap-1 py-5'>
+		<div className='flex flex-wrap items-center justify-center gap-2 py-5'>
 			<Button
 				icon
-				className='m-0'
 				disabled={page <= 1}
 				aria-label='上一頁'
+				className='size-9'
 				onClick={() => onChange(Math.max(page - 1, 1))}
 			>
 				<i className='bx bx-chevron-left' />
@@ -18,21 +18,26 @@ export function Pagination({ page, length, onChange }) {
 				item === 'ellipsis' ? (
 					<span
 						key={`ellipsis-${index}`}
-						className='inline-flex h-[34px] min-w-[34px] items-center justify-center px-1 text-[0.8em] opacity-60'
+						className='inline-flex h-9 min-w-9 items-center justify-center px-1 text-[0.8em] opacity-60'
 					>
 						...
 					</span>
 				) : (
-					<Button key={item} active={item === page} className='m-0' onClick={() => onChange(item)}>
+					<Button
+						key={item}
+						active={item === page}
+						className='h-9 min-w-9'
+						onClick={() => onChange(item)}
+					>
 						{item}
 					</Button>
 				),
 			)}
 			<Button
 				icon
-				className='m-0'
 				disabled={page >= length}
 				aria-label='下一頁'
+				className='size-9'
 				onClick={() => onChange(Math.min(page + 1, length))}
 			>
 				<i className='bx bx-chevron-right' />

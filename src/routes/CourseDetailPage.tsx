@@ -93,16 +93,15 @@ export function CourseDetailPage() {
 	}
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<div className='min-w-0 flex-1'>
-					<h2 className='m-0 text-2xl leading-[1.25] font-bold'>
+				<div>
+					<h2 className='text-2xl font-semibold'>
 						<CourseDetailTitle course={currentCourse} />
-						<br />
-						<span className='text-base font-normal opacity-80'>{currentCourse.name?.en}</span>
 					</h2>
+					<div className='text-base font-normal opacity-80'>{currentCourse.name?.en}</div>
 				</div>
-				<div className='r'>
+				<div>
 					<Button primary={!isInMyCourse} danger={isInMyCourse} onClick={toggleCourse}>
 						<i className={`bx ${isInMyCourse ? 'bx-minus' : 'bx-plus'}`} />
 						{isInMyCourse ? '從我的課程移除' : '加入我的課程'}
@@ -228,15 +227,15 @@ export function CourseDetailPage() {
 
 function InfoCard({ icon, title, items }) {
 	return (
-		<section className='rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5]'>
+		<section className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5]'>
 			<div className='text-xl'>
 				<i className={`bx ${icon}`} />
 			</div>
-			<div className='mb-2 text-base font-bold'>{title}</div>
+			<div className='mb-2 text-base font-semibold'>{title}</div>
 			<div className='grid gap-2 md:grid-cols-2'>
 				{items.map(([itemTitle, content]) => (
 					<div className='grid gap-0 md:gap-1' key={itemTitle}>
-						<div className='text-sm font-bold whitespace-nowrap'>{itemTitle}</div>
+						<div className='text-sm font-semibold whitespace-nowrap'>{itemTitle}</div>
 						<div className='text-sm opacity-75'>{content}</div>
 					</div>
 				))}
@@ -270,7 +269,7 @@ function InlineLinks({
 	return items.map((item, index) => (
 		<span key={item.to}>
 			{index > 0 ? '、' : ''}
-			<Link className='text-[rgb(var(--vs-primary))]' to={item.to}>
+			<Link className='text-[rgb(var(--vs-primary))] underline underline-offset-2' to={item.to}>
 				{item.label}
 			</Link>
 		</span>
@@ -284,7 +283,9 @@ function HtmlText({
 	text: string;
 	as?: keyof React.JSX.IntrinsicElements;
 }) {
-	return <Component dangerouslySetInnerHTML={{ __html: parseTextarea(text) }} />;
+	return (
+		<Component dangerouslySetInnerHTML={{ __html: parseTextarea(text) }} className='leading-5' />
+	);
 }
 
 function parseTextarea(text) {
@@ -336,19 +337,19 @@ function CovidInfo({ covid19 }) {
 			<h2>因應疫情所致之上課方式</h2>
 			<p>實際實施日期與上課方式，依學校公布之訊息為主</p>
 			<div className='mt-3 border-l-4 border-[#e6e6e6] pl-3'>
-				<div className='font-bold'>
+				<div className='font-semibold'>
 					若疫情為 <strong>ㄧ級</strong>警戒
 				</div>
 				<div>實體授課</div>
 			</div>
 			<div className='mt-3 border-l-4 border-[#e6e6e6] pl-3'>
-				<div className='font-bold'>
+				<div className='font-semibold'>
 					若疫情為 <strong>二級</strong>警戒
 				</div>
 				<HtmlText as='div' text={covid19.lv2Method || covid19.lv2Description || '尚無對策'} />
 			</div>
 			<div className='mt-3 border-l-4 border-[#e6e6e6] pl-3'>
-				<div className='font-bold'>
+				<div className='font-semibold'>
 					若疫情為 <strong>三級</strong>警戒
 				</div>
 				<div>遠距上課</div>

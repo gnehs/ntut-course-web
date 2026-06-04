@@ -8,7 +8,7 @@ import type { WorkflowRun } from '../types/course';
 
 export function AboutPage() {
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>關於</h1>
 			<p>
 				本網站與爬蟲由{' '}
@@ -90,7 +90,7 @@ export function DocPage() {
 				<li>資料擷取自國立臺北科技大學課程系統，資料僅供參考。</li>
 			</ul>
 			<h2>API Endpoint</h2>
-			<div className='rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'>
+			<div className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'>
 				<code>https://gnehs.github.io/ntut-course-crawler-node/</code>
 			</div>
 			<h2>API 清單</h2>
@@ -104,7 +104,7 @@ export function DocPage() {
 			].map((item) => (
 				<div
 					key={item}
-					className='rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'
+					className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'
 				>
 					<h3 className='m-0'>{item}</h3>
 				</div>
@@ -275,7 +275,7 @@ export function ChangelogPage() {
 		['2022-08-31', ['現在使用「課程標準」工具時，會自動儲存上次的位置了。']],
 	];
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>更新日誌</h1>
 			{items.map(([date, changes]) => (
 				<section key={date}>
@@ -304,7 +304,7 @@ export function ChangelogPage() {
 
 export function NotFoundPage() {
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>找不到頁面</h1>
 			<p>你要找的頁面不存在。</p>
 			<Button as={Link} to='/'>
@@ -321,7 +321,7 @@ export function SettingsPage() {
 		setDone(true);
 	}
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>設定</h1>
 			<Alert>
 				<strong>快取資料</strong>
@@ -364,7 +364,7 @@ export function StatusPage() {
 	}, []);
 	if (!runs) return <StatusSkeleton />;
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>擷取狀態</h1>
 			<p>僅顯示最新 50 筆資料</p>
 			{error ? (
@@ -394,7 +394,7 @@ export function StatusPage() {
 							)}
 						</div>
 						<div className='min-w-0 flex-1'>
-							<div className='font-bold'>{parseName(run.name)}</div>
+							<div className='font-semibold'>{parseName(run.name)}</div>
 							<div className='text-sm opacity-75'>
 								{run.event === 'schedule' ? (
 									<i className='bx bx-calendar' />

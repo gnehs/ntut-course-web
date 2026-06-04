@@ -50,10 +50,7 @@ export function AdvancedSearchPage() {
 	const { location } = useRouterState();
 	const navigate = useNavigate();
 	const { dataset, getCourses } = useApp();
-	const params = useMemo(
-		() => createSearchParams(location.search),
-		[location.search],
-	);
+	const params = useMemo(() => createSearchParams(location.search), [location.search]);
 	const restoredQuery = useMemo<AdvancedSearchQuery>(
 		() => safeParseJson(params.get('q'), {}),
 		[location.search],
@@ -433,7 +430,7 @@ export function AdvancedSearchPage() {
 					<CourseList courses={searchResult} showConflictCourse={showConflictCourse} />
 				)}
 				<div className='grid gap-3'>
-					<h3 className='m-0'>贊助商廣告</h3>
+					<h3 className='mb-4'>贊助商廣告</h3>
 					<AdsByGoogle />
 					<p className='m-0 text-center text-xs opacity-75'>
 						<Link to={`/search?year=${year}&sem=${sem}&d=${department}`}>回到舊版搜尋</Link>
@@ -473,7 +470,7 @@ function AdvancedSearchSidebarContent({
 			<div className='flex items-center justify-between gap-3'>
 				<Link
 					to='/'
-					className='font-bold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
+					className='font-semibold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
 				>
 					🍤 北科課程好朋友
 				</Link>
@@ -501,7 +498,7 @@ function AdvancedSearchSidebarContent({
 					<Button
 						key={keyword}
 						active={searchCourseKeyword === keyword}
-						className='m-0'
+						className='m-0 h-auto px-3 py-1.5'
 						onClick={() => onKeywordChange(keyword)}
 					>
 						{keyword}
@@ -589,7 +586,7 @@ function SearchSection({
 		<section className='border-t border-[rgba(var(--vs-text),0.08)] pt-3'>
 			<button
 				type='button'
-				className='flex w-full cursor-pointer items-center justify-between gap-2 border-0 bg-transparent p-0 text-left font-bold text-[rgb(var(--vs-text))]'
+				className='flex w-full cursor-pointer items-center justify-between gap-2 border-0 bg-transparent p-0 text-left font-semibold text-[rgb(var(--vs-text))]'
 				aria-expanded={expanded}
 				onClick={() => setExpanded((value) => !value)}
 			>

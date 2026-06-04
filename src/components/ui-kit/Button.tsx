@@ -24,7 +24,7 @@ export function Button({
 }: ButtonProps) {
 	const classes = cn(
 		'inline-flex h-[34px] shrink-0 items-center justify-center gap-1 rounded-[12px] px-[10px] text-[0.8em] font-normal leading-none transition-all duration-200',
-		'm-[5px] border-0 no-underline disabled:cursor-not-allowed disabled:opacity-50',
+		'border-0 no-underline disabled:cursor-not-allowed disabled:opacity-50',
 		icon && 'w-[34px] px-0',
 		active && 'bg-[rgb(var(--vs-primary))] text-white hover:bg-[rgb(var(--vs-primary))]',
 		!active &&

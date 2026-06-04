@@ -117,35 +117,35 @@ export function TeacherPage() {
 			<div className='mt-2 grid gap-3 md:grid-cols-2'>
 				{courses.map((course: TeacherWithdrawalCourse) => (
 					<Link
-						className='grid cursor-pointer grid-cols-[auto_1fr_auto_auto] items-center gap-x-2 gap-y-0 rounded-[8px] bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
+						className='grid cursor-pointer grid-cols-[auto_1fr_auto_auto] items-center gap-x-2 gap-y-0 rounded-lg bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
 						to={`/course/${course.year}/${course.sem}/${course.id}`}
 						key={`${course.year}-${course.sem}-${course.id}`}
 					>
 						<div>
-							<div className='text-base font-bold'>{course.id}</div>
+							<div className='text-base font-semibold'>{course.id}</div>
 							<div className='text-xs opacity-80'>
 								{course.year} 年{course.sem === '1' ? '上' : '下'}學期
 							</div>
 						</div>
 						<div>
-							<div className='text-base font-bold'>
+							<div className='text-base font-semibold'>
 								{course.courseType} {course.name?.zh}
 							</div>
 							<div className='text-xs opacity-80'>{course.name?.en}</div>
 						</div>
 						<div className='flex flex-col items-center justify-center px-2'>
-							<div className='text-base font-bold'>{course.peopleWithdraw}</div>
+							<div className='text-base font-semibold'>{course.peopleWithdraw}</div>
 							<div className='text-xs opacity-80'>退選</div>
 						</div>
 						<div className='flex flex-col items-center justify-center px-2'>
-							<div className='text-base font-bold'>{course.people}</div>
+							<div className='text-base font-semibold'>{course.people}</div>
 							<div className='text-xs opacity-80'>選課</div>
 						</div>
 					</Link>
 				))}
 			</div>
 			{courses.length ? null : <p>尚無課程，請選擇其他分類</p>}
-			<h3>贊助商廣告</h3>
+			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />
 		</div>
 	);

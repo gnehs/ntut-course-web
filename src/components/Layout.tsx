@@ -4,7 +4,7 @@ import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/co
 import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import { Button } from './ui-kit/Button';
-import { ContentSurface } from './ui-kit/ContentSurface';
+import { cn } from '@/lib/utils';
 import { Dialog } from './ui-kit/Dialog';
 import { Field } from './ui-kit/Field';
 import { Select, SelectOption } from './ui-kit/Select';
@@ -43,15 +43,18 @@ export function Layout() {
 	}
 
 	return (
-		<div ref={rootRef} className='flex min-h-screen flex-col bg-[#f4f7f8] text-black dark:bg-[#1d1d1d] dark:text-white'>
+		<div
+			ref={rootRef}
+			className='flex min-h-screen flex-col bg-[#f4f7f8] font-sans text-black dark:bg-[#1d1d1d] dark:text-white'
+		>
 			{!isIframe && !isAdvancedSearch ? (
 				<nav
-					className='fixed inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]'
+					className='sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]'
 					style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
 				>
 					<Link
 						to='/'
-						className='block min-w-0 truncate font-bold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
+						className='block min-w-0 truncate font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
 					>
 						🍤 北科課程好朋友
 					</Link>
@@ -59,18 +62,33 @@ export function Layout() {
 						<UniversalSearch navbar />
 					</div>
 					<div className='flex justify-end'>
-						<Button className='m-0 whitespace-nowrap' onClick={() => setDatasetDialogOpen(true)}>
+						<Button className='whitespace-nowrap' onClick={() => setDatasetDialogOpen(true)}>
 							{yearSemLabel}
 						</Button>
 					</div>
 				</nav>
 			) : null}
-			<ContentSurface
-				as='main'
-				className={`flex-1 ${isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 pt-[74px]'} ${isIframe ? 'pt-0' : ''}`}
+			<main
+				className={cn(
+					'text-[rgb(var(--vs-text))]',
+					'[&_code]:rounded-sm [&_code]:border [&_code]:border-[rgba(var(--vs-text),0.1)] [&_code]:bg-[rgba(var(--vs-text),0.01)] [&_code]:px-1 [&_code]:text-[0.95em] [&_code]:leading-[1.5em]',
+					"[&_code]:font-['Roboto_Mono','Noto_Sans_TC',monospace] [&_pre]:font-['Roboto_Mono','Noto_Sans_TC',monospace]",
+					'[&_hr]:border-0 [&_hr]:border-t [&_hr]:border-black/10',
+					'[&_h1]:text-[2em] [&_h1]:leading-[1.5em] [&_h1]:font-semibold',
+					'[&_h2]:text-[1.5em] [&_h2]:leading-[1.5em] [&_h2]:font-semibold',
+					'[&_h3]:text-[1.17em] [&_h3]:leading-[1.5em] [&_h3]:font-semibold',
+					'[&_h4]:text-[1em] [&_h4]:leading-[1.5em] [&_h4]:font-semibold',
+					'[&_h5]:text-[0.83em] [&_h5]:leading-[1.5em] [&_h5]:font-semibold',
+					'[&_h6]:text-[0.67em] [&_h6]:leading-[1.5em] [&_h6]:font-semibold',
+					'[&_p]:my-[1em] [&_p]:leading-[1.5em]',
+					'[&_h1+p]:mt-[-1em] [&_h2+p]:mt-[-1em] [&_h3+p]:mt-[-1em] [&_h4+p]:mt-[-1em] [&_h5+p]:mt-[-1em] [&_h6+p]:mt-[-1em]',
+					`flex-1`,
+					isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 py-8',
+					isIframe ? 'pt-0' : '',
+				)}
 			>
 				<Outlet />
-			</ContentSurface>
+			</main>
 			{isIframe && !isAdvancedSearch ? (
 				<div className='my-4 text-center text-[0.75em] opacity-75'>
 					本資料由{' '}
@@ -99,7 +117,6 @@ export function Layout() {
 								<Button
 									as='a'
 									icon
-									className='m-0'
 									href='https://github.com/gnehs/ntut-course-web'
 									target='_blank'
 									rel='noreferrer'
@@ -132,10 +149,7 @@ export function Layout() {
 						</Select>
 					</Field>
 					<Field label='學制'>
-						<Select
-							value={departmentValue}
-							onChange={(value) => setDepartmentValue(value)}
-						>
+						<Select value={departmentValue} onChange={(value) => setDepartmentValue(value)}>
 							{departmentItems.map((item) => (
 								<SelectOption key={item} value={item}>
 									{item}

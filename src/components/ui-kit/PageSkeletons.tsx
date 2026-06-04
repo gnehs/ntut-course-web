@@ -1,9 +1,7 @@
 import type React from 'react';
 
 function SkeletonBlock({ className = '' }: { className?: string }) {
-	return (
-		<div className={`animate-pulse rounded-[8px] bg-[rgba(var(--vs-text),0.1)] ${className}`} />
-	);
+	return <div className={`animate-pulse rounded-lg bg-[rgba(var(--vs-text),0.1)] ${className}`} />;
 }
 
 function SkeletonCard({
@@ -15,7 +13,7 @@ function SkeletonCard({
 }) {
 	return (
 		<div
-			className={`rounded-[8px] bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] ${className}`}
+			className={`rounded-lg bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] ${className}`}
 		>
 			{children}
 		</div>
@@ -60,7 +58,7 @@ function StatCardsSkeleton({
 
 function ListRowsSkeleton({ rows = 6, compact = false }: { rows?: number; compact?: boolean }) {
 	return (
-		<div className='overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
+		<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
 			{Array.from({ length: rows }, (_, index) => (
 				<div
 					key={index}

@@ -82,7 +82,7 @@ export function HomePage() {
 				>
 					{displayDepartment(dataset.department)}
 				</button>
-				<div className='text-[32px] leading-tight font-bold'>
+				<div className='text-[32px] leading-tight font-semibold'>
 					{dataset.year} 年{dataset.sem === '1' ? '上' : '下'}學期
 				</div>
 			</div>

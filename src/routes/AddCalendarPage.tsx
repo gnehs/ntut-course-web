@@ -81,7 +81,7 @@ export function AddCalendarPage() {
 
 	if (!courses) return <StepsPageSkeleton />;
 	return (
-		<div>
+		<div className='space-y-4'>
 			<h1>新增到行事曆</h1>
 			<p>注意：如果你變更了課程，需要重新新增課程到行事曆！</p>
 			{!courses.length ? (
@@ -104,7 +104,7 @@ export function AddCalendarPage() {
 				{courses.map((course) => (
 					<label
 						key={course.id}
-						className='flex items-center gap-2 rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-3 py-2'
+						className='flex items-center gap-2 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-3 py-2'
 					>
 						<input
 							type='checkbox'

@@ -98,7 +98,7 @@ export function EmptyRoomPage() {
 	if (!courses) return <EmptyRoomSkeleton />;
 
 	return (
-		<div>
+		<div className='space-y-4'>
 			{onError ? (
 				<Alert danger>
 					<strong>擷取資料時發生了錯誤</strong>
@@ -172,7 +172,7 @@ export function EmptyRoomPage() {
 				}
 			>
 				{emptyroomDetailData ? (
-					<div className='overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.1)]'>
+					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
 						{timetableSlots.map((slot, index) => (
 							<div
 								key={slot}
