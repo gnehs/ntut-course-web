@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/courseUtils';
 import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
@@ -12,7 +12,7 @@ import { UniversalSearch } from './UniversalSearch';
 
 export function Layout() {
 	const { location } = useRouterState();
-	const searchParams = createSearchParams(globalThis.location?.search || location.search);
+	const searchParams = createSearchParams(location.search);
 	const isIframe = searchParams.get('mode') === 'iframe';
 	const isAdvancedSearch = location.pathname === '/advanced-search';
 	const {
@@ -26,6 +26,14 @@ export function Layout() {
 	const [yearSemValue, setYearSemValue] = useState(`${dataset.year}-${dataset.sem}`);
 	const [departmentValue, setDepartmentValue] = useState(displayDepartment(dataset.department));
 
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	useLayoutEffect(() => {
+		if (rootRef.current) {
+			rootRef.current.style.setProperty('min-height', '100svh', 'important');
+		}
+	}, []);
+
 	const yearSemLabel = useMemo(() => parseYearSemVal(`${dataset.year}-${dataset.sem}`), [dataset]);
 
 	function applyDataset() {
@@ -35,7 +43,7 @@ export function Layout() {
 	}
 
 	return (
-		<div className='flex min-h-screen flex-col bg-[#f4f7f8] text-black dark:bg-[#1d1d1d] dark:text-white'>
+		<div ref={rootRef} className='flex min-h-screen flex-col bg-[#f4f7f8] text-black dark:bg-[#1d1d1d] dark:text-white'>
 			{!isIframe && !isAdvancedSearch ? (
 				<nav
 					className='fixed inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]'
