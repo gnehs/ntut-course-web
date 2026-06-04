@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { trimEllip } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';

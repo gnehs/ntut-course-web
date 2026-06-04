@@ -97,12 +97,11 @@ export function ClassIndexPage() {
 	return (
 		<div>
 			<h1>選擇班級</h1>
-			<div className='grid grid-cols-1 gap-3 lg:grid-cols-4'>
-				<Card>
-					<p>輸入關鍵字來篩選</p>
-					<Input value={filter} onChange={(event) => setFilter(event.target.value)} />
-				</Card>
-			</div>
+			<Input
+				value={filter}
+				onChange={(event) => setFilter(event.target.value)}
+				placeholder='輸入關鍵字來篩選...'
+			/>
 			{error ? (
 				<Alert danger>
 					<strong>搜尋時發生了錯誤</strong>

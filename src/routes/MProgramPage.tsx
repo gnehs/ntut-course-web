@@ -62,27 +62,28 @@ export function MProgramIndexPage() {
 	return (
 		<div>
 			<h1>選擇微學程</h1>
-			<div className='grid gap-3 sm:grid-cols-1 lg:grid-cols-4'>
-				<Card>
-					<p>輸入關鍵字來篩選</p>
-					<Input value={filter} onChange={(event) => setFilter(event.target.value)} />
-				</Card>
-			</div>
+
+			<Input
+				value={filter}
+				onChange={(event) => setFilter(event.target.value)}
+				placeholder='輸入關鍵字來篩選...'
+			/>
+
 			{error ? (
 				<Alert danger>
 					<strong>搜尋時發生了錯誤</strong>
 					<pre>{errorMessage(error)}</pre>
 				</Alert>
 			) : null}
-			<div className='grid gap-3 sm:grid-cols-3 lg:grid-cols-5'>
+			<div className='mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-5'>
 				{filteredPrograms.map((program) => (
 					<Card
 						className='cursor-pointer p-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
 						key={program.id}
 						to={`/mprogram/${dataset.year}/${dataset.sem}/${program.id}`}
 					>
-						<CardTitle>{program.name}</CardTitle>
 						<p>{program.id}</p>
+						<CardTitle>{program.name}</CardTitle>
 					</Card>
 				))}
 			</div>

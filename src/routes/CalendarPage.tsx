@@ -46,15 +46,15 @@ export function CalendarPage() {
 				{rows.map((item, index) => (
 					<div
 						key={item.uid || `${item.summary}-${index}`}
-						className={`calendar-item flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
+						className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
 					>
 						<div
-							className='calendar-icon flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.12)] bg-gradient-to-b from-white to-[rgba(var(--vs-text),0.04)] text-center shadow-[0_8px_18px_rgba(0,0,0,0.14),0_1px_0_rgba(255,255,255,0.75)_inset]'
+							className='flex size-12 shrink-0 flex-col overflow-hidden rounded-[8px] bg-gradient-to-b from-white to-[rgba(var(--vs-text),0.04)] text-center shadow-md'
 							style={{
 								opacity: index > 0 && sameCalendarDay(rows[index - 1]?.start, item.start) ? 0 : 1,
 							}}
 						>
-							<div className='flex h-5 w-full items-center justify-center bg-gradient-to-b from-[rgb(255,124,124)] to-[rgb(220,62,63)] text-[10px] leading-none font-bold text-white shadow-[0_1px_0_rgba(255,255,255,0.28)_inset]'>
+							<div className='flex h-5 w-full items-center justify-center bg-gradient-to-b from-[rgb(255,124,124)] to-[rgb(220,62,63)] text-[10px] leading-none font-bold text-white'>
 								{calendarDate(item.start).getMonth() + 1} 月
 							</div>
 							<div className='flex flex-1 items-center justify-center text-xl leading-none font-bold text-[rgb(var(--vs-text))]'>
