@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
-import { Loader } from '../components/ui-kit/Loader'
+import { CalendarSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchCalendar } from '../lib/courseApi'
 import type { CalendarEvent } from '../types/course'
 
@@ -22,7 +22,7 @@ export function CalendarPage() {
       .sort((a, b) => calendarDate(a.start).getTime() - calendarDate(b.start).getTime())
     return important ? data.filter((item) => item.summary?.match(/補假|加選|開學|會考|撤選|校慶|期中|期末考|網路教學評量|全校週會|選課|放假/)) : data
   }, [calendar, important])
-  if (!calendar) return <Loader />
+  if (!calendar) return <CalendarSkeleton />
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -35,11 +35,11 @@ export function CalendarPage() {
       <div className="mt-4 overflow-hidden rounded-[4px] border border-[rgba(var(--vs-text),0.1)]">
         {rows.map((item, index) => (
           <div key={item.uid || `${item.summary}-${index}`} className={`calendar-item flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}>
-            <div className="calendar-icon flex h-12 w-12 shrink-0 flex-col items-center justify-center overflow-hidden rounded-[6px] border border-[rgba(var(--vs-text),0.1)] text-center" style={{ opacity: index > 0 && sameCalendarDay(rows[index - 1]?.start, item.start) ? 0 : 1 }}>
-              <div className="w-full bg-[rgb(234,84,85)] text-[10px] leading-4 text-white">
+            <div className="calendar-icon flex h-14 w-14 shrink-0 flex-col overflow-hidden rounded-[8px] border border-[rgba(var(--vs-text),0.12)] bg-gradient-to-b from-white to-[rgba(var(--vs-text),0.04)] text-center shadow-[0_8px_18px_rgba(0,0,0,0.14),0_1px_0_rgba(255,255,255,0.75)_inset]" style={{ opacity: index > 0 && sameCalendarDay(rows[index - 1]?.start, item.start) ? 0 : 1 }}>
+              <div className="flex h-5 w-full items-center justify-center bg-gradient-to-b from-[rgb(255,124,124)] to-[rgb(220,62,63)] text-[10px] font-bold leading-none text-white shadow-[0_1px_0_rgba(255,255,255,0.28)_inset]">
                 {calendarDate(item.start).getMonth() + 1} 月
               </div>
-              <div className="text-lg font-bold leading-none">
+              <div className="flex flex-1 items-center justify-center text-xl font-bold leading-none text-[rgb(var(--vs-text))]">
                 {calendarDate(item.start).getDate()}
               </div>
             </div>
