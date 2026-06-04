@@ -5,7 +5,7 @@ import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
 import { Field } from '../components/ui-kit/Field'
 import { Input } from '../components/ui-kit/Input'
-import { Loader } from '../components/ui-kit/Loader'
+import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchCalendar } from '../lib/courseApi'
 import { buildCourseCalendar, trimEllip } from '../lib/courseUtils'
 import { useApp } from '../state/AppContext'
@@ -68,7 +68,7 @@ export function AddCalendarPage() {
     URL.revokeObjectURL(url)
   }
 
-  if (!courses) return <Loader />
+  if (!courses) return <StepsPageSkeleton />
   return (
     <div>
       <h1>新增到行事曆</h1>
