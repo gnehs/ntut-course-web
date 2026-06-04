@@ -1,31 +1,27 @@
+import { defaultParseSearch, defaultStringifySearch } from '@tanstack/react-router';
 import { describe, expect, it } from 'vitest';
-import { createSearchParams, replaceQuery } from './urlState';
+import { createSearchObject, createSearchParams } from './urlState';
 
 describe('urlState', () => {
-	it('writes plain query strings without JSON quoting values', () => {
-		replaceQuery('/advanced-search', {
-			year: '115',
-			sem: '1',
-			d: 'main',
-			q: JSON.stringify({ k: '國文' }),
-		});
-		expect(window.location.pathname).toBe('/advanced-search');
-		expect(window.location.search).toContain('year=115');
-		expect(window.location.search).toContain('sem=1');
-		expect(window.location.search).not.toContain('%22115%22');
-		expect(new URLSearchParams(window.location.search).get('q')).toBe(
-			JSON.stringify({ k: '國文' }),
-		);
-	});
-
-	it('serializes object values before writing query strings', () => {
+	it('serializes router search objects without writing history directly', () => {
 		const timetableFilter = { mon: ['1', '2', '3'], tue: ['4'], wed: [], thu: [], fri: [] };
 
-		replaceQuery('/advanced-search', { year: '115', sem: '1', q: { tf: timetableFilter } });
+		const search = createSearchObject({ year: '115', sem: '1', q: { tf: timetableFilter } });
 
-		expect(JSON.parse(new URLSearchParams(window.location.search).get('q') ?? '')).toEqual({
-			tf: timetableFilter,
-		});
+		expect(search.year).toBe('115');
+		expect(search.sem).toBe('1');
+		expect(search.q).toEqual({ tf: timetableFilter });
+	});
+
+	it('lets TanStack Router stringify nested search values only once', () => {
+		const search = createSearchObject({ year: '115', sem: '1', q: { k: '國文' } });
+
+		const searchString = defaultStringifySearch(search);
+
+		expect(searchString).toContain('q=%7B');
+		expect(searchString).not.toContain('q=%22%7B');
+		const parsedSearch = defaultParseSearch(searchString) as Record<string, unknown>;
+		expect(parsedSearch.q).toEqual({ k: '國文' });
 	});
 
 	it('normalizes router search objects with nested values', () => {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useRouterState } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { Checkbox } from '../components/ui/checkbox';
 import { CourseList } from '../components/CourseList';
 import { TimetableSelector } from '../components/TimetableSelector';
@@ -11,7 +11,7 @@ import { Field } from '../components/ui-kit/Field';
 import { Input } from '../components/ui-kit/Input';
 import { SearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils';
-import { createSearchParams, replaceQuery } from '../lib/urlState';
+import { createSearchObject, createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import type { Course, QueryValue } from '../types/course';
 import { errorMessage } from '../lib/error';
@@ -34,9 +34,10 @@ const allStandardFilter = {
 
 export function SearchPage() {
 	const { location } = useRouterState();
+	const navigate = useNavigate();
 	const { dataset, getCourses } = useApp();
 	const query = useMemo(
-		() => createSearchParams(globalThis.location?.search || location.search),
+		() => createSearchParams(location.search),
 		[location.search],
 	);
 	const initialState = useMemo(
@@ -158,6 +159,7 @@ export function SearchPage() {
 	]);
 
 	useEffect(() => {
+		if (location.pathname !== '/search') return;
 		const next: Record<string, QueryValue | undefined> = { year, sem, d: department };
 		if (searchVal) next.q = searchVal;
 		if (searchCourseId) next.id = searchCourseId;
@@ -165,10 +167,12 @@ export function SearchPage() {
 		if (searchClass) next.classroom = searchClass;
 		if (!showConflictCourse) next.hideConflict = true;
 		if (Object.values(timetableFilter).some((items) => items.length))
-			next['time-table'] = JSON.stringify(timetableFilter);
-		if (categoryFilter.length) next.category = JSON.stringify(categoryFilter);
-		replaceQuery('/search', next);
+			next['time-table'] = timetableFilter;
+		if (categoryFilter.length) next.category = categoryFilter;
+		void navigate({ to: '/search', search: createSearchObject(next), replace: true });
 	}, [
+		location.pathname,
+		navigate,
 		searchVal,
 		searchCourseId,
 		searchTeacher,

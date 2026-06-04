@@ -1,12 +1,16 @@
-export function replaceQuery(path, params) {
-	writeQuery(path, params, 'replace');
-}
+type QueryInputValue =
+	| string
+	| number
+	| boolean
+	| bigint
+	| null
+	| undefined
+	| Record<string, unknown>
+	| unknown[];
 
-export function pushQuery(path, params) {
-	writeQuery(path, params, 'push');
-}
+type QueryInput = Record<string, QueryInputValue>;
 
-export function createSearchParams(search) {
+export function createSearchParams(search: URLSearchParams | string | Record<string, unknown> | null | undefined) {
 	if (search instanceof URLSearchParams) return new URLSearchParams(search);
 	if (typeof search === 'string') return new URLSearchParams(search);
 	if (!search || typeof search !== 'object') return new URLSearchParams();
@@ -20,19 +24,16 @@ export function createSearchParams(search) {
 	return params;
 }
 
-function writeQuery(path, params, mode) {
-	const search = new URLSearchParams();
+export function createSearchObject(params: QueryInput): QueryInput {
+	const search: QueryInput = {};
 	for (const [key, value] of Object.entries(params)) {
-		const serialized = serializeQueryValue(value);
-		if (serialized === null) continue;
-		search.set(key, serialized);
+		if (value === undefined || value === null || value === '') continue;
+		search[key] = value;
 	}
-	const url = `${path}${search.size ? `?${search.toString()}` : ''}`;
-	if (mode === 'push') window.history.pushState(null, '', url);
-	else window.history.replaceState(null, '', url);
+	return search;
 }
 
-function serializeQueryValue(value) {
+function serializeQueryValue(value: QueryInputValue | unknown) {
 	if (value === undefined || value === null || value === '') return null;
 	if (typeof value === 'string') return value;
 	if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint')

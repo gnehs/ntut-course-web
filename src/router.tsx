@@ -56,4 +56,8 @@ const routeTree = rootRoute.addChildren([
 	route('/not-found', NotFoundPage),
 ]);
 
-export const router = createRouter({ routeTree });
+export function createAppRouter(options = {}) {
+	return createRouter({ routeTree, ...options });
+}
+
+export const router = createAppRouter();

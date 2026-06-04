@@ -1,4 +1,4 @@
-import { Link, useRouterState } from '@tanstack/react-router';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
@@ -14,7 +14,7 @@ import { MiniNotify } from '../components/ui-kit/MiniNotify';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils';
 import { fetchDepartment, fetchWithdrawalRate } from '../lib/courseApi';
-import { createSearchParams, replaceQuery } from '../lib/urlState';
+import { createSearchObject, createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import type { Course, DepartmentGroup, QueryValue, WithdrawalRateMap } from '../types/course';
 import { errorMessage } from '../lib/error';
@@ -48,9 +48,10 @@ type AdvancedSearchQuery = {
 
 export function AdvancedSearchPage() {
 	const { location } = useRouterState();
+	const navigate = useNavigate();
 	const { dataset, getCourses } = useApp();
 	const params = useMemo(
-		() => createSearchParams(globalThis.location?.search || location.search),
+		() => createSearchParams(location.search),
 		[location.search],
 	);
 	const restoredQuery = useMemo<AdvancedSearchQuery>(
@@ -286,6 +287,7 @@ export function AdvancedSearchPage() {
 	]);
 
 	useEffect(() => {
+		if (location.pathname !== '/advanced-search') return;
 		const q: Record<string, QueryValue | undefined> = {};
 		if (searchCourseKeyword !== '') q.k = searchCourseKeyword;
 		if (!showConflictCourse) q.c = showConflictCourse;
@@ -299,13 +301,19 @@ export function AdvancedSearchPage() {
 		if (Object.values(timetableFilter).some((items) => items.length)) q.tf = timetableFilter;
 		if (academyFilter.length) q.af = academyFilter.join(',');
 		if (showPlaceholder) q.sph = showPlaceholder;
-		replaceQuery('/advanced-search', {
-			year,
-			sem,
-			d: department,
-			...(Object.keys(q).length ? { q: JSON.stringify(q) } : {}),
+		void navigate({
+			to: '/advanced-search',
+			search: createSearchObject({
+				year,
+				sem,
+				d: department,
+				...(Object.keys(q).length ? { q } : {}),
+			}),
+			replace: true,
 		});
 	}, [
+		location.pathname,
+		navigate,
 		year,
 		sem,
 		department,

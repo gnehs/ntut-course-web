@@ -1,11 +1,11 @@
-import { useRouterState } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchStandards, fetchStandardYear } from '../lib/courseApi';
-import { createSearchParams, pushQuery } from '../lib/urlState';
+import { createSearchObject, createSearchParams } from '../lib/urlState';
 import type {
 	GroupedStandardDepartment,
 	QueryValue,
@@ -16,8 +16,9 @@ import { errorMessage } from '../lib/error';
 
 export function StandardPage() {
 	const { location } = useRouterState();
+	const navigate = useNavigate();
 	const params = useMemo(
-		() => createSearchParams(globalThis.location?.search || location.search),
+		() => createSearchParams(location.search),
 		[location.search],
 	);
 	const [years, setYears] = useState<string[] | null>(null);
@@ -73,12 +74,13 @@ export function StandardPage() {
 		return Array.isArray(years) ? [...years] : Object.keys(years).reverse();
 	}, [years]);
 	function setQuery(next: Record<string, QueryValue | undefined>) {
+		if (location.pathname !== '/standard') return;
 		const query = { year, system, department, ...next };
 		for (const key of Object.keys(query)) if (!query[key]) delete query[key];
 		setYear(query.year || '');
 		setSystem(query.system || '');
 		setDepartment(query.department || '');
-		pushQuery('/standard', query);
+		void navigate({ to: '/standard', search: createSearchObject(query) });
 	}
 	return (
 		<div>
