@@ -6,7 +6,7 @@ import { animateSearchResults } from '../lib/motion'
 import { useApp } from '../state/AppContext'
 import type { Course, SearchHistoryItem } from '../types/course'
 
-export function UniversalSearch({ navbar = false, className = '', motionItem = false }) {
+export function UniversalSearch({ navbar = false, className = '' }) {
   const { dataset, getCourses } = useApp()
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -101,7 +101,6 @@ export function UniversalSearch({ navbar = false, className = '', motionItem = f
   return (
     <div
       className={cn('relative mx-auto w-full', navbar ? 'max-w-[512px] md:max-w-[512px]' : 'max-w-none', className)}
-      data-motion-page-item={motionItem ? '' : undefined}
     >
       <div
         className={cn(

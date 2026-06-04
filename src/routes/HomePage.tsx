@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AdsByGoogle } from '../components/AdsByGoogle'
 import { fetchCalendar } from '../lib/courseApi'
 import { displayDepartment } from '../lib/courseUtils'
-import { animatePageIntro } from '../lib/motion'
 import { useApp } from '../state/AppContext'
 import { UniversalSearch } from '../components/UniversalSearch'
 import { Card } from '../components/ui-kit/Card'
@@ -64,19 +63,14 @@ function UpcomingCourse() {
 export function HomePage() {
   const { dataset, setDatasetDialogOpen } = useApp()
   const standardURL = useStandardUrl()
-  const pageRef = useRef(null)
 
   useEffect(() => {
     fetchCalendar().catch(() => {})
   }, [])
 
-  useEffect(() => {
-    return animatePageIntro(pageRef.current)
-  }, [dataset.year, dataset.sem, dataset.department])
-
   return (
-    <div ref={pageRef} className="grid gap-6">
-      <div className="grid gap-3" data-motion-page-item>
+    <div className="grid gap-6">
+      <div className="grid gap-3">
         <button
           type="button"
           className="inline-flex w-fit items-center rounded-full border border-[rgba(var(--vs-text),0.25)] px-3 py-1 text-sm text-[rgba(var(--vs-text),0.75)] transition-colors hover:bg-[rgba(var(--vs-text),0.05)]"
@@ -86,7 +80,7 @@ export function HomePage() {
         </button>
         <div className="text-[32px] font-bold leading-tight">{dataset.year} 年{dataset.sem === '1' ? '上' : '下'}學期</div>
       </div>
-      <UniversalSearch className="block md:hidden" motionItem />
+      <UniversalSearch className="block md:hidden" />
       <UpcomingCourse />
       <PageSection title="課程">
         <HomeCardGrid items={[
@@ -128,7 +122,7 @@ export function HomePage() {
 
 function PageSection({ title, children }) {
   return (
-    <section className="grid gap-3" data-motion-page-item>
+    <section className="grid gap-3">
       <h2 className="m-0">{title}</h2>
       {children}
     </section>

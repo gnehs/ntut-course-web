@@ -6,40 +6,6 @@ export function isReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-export function animatePageIntro(scope) {
-  if (!scope || isReducedMotion()) return () => {}
-
-  const context = gsap.context(() => {
-    gsap.fromTo(
-      '[data-motion-page-item]',
-      { autoAlpha: 0, y: 14, filter: 'blur(6px)' },
-      {
-        autoAlpha: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 0.58,
-        ease: 'power3.out',
-        stagger: { each: 0.055, from: 'start' },
-        clearProps: 'filter',
-      }
-    )
-  }, scope)
-
-  return () => context.revert()
-}
-
-export function animateRouteSurface(element) {
-  if (!element || isReducedMotion()) return () => {}
-
-  gsap.fromTo(
-    element,
-    { autoAlpha: 0.94, y: 10 },
-    { autoAlpha: 1, y: 0, duration: 0.34, ease: 'power2.out', overwrite: 'auto' }
-  )
-
-  return () => gsap.killTweensOf(element)
-}
-
 export function bindInteractiveCard(element) {
   if (!element || isReducedMotion()) return () => {}
 
@@ -155,52 +121,4 @@ export function animateSearchResults(element, visible) {
   }
 
   return () => gsap.killTweensOf(element)
-}
-
-export function animateCourseResults(element) {
-  if (!element || isReducedMotion()) return () => {}
-
-  const items = element.querySelectorAll('[data-course-result-item]')
-  gsap.killTweensOf([element, ...items])
-  gsap.fromTo(
-    element,
-    { autoAlpha: 0.94, y: 6 },
-    { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out', overwrite: 'auto' }
-  )
-
-  if (items.length) {
-    gsap.fromTo(
-      items,
-      { autoAlpha: 0, y: 8 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.24,
-        ease: 'power2.out',
-        stagger: { each: 0.012, from: 'start' },
-        overwrite: 'auto',
-      }
-    )
-  }
-
-  return () => gsap.killTweensOf([element, ...items])
-}
-
-export function animateCourseResultsOut(element) {
-  if (!element || isReducedMotion()) return Promise.resolve()
-
-  const items = element.querySelectorAll('[data-course-result-item]')
-  gsap.killTweensOf([element, ...items])
-
-  return new Promise((resolve) => {
-    gsap.to(items.length ? items : element, {
-      autoAlpha: 0,
-      y: -6,
-      duration: 0.14,
-      ease: 'power2.in',
-      stagger: items.length ? { each: 0.006, from: 'end' } : 0,
-      overwrite: 'auto',
-      onComplete: resolve,
-    })
-  })
 }
