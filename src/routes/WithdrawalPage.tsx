@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { WithdrawalSkeleton } from '../components/ui-kit/PageSkeletons';
-import { Select } from '../components/ui-kit/Select';
+import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchWithdrawal } from '../lib/courseApi';
 import type { WithdrawalResponse, WithdrawalStat } from '../types/course';
 
@@ -43,12 +43,12 @@ export function WithdrawalPage() {
 				<div className='flex items-center'>
 					<Select
 						value={period}
-						onChange={(event) => setPeriod(event.target.value)}
+						onChange={(value) => setPeriod(value)}
 						className='max-w-[120px]'
 					>
-						<option value='-recent-3-years'>過去三年</option>
-						<option value='-recent-5-years'>過去五年</option>
-						<option value='all'>所有期間</option>
+						<SelectOption value='-recent-3-years'>過去三年</SelectOption>
+						<SelectOption value='-recent-5-years'>過去五年</SelectOption>
+						<SelectOption value='all'>所有期間</SelectOption>
 					</Select>
 				</div>
 			</div>

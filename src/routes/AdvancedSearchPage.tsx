@@ -11,7 +11,7 @@ import { Field } from '../components/ui-kit/Field';
 import { Input } from '../components/ui-kit/Input';
 import { SearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { MiniNotify } from '../components/ui-kit/MiniNotify';
-import { Select } from '../components/ui-kit/Select';
+import { Select, SelectOption } from '../components/ui-kit/Select';
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils';
 import { fetchDepartment, fetchWithdrawalRate } from '../lib/courseApi';
 import { createSearchParams, replaceQuery } from '../lib/urlState';
@@ -510,9 +510,9 @@ function AdvancedSearchSidebarContent({
 					顯示佔位課程
 				</label>
 				<Field label='排序依照'>
-					<Select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-						<option value='default'>預設</option>
-						<option value='withdrawal'>退選率（由低到高）</option>
+					<Select value={sortBy} onChange={(value) => setSortBy(value)}>
+						<SelectOption value='default'>預設</SelectOption>
+						<SelectOption value='withdrawal'>退選率（由低到高）</SelectOption>
 					</Select>
 				</Field>
 			</SearchSection>

@@ -7,6 +7,7 @@ import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { CourseDetailSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import {
 	courseStandard,
@@ -208,17 +209,16 @@ export function CourseDetailPage() {
 					本課程含有多項資料可供查詢，請使用下拉式選單選取教師來查看資料。
 					<br />
 					<br />
-					<select
-						className='w-full max-w-[260px] rounded-[12px] border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 outline-none'
+					<Select
 						value={selectedSyllabusIndex}
-						onChange={(event) => setSelectedSyllabusIndex(event.target.value)}
+						onChange={(value) => setSelectedSyllabusIndex(value)}
 					>
 						{syllabus.map((item, index) => (
-							<option key={`${item.name}-${index}`} value={String(index)}>
+							<SelectOption key={`${item.name}-${index}`} value={String(index)}>
 								{item.name}
-							</option>
+							</SelectOption>
 						))}
-					</select>
+					</Select>
 				</Alert>
 			) : null}
 			{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}

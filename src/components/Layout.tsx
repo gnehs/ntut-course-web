@@ -7,7 +7,7 @@ import { Button } from './ui-kit/Button';
 import { ContentSurface } from './ui-kit/ContentSurface';
 import { Dialog } from './ui-kit/Dialog';
 import { Field } from './ui-kit/Field';
-import { Select } from './ui-kit/Select';
+import { Select, SelectOption } from './ui-kit/Select';
 import { UniversalSearch } from './UniversalSearch';
 
 export function Layout() {
@@ -115,23 +115,23 @@ export function Layout() {
 			>
 				<div className='grid gap-3'>
 					<Field label='學期'>
-						<Select value={yearSemValue} onChange={(event) => setYearSemValue(event.target.value)}>
+						<Select value={yearSemValue} onChange={(value) => setYearSemValue(value)}>
 							{yearSemItems.map((item) => (
-								<option key={item} value={item}>
+								<SelectOption key={item} value={item}>
 									{parseYearSemVal(item)}
-								</option>
+								</SelectOption>
 							))}
 						</Select>
 					</Field>
 					<Field label='學制'>
 						<Select
 							value={departmentValue}
-							onChange={(event) => setDepartmentValue(event.target.value)}
+							onChange={(value) => setDepartmentValue(value)}
 						>
 							{departmentItems.map((item) => (
-								<option key={item} value={item}>
+								<SelectOption key={item} value={item}>
 									{item}
-								</option>
+								</SelectOption>
 							))}
 						</Select>
 					</Field>
