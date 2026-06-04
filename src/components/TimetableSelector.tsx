@@ -14,7 +14,7 @@ export function TimetableSelector({
 	return (
 		<div
 			className={cn(
-				'overflow-hidden rounded-[12px] border border-[rgba(var(--vs-text),0.1)] bg-[rgba(var(--vs-text),0.03)]',
+				'overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgba(var(--vs-text),0.03)]',
 				className,
 			)}
 		>

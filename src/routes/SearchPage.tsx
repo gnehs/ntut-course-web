@@ -36,10 +36,7 @@ export function SearchPage() {
 	const { location } = useRouterState();
 	const navigate = useNavigate();
 	const { dataset, getCourses } = useApp();
-	const query = useMemo(
-		() => createSearchParams(location.search),
-		[location.search],
-	);
+	const query = useMemo(() => createSearchParams(location.search), [location.search]);
 	const initialState = useMemo(
 		() => ({
 			q: query.get('q') || '',
@@ -277,7 +274,7 @@ export function SearchPage() {
 					</Field>
 					<div className='grid gap-2'>
 						<span className='text-[0.85em] opacity-75'>衝堂</span>
-						<label className='inline-flex min-h-9 items-center gap-2 rounded-[12px] border border-[rgba(var(--vs-text),0.1)] px-3 py-2'>
+						<label className='inline-flex min-h-9 items-center gap-2 rounded-lg border border-[rgba(var(--vs-text),0.1)] px-3 py-2'>
 							<Checkbox
 								checked={showConflictCourse}
 								onCheckedChange={(checked) => setShowConflictCourse(Boolean(checked))}
@@ -333,7 +330,7 @@ export function SearchPage() {
 					{Object.entries(categoryFilterList).map(([key, value]) => (
 						<label
 							key={value}
-							className='flex items-center gap-2 rounded-[12px] border border-[rgba(var(--vs-text),0.08)] px-3 py-2'
+							className='flex items-center gap-2 rounded-lg border border-[rgba(var(--vs-text),0.08)] px-3 py-2'
 						>
 							<Checkbox
 								checked={categoryFilter.includes(value)}
@@ -364,7 +361,7 @@ export function SearchPage() {
 					{Object.entries(courseStandard).map(([symbol, text]) => (
 						<label
 							key={symbol}
-							className='flex items-center gap-2 rounded-[12px] border border-[rgba(var(--vs-text),0.08)] px-3 py-2'
+							className='flex items-center gap-2 rounded-lg border border-[rgba(var(--vs-text),0.08)] px-3 py-2'
 						>
 							<Checkbox
 								checked={Boolean(courseStandardFilter[symbol])}

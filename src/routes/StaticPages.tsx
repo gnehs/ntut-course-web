@@ -380,7 +380,7 @@ export function StatusPage() {
 						href={run.html_url}
 						target='_blank'
 						rel='noreferrer'
-						className='flex items-center gap-2 rounded-[12px] bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
+						className='flex items-center gap-2 rounded-lg bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
 					>
 						<div
 							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}
