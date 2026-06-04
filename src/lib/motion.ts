@@ -34,7 +34,7 @@ export function bindInteractiveCard(element) {
 		if (icon) {
 			gsap.to(icon, {
 				autoAlpha: 0.34,
-				y: -1,
+				y: -10,
 				scale: 1.025,
 				duration: 0.24,
 				ease: 'power3.out',
@@ -56,7 +56,7 @@ export function bindInteractiveCard(element) {
 		if (icon) {
 			gsap.to(icon, {
 				autoAlpha: 0.2,
-				y: 0,
+				y: 10,
 				scale: 1,
 				duration: 0.24,
 				ease: 'power2.out',
