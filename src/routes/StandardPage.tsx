@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Alert } from '../components/ui-kit/Alert'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
-import { Loader } from '../components/ui-kit/Loader'
+import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchStandards, fetchStandardYear } from '../lib/courseApi'
 import { createSearchParams, pushQuery } from '../lib/urlState'
 import type { GroupedStandardDepartment, QueryValue, StandardCourse, StandardYearData } from '../types/course'
@@ -66,7 +66,7 @@ export function StandardPage() {
     <div>
       <h1>課程標準</h1>
       {error ? <Alert danger><strong>發生了錯誤</strong><pre>{errorMessage(error)}</pre></Alert> : null}
-      {!years ? <Loader /> : null}
+      {!years ? <StandardPickerSkeleton /> : null}
       {year ? (
         <>
           <h3>已選擇的項目 <span style={{ fontSize: '.8em', opacity: .7, fontWeight: 'normal' }}>點擊來取消</span></h3>
@@ -89,7 +89,7 @@ export function StandardPage() {
           </div>
         </>
       ) : null}
-      {year && !standardData ? <Loader /> : null}
+      {year && !standardData ? <StandardPickerSkeleton /> : null}
       {standardData && !system ? (
         <>
           <h3>選擇學制</h3>

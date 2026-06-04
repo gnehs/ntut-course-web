@@ -5,7 +5,7 @@ import { Alert } from '../components/ui-kit/Alert'
 import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
-import { Loader } from '../components/ui-kit/Loader'
+import { ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons'
 import { useApp } from '../state/AppContext'
 import type { Course } from '../types/course'
 
@@ -49,7 +49,7 @@ export function MyCoursePage() {
     setVersion((value) => value + 1)
   }
 
-  if (!courses) return <Loader />
+  if (!courses) return <ClassDetailSkeleton />
 
   return (
     <div>

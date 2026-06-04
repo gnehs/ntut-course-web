@@ -9,7 +9,7 @@ import { Card } from '../components/ui-kit/Card'
 import { Dialog } from '../components/ui-kit/Dialog'
 import { Field } from '../components/ui-kit/Field'
 import { Input } from '../components/ui-kit/Input'
-import { Loader } from '../components/ui-kit/Loader'
+import { SearchPageSkeleton } from '../components/ui-kit/PageSkeletons'
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils'
 import { createSearchParams, replaceQuery } from '../lib/urlState'
 import { useApp } from '../state/AppContext'
@@ -159,8 +159,6 @@ export function SearchPage() {
     })
   }
 
-  if (result === null) return <Loader />
-
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -203,7 +201,7 @@ export function SearchPage() {
         </div>
       </Card>
       {error ? <Alert danger><strong>搜尋時發生了錯誤</strong><pre>{errorMessage(error)}</pre></Alert> : null}
-      <CourseList courses={result} showConflictCourse={showConflictCourse} />
+      {result === null ? <SearchPageSkeleton /> : <CourseList courses={result} showConflictCourse={showConflictCourse} />}
 
       <Dialog
         open={categoryDialog}

@@ -6,7 +6,7 @@ import { Alert } from '../components/ui-kit/Alert'
 import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
-import { Loader } from '../components/ui-kit/Loader'
+import { CourseDetailSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi'
 import { courseStandard, getSportsCourseIcon, getSportsCourseTitle, hasTimeConflict, isSportsCourse, parseCourseTime } from '../lib/courseUtils'
 import { useApp } from '../state/AppContext'
@@ -66,7 +66,7 @@ export function CourseDetailPage() {
   const isEarlyEight = parseCourseTime(course?.time).some((item) => item.content.split('、').includes('1'))
 
   if (error) return <Alert danger>找不到課程或資料擷取失敗：{errorMessage(error)}</Alert>
-  if (!course) return <Loader />
+  if (!course) return <CourseDetailSkeleton />
   const currentCourse = course
 
   function toggleCourse() {

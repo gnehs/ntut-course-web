@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Alert } from '../components/ui-kit/Alert'
 import { Button } from '../components/ui-kit/Button'
-import { Loader } from '../components/ui-kit/Loader'
+import { StatusSkeleton } from '../components/ui-kit/PageSkeletons'
 import { cleanStore } from '../lib/storage'
 import type { WorkflowRun } from '../types/course'
 
@@ -214,7 +214,7 @@ export function StatusPage() {
       })
     return () => { cancelled = true }
   }, [])
-  if (!runs) return <Loader />
+  if (!runs) return <StatusSkeleton />
   return (
     <div>
       <h1>擷取狀態</h1>

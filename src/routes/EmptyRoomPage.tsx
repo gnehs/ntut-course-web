@@ -4,7 +4,7 @@ import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
 import { Dialog } from '../components/ui-kit/Dialog'
-import { Loader } from '../components/ui-kit/Loader'
+import { EmptyRoomSkeleton } from '../components/ui-kit/PageSkeletons'
 import { useApp } from '../state/AppContext'
 import type { Course } from '../types/course'
 import { errorMessage } from '../lib/error'
@@ -80,7 +80,7 @@ export function EmptyRoomPage() {
     return result
   }, [courses, todayDayOfWeek])
 
-  if (!courses) return <Loader />
+  if (!courses) return <EmptyRoomSkeleton />
 
   return (
     <div>

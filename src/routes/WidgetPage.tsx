@@ -3,7 +3,7 @@ import { Alert } from '../components/ui-kit/Alert'
 import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
-import { Loader } from '../components/ui-kit/Loader'
+import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons'
 import { trimEllip } from '../lib/courseUtils'
 import { useApp } from '../state/AppContext'
 import type { CourseTime } from '../types/course'
@@ -42,7 +42,7 @@ export function WidgetPage() {
     return () => { cancelled = true }
   }, [dataset.year, dataset.sem, dataset.department])
   const code = useMemo(() => createScriptableCode(courses || []), [courses])
-  if (!courses) return <Loader />
+  if (!courses) return <StepsPageSkeleton codeBlock />
   return (
     <div>
       <h1>iOS 小工具</h1>

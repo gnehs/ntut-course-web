@@ -7,7 +7,7 @@ import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
 import { Input } from '../components/ui-kit/Input'
-import { Loader } from '../components/ui-kit/Loader'
+import { CardGridSkeleton, ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchCourse, fetchMicroPrograms } from '../lib/courseApi'
 import { useApp } from '../state/AppContext'
 import type { Course, MicroProgram } from '../types/course'
@@ -42,7 +42,18 @@ export function MProgramIndexPage() {
     return (programs || []).filter((program) => program.name.includes(value) || program.id.includes(value))
   }, [programs, filter])
 
-  if (!programs) return <Loader />
+  if (!programs) return (
+    <div>
+      <h1>選擇微學程</h1>
+      <div className="grid gap-3 sm:grid-cols-1 lg:grid-cols-4">
+        <Card>
+          <p>輸入關鍵字來篩選</p>
+          <Input value={filter} onChange={(event) => setFilter(event.target.value)} />
+        </Card>
+      </div>
+      <CardGridSkeleton count={10} />
+    </div>
+  )
   return (
     <div>
       <h1>選擇微學程</h1>
@@ -117,7 +128,7 @@ export function MProgramDetailPage() {
     setVersion((value) => value + 1)
   }
 
-  if (!courses) return <Loader />
+  if (!courses) return <ClassDetailSkeleton />
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-2">

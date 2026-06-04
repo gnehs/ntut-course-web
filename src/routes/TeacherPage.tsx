@@ -5,7 +5,7 @@ import { Alert } from '../components/ui-kit/Alert'
 import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
-import { Loader } from '../components/ui-kit/Loader'
+import { TeacherSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchWithdrawal, fetchWithdrawalRate } from '../lib/courseApi'
 import type { TeacherWithdrawalCourse, WithdrawalRateMap, WithdrawalStat } from '../types/course'
 
@@ -39,7 +39,7 @@ export function TeacherPage() {
     return null
   }
   if (teacher === false) return <Alert danger>{String(error || '找不到教師')}</Alert>
-  if (!teacher || !rates) return <Loader />
+  if (!teacher || !rates) return <TeacherSkeleton />
   const courses = (teacher.course || []).filter((item) => item.department === department)
   const stats = [
     { name: '近三年退選率', value: rates.r3[id] ?? '無資料' },
