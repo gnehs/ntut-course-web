@@ -127,7 +127,7 @@ export function CourseList({
 			</div>
 			{layout === 'card' ? (
 				<>
-					<div className='grid [grid-template-columns:repeat(auto-fill,minmax(250px,1fr))] gap-3'>
+					<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
 						{pageItems.map((course) => (
 							<Card
 								key={course.id}
@@ -144,7 +144,7 @@ export function CourseList({
 									) : null}
 								</CardTitle>
 								<CourseTags course={course} />
-								<div className='mt-2 grid [grid-template-columns:repeat(auto-fit,minmax(86px,1fr))] gap-2'>
+								<div className='mt-2 grid grid-cols-[repeat(auto-fit,minmax(64px,1fr))] gap-2'>
 									<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
 										<CardTitle>{course.id}</CardTitle>
 										<p>課號</p>

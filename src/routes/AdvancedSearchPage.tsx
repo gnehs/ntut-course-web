@@ -404,9 +404,6 @@ export function AdvancedSearchPage() {
 			</aside>
 			<main className='px-3 pt-[74px] pb-10 lg:px-0 lg:pt-0 lg:pb-10'>
 				<div className='flex items-center justify-between gap-3'>
-					<div>
-						<h2 className='m-0'>進階搜尋</h2>
-					</div>
 					<Button
 						className='m-0 inline-flex lg:hidden'
 						active={sidebarOpen}
