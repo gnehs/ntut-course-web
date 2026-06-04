@@ -246,7 +246,7 @@ export function AdvancedSearchPage() {
         className={`fixed inset-0 z-[29] transition-colors duration-200 lg:hidden ${sidebarOpen ? 'pointer-events-auto bg-black/20' : 'pointer-events-none bg-transparent'}`}
         onClick={() => setSidebarOpen(false)}
       />
-      <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[min(340px,90vw)] overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] transition-transform duration-200 lg:sticky lg:top-0 lg:z-auto lg:w-auto lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-[105%]'}`}>
+      <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[min(340px,90vw)] overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:w-auto lg:translate-x-0 lg:opacity-100 ${sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-[105%] opacity-0'}`}>
         <AdvancedSearchSidebarContent
           academyFilter={academyFilter}
           academyList={academyList}
@@ -324,7 +324,7 @@ function AdvancedSearchSidebarContent({
         <Link to="/" className="font-bold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]">🍤 北科課程好朋友</Link>
         <div className="flex items-center gap-1">
           <Button className="m-0" onClick={onReset}>重設</Button>
-          {showCloseButton ? <Button icon className="m-0" onClick={onClose}><i className="bx bx-x" /></Button> : null}
+          {showCloseButton ? <Button icon className="m-0 lg:hidden" onClick={onClose}><i className="bx bx-x" /></Button> : null}
         </div>
       </div>
       <Field label="搜尋關鍵字">
@@ -402,7 +402,15 @@ function SearchSection({ title, open = false, children }: { title: string; open?
         <span>{title}</span>
         <i className={`bx bx-chevron-down transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
       </button>
-      {expanded ? <div className="mt-3 grid gap-2">{children}</div> : null}
+      <div
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity,transform] duration-200 ease-out motion-reduce:transition-none ${expanded ? 'grid-rows-[1fr] opacity-100 translate-y-0' : 'grid-rows-[0fr] opacity-0 -translate-y-1'}`}
+        aria-hidden={!expanded}
+        inert={!expanded ? true : undefined}
+      >
+        <div className="min-h-0">
+          <div className="mt-3 grid gap-2">{children}</div>
+        </div>
+      </div>
     </section>
   )
 }

@@ -1,7 +1,9 @@
 import { Link } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import type React from 'react'
 import { cn } from '../lib/utils'
+import { animateCourseResults, animateCourseResultsOut } from '../lib/motion'
 import {
   courseTitle,
   dateEng2zh,
@@ -43,6 +45,8 @@ export function CourseList({ courses, showTimetable = false, showConflictCourse 
   const [layout, setLayout] = useState('card')
   const [page, setPage] = useState(1)
   const [conflictCourseData, setConflictCourseData] = useState<string[]>([])
+  const resultSurfaceRef = useRef<HTMLDivElement | null>(null)
+  const resultTransitionRef = useRef(Promise.resolve())
   const viewYear = year || dataset.year
   const viewSem = sem || dataset.sem
 
@@ -77,21 +81,45 @@ export function CourseList({ courses, showTimetable = false, showConflictCourse 
     if (page > pageCount) setPage(1)
   }, [page, pageCount])
 
+  function transitionResults(update: () => void) {
+    resultTransitionRef.current = resultTransitionRef.current
+      .then(() => animateCourseResultsOut(resultSurfaceRef.current))
+      .then(() => {
+        flushSync(update)
+        requestAnimationFrame(() => animateCourseResults(resultSurfaceRef.current))
+      })
+  }
+
+  function changeLayout(nextLayout: string) {
+    if (nextLayout === layout) return
+    transitionResults(() => {
+      setLayout(nextLayout)
+      setPage(1)
+    })
+  }
+
+  function changePage(nextPage: number) {
+    if (nextPage === page) return
+    transitionResults(() => setPage(nextPage))
+  }
+
   if (!courses) return null
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-center gap-1 py-4">
-        <Button active={layout === 'table'} className="m-0" onClick={() => setLayout('table')}><i className="bx bx-table" />表格</Button>
-        <Button active={layout === 'card'} className="m-0" onClick={() => setLayout('card')}><i className="bx bx-card" />卡片</Button>
-        {showTimetable ? <Button active={layout === 'timetable'} className="m-0" onClick={() => setLayout('timetable')}><i className="bx bx-time" />課表</Button> : null}
+        <Button active={layout === 'table'} className="m-0" onClick={() => changeLayout('table')}><i className="bx bx-table" />表格</Button>
+        <Button active={layout === 'card'} className="m-0" onClick={() => changeLayout('card')}><i className="bx bx-card" />卡片</Button>
+        {showTimetable ? <Button active={layout === 'timetable'} className="m-0" onClick={() => changeLayout('timetable')}><i className="bx bx-time" />課表</Button> : null}
       </div>
-      {layout === 'card' ? (
-        <>
+      <div ref={resultSurfaceRef}>
+        {layout === 'card' ? (
+          <>
           <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(250px,1fr))]">
             {pageItems.map((course) => (
               <Card
                 key={course.id}
+                data-course-result-item
                 to={`/course/${viewYear}/${viewSem}/${course.id}`}
                 className="cursor-pointer px-4 py-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none"
               >
@@ -115,11 +143,11 @@ export function CourseList({ courses, showTimetable = false, showConflictCourse 
             ))}
           </div>
           {!filteredCourse.length ? <div className="flex items-center justify-center p-5"><p>查無資料</p></div> : null}
-          <Pagination page={page} length={pageCount} onChange={setPage} />
-        </>
-      ) : null}
-      {layout === 'table' ? (
-        <Card className="overflow-hidden p-0">
+          <Pagination page={page} length={pageCount} onChange={changePage} />
+          </>
+        ) : null}
+        {layout === 'table' ? (
+          <Card className="overflow-hidden p-0">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
@@ -133,7 +161,7 @@ export function CourseList({ courses, showTimetable = false, showConflictCourse 
               </thead>
               <tbody>
                 {pageItems.map((course) => (
-                  <tr key={course.id} className="transition-colors hover:bg-[rgba(var(--vs-text),0.04)]">
+                  <tr key={course.id} data-course-result-item className="transition-colors hover:bg-[rgba(var(--vs-text),0.04)]">
                     <td className="border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2">{course.id}</td>
                     <td className="border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2"><Link to={`/course/${viewYear}/${viewSem}/${course.id}`}>{courseTitle(course)}</Link></td>
                     <td className="border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2">{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 9)}</td>
@@ -144,10 +172,11 @@ export function CourseList({ courses, showTimetable = false, showConflictCourse 
               </tbody>
             </table>
           </div>
-          <Pagination page={page} length={pageCount} onChange={setPage} />
-        </Card>
-      ) : null}
-      {layout === 'timetable' ? <TimetableCourses courses={filteredCourse} year={viewYear} sem={viewSem} /> : null}
+          <Pagination page={page} length={pageCount} onChange={changePage} />
+          </Card>
+        ) : null}
+        {layout === 'timetable' ? <TimetableCourses courses={filteredCourse} year={viewYear} sem={viewSem} /> : null}
+      </div>
     </div>
   )
 }
@@ -239,6 +268,7 @@ function TimetableCourses({ courses, year, sem }: { courses: Course[]; year: str
           return (
             <Link
               key={`${item.id}-${item.date}-${item.slots.join('-')}`}
+              data-course-result-item
               to={`/course/${year}/${sem}/${item.id}`}
               className={cn(
                 'relative z-[1] flex h-full w-full flex-col justify-between gap-1 rounded-[8px] px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',

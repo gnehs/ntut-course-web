@@ -35,13 +35,13 @@ function TimetableRow({ slot, dayKeys, selected, onToggle }) {
               aria-pressed={active}
               onClick={() => onToggle(day, slot)}
               className={cn(
-                'flex h-full min-h-[52px] w-full items-center justify-center px-2 py-2 text-2xl transition-colors',
+                'group flex h-full min-h-[52px] w-full items-center justify-center px-2 py-2 text-2xl transition-[background-color,color,transform] duration-200 active:scale-[0.97] motion-reduce:transition-none',
                 active
                   ? 'bg-[rgba(var(--vs-danger),0.18)] text-[rgb(var(--vs-danger))]'
                   : 'bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]'
               )}
             >
-              <i className={`bx ${active ? 'bx-x' : 'bx-check'}`} />
+              <i className={`bx transition-transform duration-200 group-active:scale-90 motion-reduce:transition-none ${active ? 'bx-x scale-110' : 'bx-check scale-100'}`} />
             </button>
           </div>
         )
