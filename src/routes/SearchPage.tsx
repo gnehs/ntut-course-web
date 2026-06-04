@@ -288,13 +288,13 @@ export function SearchPage() {
 							className='m-0 w-full justify-center'
 							onClick={() => setCourseStandardDialog(true)}
 						>
-							<Filter />
+							<Filter className='size-4' />
 							依課程標準篩選
 						</Button>
 					</Field>
 					<Field label='上課時間'>
 						<Button className='m-0 w-full justify-center' onClick={() => setTimetableDialog(true)}>
-							<Filter />
+							<Filter className='size-4' />
 							依時間篩選
 						</Button>
 					</Field>

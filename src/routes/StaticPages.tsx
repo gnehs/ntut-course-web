@@ -198,6 +198,10 @@ export function PrivacyPage() {
 export function ChangelogPage() {
 	type ChangeItem = string | [string, string[]];
 	const items: [string, ChangeItem[]][] = [
+		['2026-06-05', ['更新圖示系統，改用更現代的圖示庫。']],
+		['2026-06-04', ['改善整體使用者介面與互動體驗。']],
+		['2025-11-13', ['修正課表時間解析錯誤。']],
+		['2025-09-29', ['新增微學程查詢功能。']],
 		['2023-12-21', ['修正課程資料爬取問題。']],
 		['2023-03-26', ['修正空教室解析問題。']],
 		[
@@ -387,24 +391,24 @@ export function StatusPage() {
 							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}
 						>
 							{run.status === 'in_progress' ? (
-								<Loader className='animate-spin' />
+								<Loader className='size-4 animate-spin' />
 							) : run.status === 'completed' ? (
-								<Check />
+								<Check className='size-4' />
 							) : (
-								<BadgeQuestionMark />
+								<BadgeQuestionMark className='size-4' />
 							)}
 						</div>
 						<div className='min-w-0 flex-1'>
 							<div className='font-semibold'>{parseName(run.name)}</div>
 							<div className='text-sm opacity-75'>
 								{run.event === 'schedule' ? (
-									<Calendar className='inline-block align-[-0.125em]' />
+									<Calendar className='inline-block size-4 align-[-0.125em]' />
 								) : run.event === 'push' ? (
-									<GitCommit className='inline-block align-[-0.125em]' />
+									<GitCommit className='inline-block size-4 align-[-0.125em]' />
 								) : run.event === 'dynamic' ? (
-									<RefreshCw className='inline-block align-[-0.125em]' />
+									<RefreshCw className='inline-block size-4 align-[-0.125em]' />
 								) : (
-									<BadgeQuestionMark className='inline-block align-[-0.125em]' />
+									<BadgeQuestionMark className='inline-block size-4 align-[-0.125em]' />
 								)}
 								<span> • </span>
 								{timeSince(new Date(run.created_at))}前
