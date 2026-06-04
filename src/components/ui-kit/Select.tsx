@@ -13,6 +13,7 @@ export function Select({
 	onChange,
 	placeholder,
 	children,
+	disabled,
 	...props
 }: {
 	className?: string;
@@ -20,9 +21,10 @@ export function Select({
 	onChange: (value: string) => void;
 	placeholder?: string;
 	children: React.ReactNode;
+	disabled?: boolean;
 }) {
 	return (
-		<ShadcnSelect value={value} onValueChange={onChange} {...props}>
+		<ShadcnSelect value={value} onValueChange={onChange} disabled={disabled} {...props}>
 			<SelectTrigger
 				className={cn(
 					'h-9 w-full min-w-0 rounded-lg border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 text-[rgb(var(--vs-text))] transition-colors outline-none',
