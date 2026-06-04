@@ -1,6 +1,8 @@
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true
+  sharp: true
+  workerd: true
 minimumReleaseAgeExclude:
   - '@tanstack/react-router@1.170.11'
   - '@tanstack/router-core@1.171.9'
