@@ -46,15 +46,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<unknown>(null)
 
   const setDataset = useCallback((next: Partial<Dataset>) => {
-    const normalized = {
-      year: next.year || '',
-      sem: next.sem || '',
-      department: storageDepartment(next.department || 'main'),
-    }
-    localStorage.setItem('data-year', normalized.year)
-    localStorage.setItem('data-sem', normalized.sem)
-    localStorage.setItem('data-department', normalized.department)
-    setDatasetState(normalized)
+    setDatasetState((current) => {
+      const normalized = {
+        year: next.year ?? current.year,
+        sem: next.sem ?? current.sem,
+        department: storageDepartment(next.department ?? current.department),
+      }
+      localStorage.setItem('data-year', normalized.year)
+      localStorage.setItem('data-sem', normalized.sem)
+      localStorage.setItem('data-department', normalized.department)
+      return normalized
+    })
   }, [])
 
   useEffect(() => {

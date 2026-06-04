@@ -8,7 +8,8 @@
     "build": "vite build",
     "start": "vite preview --host 0.0.0.0 --port 7190",
     "preview": "vite preview --host 0.0.0.0 --port 7190",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
