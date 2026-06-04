@@ -15,14 +15,7 @@ import type {
 } from '../types/course';
 import { errorMessage } from '../lib/error';
 import { courseStandard } from '../lib/courseUtils';
-import {
-	BookOpen,
-	Building2,
-	Calendar,
-	GraduationCap,
-	ListChecks,
-	Search,
-} from 'lucide-react';
+import { BookOpen, Building2, Calendar, GraduationCap, ListChecks, Search } from 'lucide-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
 
@@ -118,10 +111,7 @@ export function StandardPage() {
 	return (
 		<div className='mx-auto max-w-5xl space-y-6'>
 			<div className='space-y-1'>
-				<div className='flex items-center gap-2'>
-					<BookOpen className='size-6 shrink-0 text-[rgb(var(--vs-primary))]' />
-					<h1 className='text-2xl font-bold tracking-tight'>課程標準</h1>
-				</div>
+				<h1 className='text-2xl font-bold tracking-tight'>課程標準</h1>
 				<p className='text-sm opacity-60'>
 					選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
 				</p>
@@ -195,8 +185,6 @@ export function StandardPage() {
 							</Select>
 						</div>
 					</div>
-
-					
 				</div>
 			) : null}
 
