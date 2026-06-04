@@ -4,6 +4,7 @@ import { Alert } from '../components/ui-kit/Alert';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchStandards, fetchStandardYear } from '../lib/courseApi';
 import { createSearchObject, createSearchParams } from '../lib/urlState';
 import type {
@@ -13,6 +14,17 @@ import type {
 	StandardYearData,
 } from '../types/course';
 import { errorMessage } from '../lib/error';
+import { courseStandard } from '../lib/courseUtils';
+import {
+	BookOpen,
+	Building2,
+	Calendar,
+	GraduationCap,
+	ListChecks,
+	Search,
+} from 'lucide-react';
+
+const courseStandardEntries = Object.entries(courseStandard);
 
 export function StandardPage() {
 	const { location } = useRouterState();
@@ -24,6 +36,7 @@ export function StandardPage() {
 	const [standardData, setStandardData] = useState<StandardYearData | null>(null);
 	const [system, setSystem] = useState(params.get('system') || '');
 	const [department, setDepartment] = useState(params.get('department') || '');
+
 	useEffect(() => {
 		fetchStandards()
 			.then(setYears)
@@ -32,6 +45,7 @@ export function StandardPage() {
 				setYears([]);
 			});
 	}, []);
+
 	useEffect(() => {
 		if (!year) return;
 		setStandardData(null);
@@ -42,12 +56,15 @@ export function StandardPage() {
 				setStandardData({});
 			});
 	}, [year]);
+
 	const systems = Object.keys(standardData || {});
+
 	const departments = system
 		? Object.keys(standardData?.[system] || {})
 				.sort((a, b) => a.localeCompare(b))
 				.sort((a, b) => a.length - b.length)
 		: [];
+
 	const current = useMemo(() => {
 		const data =
 			system && department ? structuredClone(standardData?.[system]?.[department]) : null;
@@ -60,16 +77,25 @@ export function StandardPage() {
 			if (!grouped[courseYear][courseSem]) grouped[courseYear][courseSem] = [];
 			grouped[courseYear][courseSem].push(course);
 		}
-		return { ...data, courses: grouped } satisfies GroupedStandardDepartment;
+		const sorted: Record<string, Record<string, StandardCourse[]>> = {};
+		Object.keys(grouped)
+			.sort((a, b) => a.localeCompare(b))
+			.forEach((k) => {
+				sorted[k] = grouped[k];
+			});
+		return { ...data, courses: sorted } satisfies GroupedStandardDepartment;
 	}, [standardData, system, department]);
+
 	useEffect(() => {
 		if (year && system && department)
 			localStorage.setItem('data-standard-query', JSON.stringify({ year, system, department }));
 	}, [year, system, department]);
+
 	const yearItems = useMemo(() => {
 		if (!years) return [];
 		return Array.isArray(years) ? [...years] : Object.keys(years).reverse();
 	}, [years]);
+
 	function setQuery(next: Record<string, QueryValue | undefined>) {
 		if (location.pathname !== '/standard') return;
 		const query = { year, system, department, ...next };
@@ -79,147 +105,194 @@ export function StandardPage() {
 		setDepartment(query.department || '');
 		void navigate({ to: '/standard', search: createSearchObject(query) });
 	}
+
+	const creditItems = useMemo(() => {
+		if (!current?.credits) return [];
+		return Object.entries(current.credits).filter(([, v]) => v !== 0);
+	}, [current]);
+
+	function gradeLabel(courseYear: string, sem: string) {
+		return `${courseYear} 年級${sem === '1' ? '上' : sem === '2' ? '下' : ''}學期`;
+	}
+
 	return (
-		<div className='space-y-4'>
-			<h1>課程標準</h1>
+		<div className='mx-auto max-w-5xl space-y-6'>
+			<div className='space-y-1'>
+				<div className='flex items-center gap-2'>
+					<BookOpen className='size-6 shrink-0 text-[rgb(var(--vs-primary))]' />
+					<h1 className='text-2xl font-bold tracking-tight'>課程標準</h1>
+				</div>
+				<p className='text-sm opacity-60'>
+					選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
+				</p>
+			</div>
+
 			{error ? (
 				<Alert danger>
 					<strong>發生了錯誤</strong>
 					<pre>{errorMessage(error)}</pre>
 				</Alert>
 			) : null}
+
 			{!years ? <StandardPickerSkeleton /> : null}
-			{year ? (
-				<>
-					<h3>
-						已選擇的項目{' '}
-						<span style={{ fontSize: '.8em', opacity: 0.7, fontWeight: 'normal' }}>點擊來取消</span>
-					</h3>
-					<div className='grid grid-cols-3 gap-3 lg:grid-cols-5'>
-						<Card
-							className='px-4 py-3'
-							onClick={() => setQuery({ year: '', system: '', department: '' })}
-						>
-							<CardTitle>{formatRocYear(year)}</CardTitle>
-							<p>年</p>
-						</Card>
-						{system ? (
-							<Card className='px-4 py-3' onClick={() => setQuery({ system: '', department: '' })}>
-								<CardTitle>{system}</CardTitle>
-								<p>學制</p>
-							</Card>
-						) : null}
-						{department ? (
-							<Card className='px-4 py-3' onClick={() => setQuery({ department: '' })}>
-								<CardTitle>{department}</CardTitle>
-								<p>科系</p>
-							</Card>
-						) : null}
-					</div>
-				</>
-			) : null}
-			{years && !year ? (
-				<>
-					<h3>選擇入學年度</h3>
-					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
-						{yearItems.map((item, index) => (
-							<div
-								key={item}
-								onClick={() => setQuery({ year: item })}
-								className={`cursor-pointer px-4 py-3 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''} hover:bg-[rgba(var(--vs-text),0.05)]`}
+
+			{years ? (
+				<div className='space-y-4'>
+					<div className='flex flex-col gap-3 sm:flex-row'>
+						<div className='flex-1 space-y-1.5'>
+							<label className='flex items-center gap-1.5 text-xs font-medium opacity-50'>
+								<Calendar className='size-3.5' />
+								入學年度
+							</label>
+							<Select
+								value={year}
+								onChange={(v) => setQuery({ year: v, system: '', department: '' })}
+								placeholder='選擇入學年度'
 							>
-								{formatRocYear(item)}
-							</div>
-						))}
+								{yearItems.map((item) => (
+									<SelectOption key={item} value={item}>
+										{formatRocYear(item)}
+									</SelectOption>
+								))}
+							</Select>
+						</div>
+
+						<div className='flex-1 space-y-1.5'>
+							<label className='flex items-center gap-1.5 text-xs font-medium opacity-50'>
+								<Building2 className='size-3.5' />
+								學制
+							</label>
+							<Select
+								value={system}
+								onChange={(v) => setQuery({ system: v, department: '' })}
+								placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
+								disabled={!year || !standardData}
+							>
+								{systems.map((item) => (
+									<SelectOption key={item} value={item}>
+										{item}
+									</SelectOption>
+								))}
+							</Select>
+						</div>
+
+						<div className='flex-1 space-y-1.5'>
+							<label className='flex items-center gap-1.5 text-xs font-medium opacity-50'>
+								<Search className='size-3.5' />
+								系所
+							</label>
+							<Select
+								value={department}
+								onChange={(v) => setQuery({ department: v })}
+								placeholder={!system ? '請先選擇學制' : '選擇系所'}
+								disabled={!system}
+							>
+								{departments.map((item) => (
+									<SelectOption key={item} value={item}>
+										{item}
+									</SelectOption>
+								))}
+							</Select>
+						</div>
 					</div>
-				</>
+
+					
+				</div>
 			) : null}
+
 			{year && !standardData ? <StandardPickerSkeleton /> : null}
-			{standardData && !system ? (
-				<>
-					<h3>選擇學制</h3>
-					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
-						{systems.map((item, index) => (
-							<div
-								key={item}
-								onClick={() => setQuery({ system: item })}
-								className={`cursor-pointer px-4 py-3 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''} hover:bg-[rgba(var(--vs-text),0.05)]`}
-							>
-								{item}
-							</div>
-						))}
-					</div>
-				</>
-			) : null}
-			{standardData && system && !department ? (
-				<>
-					<h3>選擇系所</h3>
-					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
-						{departments.map((item, index) => (
-							<div
-								key={item}
-								onClick={() => setQuery({ department: item })}
-								className={`cursor-pointer px-4 py-3 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''} hover:bg-[rgba(var(--vs-text),0.05)]`}
-							>
-								{item}
-							</div>
-						))}
-					</div>
-				</>
-			) : null}
+
 			{department && current ? (
 				<>
-					<h3>{department}</h3>
-					<div className='grid grid-cols-3 gap-3 lg:grid-cols-5'>
-						{Object.entries(current.credits || {})
-							.filter(([, value]) => value !== 0)
-							.map(([key, value]) => (
-								<Card key={key}>
-									<CardTitle>{value}</CardTitle>
+					<div>
+						<div className='mb-3 flex items-center gap-2'>
+							<GraduationCap className='size-5 shrink-0 text-[rgb(var(--vs-primary))]' />
+							<h2 className='text-lg font-semibold'>畢業學分要求</h2>
+						</div>
+						<div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
+							{creditItems.map(([key, value]) => (
+								<Card key={key} className='padding text-center'>
+									<CardTitle className='tabular-nums'>{value}</CardTitle>
 									<p>{key}</p>
 								</Card>
 							))}
+						</div>
 					</div>
-					<h3>相關規定事項</h3>
-					{current.rules?.length ? (
-						<ul>
-							{current.rules.map((item) => (
-								<li key={item}>{item}</li>
-							))}
-						</ul>
-					) : (
-						<Alert>無相關規定事項</Alert>
-					)}
-					<h3>課程</h3>
-					<div className='grid gap-4 lg:grid-cols-2'>
-						{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
-							<div key={courseYear} className='flex-1'>
-								{(Object.entries(yearData) as [string, StandardCourse[]][]).map(([sem, items]) => (
-									<div
-										key={`${courseYear}-${sem}`}
-										style={{ marginBottom: '1rem' }}
-										className='space-y-2'
-									>
-										<h4>
-											{courseYear} 年級{sem === '1' ? '上' : '下'}學期
-										</h4>
-										<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
-											{items.map((item, index) => (
-												<div
-													className={`flex items-center justify-between gap-2 px-4 py-3 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
-													key={`${item.type}-${item.name}`}
-												>
-													<span>
-														{item.type} {item.name}
-													</span>
-													<span>{item.credit} 學分</span>
-												</div>
-											))}
-										</div>
-									</div>
+
+					<div>
+						<div className='mb-3 flex items-center gap-2'>
+							<ListChecks className='size-5 shrink-0 text-[rgb(var(--vs-primary))]' />
+							<h2 className='text-lg font-semibold'>相關規定事項</h2>
+						</div>
+						{current.rules?.length ? (
+							<ul className='space-y-2 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-4'>
+								{current.rules.map((item) => (
+									<li key={item} className='flex items-start gap-2 text-sm leading-relaxed'>
+										<span className='mt-1.5 block size-1.5 shrink-0 rounded-full bg-[rgb(var(--vs-primary))]' />
+										{item}
+									</li>
 								))}
-							</div>
-						))}
+							</ul>
+						) : (
+							<Alert>無相關規定事項</Alert>
+						)}
+					</div>
+
+					<div>
+						<div className='mb-3 flex items-center gap-2'>
+							<BookOpen className='size-5 shrink-0 text-[rgb(var(--vs-primary))]' />
+							<h2 className='text-lg font-semibold'>課程列表</h2>
+						</div>
+						<div className='grid gap-4 lg:grid-cols-2'>
+							{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
+								<div key={courseYear} className='space-y-3'>
+									{(Object.entries(yearData) as [string, StandardCourse[]][]).map(
+										([sem, items]) => (
+											<div key={`${courseYear}-${sem}`} className='space-y-2'>
+												<h3 className='text-sm font-semibold opacity-70'>
+													{gradeLabel(courseYear, sem)}
+												</h3>
+												<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
+													{items.map((item, index) => (
+														<div
+															className={`flex items-center justify-between gap-2 px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
+															key={`${item.type}-${item.name}`}
+														>
+															<span className='flex min-w-0 items-center gap-2 text-sm'>
+																<span className='shrink-0 rounded bg-[rgba(var(--vs-primary),0.08)] px-1.5 py-0.5 text-xs font-medium'>
+																	{item.type}
+																</span>
+																<span className='truncate'>{item.name}</span>
+															</span>
+															<span className='shrink-0 text-sm tabular-nums opacity-60'>
+																{item.credit} 學分
+															</span>
+														</div>
+													))}
+												</div>
+											</div>
+										),
+									)}
+								</div>
+							))}
+						</div>
+					</div>
+
+					<div className='rounded-lg border border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.02)] p-4'>
+						<h3 className='mb-2.5 text-xs font-medium opacity-50'>課程類型圖例</h3>
+						<div className='flex flex-wrap gap-2'>
+							{courseStandardEntries.map(([symbol, label]) => (
+								<div
+									key={symbol}
+									className='inline-flex items-center gap-1.5 rounded border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-2 py-1 text-xs'
+								>
+									<span className='rounded bg-[rgba(var(--vs-primary),0.08)] px-1.5 py-0.5 text-xs font-medium'>
+										{symbol}
+									</span>
+									<span className='opacity-60'>{label}</span>
+								</div>
+							))}
+						</div>
 					</div>
 				</>
 			) : null}
@@ -227,7 +300,7 @@ export function StandardPage() {
 	);
 }
 
-function formatRocYear(value) {
+function formatRocYear(value: string) {
 	const text = String(value || '');
 	return /^\d+$/.test(text) ? `${text} 年` : text;
 }
