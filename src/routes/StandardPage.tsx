@@ -109,13 +109,11 @@ export function StandardPage() {
 	}
 
 	return (
-		<div className='mx-auto max-w-5xl space-y-6'>
-			<div className='space-y-1'>
-				<h1 className='text-2xl font-bold tracking-tight'>課程標準</h1>
-				<p className='text-sm opacity-60'>
-					選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
-				</p>
-			</div>
+		<div className='mx-auto max-w-5xl space-y-4'>
+			<h1 className='text-2xl font-semibold tracking-tight'>課程標準</h1>
+			<p className='text-sm opacity-60'>
+				選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
+			</p>
 
 			{error ? (
 				<Alert danger>
@@ -193,13 +191,10 @@ export function StandardPage() {
 			{department && current ? (
 				<>
 					<div>
-						<div className='mb-3 flex items-center gap-2'>
-							<GraduationCap className='size-5 shrink-0 text-[rgb(var(--vs-primary))]' />
-							<h2 className='text-lg font-semibold'>畢業學分要求</h2>
-						</div>
+						<h2 className='text-lg font-semibold'>畢業學分要求</h2>
 						<div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
 							{creditItems.map(([key, value]) => (
-								<Card key={key} className='padding text-center'>
+								<Card key={key}>
 									<CardTitle className='tabular-nums'>{value}</CardTitle>
 									<p>{key}</p>
 								</Card>
@@ -208,10 +203,7 @@ export function StandardPage() {
 					</div>
 
 					<div>
-						<div className='mb-3 flex items-center gap-2'>
-							<ListChecks className='size-5 shrink-0 text-[rgb(var(--vs-primary))]' />
-							<h2 className='text-lg font-semibold'>相關規定事項</h2>
-						</div>
+						<h2 className='text-lg font-semibold'>相關規定事項</h2>
 						{current.rules?.length ? (
 							<ul className='space-y-2 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-4'>
 								{current.rules.map((item) => (
@@ -227,10 +219,7 @@ export function StandardPage() {
 					</div>
 
 					<div>
-						<div className='mb-3 flex items-center gap-2'>
-							<BookOpen className='size-5 shrink-0 text-[rgb(var(--vs-primary))]' />
-							<h2 className='text-lg font-semibold'>課程列表</h2>
-						</div>
+						<h2 className='text-lg font-semibold'>課程列表</h2>
 						<div className='grid gap-4 lg:grid-cols-2'>
 							{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
 								<div key={courseYear} className='space-y-3'>
@@ -247,7 +236,7 @@ export function StandardPage() {
 															key={`${item.type}-${item.name}`}
 														>
 															<span className='flex min-w-0 items-center gap-2 text-sm'>
-																<span className='shrink-0 rounded bg-[rgba(var(--vs-primary),0.08)] px-1.5 py-0.5 text-xs font-medium'>
+																<span className='shrink-0 rounded bg-[rgba(var(--vs-primary),0.08)] px-1 py-0.5 text-xs font-medium'>
 																	{item.type}
 																</span>
 																<span className='truncate'>{item.name}</span>
@@ -267,14 +256,14 @@ export function StandardPage() {
 					</div>
 
 					<div className='rounded-lg border border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.02)] p-4'>
-						<h3 className='mb-2.5 text-xs font-medium opacity-50'>課程類型圖例</h3>
+						<h3 className='mb-2.5 text-xs font-medium'>課程類型圖例</h3>
 						<div className='flex flex-wrap gap-2'>
 							{courseStandardEntries.map(([symbol, label]) => (
 								<div
 									key={symbol}
 									className='inline-flex items-center gap-1.5 rounded border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-2 py-1 text-xs'
 								>
-									<span className='rounded bg-[rgba(var(--vs-primary),0.08)] px-1.5 py-0.5 text-xs font-medium'>
+									<span className='rounded bg-[rgba(var(--vs-primary),0.08)] px-1 py-0.5 text-xs font-medium'>
 										{symbol}
 									</span>
 									<span className='opacity-60'>{label}</span>
