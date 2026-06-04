@@ -9,7 +9,7 @@ import { Alert } from '../components/ui-kit/Alert'
 import { Button } from '../components/ui-kit/Button'
 import { Field } from '../components/ui-kit/Field'
 import { Input } from '../components/ui-kit/Input'
-import { Loader } from '../components/ui-kit/Loader'
+import { SearchPageSkeleton } from '../components/ui-kit/PageSkeletons'
 import { MiniNotify } from '../components/ui-kit/MiniNotify'
 import { Select } from '../components/ui-kit/Select'
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils'
@@ -236,8 +236,6 @@ export function AdvancedSearchPage() {
     })
   }
 
-  if (!searchResult) return <Loader />
-
   return (
     <div className="grid gap-[18px] lg:grid-cols-[340px_1fr]">
       <button
@@ -246,7 +244,7 @@ export function AdvancedSearchPage() {
         className={`fixed inset-0 z-[29] transition-colors duration-200 lg:hidden ${sidebarOpen ? 'pointer-events-auto bg-black/20' : 'pointer-events-none bg-transparent'}`}
         onClick={() => setSidebarOpen(false)}
       />
-      <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[min(340px,90vw)] overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none lg:sticky lg:top-0 lg:z-auto lg:w-auto lg:translate-x-0 lg:opacity-100 ${sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-[105%] opacity-0'}`}>
+      <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[min(340px,90vw)] overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] lg:sticky lg:top-0 lg:z-auto lg:w-auto lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-[105%]'}`}>
         <AdvancedSearchSidebarContent
           academyFilter={academyFilter}
           academyList={academyList}
@@ -281,7 +279,7 @@ export function AdvancedSearchPage() {
         </div>
         <MiniNotify className="mt-3 lg:hidden"><strong>第一次來嗎？</strong> 使用右上角按鈕進行搜尋</MiniNotify>
         {onError ? <Alert danger><strong>搜尋時發生錯誤</strong><pre>{errorMessage(onError)}</pre></Alert> : null}
-        <CourseList courses={searchResult} showConflictCourse={showConflictCourse} />
+        {!searchResult ? <SearchPageSkeleton /> : <CourseList courses={searchResult} showConflictCourse={showConflictCourse} />}
         <div className="grid gap-3">
           <h3 className="m-0">贊助商廣告</h3>
           <AdsByGoogle />
@@ -402,15 +400,7 @@ function SearchSection({ title, open = false, children }: { title: string; open?
         <span>{title}</span>
         <i className={`bx bx-chevron-down transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
       </button>
-      <div
-        className={`grid overflow-hidden transition-[grid-template-rows,opacity,transform] duration-200 ease-out motion-reduce:transition-none ${expanded ? 'grid-rows-[1fr] opacity-100 translate-y-0' : 'grid-rows-[0fr] opacity-0 -translate-y-1'}`}
-        aria-hidden={!expanded}
-        inert={!expanded ? true : undefined}
-      >
-        <div className="min-h-0">
-          <div className="mt-3 grid gap-2">{children}</div>
-        </div>
-      </div>
+      {expanded ? <div className="mt-3 grid gap-2">{children}</div> : null}
     </section>
   )
 }

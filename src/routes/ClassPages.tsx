@@ -7,7 +7,7 @@ import { Button } from '../components/ui-kit/Button'
 import { Card } from '../components/ui-kit/Card'
 import { CardTitle } from '../components/ui-kit/CardTitle'
 import { Input } from '../components/ui-kit/Input'
-import { Loader } from '../components/ui-kit/Loader'
+import { ClassDetailSkeleton, ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons'
 import { fetchCourse, fetchDepartment } from '../lib/courseApi'
 import { useApp } from '../state/AppContext'
 import type { Course, DepartmentClass, DepartmentGroup } from '../types/course'
@@ -74,7 +74,7 @@ export function ClassIndexPage() {
     }
   }, [departments, filter])
 
-  if (!departments) return <Loader />
+  if (!departments) return <ClassIndexSkeleton />
 
   return (
     <div>
@@ -158,7 +158,7 @@ export function ClassDetailPage() {
     setVersion((value) => value + 1)
   }
 
-  if (!courses) return <Loader />
+  if (!courses) return <ClassDetailSkeleton />
   const courseGroups = groupClassCourses(courses)
 
   return (

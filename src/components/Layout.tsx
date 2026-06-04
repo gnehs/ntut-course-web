@@ -1,8 +1,6 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { gsap } from 'gsap'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/courseUtils'
-import { animateRouteSurface, isReducedMotion } from '../lib/motion'
 import { createSearchParams } from '../lib/urlState'
 import { useApp } from '../state/AppContext'
 import { Button } from './ui-kit/Button'
@@ -20,24 +18,8 @@ export function Layout() {
   const { dataset, setDataset, yearSemItems, departmentItems, datasetDialogOpen, setDatasetDialogOpen } = useApp()
   const [yearSemValue, setYearSemValue] = useState(`${dataset.year}-${dataset.sem}`)
   const [departmentValue, setDepartmentValue] = useState(displayDepartment(dataset.department))
-  const navRef = useRef(null)
-  const mainRef = useRef(null)
 
   const yearSemLabel = useMemo(() => parseYearSemVal(`${dataset.year}-${dataset.sem}`), [dataset])
-
-  useEffect(() => {
-    if (isReducedMotion() || !navRef.current) return undefined
-    gsap.fromTo(
-      navRef.current,
-      { autoAlpha: 0, y: -14 },
-      { autoAlpha: 1, y: 0, duration: 0.42, ease: 'power3.out', overwrite: 'auto' }
-    )
-    return () => gsap.killTweensOf(navRef.current)
-  }, [])
-
-  useEffect(() => {
-    return animateRouteSurface(mainRef.current)
-  }, [location.pathname, location.search])
 
   function applyDataset() {
     const [year, sem] = yearSemValue.split('-')
@@ -49,7 +31,6 @@ export function Layout() {
     <div className="flex min-h-screen flex-col bg-[#f4f7f8] text-black dark:bg-[#1d1d1d] dark:text-white">
       {!isIframe && !isAdvancedSearch ? (
         <nav
-          ref={navRef}
           className="fixed inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]"
           style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
         >
@@ -60,7 +41,7 @@ export function Layout() {
           </div>
         </nav>
       ) : null}
-      <ContentSurface as="main" ref={mainRef} className={`${isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 pt-[74px]' } ${isIframe ? 'pt-0' : ''}`}>
+      <ContentSurface as="main" className={`${isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 pt-[74px]' } ${isIframe ? 'pt-0' : ''}`}>
         <Outlet />
       </ContentSurface>
       {isIframe && !isAdvancedSearch ? (
