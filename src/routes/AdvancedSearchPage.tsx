@@ -4,6 +4,7 @@ import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { TimetableSelector } from '../components/TimetableSelector';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -411,7 +412,7 @@ export function AdvancedSearchPage() {
 						active={sidebarOpen}
 						onClick={() => setSidebarOpen((value) => !value)}
 					>
-						<i className='bx bx-search' />
+						<Search className='size-4' />
 						搜尋
 					</Button>
 				</div>
@@ -480,7 +481,7 @@ function AdvancedSearchSidebarContent({
 					</Button>
 					{showCloseButton ? (
 						<Button icon className='m-0 lg:hidden' onClick={onClose}>
-							<i className='bx bx-x' />
+							<X className='size-4' />
 						</Button>
 					) : null}
 				</div>
@@ -591,8 +592,8 @@ function SearchSection({
 				onClick={() => setExpanded((value) => !value)}
 			>
 				<span>{title}</span>
-				<i
-					className={`bx bx-chevron-down transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+				<ChevronDown
+					className={`size-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
 				/>
 			</button>
 			{expanded ? <div className='mt-3 grid gap-2'>{children}</div> : null}

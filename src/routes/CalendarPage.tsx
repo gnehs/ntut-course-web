@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Check, Filter } from 'lucide-react';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
@@ -38,7 +39,7 @@ export function CalendarPage() {
 			<div className='flex flex-wrap items-center justify-between gap-2'>
 				<h1 className='m-0'>行事曆</h1>
 				<Button active={important} className='m-0' onClick={() => setImportant((value) => !value)}>
-					<i className={`bx ${important ? 'bx-check' : 'bx-filter-alt'}`} />
+					{important ? <Check className='size-4' /> : <Filter className='size-4' />}
 					僅顯示重要日程
 				</Button>
 			</div>

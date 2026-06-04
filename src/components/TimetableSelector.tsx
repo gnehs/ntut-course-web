@@ -1,5 +1,6 @@
 import { cn } from '../lib/utils';
 import { dateEng2zh, timetable as defaultTimetable } from '../lib/courseUtils';
+import { Check, X } from 'lucide-react';
 import type React from 'react';
 
 const defaultDays = ['mon', 'tue', 'wed', 'thu', 'fri'];
@@ -61,7 +62,7 @@ function TimetableRow({ slot, dayKeys, selected, onToggle }) {
 									: 'bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
 							)}
 						>
-							<i className={`bx ${active ? 'bx-x' : 'bx-check'}`} />
+							{active ? <X className='size-4' /> : <Check className='size-4' />}
 						</button>
 					</div>
 				);

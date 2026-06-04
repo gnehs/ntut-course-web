@@ -1,13 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
+import { CircleAlert, Clock, PanelTop, Table } from 'lucide-react';
 import { cn } from '../lib/utils';
 import {
 	courseTitle,
 	dateEng2zh,
 	getCourseDisplayTitle,
 	getGeneralCourseTags,
-	getSportsCourseIcon,
 	getSportsCourseTitle,
 	isSportsCourse,
 	parseCourseTime,
@@ -21,6 +21,7 @@ import { CardTitle } from './ui-kit/CardTitle';
 import { Pagination } from './ui-kit/Pagination';
 import { Tag } from './ui-kit/Tag';
 import type { Course } from '../types/course';
+import { SportsCourseIcon } from './SportsCourseIcon';
 
 const PAGE_SIZE = 54;
 
@@ -110,16 +111,16 @@ export function CourseList({
 		<div>
 			<div className='flex flex-wrap items-center justify-center gap-1 py-4'>
 				<Button active={layout === 'table'} className='m-0' onClick={() => changeLayout('table')}>
-					<i className='bx bx-table' />
+					<Table className='size-4' />
 					表格
 				</Button>
 				<Button active={layout === 'card'} className='m-0' onClick={() => changeLayout('card')}>
-					<i className='bx bx-card' />
+					<PanelTop className='size-4' />
 					卡片
 				</Button>
 				{showTimetable ? (
 					<Button active={layout === 'timetable'} onClick={() => changeLayout('timetable')}>
-						<i className='bx bx-time' />
+						<Clock className='size-4' />
 						課表
 					</Button>
 				) : null}
@@ -137,7 +138,7 @@ export function CourseList({
 									<CourseDisplayHeading course={course} />
 									{conflictCourseData.includes(course.id) ? (
 										<Tag color='rgba(var(--vs-danger),0.15)' textColor={`rgb(var(--vs-danger))`}>
-											<i className='bx bxs-error' />
+											<CircleAlert className='size-4' />
 											衝堂
 										</Tag>
 									) : null}
@@ -246,10 +247,9 @@ export function CourseList({
 function CourseDisplayHeading({ course }: { course: Course }) {
 	if (isSportsCourse(course)) {
 		const title = getSportsCourseTitle(course);
-		const icon = getSportsCourseIcon(title);
 		return (
 			<span className='flex items-center gap-1'>
-				{icon ? <i className={cn(icon, 'text-base')} /> : null}
+				<SportsCourseIcon title={title} className='text-base' />
 				<span>{title}</span>
 			</span>
 		);

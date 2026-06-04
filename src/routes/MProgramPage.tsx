@@ -2,6 +2,7 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
+import { Check, Minus, Plus, X } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -9,6 +10,7 @@ import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
 import { CardGridSkeleton, ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCourse, fetchMicroPrograms } from '../lib/courseApi';
+import { usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
 import type { Course, MicroProgram } from '../types/course';
 import { errorMessage } from '../lib/error';
@@ -100,6 +102,7 @@ export function MProgramDetailPage() {
 	const storageKey = `my-couse-mprogram-${year}-${sem}`;
 	const programName = program?.name || '微學程';
 	const isInMyCourse = localStorage.getItem(storageKey) === programName;
+	usePageTitle(programName);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -164,17 +167,17 @@ export function MProgramDetailPage() {
 						active={showConflictCourse}
 						onClick={() => setShowConflictCourse((value) => !value)}
 					>
-						<i className={`bx ${showConflictCourse ? 'bx-check' : 'bx-x'}`} />
+						{showConflictCourse ? <Check className='size-4' /> : <X className='size-4' />}
 						衝堂課程
 					</Button>
 					{!isInMyCourse ? (
 						<Button primary onClick={addProgramCourses}>
-							<i className='bx bx-plus' />
+							<Plus className='size-4' />
 							加入我的課程
 						</Button>
 					) : (
 						<Button danger onClick={removeProgramCourses}>
-							<i className='bx bx-minus' />
+							<Minus className='size-4' />
 							從我的課程移除
 						</Button>
 					)}

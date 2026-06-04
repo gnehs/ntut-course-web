@@ -9,7 +9,7 @@ export function isReducedMotion() {
 export function bindInteractiveCard(element) {
 	if (!element || isReducedMotion()) return () => {};
 
-	const icon = element.querySelector(':scope > i');
+	const icon = element.querySelector(':scope > [data-card-icon]');
 	const shadowOpacity =
 		Number.parseFloat(
 			getComputedStyle(document.documentElement).getPropertyValue('--vs-shadow-opacity'),

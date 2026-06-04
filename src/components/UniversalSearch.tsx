@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
+import { ArrowRight, History, Loader, Search, X } from 'lucide-react';
 import { courseTitle, searchCourseList } from '../lib/courseUtils';
 import { animateSearchResults } from '../lib/motion';
 import { useApp } from '../state/AppContext';
@@ -161,11 +162,11 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					}}
 				>
 					{input ? (
-						<i className='bx bx-x text-2xl' />
+						<X className='text-2xl' />
 					) : loading ? (
-						<i className='bx bx-loader-alt bx-spin text-2xl' />
+						<Loader className='animate-spin text-2xl' />
 					) : (
-						<i className='bx bx-search text-2xl' />
+						<Search className='text-2xl' />
 					)}
 				</button>
 			</div>
@@ -217,12 +218,12 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 							>
 								{item.history ? (
 									currentSelectionIndex === index ? (
-										<i className='bx bx-right-arrow-alt text-2xl' />
+										<ArrowRight className='text-2xl' />
 									) : (
-										<i className='bx bx-history text-2xl' />
+										<History className='text-2xl' />
 									)
 								) : (
-									<i className='bx bx-right-arrow-alt text-2xl' />
+									<ArrowRight className='text-2xl' />
 								)}
 							</div>
 						</Link>

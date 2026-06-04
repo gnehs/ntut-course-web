@@ -1,6 +1,7 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
+import { BookOpen, Calendar, Clock, FileInput, FileOutput, Puzzle, Shapes } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -74,11 +75,11 @@ export function MyCoursePage() {
 				</div>
 				<div className='flex flex-wrap justify-end gap-2'>
 					<Button onClick={exportData}>
-						<i className='bx bxs-file-export' />
+						<FileOutput className='size-4' />
 						匯出
 					</Button>
 					<Button onClick={importData}>
-						<i className='bx bxs-file-import' />
+						<FileInput className='size-4' />
 						匯入
 					</Button>
 				</div>
@@ -102,12 +103,12 @@ export function MyCoursePage() {
 						<Card className='px-4 py-3' to={`/widget?year=${dataset.year}`}>
 							<CardTitle>iOS 小工具</CardTitle>
 							<p>在桌面上檢視接下來的課程</p>
-							<i className='bx bx-extension' />
+							<Puzzle data-card-icon />
 						</Card>
 						<Card className='px-4 py-3' to={`/add-calendar?year=${dataset.year}`}>
 							<CardTitle>新增到行事曆</CardTitle>
 							<p>將我的課程匯入至行事曆</p>
-							<i className='bx bx-calendar' />
+							<Calendar data-card-icon />
 						</Card>
 					</div>
 					<h3>課程</h3>
@@ -115,17 +116,17 @@ export function MyCoursePage() {
 						<Card>
 							<CardTitle>{credit}</CardTitle>
 							<p>學分</p>
-							<i className='bx bx-book' />
+							<BookOpen data-card-icon />
 						</Card>
 						<Card>
 							<CardTitle>{hours}</CardTitle>
 							<p>時數</p>
-							<i className='bx bx-time' />
+							<Clock data-card-icon />
 						</Card>
 						<Card>
 							<CardTitle>{courses.length}</CardTitle>
 							<p>課程數</p>
-							<i className='bx bx-category-alt' />
+							<Shapes data-card-icon />
 						</Card>
 					</div>
 					<CourseList courses={courses} showTimetable />

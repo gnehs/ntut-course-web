@@ -1,4 +1,22 @@
+import type React from 'react';
 import { useEffect, useState } from 'react';
+import {
+	BookOpen,
+	Calendar,
+	CalendarPlus,
+	Clock,
+	FileText,
+	Ghost,
+	GraduationCap,
+	History,
+	Info,
+	Puzzle,
+	Search,
+	Settings,
+	Terminal,
+	User,
+	UserX,
+} from 'lucide-react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { fetchCalendar } from '../lib/courseApi';
 import { displayDepartment } from '../lib/courseUtils';
@@ -56,7 +74,7 @@ function UpcomingCourse() {
 					>
 						<CardTitle>{course.name?.zh || '未命名課程'}</CardTitle>
 						<p>{(course.teacher || []).map((item) => item.name).join('、')}</p>
-						<i className='bx bx-time absolute right-[0.1em] bottom-0 text-[48px] opacity-20' />
+						<Clock data-card-icon />
 					</Card>
 				))}
 			</div>
@@ -95,16 +113,16 @@ export function HomePage() {
 							to: `/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`,
 							title: '進階搜尋',
 							text: '依條件搜尋課程',
-							icon: 'bx bx-search',
+							icon: Search,
 						},
-						{ to: '/class', title: '班級課表', text: '查看各班上課時間表', icon: 'bx bx-time' },
+						{ to: '/class', title: '班級課表', text: '查看各班上課時間表', icon: Clock },
 						{
 							to: '/mprogram',
 							title: '微學程',
 							text: '查詢微學程課程',
-							icon: 'bx bx-book-content',
+							icon: BookOpen,
 						},
-						{ to: '/my-course', title: '我的課程', text: '查看已儲存的課程', icon: 'bx bx-user' },
+						{ to: '/my-course', title: '我的課程', text: '查看已儲存的課程', icon: User },
 					]}
 				/>
 			</PageSection>
@@ -115,32 +133,32 @@ export function HomePage() {
 							to: standardURL,
 							title: '課程標準',
 							text: '查看各系所畢業標準等相關資訊',
-							icon: 'bx bxs-graduation',
+							icon: GraduationCap,
 						},
 						{
 							to: '/emptyroom',
 							title: '尋找空教室',
 							text: '查看沒有課程進行的教室',
-							icon: 'bx bx-ghost',
+							icon: Ghost,
 						},
 						{
 							to: '/withdrawal',
 							title: '退選率',
 							text: '查看所有教師的退選率',
-							icon: 'bx bx-user-x',
+							icon: UserX,
 						},
-						{ to: '/calendar', title: '行事曆', text: '查看學校行事曆', icon: 'bx bx-calendar' },
+						{ to: '/calendar', title: '行事曆', text: '查看學校行事曆', icon: Calendar },
 						{
 							to: `/widget?year=${dataset.year}`,
 							title: 'iOS 小工具',
 							text: '在桌面上檢視接下來的課程',
-							icon: 'bx bx-extension',
+							icon: Puzzle,
 						},
 						{
 							to: `/add-calendar?year=${dataset.year}`,
 							title: '新增課程到行事曆',
 							text: '將我的課程匯入至行事曆',
-							icon: 'bx bx-calendar-plus',
+							icon: CalendarPlus,
 						},
 					]}
 				/>
@@ -152,23 +170,23 @@ export function HomePage() {
 							to: '/doc',
 							title: '文件',
 							text: 'API 文件與嵌入頁面相關功能介紹與說明',
-							icon: 'bx bx-file',
+							icon: FileText,
 						},
 						{
 							to: '/changelog',
 							title: '更新日誌',
 							text: '查看本站最近的更新日誌',
-							icon: 'bx bx-history',
+							icon: History,
 						},
-						{ to: '/about', title: '關於', text: '關於本網站', icon: 'bx bx-info-circle' },
-						{ to: '/privacy', title: '隱私權政策', text: '隱私權政策', icon: 'bx bx-info-circle' },
+						{ to: '/about', title: '關於', text: '關於本網站', icon: Info },
+						{ to: '/privacy', title: '隱私權政策', text: '隱私權政策', icon: Info },
 						{
 							to: '/status',
 							title: '擷取狀態',
 							text: '查看爬蟲資料擷取狀態',
-							icon: 'bx bx-terminal',
+							icon: Terminal,
 						},
-						{ to: '/settings', title: '設定', text: '課程資料庫、資料匯出等', icon: 'bx bx-cog' },
+						{ to: '/settings', title: '設定', text: '課程資料庫、資料匯出等', icon: Settings },
 					]}
 				/>
 			</PageSection>
@@ -195,16 +213,41 @@ function PageSection({ title, children }) {
 	);
 }
 
-function HomeCardGrid({ items }) {
+function HomeCardGrid({
+	items,
+}: {
+	items: {
+		to: string;
+		title: string;
+		text: string;
+		icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	}[];
+}) {
 	return (
 		<div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
 			{items.map((item) => (
-				<Card key={item.to} className='px-4 py-3' to={item.to}>
-					<CardTitle>{item.title}</CardTitle>
-					<p>{item.text}</p>
-					<i className={`${item.icon} absolute right-[0.1em] bottom-0 text-[48px] opacity-20`} />
-				</Card>
+				<HomeCard item={item} key={item.to} />
 			))}
 		</div>
+	);
+}
+
+function HomeCard({
+	item,
+}: {
+	item: {
+		to: string;
+		title: string;
+		text: string;
+		icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	};
+}) {
+	const Icon = item.icon;
+	return (
+		<Card className='px-4 py-3' to={item.to}>
+			<CardTitle>{item.title}</CardTitle>
+			<p>{item.text}</p>
+			<Icon data-card-icon />
+		</Card>
 	);
 }

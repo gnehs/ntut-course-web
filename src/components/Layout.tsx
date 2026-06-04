@@ -1,8 +1,10 @@
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/courseUtils';
+import { pageTitleForPath, usePageTitle } from '../lib/pageTitle';
 import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
+import { GitBranch } from 'lucide-react';
 import { Button } from './ui-kit/Button';
 import { cn } from '@/lib/utils';
 import { Dialog } from './ui-kit/Dialog';
@@ -35,6 +37,8 @@ export function Layout() {
 	}, []);
 
 	const yearSemLabel = useMemo(() => parseYearSemVal(`${dataset.year}-${dataset.sem}`), [dataset]);
+
+	usePageTitle(pageTitleForPath(location.pathname));
 
 	function applyDataset() {
 		const [year, sem] = yearSemValue.split('-');
@@ -121,7 +125,7 @@ export function Layout() {
 									target='_blank'
 									rel='noreferrer'
 								>
-									<i className='bx bxl-github' />
+									<GitBranch className='size-4' />
 								</Button>
 							</div>
 						</div>

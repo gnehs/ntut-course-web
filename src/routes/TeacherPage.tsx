@@ -7,6 +7,7 @@ import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { TeacherSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchWithdrawal, fetchWithdrawalRate } from '../lib/courseApi';
+import { usePageTitle } from '../lib/pageTitle';
 import type { TeacherWithdrawalCourse, WithdrawalRateMap, WithdrawalStat } from '../types/course';
 
 export function TeacherPage() {
@@ -19,6 +20,7 @@ export function TeacherPage() {
 		r5: WithdrawalRateMap;
 	} | null>(null);
 	const [error, setError] = useState<unknown>(null);
+	usePageTitle(id);
 	useEffect(() => {
 		let cancelled = false;
 		Promise.all([
@@ -64,8 +66,8 @@ export function TeacherPage() {
 		localStorage.setItem('data-department', value);
 	}
 	return (
-		<div>
-			<h1 className='mb-3'>{id}</h1>
+		<div className='space-y-4'>
+			<h1>{id}</h1>
 			<div className='grid gap-3 sm:grid-cols-3 lg:grid-cols-6'>
 				<Card>
 					<CardTitle>{teacher.withdraw}</CardTitle>

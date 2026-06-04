@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Clipboard } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
@@ -94,7 +95,7 @@ export function WidgetPage() {
 							setCopyState(result);
 						}}
 					>
-						<i className='bx bx-clipboard' />
+						<Clipboard className='size-4' />
 						複製
 					</Button>
 				</div>

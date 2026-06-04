@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { Checkbox } from '../components/ui/checkbox';
 import { CourseList } from '../components/CourseList';
+import { Filter } from 'lucide-react';
 import { TimetableSelector } from '../components/TimetableSelector';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -261,7 +262,7 @@ export function SearchPage() {
 					<Field label={searchClass === '^博雅' ? '博雅' : '班級'}>
 						{searchClass === '^博雅' ? (
 							<Button className='m-0 w-full justify-center' onClick={() => setCategoryDialog(true)}>
-								<i className='bx bxs-filter-alt' />
+								<Filter className='size-4' />
 								依博雅類別篩選
 							</Button>
 						) : (
@@ -287,13 +288,13 @@ export function SearchPage() {
 							className='m-0 w-full justify-center'
 							onClick={() => setCourseStandardDialog(true)}
 						>
-							<i className='bx bxs-filter-alt' />
+							<Filter />
 							依課程標準篩選
 						</Button>
 					</Field>
 					<Field label='上課時間'>
 						<Button className='m-0 w-full justify-center' onClick={() => setTimetableDialog(true)}>
-							<i className='bx bxs-filter-alt' />
+							<Filter />
 							依時間篩選
 						</Button>
 					</Field>

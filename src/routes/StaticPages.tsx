@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
+import { BadgeQuestionMark, Calendar, Check, GitCommit, Loader, RefreshCw } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { StatusSkeleton } from '../components/ui-kit/PageSkeletons';
@@ -47,8 +48,8 @@ export function AboutPage() {
 			<h2>Special Thanks</h2>
 			<ul className='list-disc space-y-1 pl-6'>
 				<li>
-					<a href='https://boxicons.com/' target='_blank' rel='noreferrer'>
-						Boxicons
+					<a href='https://lucide.dev/' target='_blank' rel='noreferrer'>
+						Lucide
 					</a>
 				</li>
 				<li>
@@ -386,24 +387,24 @@ export function StatusPage() {
 							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}
 						>
 							{run.status === 'in_progress' ? (
-								<i className='bx bx-loader bx-spin' />
+								<Loader className='animate-spin' />
 							) : run.status === 'completed' ? (
-								<i className='bx bx-check' />
+								<Check />
 							) : (
-								<i className='bx bx-question-mark' />
+								<BadgeQuestionMark />
 							)}
 						</div>
 						<div className='min-w-0 flex-1'>
 							<div className='font-semibold'>{parseName(run.name)}</div>
 							<div className='text-sm opacity-75'>
 								{run.event === 'schedule' ? (
-									<i className='bx bx-calendar' />
+									<Calendar className='inline-block align-[-0.125em]' />
 								) : run.event === 'push' ? (
-									<i className='bx bx-git-commit' />
+									<GitCommit className='inline-block align-[-0.125em]' />
 								) : run.event === 'dynamic' ? (
-									<i className='bx bx-revision' />
+									<RefreshCw className='inline-block align-[-0.125em]' />
 								) : (
-									<i className='bx bx-question-mark' />
+									<BadgeQuestionMark className='inline-block align-[-0.125em]' />
 								)}
 								<span> • </span>
 								{timeSince(new Date(run.created_at))}前

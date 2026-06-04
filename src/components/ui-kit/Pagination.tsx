@@ -1,4 +1,5 @@
 import { Button } from './Button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function Pagination({ page, length, onChange }) {
 	if (length <= 1) return null;
@@ -12,7 +13,7 @@ export function Pagination({ page, length, onChange }) {
 				className='size-9'
 				onClick={() => onChange(Math.max(page - 1, 1))}
 			>
-				<i className='bx bx-chevron-left' />
+				<ChevronLeft className='size-4' />
 			</Button>
 			{items.map((item, index) =>
 				item === 'ellipsis' ? (
@@ -40,7 +41,7 @@ export function Pagination({ page, length, onChange }) {
 				className='size-9'
 				onClick={() => onChange(Math.min(page + 1, length))}
 			>
-				<i className='bx bx-chevron-right' />
+				<ChevronRight className='size-4' />
 			</Button>
 		</div>
 	);

@@ -2,6 +2,7 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
+import { Star } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -9,6 +10,7 @@ import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
 import { ClassDetailSkeleton, ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCourse, fetchDepartment } from '../lib/courseApi';
+import { usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
 import type { Course, DepartmentClass, DepartmentGroup } from '../types/course';
 import { errorMessage } from '../lib/error';
@@ -121,7 +123,7 @@ export function ClassIndexPage() {
 							>
 								<CardTitle>{item.name}</CardTitle>
 								<p>{item.description}</p>
-								<i className='bx bx-star' />
+								<Star data-card-icon />
 							</Card>
 						))}
 					</div>
@@ -155,6 +157,7 @@ export function ClassDetailPage() {
 	const [classData, setClassData] = useState<DepartmentClass | null>(null);
 	const [version, setVersion] = useState(0);
 	const isInMyCourse = localStorage.getItem(myCourseClassKey(year, sem)) === id;
+	usePageTitle(classData?.name || id);
 
 	useEffect(() => {
 		let cancelled = false;

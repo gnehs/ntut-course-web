@@ -115,25 +115,6 @@ export function getSportsCourseTitle(course?: CourseTitleLike | null) {
 	);
 }
 
-export function getSportsCourseIcon(title: string) {
-	const rules: [RegExp, string][] = [
-		[/籃球/, 'bx bx-basketball'],
-		[/棒球/, 'bx bx-baseball'],
-		[/足球/, 'bx bx-football'],
-		[/網球/, 'bx bx-tennis-ball'],
-		[/保齡球/, 'bx bx-bowling-ball'],
-		[/體適能/, 'bx bx-run'],
-		[/羽球/, 'mdi mdi-badminton'],
-		[/排球/, 'mdi mdi-volleyball'],
-		[/桌球/, 'mdi mdi-table-tennis'],
-		[/撞球/, 'mdi mdi-billiards'],
-		[/太極/, 'mdi mdi-crowd'],
-		[/適應/, 'mdi mdi-walk'],
-		[/美學/, 'bx bx-body'],
-	];
-	return rules.find(([pattern]) => pattern.test(title))?.[1] || null;
-}
-
 export function getGeneralCourseTags(course: Course) {
 	if (!(course?.class || []).some((item) => /^博雅/.test(item.name))) return [];
 	const colors: [RegExp, string][] = [
