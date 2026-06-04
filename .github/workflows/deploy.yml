@@ -9,31 +9,31 @@ on:
     branches: 蹦蹦
   workflow_dispatch:
   schedule:
-    - cron:  '0 0 */1 * *'
+    - cron: '0 0 */1 * *'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        cache: 'pnpm'
-        cache-dependency-path: pnpm-lock.yaml
-    - name: Enable pnpm
-      run: corepack enable pnpm
-    - name: Install pnpm packages
-      run: pnpm install --frozen-lockfile
-    - name: Build Pages
-      run: pnpm build
-    - name: Add SPA fallback
-      run: cp ./dist/index.html ./dist/404.html
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: dist
-        force_orphan: true
-        cname: ${{ vars.DOMAIN_NAME || 'ntut-course.gnehs.net' }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Enable pnpm
+        run: corepack enable pnpm
+      - name: Install pnpm packages
+        run: pnpm install --frozen-lockfile
+      - name: Build Pages
+        run: pnpm build
+      - name: Add SPA fallback
+        run: cp ./dist/index.html ./dist/404.html
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          force_orphan: true
+          cname: ${{ vars.DOMAIN_NAME || 'ntut-course.gnehs.net' }}

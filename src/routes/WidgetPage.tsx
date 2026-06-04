@@ -1,93 +1,146 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Alert } from '../components/ui-kit/Alert'
-import { Button } from '../components/ui-kit/Button'
-import { Card } from '../components/ui-kit/Card'
-import { CardTitle } from '../components/ui-kit/CardTitle'
-import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons'
-import { trimEllip } from '../lib/courseUtils'
-import { useApp } from '../state/AppContext'
-import type { CourseTime } from '../types/course'
+import { useEffect, useMemo, useState } from 'react';
+import { Alert } from '../components/ui-kit/Alert';
+import { Button } from '../components/ui-kit/Button';
+import { Card } from '../components/ui-kit/Card';
+import { CardTitle } from '../components/ui-kit/CardTitle';
+import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
+import { trimEllip } from '../lib/courseUtils';
+import { useApp } from '../state/AppContext';
+import type { CourseTime } from '../types/course';
 
 type WidgetCourse = {
-  name: string
-  time: CourseTime | undefined
-  classroom: string
-  link: string
-}
+	name: string;
+	time: CourseTime | undefined;
+	classroom: string;
+	link: string;
+};
 
 type CopyState = {
-  title: string
-  text: string
-}
+	title: string;
+	text: string;
+};
 
 export function WidgetPage() {
-  const { dataset, getCourses, getMyCourseIds } = useApp()
-  const [courses, setCourses] = useState<WidgetCourse[] | null>(null)
-  const [copyState, setCopyState] = useState<CopyState | null>(null)
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      const ids = getMyCourseIds()
-      const all = await getCourses()
-      if (!cancelled) {
-        setCourses(all.filter((course) => ids.includes(course.id)).map((course) => ({
-          name: course.name?.zh || '',
-          time: course.time,
-          classroom: trimEllip((course.classroom || []).map((item) => item.name).join('、'), 13),
-          link: `https://ntut-course.gnehs.net/course/${dataset.year}/${dataset.sem}/${course.id}`,
-        })))
-      }
-    }
-    load().catch(() => setCourses([]))
-    return () => { cancelled = true }
-  }, [dataset.year, dataset.sem, dataset.department])
-  const code = useMemo(() => createScriptableCode(courses || []), [courses])
-  if (!courses) return <StepsPageSkeleton codeBlock />
-  return (
-    <div>
-      <h1>iOS 小工具</h1>
-      <p>新增小工具在你的桌面上，隨時檢視接下來的課程！</p>
-      <p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
-      {!courses.length ? <Alert danger><strong>沒有課程資料</strong><br />請先新增課程資料</Alert> : null}
-      <h2><span style={{ color: 'rgb(var(--vs-primary))' }}>Step 0</span> 加入課程</h2>
-      <p>請先將你本學期的課程新增到 <strong>北科課程好朋友</strong></p>
-      <h2><span style={{ color: 'rgb(var(--vs-primary))' }}>Step 1</span> 安裝 Scriptable</h2>
-      <p>到 App Store 安裝 <a href="https://apps.apple.com/tw/app/scriptable/id1405459188" target="_blank" rel="noreferrer">Scriptable</a></p>
-      <h2><span style={{ color: 'rgb(var(--vs-primary))' }}>Step 2</span> 複製並貼上程式碼</h2>
-      <p>建立一個 Script 並貼上以下程式碼</p>
-      <div className="relative rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3">
-        <div className="absolute right-2 top-2">
-          <Button className="m-0" onClick={async () => {
-            const result = await copyCode(code)
-            setCopyState(result)
-          }}><i className="bx bx-clipboard" />複製</Button>
-        </div>
-        <pre id="scriptable-code" className="h-[512px] overflow-auto whitespace-pre-wrap">{code}</pre>
-      </div>
-      {copyState ? <Alert className="mt-3"><strong>{copyState.title}</strong><br />{copyState.text}</Alert> : null}
-      <h2><span style={{ color: 'rgb(var(--vs-primary))' }}>Step 3</span> 新增小工具到桌面</h2>
-      <p>參考此影片建立你的小工具</p>
-      <video loop controls autoPlay className="mx-auto block h-[700px] max-w-full rounded-[16px] shadow-[0_0_16px_rgba(0,0,0,0.05)]">
-        <source src="/video/how_to_add_iOS_widget.mp4" type="video/mp4" />
-      </video>
-    </div>
-  )
+	const { dataset, getCourses, getMyCourseIds } = useApp();
+	const [courses, setCourses] = useState<WidgetCourse[] | null>(null);
+	const [copyState, setCopyState] = useState<CopyState | null>(null);
+	useEffect(() => {
+		let cancelled = false;
+		async function load() {
+			const ids = getMyCourseIds();
+			const all = await getCourses();
+			if (!cancelled) {
+				setCourses(
+					all
+						.filter((course) => ids.includes(course.id))
+						.map((course) => ({
+							name: course.name?.zh || '',
+							time: course.time,
+							classroom: trimEllip(
+								(course.classroom || []).map((item) => item.name).join('、'),
+								13,
+							),
+							link: `https://ntut-course.gnehs.net/course/${dataset.year}/${dataset.sem}/${course.id}`,
+						})),
+				);
+			}
+		}
+		load().catch(() => setCourses([]));
+		return () => {
+			cancelled = true;
+		};
+	}, [dataset.year, dataset.sem, dataset.department]);
+	const code = useMemo(() => createScriptableCode(courses || []), [courses]);
+	if (!courses) return <StepsPageSkeleton codeBlock />;
+	return (
+		<div>
+			<h1>iOS 小工具</h1>
+			<p>新增小工具在你的桌面上，隨時檢視接下來的課程！</p>
+			<p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
+			{!courses.length ? (
+				<Alert danger>
+					<strong>沒有課程資料</strong>
+					<br />
+					請先新增課程資料
+				</Alert>
+			) : null}
+			<h2>
+				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 0</span> 加入課程
+			</h2>
+			<p>
+				請先將你本學期的課程新增到 <strong>北科課程好朋友</strong>
+			</p>
+			<h2>
+				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 1</span> 安裝 Scriptable
+			</h2>
+			<p>
+				到 App Store 安裝{' '}
+				<a
+					href='https://apps.apple.com/tw/app/scriptable/id1405459188'
+					target='_blank'
+					rel='noreferrer'
+				>
+					Scriptable
+				</a>
+			</p>
+			<h2>
+				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 2</span> 複製並貼上程式碼
+			</h2>
+			<p>建立一個 Script 並貼上以下程式碼</p>
+			<div className='relative rounded-[8px] border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3'>
+				<div className='absolute top-2 right-2'>
+					<Button
+						className='m-0'
+						onClick={async () => {
+							const result = await copyCode(code);
+							setCopyState(result);
+						}}
+					>
+						<i className='bx bx-clipboard' />
+						複製
+					</Button>
+				</div>
+				<pre id='scriptable-code' className='h-[512px] overflow-auto whitespace-pre-wrap'>
+					{code}
+				</pre>
+			</div>
+			{copyState ? (
+				<Alert className='mt-3'>
+					<strong>{copyState.title}</strong>
+					<br />
+					{copyState.text}
+				</Alert>
+			) : null}
+			<h2>
+				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 3</span> 新增小工具到桌面
+			</h2>
+			<p>參考此影片建立你的小工具</p>
+			<video
+				loop
+				controls
+				autoPlay
+				className='mx-auto block h-[700px] max-w-full rounded-[16px] shadow-[0_0_16px_rgba(0,0,0,0.05)]'
+			>
+				<source src='/video/how_to_add_iOS_widget.mp4' type='video/mp4' />
+			</video>
+		</div>
+	);
 }
 
 async function copyCode(code: string): Promise<CopyState> {
-  try {
-    window.gtag?.('event', 'copy_ios_widget_code')
-  } catch {}
-  try {
-    await navigator.clipboard.writeText(code)
-    return { title: '已複製', text: '請到 Scriptable 貼上程式碼即可使用小工具' }
-  } catch {
-    return { title: '複製失敗', text: '請嘗試手動複製' }
-  }
+	try {
+		window.gtag?.('event', 'copy_ios_widget_code');
+	} catch {}
+	try {
+		await navigator.clipboard.writeText(code);
+		return { title: '已複製', text: '請到 Scriptable 貼上程式碼即可使用小工具' };
+	} catch {
+		return { title: '複製失敗', text: '請嘗試手動複製' };
+	}
 }
 
 function createScriptableCode(courseData: WidgetCourse[]) {
-  return `const courseData = ${JSON.stringify(courseData)}
+	return `const courseData = ${JSON.stringify(courseData)}
 function getUpcomingCourse() {
     let currentDate = new Date()
     let timetable = {
@@ -205,5 +258,5 @@ if (config.runsInWidget) {
     widget.presentMedium()
 }
 Script.complete()
-`
+`;
 }
