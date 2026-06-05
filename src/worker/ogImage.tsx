@@ -5,6 +5,11 @@ import { WORKER_PREVIEW_CACHE_CONTROL } from './cache';
 import { parseOgImageRoute, type OgImageRoute } from './ogImageRoute';
 
 const DEFAULT_API_BASE = 'https://gnehs.github.io/ntut-course-crawler-node';
+const OG_IMAGE_DEFAULT_FONT = new GoogleFont('Inter Tight', { weight: 400 });
+const OG_IMAGE_DEFAULT_FONT_BOLD = new GoogleFont('Inter Tight', { weight: 700 });
+const OG_IMAGE_FALLBACK_FONT = new GoogleFont('Noto Sans TC', { weight: 400 });
+const OG_IMAGE_FALLBACK_FONT_BOLD = new GoogleFont('Noto Sans TC', { weight: 700 });
+const OG_IMAGE_FONT_FAMILY = "'Inter Tight', 'Noto Sans TC'";
 
 const courseStandardList: Record<string, string> = {
 	'○': '部訂共同必修',
@@ -34,7 +39,13 @@ export async function handleOgImageRequest(request: Request, config: OgImageConf
 		width: 1200,
 		height: 600,
 		emoji: 'fluent',
-		fonts: [new GoogleFont('Lato')],
+		defaultFont: OG_IMAGE_DEFAULT_FONT,
+		fonts: [
+			OG_IMAGE_DEFAULT_FONT,
+			OG_IMAGE_DEFAULT_FONT_BOLD,
+			OG_IMAGE_FALLBACK_FONT,
+			OG_IMAGE_FALLBACK_FONT_BOLD,
+		],
 		headers: {
 			'Cache-Control': WORKER_PREVIEW_CACHE_CONTROL,
 		},
@@ -84,7 +95,7 @@ function renderCourseImage(year: string, sem: string, course: Course) {
 			</Header>
 			<Spacer />
 			<Content>
-				{course.id}
+				<Eyebrow>{course.id}</Eyebrow>
 				<Title>{course.name?.zh || course.id}</Title>
 				<SubTitle>{course.name?.en || ''}</SubTitle>
 				<Tags>
@@ -172,6 +183,7 @@ function FooterItem({ title, value }: { title: string; value: ReactNode }) {
 			<div
 				style={{
 					fontSize: 24,
+					fontWeight: 700,
 				}}
 			>
 				{title}
@@ -200,7 +212,7 @@ function Container({ children }: { children: ReactNode }) {
 				textAlign: 'left',
 				flexDirection: 'column',
 				justifyContent: 'flex-start',
-				fontFamily: 'Lato',
+				fontFamily: OG_IMAGE_FONT_FAMILY,
 				alignItems: 'flex-start',
 				fontSize: 24,
 			}}
@@ -216,6 +228,7 @@ function Tag({ children }: { children: ReactNode }) {
 		<div
 			style={{
 				fontSize: 24,
+				fontWeight: 700,
 				border: '1px solid #f2f2f2',
 				padding: '8px 16px',
 				borderRadius: 12,
@@ -266,6 +279,7 @@ function Header({ children }: { children?: ReactNode }) {
 				display: 'flex',
 				justifyContent: 'space-between',
 				width: '100%',
+				fontWeight: 700,
 			}}
 		>
 			<div>🍤 北科課程好朋友</div>
@@ -293,11 +307,15 @@ function Content({ children }: { children: ReactNode }) {
 }
 
 function Title({ children }: { children: ReactNode }) {
-	return <div style={{ fontSize: 56 }}>{children}</div>;
+	return <div style={{ fontSize: 56, fontWeight: 700 }}>{children}</div>;
 }
 
 function SubTitle({ children }: { children: ReactNode }) {
 	return <div style={{ fontSize: 36, opacity: 0.5 }}>{children}</div>;
+}
+
+function Eyebrow({ children }: { children: ReactNode }) {
+	return <div style={{ fontSize: 24, fontWeight: 700, opacity: 0.7 }}>{children}</div>;
 }
 
 function Spacer() {
