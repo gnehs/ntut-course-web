@@ -186,7 +186,7 @@ export function StandardPage() {
 				</div>
 			) : null}
 
-			{year && !standardData ? <StandardPickerSkeleton /> : null}
+			{year && !standardData ? <StandardPickerSkeleton content /> : null}
 
 			{department && current ? (
 				<>
