@@ -1,11 +1,145 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { BadgeQuestionMark, Calendar, Check, GitCommit, Loader, RefreshCw } from 'lucide-react';
+import {
+	BadgeQuestionMark,
+	Calendar,
+	CalendarDays,
+	Check,
+	GitCommit,
+	Loader,
+	RefreshCw,
+} from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { StatusSkeleton } from '../components/ui-kit/PageSkeletons';
 import { cleanStore } from '../lib/storage';
 import type { WorkflowRun } from '../types/course';
+
+type ChangelogChange = {
+	title: string;
+	details?: string[];
+};
+
+type ChangelogEntry = {
+	date: string;
+	changes: ChangelogChange[];
+};
+
+const changelogEntries: ChangelogEntry[] = [
+	{ date: '2026-06-05', changes: [{ title: '更新圖示系統，改用更現代的圖示庫。' }] },
+	{ date: '2026-06-04', changes: [{ title: '改善整體使用者介面與互動體驗。' }] },
+	{ date: '2025-11-13', changes: [{ title: '修正課表時間解析錯誤。' }] },
+	{ date: '2025-09-29', changes: [{ title: '新增微學程查詢功能。' }] },
+	{ date: '2023-12-21', changes: [{ title: '修正課程資料爬取問題。' }] },
+	{ date: '2023-03-26', changes: [{ title: '修正空教室解析問題。' }] },
+	{
+		date: '2023-02-21',
+		changes: [
+			{ title: '新增了重設資料庫選項，可以在此重設異常的課程資料庫。' },
+			{
+				title: '修正了進入課程頁面再返回進階搜尋頁面時，無法載入課程資料的錯誤。',
+			},
+		],
+	},
+	{
+		date: '2023-01-13',
+		changes: [
+			{ title: '新增了班級頁面的預覽功能。' },
+			{ title: '修正了班級頁面在瀏覽過往班級時，會顯示錯誤建議的錯誤。' },
+			{ title: '修改了班級連結格式。' },
+		],
+	},
+	{
+		date: '2023-01-12',
+		changes: [
+			{ title: '新增了預覽功能，發送在 SNS 上的課程與教師的網址會自動顯示預覽。' },
+			{ title: '新增 Sitemap 產生器' },
+		],
+	},
+	{ date: '2022-12-30', changes: [{ title: '新增了「行事曆」頁面' }] },
+	{
+		date: '2022-12-29',
+		changes: [
+			{
+				title: '更新了「新增到行事曆」的自動填寫功能，現在能根據學校行事曆自動填上起始與結束日',
+			},
+			{ title: '新增了「行事曆」API' },
+		],
+	},
+	{
+		date: '2022-12-27',
+		changes: [{ title: '新增了廣告' }, { title: '更新了進階搜尋功能，現在能夠產生更短的網址' }],
+	},
+	{ date: '2022-12-25', changes: [{ title: '推出新版進階搜尋' }] },
+	{ date: '2022-12-23', changes: [{ title: '修正博雅課的篩選錯誤' }] },
+	{ date: '2022-12-21', changes: [{ title: '修正了當課表出現節次為「D」時的顯示錯誤' }] },
+	{
+		date: '2022-12-20',
+		changes: [{ title: '修正了新課表的博雅篩選' }, { title: '進階搜尋新增了依課程標準篩選' }],
+	},
+	{
+		date: '2022-11-26',
+		changes: [{ title: '修正了萬用搜尋的一些錯誤' }, { title: '新增萬用搜尋的搜尋歷史' }],
+	},
+	{ date: '2022-11-25', changes: [{ title: '新增萬用搜尋' }] },
+	{
+		date: '2022-11-24',
+		changes: [{ title: '新增教師頁面' }, { title: '修正了教師頁面選擇其他學制時的錯誤' }],
+	},
+	{
+		date: '2022-11-23',
+		changes: [
+			{ title: '重新設計了課程頁面卡片區域' },
+			{
+				title: '退選率',
+				details: [
+					'新增退選率 API',
+					'除了日間部外，也一起統計了進修部與研究所等課程，提供更加精確的退選率',
+					'課程頁面顯示退選率與其介紹',
+					'退選率頁面改由 API 提供服務，加快了讀取速度！',
+				],
+			},
+		],
+	},
+	{ date: '2022-10-05', changes: [{ title: '尋找空教室支援了星期選擇功能' }] },
+	{
+		date: '2022-10-03',
+		changes: [
+			{
+				title:
+					'現在課程資料會自動儲存在瀏覽器中了！除了能夠帶來高速的讀取速度，重新整理時也無需下載新資料了',
+			},
+			{ title: '修正了重複點擊課程標準中相同科系時，造成的錯誤' },
+			{ title: '修正了一些錯字' },
+		],
+	},
+	{
+		date: '2022-09-28',
+		changes: [
+			{
+				title: '重新設計的課表',
+				details: ['顯示更多有用資訊', '自動合併連堂課程', '課表將依據課程進行動態調整'],
+			},
+		],
+	},
+	{ date: '2022-09-27', changes: [{ title: '「退選率」現在預設會抓取十個學期的資料' }] },
+	{
+		date: '2022-09-19',
+		changes: [
+			{ title: '新增了「新增到行事曆」自訂區間選項' },
+			{ title: '於「課程頁面」瀏覽器標題中新增了課號' },
+			{ title: '修正了接下來的課程排序' },
+		],
+	},
+	{
+		date: '2022-09-17',
+		changes: [{ title: '現在使用「博雅課程」搜尋頁面時，可以透過類別篩選課程了。' }],
+	},
+	{
+		date: '2022-08-31',
+		changes: [{ title: '現在使用「課程標準」工具時，會自動儲存上次的位置了。' }],
+	},
+];
 
 export function AboutPage() {
 	return (
@@ -235,113 +369,80 @@ export function PrivacyPage() {
 }
 
 export function ChangelogPage() {
-	type ChangeItem = string | [string, string[]];
-	const items: [string, ChangeItem[]][] = [
-		['2026-06-05', ['更新圖示系統，改用更現代的圖示庫。']],
-		['2026-06-04', ['改善整體使用者介面與互動體驗。']],
-		['2025-11-13', ['修正課表時間解析錯誤。']],
-		['2025-09-29', ['新增微學程查詢功能。']],
-		['2023-12-21', ['修正課程資料爬取問題。']],
-		['2023-03-26', ['修正空教室解析問題。']],
-		[
-			'2023-02-21',
-			[
-				'新增了重設資料庫選項，可以在此重設異常的課程資料庫。',
-				'修正了進入課程頁面再返回進階搜尋頁面時，無法載入課程資料的錯誤。',
-			],
-		],
-		[
-			'2023-01-13',
-			[
-				'新增了班級頁面的預覽功能。',
-				'修正了班級頁面在瀏覽過往班級時，會顯示錯誤建議的錯誤。',
-				'修改了班級連結格式。',
-			],
-		],
-		[
-			'2023-01-12',
-			['新增了預覽功能，發送在 SNS 上的課程與教師的網址會自動顯示預覽。', '新增 Sitemap 產生器'],
-		],
-		['2022-12-30', ['新增了「行事曆」頁面']],
-		[
-			'2022-12-29',
-			[
-				'更新了「新增到行事曆」的自動填寫功能，現在能根據學校行事曆自動填上起始與結束日',
-				'新增了「行事曆」API',
-			],
-		],
-		['2022-12-27', ['新增了廣告', '更新了進階搜尋功能，現在能夠產生更短的網址']],
-		['2022-12-25', ['推出新版進階搜尋']],
-		['2022-12-23', ['修正博雅課的篩選錯誤']],
-		['2022-12-21', ['修正了當課表出現節次為「D」時的顯示錯誤']],
-		['2022-12-20', ['修正了新課表的博雅篩選', '進階搜尋新增了依課程標準篩選']],
-		['2022-11-26', ['修正了萬用搜尋的一些錯誤', '新增萬用搜尋的搜尋歷史']],
-		['2022-11-25', ['新增萬用搜尋']],
-		['2022-11-24', ['新增教師頁面', '修正了教師頁面選擇其他學制時的錯誤']],
-		[
-			'2022-11-23',
-			[
-				'重新設計了課程頁面卡片區域',
-				[
-					'退選率',
-					[
-						'新增退選率 API',
-						'除了日間部外，也一起統計了進修部與研究所等課程，提供更加精確的退選率',
-						'課程頁面顯示退選率與其介紹',
-						'退選率頁面改由 API 提供服務，加快了讀取速度！',
-					],
-				],
-			],
-		],
-		['2022-10-05', ['尋找空教室支援了星期選擇功能']],
-		[
-			'2022-10-03',
-			[
-				'現在課程資料會自動儲存在瀏覽器中了！除了能夠帶來高速的讀取速度，重新整理時也無需下載新資料了',
-				'修正了重複點擊課程標準中相同科系時，造成的錯誤',
-				'修正了一些錯字',
-			],
-		],
-		[
-			'2022-09-28',
-			[['重新設計的課表', ['顯示更多有用資訊', '自動合併連堂課程', '課表將依據課程進行動態調整']]],
-		],
-		['2022-09-27', ['「退選率」現在預設會抓取十個學期的資料']],
-		[
-			'2022-09-19',
-			[
-				'新增了「新增到行事曆」自訂區間選項',
-				'於「課程頁面」瀏覽器標題中新增了課號',
-				'修正了接下來的課程排序',
-			],
-		],
-		['2022-09-17', ['現在使用「博雅課程」搜尋頁面時，可以透過類別篩選課程了。']],
-		['2022-08-31', ['現在使用「課程標準」工具時，會自動儲存上次的位置了。']],
-	];
+	const yearGroups = changelogEntries.reduce<Array<{ year: string; entries: ChangelogEntry[] }>>(
+		(groups, entry) => {
+			const year = entry.date.slice(0, 4);
+			const group = groups.find((item) => item.year === year);
+			if (group) {
+				group.entries.push(entry);
+			} else {
+				groups.push({ year, entries: [entry] });
+			}
+			return groups;
+		},
+		[],
+	);
+
 	return (
-		<div className='space-y-4'>
+		<div className='space-y-5'>
 			<h1>更新日誌</h1>
-			{items.map(([date, changes]) => (
-				<section key={date}>
-					<h2>{date}</h2>
-					<ul>
-						{changes.map((item) =>
-							Array.isArray(item) ? (
-								<li key={item[0]}>
-									{item[0]}
-									<ul>
-										{item[1].map((child) => (
-											<li key={child}>{child}</li>
-										))}
-									</ul>
+
+			<nav aria-label='更新日誌年份' className='flex flex-wrap gap-2'>
+				{yearGroups.map(({ year, entries }) => (
+					<a
+						key={year}
+						href={`#changelog-${year}`}
+						className='inline-flex items-center gap-2 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-1.5 text-sm text-[rgb(var(--vs-text))] no-underline transition-colors hover:border-[rgba(var(--vs-primary),0.45)] hover:bg-[rgba(var(--vs-primary),0.08)]'
+					>
+						<span>{year}</span>
+						<span className='text-[rgba(var(--vs-text),0.58)]'>{entries.length}</span>
+					</a>
+				))}
+			</nav>
+
+			<div className='space-y-8'>
+				{yearGroups.map(({ year, entries }) => (
+					<section key={year} id={`changelog-${year}`} className='scroll-mt-20 space-y-3'>
+						<div className='flex items-center gap-3'>
+							<h2 className='m-0 text-xl font-semibold'>{year}</h2>
+							<div className='h-px flex-1 bg-[rgba(var(--vs-text),0.12)]' />
+						</div>
+						<ol className='space-y-3'>
+							{entries.map((entry) => (
+								<li key={entry.date} className='grid gap-3 sm:grid-cols-[9rem_minmax(0,1fr)]'>
+									<div className='flex items-center gap-2 text-sm text-[rgba(var(--vs-text),0.65)] sm:pt-4'>
+										<CalendarDays className='size-4' />
+										<time dateTime={entry.date}>{entry.date}</time>
+									</div>
+									<div className='relative rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.04))]'>
+										<span className='absolute top-5 -left-[0.45rem] hidden size-3 rounded-full border-2 border-[rgb(var(--vs-background))] bg-[rgb(var(--vs-primary))] sm:block' />
+										<ul className='space-y-3'>
+											{entry.changes.map((change) => (
+												<li key={change.title} className='space-y-2'>
+													<div className='flex gap-2'>
+														<span className='mt-2 block size-1.5 shrink-0 rounded-full bg-[rgb(var(--vs-primary))]' />
+														<p className='m-0 leading-relaxed'>{change.title}</p>
+													</div>
+													{change.details ? (
+														<ul className='ml-5 space-y-1 rounded-lg bg-[rgba(var(--vs-text),0.035)] px-3 py-2 text-sm text-[rgba(var(--vs-text),0.76)]'>
+															{change.details.map((detail) => (
+																<li key={detail} className='flex gap-2'>
+																	<span className='mt-2 block size-1 shrink-0 rounded-full bg-[rgba(var(--vs-text),0.45)]' />
+																	<span>{detail}</span>
+																</li>
+															))}
+														</ul>
+													) : null}
+												</li>
+											))}
+										</ul>
+									</div>
 								</li>
-							) : (
-								<li key={item}>{item}</li>
-							),
-						)}
-					</ul>
-				</section>
-			))}
+							))}
+						</ol>
+					</section>
+				))}
+			</div>
 		</div>
 	);
 }

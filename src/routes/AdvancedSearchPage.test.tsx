@@ -24,6 +24,22 @@ vi.mock('../lib/courseApi', () => ({
 }));
 
 describe('AdvancedSearchPage navigation', () => {
+	it('redirects the legacy search route to advanced search', async () => {
+		const history = createMemoryHistory({
+			initialEntries: ['/search?year=115&sem=1&d=main'],
+		});
+		const router = createAppRouter({ history });
+
+		render(<RouterProvider router={router} />);
+
+		await waitFor(() => expect(router.state.location.pathname).toBe('/advanced-search'));
+		expect(router.state.location.search).toEqual({
+			year: '115',
+			sem: '1',
+			d: 'main',
+		});
+	});
+
 	it('returns to the home page when the site title is clicked', async () => {
 		const history = createMemoryHistory({
 			initialEntries: ['/advanced-search?year=115&sem=1&d=main'],

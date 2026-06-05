@@ -5,8 +5,7 @@ import type { Course } from '../types/course';
 export const SITE_TITLE = '北科課程好朋友';
 
 const routeTitles: [RegExp, string][] = [
-	[/^\/advanced-search\/?$/, '進階搜尋'],
-	[/^\/search\/?$/, '搜尋課程'],
+	[/^\/advanced-search\/?$/, '搜尋'],
 	[/^\/class\/?$/, '班級課表'],
 	[/^\/mprogram\/?$/, '微學程'],
 	[/^\/my-course\/?$/, '我的課程'],

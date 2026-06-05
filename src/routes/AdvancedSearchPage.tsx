@@ -10,7 +10,7 @@ import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Field } from '../components/ui-kit/Field';
 import { Input } from '../components/ui-kit/Input';
-import { SearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
+import { AdvancedSearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { MiniNotify } from '../components/ui-kit/MiniNotify';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils';
@@ -423,7 +423,7 @@ export function AdvancedSearchPage() {
 					</Alert>
 				) : null}
 				{!searchResult ? (
-					<SearchPageSkeleton />
+					<AdvancedSearchPageSkeleton />
 				) : (
 					<CourseList courses={searchResult} showConflictCourse={showConflictCourse} />
 				)}

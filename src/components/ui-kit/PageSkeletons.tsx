@@ -417,6 +417,6 @@ export function StatusSkeleton() {
 	);
 }
 
-export function SearchPageSkeleton() {
+export function AdvancedSearchPageSkeleton() {
 	return <CourseCardsSkeleton count={8} />;
 }

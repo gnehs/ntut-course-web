@@ -28,7 +28,7 @@ describe('HomePage', () => {
 	it('renders the original home navigation cards', () => {
 		render(<HomePage />);
 		expect(screen.getByText('112 年上學期')).toBeInTheDocument();
-		expect(screen.getByText('進階搜尋')).toBeInTheDocument();
+		expect(screen.getByText('搜尋')).toBeInTheDocument();
 		expect(screen.getByText('我的課程')).toBeInTheDocument();
 		expect(screen.getByText('尋找空教室')).toBeInTheDocument();
 	});

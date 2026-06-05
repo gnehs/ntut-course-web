@@ -111,7 +111,7 @@ export function HomePage() {
 					items={[
 						{
 							to: `/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`,
-							title: '進階搜尋',
+							title: '搜尋',
 							text: '依條件搜尋課程',
 							icon: Search,
 						},

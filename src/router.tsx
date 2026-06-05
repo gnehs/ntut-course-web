@@ -1,4 +1,4 @@
-import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
+import { Navigate, createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 import { Layout } from './components/Layout';
 import {
 	AboutPage,
@@ -18,7 +18,6 @@ import { EmptyRoomPage } from './routes/EmptyRoomPage';
 import { HomePage } from './routes/HomePage';
 import { MProgramDetailPage, MProgramIndexPage } from './routes/MProgramPage';
 import { MyCoursePage } from './routes/MyCoursePage';
-import { SearchPage } from './routes/SearchPage';
 import { StandardPage } from './routes/StandardPage';
 import { TeacherPage } from './routes/TeacherPage';
 import { WidgetPage } from './routes/WidgetPage';
@@ -30,10 +29,14 @@ function route(path, component) {
 	return createRoute({ getParentRoute: () => rootRoute, path, component });
 }
 
+function LegacySearchRedirect() {
+	return <Navigate to='/advanced-search' search={(previous) => previous} replace />;
+}
+
 const routeTree = rootRoute.addChildren([
 	route('/', HomePage),
 	route('/advanced-search', AdvancedSearchPage),
-	route('/search', SearchPage),
+	route('/search', LegacySearchRedirect),
 	route('/course/$year/$sem/$id', CourseDetailPage),
 	route('/class', ClassIndexPage),
 	route('/class/$year/$sem/$id', ClassDetailPage),

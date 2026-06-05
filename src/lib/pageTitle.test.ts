@@ -8,7 +8,7 @@ describe('pageTitle', () => {
 	});
 
 	it('maps known static routes to page titles', () => {
-		expect(pageTitleForPath('/advanced-search')).toBe('進階搜尋');
+		expect(pageTitleForPath('/advanced-search')).toBe('搜尋');
 		expect(pageTitleForPath('/calendar')).toBe('行事曆');
 	});
 
