@@ -36,7 +36,13 @@ type CourseListProps = {
 type TimetableCourseItem = Course & {
 	date: string;
 	slots: string[];
+	startSlot: string;
+	endSlot: string;
+	startIndex: number;
+	endIndex: number;
 	isConflict: boolean;
+	laneIndex: number;
+	laneCount: number;
 };
 
 export function CourseList({
@@ -292,22 +298,7 @@ function TimetableCourses({
 	const weekdays = Object.keys(dateEng2zh).filter((date) =>
 		courses.some((course) => course.time?.[date]?.length),
 	);
-	const items: TimetableCourseItem[] = [];
-	const occupied = new Map<string, TimetableCourseItem>();
-	for (const course of courses) {
-		for (const [date, slots] of Object.entries(course.time || {}) as [string, string[]][]) {
-			if (!slots.length) continue;
-			const key = `${date}-${slots.join(',')}`;
-			if (occupied.has(key)) {
-				const occupiedItem = occupied.get(key);
-				if (occupiedItem) occupiedItem.isConflict = true;
-			} else {
-				const item: TimetableCourseItem = { ...course, date, slots, isConflict: false };
-				occupied.set(key, item);
-				items.push(item);
-			}
-		}
-	}
+	const items = buildTimetableCourseItems(courses);
 
 	return (
 		<Card className='overflow-hidden p-0'>
@@ -350,31 +341,32 @@ function TimetableCourses({
 					</div>
 				))}
 				{items.map((item) => {
-					const start = item.slots[0];
-					const lastSlot = item.slots[item.slots.length - 1];
-					const end = lastSlot ? timetable[timetable.indexOf(lastSlot) + 1] || 'end' : 'end';
+					const laneWidth = `${100 / item.laneCount}%`;
 					return (
 						<Link
 							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
 							to={`/course/${year}/${sem}/${item.id}`}
 							className={cn(
-								'relative z-[1] flex h-full w-full flex-col justify-between gap-1 rounded-lg px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
+								'relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 rounded-lg border px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
 								item.isConflict
-									? 'pointer-events-none bg-red-600 text-white'
-									: 'bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
+									? 'border-[rgba(var(--vs-danger),0.35)] bg-[rgba(var(--vs-danger),0.16)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.22)]'
+									: 'border-transparent bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
 							)}
 							style={{
 								gridColumn: dateEng2zh[item.date].slice(1),
-								gridRow: `slot${start} / slot${end}`,
+								gridRow: `slot${item.startSlot} / slot${item.endSlot}`,
+								width: laneWidth,
+								marginLeft: `${(100 / item.laneCount) * item.laneIndex}%`,
 							}}
 						>
-							<div className='font-semibold'>
-								{item.isConflict ? '含有多個課程' : item.name?.zh || '未命名課程'}
+							<div className='truncate font-semibold' title={item.name?.zh || '未命名課程'}>
+								{item.name?.zh || '未命名課程'}
 							</div>
-							<div className='text-[0.85em] opacity-75'>
-								{item.isConflict
-									? '無法顯示課程，請使用其他模式檢視'
-									: (item.teacher || []).map((x) => x.name).join('、')}
+							<div
+								className='truncate text-[0.85em] opacity-75'
+								title={(item.teacher || []).map((x) => x.name).join('、')}
+							>
+								{(item.teacher || []).map((x) => x.name).join('、') || item.id}
 							</div>
 						</Link>
 					);
@@ -382,4 +374,63 @@ function TimetableCourses({
 			</div>
 		</Card>
 	);
+}
+
+export function buildTimetableCourseItems(courses: Course[]) {
+	const items: TimetableCourseItem[] = [];
+	for (const course of courses) {
+		for (const [date, slots] of Object.entries(course.time || {}) as [string, string[]][]) {
+			const sortedSlots = [...new Set(slots)]
+				.map((slot) => ({ slot, index: timetable.indexOf(slot) }))
+				.filter((item) => item.index >= 0)
+				.sort((a, b) => a.index - b.index);
+			if (!sortedSlots.length) continue;
+			const startIndex = sortedSlots[0].index;
+			const endIndex = sortedSlots[sortedSlots.length - 1].index + 1;
+			items.push({
+				...course,
+				date,
+				slots: sortedSlots.map((item) => item.slot),
+				startSlot: timetable[startIndex],
+				endSlot: timetable[endIndex] || 'end',
+				startIndex,
+				endIndex,
+				isConflict: false,
+				laneIndex: 0,
+				laneCount: 1,
+			});
+		}
+	}
+
+	const itemsByDate = new Map<string, TimetableCourseItem[]>();
+	for (const item of items) {
+		itemsByDate.set(item.date, [...(itemsByDate.get(item.date) || []), item]);
+	}
+
+	for (const dayItems of itemsByDate.values()) {
+		dayItems.sort((a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex);
+		const active: TimetableCourseItem[] = [];
+		for (const item of dayItems) {
+			for (let i = active.length - 1; i >= 0; i--) {
+				if (active[i].endIndex <= item.startIndex) active.splice(i, 1);
+			}
+			const usedLanes = new Set(active.map((activeItem) => activeItem.laneIndex));
+			let laneIndex = 0;
+			while (usedLanes.has(laneIndex)) laneIndex++;
+			item.laneIndex = laneIndex;
+			active.push(item);
+		}
+
+		for (const item of dayItems) {
+			const overlappingItems = dayItems.filter((other) => intervalsOverlap(item, other));
+			item.isConflict = overlappingItems.length > 1;
+			item.laneCount = Math.max(...overlappingItems.map((other) => other.laneIndex + 1), 1);
+		}
+	}
+
+	return items;
+}
+
+function intervalsOverlap(a: TimetableCourseItem, b: TimetableCourseItem) {
+	return a.startIndex < b.endIndex && b.startIndex < a.endIndex;
 }
