@@ -1,6 +1,7 @@
 import { GoogleFont, ImageResponse } from '@cf-wasm/og/workerd';
 import type { ReactNode } from 'react';
 import type { Course, DepartmentGroup, WithdrawalResponse, WithdrawalStat } from '../types/course';
+import { WORKER_PREVIEW_CACHE_CONTROL } from './cache';
 import { parseOgImageRoute, type OgImageRoute } from './ogImageRoute';
 
 const DEFAULT_API_BASE = 'https://gnehs.github.io/ntut-course-crawler-node';
@@ -35,7 +36,7 @@ export async function handleOgImageRequest(request: Request, config: OgImageConf
 		emoji: 'fluent',
 		fonts: [new GoogleFont('Lato')],
 		headers: {
-			'Cache-Control': 'public, max-age=86400, s-maxage=604800',
+			'Cache-Control': WORKER_PREVIEW_CACHE_CONTROL,
 		},
 	});
 }

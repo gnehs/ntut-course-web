@@ -6,7 +6,7 @@
 	"assets": {
 		"directory": "./dist/",
 		"binding": "ASSETS",
-		"run_worker_first": ["/api", "/api/*", "/course/*", "/class/*", "/teacher/*"],
+		"run_worker_first": ["/course/*", "/class/*", "/teacher/*"],
 		"not_found_handling": "single-page-application",
 	},
 }

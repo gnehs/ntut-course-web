@@ -4,30 +4,31 @@ export type OgImageRoute =
 	| { type: 'teacher'; name: string };
 
 export function parseOgImageRoute(url: URL): OgImageRoute | null {
-	if (url.pathname === '/api') {
-		const year = url.searchParams.get('year');
-		const sem = url.searchParams.get('sem');
-		const id = url.searchParams.get('id');
-		if (!year || !sem || !id) return null;
+	const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+	if (parts.at(-1) !== 'og.png') return null;
+
+	if (parts[0] === 'course' && parts.length === 5) {
 		return {
 			type: 'course',
-			year,
-			sem,
-			id,
+			year: parts[1],
+			sem: parts[2],
+			id: parts[3],
 			department: url.searchParams.get('d') || 'main',
 		};
 	}
-	if (url.pathname === '/api/class') {
-		const year = url.searchParams.get('year');
-		const sem = url.searchParams.get('sem');
-		const id = url.searchParams.get('id');
-		if (!year || !sem || !id) return null;
-		return { type: 'class', year, sem, id };
+	if (parts[0] === 'class' && parts.length === 5) {
+		return {
+			type: 'class',
+			year: parts[1],
+			sem: parts[2],
+			id: parts[3],
+		};
 	}
-	if (url.pathname === '/api/teacher') {
-		const name = url.searchParams.get('name');
-		if (!name) return null;
-		return { type: 'teacher', name };
+	if (parts[0] === 'teacher' && parts.length === 3) {
+		return {
+			type: 'teacher',
+			name: parts[1],
+		};
 	}
 	return null;
 }

@@ -5,6 +5,7 @@ import {
 	type PreviewMeta,
 } from './worker/preview';
 import { cache } from '@cf-wasm/og/workerd';
+import { WORKER_PREVIEW_CACHE_CONTROL } from './worker/cache';
 import { handleOgImageRequest } from './worker/ogImage';
 
 type AssetFetcher = {
@@ -68,7 +69,7 @@ export default {
 };
 
 export function rewritePreviewHtml(response: Response, meta: PreviewMeta) {
-	return new HTMLRewriter()
+	const rewritten = new HTMLRewriter()
 		.on('title', {
 			element(element) {
 				element.setInnerContent(meta.title);
@@ -86,6 +87,9 @@ export function rewritePreviewHtml(response: Response, meta: PreviewMeta) {
 			},
 		})
 		.transform(response);
+	const cachedResponse = new Response(rewritten.body, rewritten);
+	cachedResponse.headers.set('Cache-Control', WORKER_PREVIEW_CACHE_CONTROL);
+	return cachedResponse;
 }
 
 function renderPreviewTags(meta: PreviewMeta) {

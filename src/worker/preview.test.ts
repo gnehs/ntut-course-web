@@ -10,7 +10,6 @@ import type { Course, DepartmentGroup, WithdrawalStat } from '../types/course';
 
 const config = {
 	origin: 'https://ntut-course.gnehs.net',
-	ogImageBase: 'https://ntut-course-og.gnehs.net',
 };
 
 describe('preview metadata', () => {
@@ -50,7 +49,7 @@ describe('preview metadata', () => {
 		expect(meta).toEqual({
 			title: '𝟭𝟮𝟯𝟰𝟱𝟲 資料結構',
 			description: '課程說明',
-			image: 'https://ntut-course-og.gnehs.net/api?year=115&sem=1&id=123456',
+			image: 'https://ntut-course.gnehs.net/course/115/1/123456/og.png',
 			url: 'https://ntut-course.gnehs.net/course/115/1/123456',
 		});
 	});
@@ -67,7 +66,7 @@ describe('preview metadata', () => {
 			{ origin: 'https://ntut-course.gnehs.net' },
 		);
 
-		expect(meta.image).toBe('https://ntut-course.gnehs.net/api?year=115&sem=1&id=123456');
+		expect(meta.image).toBe('https://ntut-course.gnehs.net/course/115/1/123456/og.png');
 	});
 
 	it('creates class metadata with course summary and class og image id', () => {
@@ -91,7 +90,9 @@ describe('preview metadata', () => {
 
 		expect(meta.title).toBe('四技資工一');
 		expect(meta.description).toContain('資料結構、離散數學');
-		expect(meta.image).toBe('https://ntut-course-og.gnehs.net/api/class?year=115&sem=1&id=ABCD');
+		expect(meta.image).toBe(
+			'https://ntut-course.gnehs.net/class/115/1/%E5%9B%9B%E6%8A%80%E8%B3%87%E5%B7%A5%E4%B8%80/og.png',
+		);
 		expect(meta.url).toBe(
 			'https://ntut-course.gnehs.net/class/115/1/%E5%9B%9B%E6%8A%80%E8%B3%87%E5%B7%A5%E4%B8%80',
 		);
@@ -107,7 +108,7 @@ describe('preview metadata', () => {
 
 		expect(meta.description).toContain('資料結構');
 		expect(meta.image).toBe(
-			'https://ntut-course-og.gnehs.net/api/teacher?name=%E7%8E%8B%E5%B0%8F%E6%98%8E',
+			'https://ntut-course.gnehs.net/teacher/%E7%8E%8B%E5%B0%8F%E6%98%8E/og.png',
 		);
 		expect(tags.map((tag) => tag.key)).toEqual([
 			'description',

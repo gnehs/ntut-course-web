@@ -70,10 +70,10 @@ export function createCoursePreview(
 	route: Extract<PreviewRoute, { type: 'course' }>,
 	config: PreviewConfig,
 ): PreviewMeta {
-	const image = new URL('/api', previewImageBase(config));
-	image.searchParams.set('year', route.year);
-	image.searchParams.set('sem', route.sem);
-	image.searchParams.set('id', route.id);
+	const image = imageUrl(
+		config,
+		`/course/${route.year}/${route.sem}/${encodeURIComponent(route.id)}/og.png`,
+	);
 	if (route.department !== 'main') image.searchParams.set('d', route.department);
 	return {
 		title: `${formatCourseId(route.id)} ${course.name?.zh || route.id}`,
@@ -105,14 +105,14 @@ export function createClassPreview(
 	const description = courseNames.length
 		? `在北科好朋友上查看課程「${classData.name}」的資訊，包含${courseNames.slice(0, 3).join('、')}課程與博雅、必選修等相關資訊`
 		: `在北科好朋友上查看課程「${classData.name}」的資訊，如必選修課程、博雅等相關課程資訊`;
-	const image = new URL('/api/class', previewImageBase(config));
-	image.searchParams.set('year', route.year);
-	image.searchParams.set('sem', route.sem);
-	image.searchParams.set('id', classData.id || route.id);
+	const classId = classData.name || route.id;
 	return {
 		title: classData.name,
 		description,
-		image: image.toString(),
+		image: imageUrl(
+			config,
+			`/class/${route.year}/${route.sem}/${encodeURIComponent(classId)}/og.png`,
+		).toString(),
 		url: canonicalUrl(
 			config,
 			`/class/${route.year}/${route.sem}/${encodeURIComponent(classData.name || route.id)}`,
@@ -130,12 +130,10 @@ export function createTeacherPreview(
 			.map((course) => course.name?.zh)
 			.filter((name): name is string => Boolean(name)),
 	);
-	const image = new URL('/api/teacher', previewImageBase(config));
-	image.searchParams.set('name', route.id);
 	return {
 		title: teacher.name,
 		description: `在北科好朋友上查看教師「${teacher.name}」的資訊，包含${courseNames.slice(0, 3).join('、')}等課程與選課人數等相關資訊`,
-		image: image.toString(),
+		image: imageUrl(config, `/teacher/${encodeURIComponent(route.id)}/og.png`).toString(),
 		url: canonicalUrl(config, `/teacher/${encodeURIComponent(route.id)}`),
 	};
 }
@@ -206,6 +204,10 @@ function createApiFetcher(apiBase = DEFAULT_API_BASE): FetchJson {
 
 function previewImageBase(config: PreviewConfig) {
 	return config.ogImageBase || config.origin;
+}
+
+function imageUrl(config: PreviewConfig, path: string) {
+	return new URL(path, previewImageBase(config));
 }
 
 function canonicalUrl(config: PreviewConfig, path: string) {
