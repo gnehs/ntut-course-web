@@ -409,29 +409,29 @@ export function ChangelogPage() {
 						</div>
 						<ol className='space-y-3'>
 							{entries.map((entry) => (
-								<li key={entry.date} className='grid gap-3 sm:grid-cols-[9rem_minmax(0,1fr)]'>
-									<div className='flex items-center gap-2 text-sm text-[rgba(var(--vs-text),0.65)] sm:pt-4'>
-										<CalendarDays className='size-4' />
-										<time dateTime={entry.date}>{entry.date}</time>
+								<li
+									key={entry.date}
+									className='grid overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.04))] sm:grid-cols-[10rem_minmax(0,1fr)]'
+								>
+									<div className='flex items-center gap-2 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.025)] px-4 py-3 text-sm text-[rgba(var(--vs-text),0.65)] sm:border-r sm:border-b-0'>
+										<CalendarDays className='size-4 shrink-0' />
+										<time dateTime={entry.date} className='tabular-nums'>
+											{entry.date}
+										</time>
 									</div>
-									<div className='relative rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.04))]'>
-										<span className='absolute top-5 -left-[0.45rem] hidden size-3 rounded-full border-2 border-[rgb(var(--vs-background))] bg-[rgb(var(--vs-primary))] sm:block' />
-										<ul className='space-y-3'>
+									<div className='px-4 py-3'>
+										<ul className='divide-y divide-[rgba(var(--vs-text),0.08)]'>
 											{entry.changes.map((change) => (
-												<li key={change.title} className='space-y-2'>
-													<div className='flex gap-2'>
-														<span className='mt-2 block size-1.5 shrink-0 rounded-full bg-[rgb(var(--vs-primary))]' />
-														<p className='m-0 leading-relaxed'>{change.title}</p>
-													</div>
+												<li key={change.title} className='py-2 first:pt-0 last:pb-0'>
+													<p className='m-0 leading-relaxed'>{change.title}</p>
 													{change.details ? (
-														<ul className='ml-5 space-y-1 rounded-lg bg-[rgba(var(--vs-text),0.035)] px-3 py-2 text-sm text-[rgba(var(--vs-text),0.76)]'>
+														<div className='mt-2 space-y-1 rounded-lg bg-[rgba(var(--vs-text),0.035)] px-3 py-2 text-sm text-[rgba(var(--vs-text),0.76)]'>
 															{change.details.map((detail) => (
-																<li key={detail} className='flex gap-2'>
-																	<span className='mt-2 block size-1 shrink-0 rounded-full bg-[rgba(var(--vs-text),0.45)]' />
-																	<span>{detail}</span>
-																</li>
+																<p key={detail} className='m-0 leading-relaxed'>
+																	{detail}
+																</p>
 															))}
-														</ul>
+														</div>
 													) : null}
 												</li>
 											))}
