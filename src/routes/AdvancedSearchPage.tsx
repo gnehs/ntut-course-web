@@ -430,9 +430,6 @@ export function AdvancedSearchPage() {
 				<div className='grid gap-3'>
 					<h3 className='mb-4'>贊助商廣告</h3>
 					<AdsByGoogle />
-					<p className='m-0 text-center text-xs opacity-75'>
-						<Link to={`/search?year=${year}&sem=${sem}&d=${department}`}>回到舊版搜尋</Link>
-					</p>
 				</div>
 			</main>
 		</div>

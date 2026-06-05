@@ -13,7 +13,12 @@ export function AboutPage() {
 			<h1>關於</h1>
 			<p>
 				本網站與爬蟲由{' '}
-				<a href='https://gnehs.net' target='_blank' rel='noreferrer'>
+				<a
+					href='https://gnehs.net'
+					target='_blank'
+					rel='noreferrer'
+					className='underline underline-offset-2'
+				>
 					勝勝
 				</a>{' '}
 				開發。
@@ -24,13 +29,22 @@ export function AboutPage() {
 				<li>自動偵測衝堂課程</li>
 				<li>記錄課程供選課參考</li>
 				<li>
-					提供 <Link to='/doc'>API</Link> 供公眾使用
+					提供{' '}
+					<Link to='/doc' className='underline underline-offset-2'>
+						API
+					</Link>{' '}
+					供公眾使用
 				</li>
 			</ul>
 			<h2>技術細節</h2>
 			<p>
 				本站資料擷取自{' '}
-				<a href='https://aps.ntut.edu.tw/course/tw/course.jsp' target='_blank' rel='noreferrer'>
+				<a
+					href='https://aps.ntut.edu.tw/course/tw/course.jsp'
+					target='_blank'
+					rel='noreferrer'
+					className='underline underline-offset-2'
+				>
 					國立臺北科技大學課程系統
 				</a>
 				，資料僅供參考，可能會有所遺漏或錯誤，正式資料仍以學校公佈為主。若資料有問題或有任何建議，歡迎於
@@ -40,7 +54,12 @@ export function AboutPage() {
 			<p>
 				若對北科好朋友有任何建議或找到 Bug，請聯繫 ntut-course-web[at]gnehs.net（請將 [at] 替換為
 				@），或在{' '}
-				<a href='https://github.com/gnehs/ntut-course-web' target='_blank' rel='noreferrer'>
+				<a
+					href='https://github.com/gnehs/ntut-course-web'
+					target='_blank'
+					rel='noreferrer'
+					className='underline underline-offset-2'
+				>
 					GitHub
 				</a>{' '}
 				上發 issue。
@@ -48,22 +67,42 @@ export function AboutPage() {
 			<h2>Special Thanks</h2>
 			<ul className='list-disc space-y-1 pl-6'>
 				<li>
-					<a href='https://lucide.dev/' target='_blank' rel='noreferrer'>
+					<a
+						href='https://lucide.dev/'
+						target='_blank'
+						rel='noreferrer'
+						className='underline underline-offset-2'
+					>
 						Lucide
 					</a>
 				</li>
 				<li>
-					<a href='https://react.dev/' target='_blank' rel='noreferrer'>
+					<a
+						href='https://react.dev/'
+						target='_blank'
+						rel='noreferrer'
+						className='underline underline-offset-2'
+					>
 						React
 					</a>
 				</li>
 				<li>
-					<a href='https://vite.dev/' target='_blank' rel='noreferrer'>
+					<a
+						href='https://vite.dev/'
+						target='_blank'
+						rel='noreferrer'
+						className='underline underline-offset-2'
+					>
 						Vite
 					</a>
 				</li>
 				<li>
-					<a href='https://tanstack.com/router/latest' target='_blank' rel='noreferrer'>
+					<a
+						href='https://tanstack.com/router/latest'
+						target='_blank'
+						rel='noreferrer'
+						className='underline underline-offset-2'
+					>
 						TanStack Router
 					</a>
 				</li>

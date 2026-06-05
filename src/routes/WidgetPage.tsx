@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Clipboard, PlaySquare } from 'lucide-react';
+import { AlertCircle, Clipboard, PlaySquare, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +57,11 @@ export function WidgetPage() {
 					複製下方 Scriptable 程式碼，貼到 iPhone 後就能在桌面查看下一堂課。
 				</p>
 			</section>
+			<Alert>
+				<RefreshCw />
+				<AlertTitle>課表變更後要重新設定</AlertTitle>
+				<AlertDescription>加退選或修改課程後，課表變更後請重新複製程式碼。</AlertDescription>
+			</Alert>
 			{!courses.length ? (
 				<Alert variant='destructive'>
 					<AlertCircle />
@@ -68,9 +73,7 @@ export function WidgetPage() {
 				<CardHeader className='gap-3 border-b border-[rgba(var(--vs-text),0.08)] p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='min-w-0'>
 						<CardTitle className='text-base font-semibold'>1. 複製 Scriptable 程式碼</CardTitle>
-						<CardDescription>
-							包含 {courses.length} 門課程資料，課表變更後請重新複製。
-						</CardDescription>
+						<CardDescription>包含 {courses.length} 門課程資料。</CardDescription>
 					</div>
 					<Button
 						active

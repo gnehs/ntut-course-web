@@ -132,7 +132,12 @@ export function CourseDetailPage() {
 					{conflictCourses.map((item, index) => (
 						<span key={item.id}>
 							{index > 0 ? '、' : ''}
-							<Link to={`/course/${year}/${sem}/${item.id}`}>{item.name?.zh}</Link>
+							<Link
+								to={`/course/${year}/${sem}/${item.id}`}
+								className='underline underline-offset-2'
+							>
+								{item.name?.zh}
+							</Link>
 						</span>
 					))}{' '}
 					衝堂！
