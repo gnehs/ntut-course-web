@@ -3,6 +3,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
 import { Info, MapPin, Minus, Plus, User } from 'lucide-react';
+import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -93,8 +94,17 @@ export function CourseDetailPage() {
 	const currentCourse = course;
 
 	function toggleCourse() {
-		if (isInMyCourse) removeCourse(currentCourse.id);
-		else addCourse(currentCourse.id);
+		if (isInMyCourse) {
+			removeCourse(currentCourse.id);
+			toast.success('已從我的課程移除', {
+				description: `${currentCourse.id} ${currentCourse.name?.zh || '未命名課程'}`,
+			});
+		} else {
+			addCourse(currentCourse.id);
+			toast.success('已加入我的課程', {
+				description: `${currentCourse.id} ${currentCourse.name?.zh || '未命名課程'}`,
+			});
+		}
 		setVersion((value) => value + 1);
 	}
 

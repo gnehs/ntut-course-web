@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, Clipboard, PlaySquare } from 'lucide-react';
+import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,15 +18,9 @@ type WidgetCourse = {
 	link: string;
 };
 
-type CopyState = {
-	title: string;
-	text: string;
-};
-
 export function WidgetPage() {
 	const { dataset, getCourses, getMyCourseIds } = useApp();
 	const [courses, setCourses] = useState<WidgetCourse[] | null>(null);
-	const [copyState, setCopyState] = useState<CopyState | null>(null);
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
@@ -81,8 +76,16 @@ export function WidgetPage() {
 						active
 						size='sm'
 						onClick={async () => {
-							const result = await copyCode(code);
-							setCopyState(result);
+							try {
+								await copyCode(code);
+								toast.success('已複製', {
+									description: '請到 Scriptable 貼上程式碼即可使用小工具',
+								});
+							} catch {
+								toast.error('複製失敗', {
+									description: '請嘗試手動複製',
+								});
+							}
 						}}
 					>
 						<Clipboard className='size-4' data-icon='inline-start' />
@@ -98,13 +101,6 @@ export function WidgetPage() {
 					</pre>
 				</CardContent>
 			</Card>
-			{copyState ? (
-				<Alert>
-					<Clipboard />
-					<AlertTitle>{copyState.title}</AlertTitle>
-					<AlertDescription>{copyState.text}</AlertDescription>
-				</Alert>
-			) : null}
 			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>2. 貼到 Scriptable 並加入小工具</CardTitle>
@@ -138,16 +134,11 @@ export function WidgetPage() {
 	);
 }
 
-async function copyCode(code: string): Promise<CopyState> {
+async function copyCode(code: string) {
 	try {
 		window.gtag?.('event', 'copy_ios_widget_code');
 	} catch {}
-	try {
-		await navigator.clipboard.writeText(code);
-		return { title: '已複製', text: '請到 Scriptable 貼上程式碼即可使用小工具' };
-	} catch {
-		return { title: '複製失敗', text: '請嘗試手動複製' };
-	}
+	await navigator.clipboard.writeText(code);
 }
 
 function createScriptableCode(courseData: WidgetCourse[]) {

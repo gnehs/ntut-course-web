@@ -2,6 +2,7 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
 import { BookOpen, Calendar, Clock, FileInput, FileOutput, Puzzle, Shapes } from 'lucide-react';
+import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -10,10 +11,16 @@ import { ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons';
 import { useApp } from '../state/AppContext';
 import type { Course } from '../types/course';
 
+type MyCourseExportData = {
+	key?: unknown;
+	data?: unknown;
+	classKey?: unknown;
+	classData?: unknown;
+};
+
 export function MyCoursePage() {
 	const { dataset, getCourses, getMyCourseIds, myCourseKey, myCourseClassKey } = useApp();
 	const [courses, setCourses] = useState<Course[] | null>(null);
-	const [message, setMessage] = useState<string | null>(null);
 	const [version, setVersion] = useState(0);
 
 	useEffect(() => {
@@ -51,11 +58,25 @@ export function MyCoursePage() {
 	function importData() {
 		const raw = prompt('請貼上先前複製的資料：');
 		if (!raw) return;
-		const data = JSON.parse(raw);
-		if (data.key && data.data) localStorage.setItem(data.key, data.data);
-		if (data.classKey && data.classData) localStorage.setItem(data.classKey, data.classData);
-		setMessage(`已匯入 ${JSON.parse(data.data || '[]').length} 筆課程到我的課程`);
-		setVersion((value) => value + 1);
+		try {
+			const data = JSON.parse(raw) as MyCourseExportData;
+			if (typeof data.key === 'string' && typeof data.data === 'string') {
+				localStorage.setItem(data.key, data.data);
+			}
+			if (typeof data.classKey === 'string' && typeof data.classData === 'string') {
+				localStorage.setItem(data.classKey, data.classData);
+			}
+			const importedCourses = typeof data.data === 'string' ? JSON.parse(data.data) : [];
+			const importedCourseCount = Array.isArray(importedCourses) ? importedCourses.length : 0;
+			toast.success('匯入完成', {
+				description: `已匯入 ${importedCourseCount} 筆課程到我的課程`,
+			});
+			setVersion((value) => value + 1);
+		} catch {
+			toast.error('匯入失敗', {
+				description: '請確認貼上的資料格式是否正確',
+			});
+		}
 	}
 
 	if (!courses) return <ClassDetailSkeleton />;
@@ -131,13 +152,6 @@ export function MyCoursePage() {
 					</div>
 					<CourseList courses={courses} showTimetable />
 				</>
-			) : null}
-			{message ? (
-				<Alert>
-					<strong>匯入完成！</strong>
-					<br />
-					{message}
-				</Alert>
 			) : null}
 			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />

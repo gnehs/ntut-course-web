@@ -3,6 +3,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
 import { Star } from 'lucide-react';
+import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -195,12 +196,18 @@ export function ClassDetailPage() {
 		localStorage.setItem('my-class', classData?.id || id);
 		localStorage.setItem(myCourseClassKey(year, sem), id);
 		for (const course of courses || []) addCourse(course.id, year, sem, dataset.department);
+		toast.success(`已加入 ${courses?.length || 0} 門課程`, {
+			description: `${id} 已加入我的課程`,
+		});
 		setVersion((value) => value + 1);
 	}
 
 	function removeClassCourses() {
 		for (const course of courses || []) removeCourse(course.id, year, sem, dataset.department);
 		localStorage.removeItem(myCourseClassKey(year, sem));
+		toast.success(`已移除 ${courses?.length || 0} 門課程`, {
+			description: `${id} 已從我的課程移除`,
+		});
 		setVersion((value) => value + 1);
 	}
 
