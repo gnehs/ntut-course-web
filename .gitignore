@@ -8,3 +8,5 @@ npm-debug.log
 dist
 static/sw.js 
 .DS_Store
+.pnpm-store
+.wrangler
