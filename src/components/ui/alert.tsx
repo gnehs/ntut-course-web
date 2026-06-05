@@ -19,7 +19,11 @@ const alertVariants = cva(
 	},
 );
 
-function Alert({ className, variant, ...props }) {
+type AlertProps = React.ComponentProps<'div'> & {
+	variant?: 'default' | 'destructive';
+};
+
+function Alert({ className = '', variant, ...props }: AlertProps) {
 	return (
 		<div
 			data-slot='alert'
@@ -30,7 +34,7 @@ function Alert({ className, variant, ...props }) {
 	);
 }
 
-function AlertTitle({ className, ...props }) {
+function AlertTitle({ className = '', ...props }) {
 	return (
 		<div
 			data-slot='alert-title'
@@ -40,7 +44,7 @@ function AlertTitle({ className, ...props }) {
 	);
 }
 
-function AlertDescription({ className, ...props }) {
+function AlertDescription({ className = '', ...props }) {
 	return (
 		<div
 			data-slot='alert-description'

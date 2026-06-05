@@ -3,12 +3,12 @@ import { Slot } from 'radix-ui';
 
 import { cn } from '@/lib/utils';
 
-function Card({ className, asChild = false, ...props }) {
+function Card({ className = '', asChild = false, ...props }) {
 	const Comp = asChild ? Slot.Root : 'div';
 	return <Comp data-slot='card' className={cn(className)} {...props} />;
 }
 
-function CardHeader({ className, ...props }) {
+function CardHeader({ className = '', ...props }) {
 	return (
 		<div
 			data-slot='card-header'
@@ -21,12 +21,12 @@ function CardHeader({ className, ...props }) {
 	);
 }
 
-function CardTitle({ className, asChild = false, ...props }) {
+function CardTitle({ className = '', asChild = false, ...props }) {
 	const Comp = asChild ? Slot.Root : 'div';
 	return <Comp data-slot='card-title' className={cn(className)} {...props} />;
 }
 
-function CardDescription({ className, ...props }) {
+function CardDescription({ className = '', ...props }) {
 	return (
 		<div
 			data-slot='card-description'
@@ -36,7 +36,7 @@ function CardDescription({ className, ...props }) {
 	);
 }
 
-function CardAction({ className, ...props }) {
+function CardAction({ className = '', ...props }) {
 	return (
 		<div
 			data-slot='card-action'
@@ -46,11 +46,11 @@ function CardAction({ className, ...props }) {
 	);
 }
 
-function CardContent({ className, ...props }) {
+function CardContent({ className = '', ...props }) {
 	return <div data-slot='card-content' className={cn('px-6', className)} {...props} />;
 }
 
-function CardFooter({ className, ...props }) {
+function CardFooter({ className = '', ...props }) {
 	return (
 		<div
 			data-slot='card-footer'

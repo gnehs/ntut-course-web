@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Clipboard } from 'lucide-react';
-import { Alert } from '../components/ui-kit/Alert';
+import { AlertCircle, Clipboard, PlaySquare } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '../components/ui-kit/Button';
 import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { trimEllip } from '../lib/courseUtils';
@@ -52,76 +55,85 @@ export function WidgetPage() {
 	const code = useMemo(() => createScriptableCode(courses || []), [courses]);
 	if (!courses) return <StepsPageSkeleton codeBlock />;
 	return (
-		<div className='space-y-4'>
-			<h1>iOS 小工具</h1>
-			<p>新增小工具在你的桌面上，隨時檢視接下來的課程！</p>
-			<p>注意：如果你變更了課程，需要重新複製程式碼才能讓小工具使用最新的課程資料！</p>
+		<div className='flex flex-col gap-5'>
+			<section className='flex flex-col gap-4'>
+				<h1 className='text-3xl font-semibold tracking-normal'>iOS 小工具</h1>
+				<p className='max-w-2xl text-[rgb(var(--vs-text))]/75'>
+					複製下方 Scriptable 程式碼，貼到 iPhone 後就能在桌面查看下一堂課。
+				</p>
+			</section>
 			{!courses.length ? (
-				<Alert danger>
-					<strong>沒有課程資料</strong>
-					<br />
-					請先新增課程資料
+				<Alert variant='destructive'>
+					<AlertCircle />
+					<AlertTitle>沒有課程資料</AlertTitle>
+					<AlertDescription>請先新增課程資料，產生的小工具才會有課表內容。</AlertDescription>
 				</Alert>
 			) : null}
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 0</span> 加入課程
-			</h2>
-			<p>
-				請先將你本學期的課程新增到 <strong>北科課程好朋友</strong>
-			</p>
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 1</span> 安裝 Scriptable
-			</h2>
-			<p>
-				到 App Store 安裝{' '}
-				<a
-					href='https://apps.apple.com/tw/app/scriptable/id1405459188'
-					target='_blank'
-					rel='noreferrer'
-				>
-					Scriptable
-				</a>
-			</p>
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 2</span> 複製並貼上程式碼
-			</h2>
-			<p>建立一個 Script 並貼上以下程式碼</p>
-			<div className='relative rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3'>
-				<div className='absolute top-2 right-2'>
+			<Card className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+				<CardHeader className='gap-3 border-b border-[rgba(var(--vs-text),0.08)] p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
+					<div className='min-w-0'>
+						<CardTitle className='text-base font-semibold'>1. 複製 Scriptable 程式碼</CardTitle>
+						<CardDescription>
+							包含 {courses.length} 門課程資料，課表變更後請重新複製。
+						</CardDescription>
+					</div>
 					<Button
-						className='m-0'
+						active
+						size='sm'
 						onClick={async () => {
 							const result = await copyCode(code);
 							setCopyState(result);
 						}}
 					>
-						<Clipboard className='size-4' />
+						<Clipboard className='size-4' data-icon='inline-start' />
 						複製
 					</Button>
-				</div>
-				<pre id='scriptable-code' className='h-[512px] overflow-auto whitespace-pre-wrap'>
-					{code}
-				</pre>
-			</div>
+				</CardHeader>
+				<CardContent className='p-0'>
+					<pre
+						id='scriptable-code'
+						className='h-[512px] overflow-auto bg-[rgb(var(--vs-gray-1))] p-4 text-sm leading-6 whitespace-pre-wrap'
+					>
+						{code}
+					</pre>
+				</CardContent>
+			</Card>
 			{copyState ? (
-				<Alert className='mt-3'>
-					<strong>{copyState.title}</strong>
-					<br />
-					{copyState.text}
+				<Alert>
+					<Clipboard />
+					<AlertTitle>{copyState.title}</AlertTitle>
+					<AlertDescription>{copyState.text}</AlertDescription>
 				</Alert>
 			) : null}
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 3</span> 新增小工具到桌面
-			</h2>
-			<p>參考此影片建立你的小工具</p>
-			<video
-				loop
-				controls
-				autoPlay
-				className='mx-auto block h-[700px] max-w-full rounded-[16px] shadow-[0_0_16px_rgba(0,0,0,0.05)]'
-			>
-				<source src='/video/how_to_add_iOS_widget.mp4' type='video/mp4' />
-			</video>
+			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+				<CardHeader className='p-4 sm:px-5'>
+					<CardTitle className='text-base font-semibold'>2. 貼到 Scriptable 並加入小工具</CardTitle>
+					<CardDescription>
+						先安裝 Scriptable，建立 Script 後貼上程式碼，再依照影片加入桌面小工具。
+						<br />* 課表變更後重新貼上程式碼
+					</CardDescription>
+				</CardHeader>
+				<CardContent className='flex flex-col gap-4 p-4 pt-0 sm:px-5'>
+					<div className='flex flex-wrap gap-2'>
+						<Button
+							as='a'
+							href='https://apps.apple.com/tw/app/scriptable/id1405459188'
+							target='_blank'
+							rel='noreferrer'
+						>
+							開啟 App Store
+						</Button>
+					</div>
+					<Separator className='bg-[rgba(var(--vs-text),0.08)]' />
+					<div className='flex items-center gap-2 text-sm font-medium'>
+						<PlaySquare className='size-4' />
+						教學影片
+					</div>
+					<video loop controls className='mx-auto block max-h-[640px] max-w-full rounded-lg'>
+						<source src='/video/how_to_add_iOS_widget.mp4' type='video/mp4' />
+					</video>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

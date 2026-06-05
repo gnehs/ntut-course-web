@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert } from '../components/ui-kit/Alert';
+import { AlertCircle, CheckCircle2, Download, RefreshCw } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '../components/ui-kit/Button';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
-import { Field } from '../components/ui-kit/Field';
-import { Input } from '../components/ui-kit/Input';
 import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCalendar } from '../lib/courseApi';
 import { buildCourseCalendar, trimEllip } from '../lib/courseUtils';
@@ -21,12 +23,18 @@ export function AddCalendarPage() {
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
-			const [calendar, allCourses] = await Promise.all([fetchCalendar(), getCourses()]);
+			const calendar = await fetchCalendar().catch(() => []);
+			const startDate = resolveStartDate(calendar, dataset.year, dataset.sem);
+			const endDate = resolveEndDate(calendar, dataset.year, dataset.sem);
+			if (!cancelled) {
+				setStart(startDate);
+				setUntil(endDate);
+			}
+
+			const allCourses = await getCourses();
 			const ids = getMyCourseIds();
 			const myCourses = allCourses.filter((course) => ids.includes(course.id));
 			const origin = globalThis.location?.origin || 'https://ntut-course.gnehs.net';
-			const startDate = resolveStartDate(calendar, dataset.year, dataset.sem);
-			const endDate = resolveEndDate(calendar, dataset.year, dataset.sem);
 			if (!cancelled) {
 				setCourses(
 					myCourses.map((course) => ({
@@ -41,8 +49,6 @@ export function AddCalendarPage() {
 					})),
 				);
 				setSelectedIds(myCourses.map((course) => course.id));
-				setStart(startDate);
-				setUntil(endDate);
 			}
 		}
 		load().catch(() => setCourses([]));
@@ -81,100 +87,172 @@ export function AddCalendarPage() {
 
 	if (!courses) return <StepsPageSkeleton />;
 	return (
-		<div className='space-y-4'>
-			<h1>新增到行事曆</h1>
-			<p>注意：如果你變更了課程，需要重新新增課程到行事曆！</p>
+		<div className='flex flex-col gap-5'>
+			<section className='flex flex-col gap-4'>
+				<h1 className='text-3xl font-semibold tracking-normal'>新增到行事曆</h1>
+				<p className='max-w-2xl text-[rgb(var(--vs-text))]/75'>
+					選擇課程和日期區間，下載 ICS 後匯入你慣用的行事曆。
+				</p>
+			</section>
+			<Alert>
+				<RefreshCw />
+				<AlertTitle>課表變更後要重新匯入</AlertTitle>
+				<AlertDescription>
+					下載的 ICS 是一次性檔案；加退選或修改課程後，請重新下載並匯入新的行事曆檔案。
+				</AlertDescription>
+			</Alert>
 			{!courses.length ? (
-				<Alert danger>
-					<strong>沒有課程資料</strong>
-					<br />
-					請先新增課程資料
+				<Alert variant='destructive'>
+					<AlertCircle />
+					<AlertTitle>沒有課程資料</AlertTitle>
+					<AlertDescription>請先新增課程資料，才能產生可匯入的行事曆。</AlertDescription>
 				</Alert>
 			) : null}
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 0</span> 加入課程
-			</h2>
-			<p>
-				請先將你本學期的課程新增到 <strong>北科課程好朋友</strong>
-			</p>
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 1</span> 請選擇要加入的課程
-			</h2>
-			<div className='grid gap-2'>
-				{courses.map((course) => (
-					<label
-						key={course.id}
-						className='flex items-center gap-2 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-3 py-2'
-					>
-						<input
-							type='checkbox'
-							checked={selectedIds.includes(course.id)}
-							onChange={() =>
-								setSelectedIds((ids) =>
-									ids.includes(course.id)
-										? ids.filter((id) => id !== course.id)
-										: [...ids, course.id],
-								)
-							}
-						/>{' '}
-						{course.name}
+			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+				<CardHeader className='p-4 sm:px-5'>
+					<div className='flex flex-wrap items-start justify-between gap-3'>
+						<div className='flex min-w-0 flex-col gap-2'>
+							<CardTitle className='text-base font-semibold'>1. 選擇要加入的課程</CardTitle>
+						</div>
+						<Badge variant='outline'>
+							<CheckCircle2 data-icon='inline-start' />
+							{selectedCourses.length} / {courses.length}
+						</Badge>
+					</div>
+				</CardHeader>
+				<CardContent className='p-4 pt-0 sm:px-5'>
+					<div className='grid gap-2 md:grid-cols-2'>
+						{courses.map((course) => {
+							const checked = selectedIds.includes(course.id);
+							return (
+								<label
+									key={course.id}
+									htmlFor={`calendar-course-${course.id}`}
+									className='flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3 transition-colors hover:bg-[rgba(var(--vs-primary),0.06)]'
+								>
+									<Checkbox
+										id={`calendar-course-${course.id}`}
+										checked={checked}
+										onCheckedChange={(value) =>
+											setSelectedIds((ids) =>
+												value === true
+													? ids.includes(course.id)
+														? ids
+														: [...ids, course.id]
+													: ids.filter((id) => id !== course.id),
+											)
+										}
+									/>
+									<span className='min-w-0 flex-1'>
+										<span className='block truncate font-medium'>{course.name}</span>
+										<span className='mt-1 block truncate text-sm text-[rgb(var(--vs-text))]/65'>
+											{[course.teacher, course.classroom].filter(Boolean).join(' · ') || '課程資料'}
+										</span>
+									</span>
+								</label>
+							);
+						})}
+					</div>
+				</CardContent>
+			</Card>
+			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+				<CardHeader className='p-4 sm:px-5'>
+					<CardTitle className='text-base font-semibold'>2. 確認日期並下載</CardTitle>
+					<CardDescription>
+						通常會自動填上開學日與最後上課日；若學校行事曆有異動可手動修改。
+					</CardDescription>
+				</CardHeader>
+				<CardContent className='grid gap-4 p-4 pt-0 sm:grid-cols-2 sm:px-5'>
+					<label className='flex flex-col gap-2'>
+						<span className='text-sm font-medium'>開學日</span>
+						<Input type='date' value={start} onChange={(event) => setStart(event.target.value)} />
 					</label>
-				))}
-			</div>
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 2</span> 新增專用行事曆
-			</h2>
-			<p>建議建立專用的行事曆，未來若需移除課程時僅需刪除該行事曆即可。</p>
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 3</span> 填寫行程期間
-			</h2>
-			<p>這裡通常會自動填上開學日與最後上課日，若有誤請自行修改。</p>
-			<div className='grid gap-3 sm:grid-cols-2'>
-				<Card>
-					<p>開學日</p>
-					<Input type='date' value={start} onChange={(event) => setStart(event.target.value)} />
-				</Card>
-				<Card>
-					<p>最後上課日</p>
-					<Input type='date' value={until} onChange={(event) => setUntil(event.target.value)} />
-				</Card>
-			</div>
-			<h2>
-				<span style={{ color: 'rgb(var(--vs-primary))' }}>Step 4</span> 匯入至行事曆
-			</h2>
-			<p>
-				輕觸「匯入」按鈕以繼續，匯入流程根據系統與提供商有所不同，請查詢行事曆提供商之說明來了解如何匯入。
-			</p>
-			<Button primary disabled={!selectedCourses.length} onClick={downloadIcs}>
-				匯入
-			</Button>
-			<h2>已知問題</h2>
-			<p>目前尚未撰寫跳過連假的功能，因此遇到連假時行事曆上仍會有課程。</p>
+					<label className='flex flex-col gap-2'>
+						<span className='text-sm font-medium'>最後上課日</span>
+						<Input type='date' value={until} onChange={(event) => setUntil(event.target.value)} />
+					</label>
+				</CardContent>
+				<Separator className='bg-[rgba(var(--vs-text),0.08)]' />
+				<CardContent className='flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5'>
+					<div className='text-sm text-[rgb(var(--vs-text))]/70'>
+						將下載 `{dataset.year}-{dataset.sem}-course.ics`，內含 {selectedCourses.length} 門課程。
+					</div>
+					<Button active disabled={!selectedCourses.length} onClick={downloadIcs}>
+						<Download className='size-4' data-icon='inline-start' />
+						下載 ICS
+					</Button>
+				</CardContent>
+			</Card>
+			<Alert>
+				<AlertCircle />
+				<AlertTitle>已知問題</AlertTitle>
+				<AlertDescription>
+					目前尚未撰寫跳過連假的功能，因此遇到連假時行事曆上仍會有課程。
+				</AlertDescription>
+			</Alert>
 		</div>
 	);
 }
 
-function resolveStartDate(calendar: CalendarEvent[], rocYear: string, sem: string) {
-	const startDays = calendar
-		.filter((item) => item.summary?.includes('開學'))
-		.map((item) => item.start);
-	const target = semesterDate(rocYear, sem, 'start');
-	return startDays.find((item) => new Date(item) >= target) || isoDate(target);
+export function resolveStartDate(calendar: CalendarEvent[], rocYear: string, sem: string) {
+	const window = semesterWindow(rocYear, sem);
+	const startDay = calendar
+		.filter((item) => isInsideSemesterWindow(item, window))
+		.filter((item) => /開學|正式上課|開始上課/.test(item.summary || ''))
+		.sort((a, b) => calendarDate(a.start).getTime() - calendarDate(b.start).getTime())[0];
+	return startDay ? calendarIsoDate(startDay.start) : isoDate(window.fallbackStart);
 }
 
-function resolveEndDate(calendar: CalendarEvent[], rocYear: string, sem: string) {
-	const endDays = calendar.filter((item) => item.summary === '期末考試').map((item) => item.end);
-	const target = semesterDate(rocYear, sem, 'end');
-	return endDays.find((item) => new Date(item) >= target) || isoDate(target);
+export function resolveEndDate(calendar: CalendarEvent[], rocYear: string, sem: string) {
+	const window = semesterWindow(rocYear, sem);
+	const finalExam = calendar
+		.filter((item) => isInsideSemesterWindow(item, window))
+		.filter((item) => item.summary?.includes('期末考試'))
+		.sort((a, b) => calendarDate(a.start).getTime() - calendarDate(b.start).getTime())[0];
+	if (!finalExam) return isoDate(window.fallbackEnd);
+
+	const finalExamStart = calendarDate(finalExam.start);
+	finalExamStart.setDate(finalExamStart.getDate() - 1);
+	return isoDate(finalExamStart);
 }
 
-function semesterDate(rocYear: string, sem: string, type: 'start' | 'end') {
+function semesterWindow(rocYear: string, sem: string) {
 	let year = Number(rocYear) + 1911;
 	if (sem === '2') year += 1;
-	if (sem === '1') return type === 'start' ? new Date(year, 7, 2) : new Date(year + 1, 0, 2);
-	return type === 'start' ? new Date(year, 0, 2) : new Date(year, 5, 31);
+	if (sem === '1') {
+		return {
+			start: new Date(year, 7, 1),
+			end: new Date(year + 1, 1, 15),
+			fallbackStart: new Date(year, 7, 2),
+			fallbackEnd: new Date(year + 1, 0, 31),
+		};
+	}
+	return {
+		start: new Date(year, 0, 1),
+		end: new Date(year, 6, 15),
+		fallbackStart: new Date(year, 0, 2),
+		fallbackEnd: new Date(year, 5, 30),
+	};
+}
+
+function isInsideSemesterWindow(item: CalendarEvent, window: ReturnType<typeof semesterWindow>) {
+	const start = calendarDate(item.start);
+	return start >= window.start && start <= window.end;
+}
+
+function calendarDate(value: string) {
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return new Date(value);
+	return date;
+}
+
+function calendarIsoDate(value: string) {
+	return isoDate(calendarDate(value));
 }
 
 function isoDate(date: Date) {
-	return date.toISOString().split('T')[0];
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
 }
