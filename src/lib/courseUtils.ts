@@ -217,6 +217,18 @@ export function filterPlaceholderCourses<T extends { id?: string }>(courses: T[]
 	return courses.filter((course) => !String(course.id || '').match(/^placeholder/i));
 }
 
+function normalizeCreditText(value: string) {
+	return value.replace(/[０-９]/g, (char) => String(char.charCodeAt(0) - 0xff10));
+}
+
+export function isZeroCreditValue(value: string | number) {
+	if (typeof value === 'number') return value === 0;
+	const normalized = normalizeCreditText(value).trim();
+	if (!normalized) return false;
+	const credit = Number(normalized);
+	return Number.isFinite(credit) && credit === 0;
+}
+
 export function createIcsEvent({
 	title,
 	location,

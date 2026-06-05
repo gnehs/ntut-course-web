@@ -14,7 +14,7 @@ import type {
 	StandardYearData,
 } from '../types/course';
 import { errorMessage } from '../lib/error';
-import { courseStandard } from '../lib/courseUtils';
+import { courseStandard, isZeroCreditValue } from '../lib/courseUtils';
 import { BookOpen, Building2, Calendar, GraduationCap, ListChecks, Search } from 'lucide-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
@@ -101,7 +101,7 @@ export function StandardPage() {
 
 	const creditItems = useMemo(() => {
 		if (!current?.credits) return [];
-		return Object.entries(current.credits).filter(([, v]) => v !== 0);
+		return Object.entries(current.credits).filter(([, value]) => !isZeroCreditValue(value));
 	}, [current]);
 
 	function gradeLabel(courseYear: string, sem: string) {

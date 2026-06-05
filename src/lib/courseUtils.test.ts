@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	buildCourseCalendar,
 	filterPlaceholderCourses,
+	isZeroCreditValue,
 	parseCourseTime,
 	parseYearSemVal,
 	searchCourseList,
@@ -44,6 +45,16 @@ describe('courseUtils', () => {
 		expect(filterPlaceholderCourses([{ id: 'placeholder-1' }, { id: '123' }])).toEqual([
 			{ id: '123' },
 		]);
+	});
+
+	it('detects zero-credit requirement values from API payloads', () => {
+		expect(isZeroCreditValue(0)).toBe(true);
+		expect(isZeroCreditValue('0')).toBe(true);
+		expect(isZeroCreditValue(' 0.0 ')).toBe(true);
+		expect(isZeroCreditValue('０')).toBe(true);
+		expect(isZeroCreditValue('１')).toBe(false);
+		expect(isZeroCreditValue('128')).toBe(false);
+		expect(isZeroCreditValue('')).toBe(false);
 	});
 
 	it('builds weekly course calendar events with Taipei timezone', () => {
