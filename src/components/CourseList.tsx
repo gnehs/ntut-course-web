@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
-import { CircleAlert, Clock, PanelTop, Table } from 'lucide-react';
+import { CircleAlert, Clock, Minus, PanelTop, Plus, Table } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import {
 	courseTitle,
@@ -52,12 +53,17 @@ export function CourseList({
 	year,
 	sem,
 }: CourseListProps) {
-	const { dataset, getCourses, getMyCourseIds } = useApp();
+	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
 	const [layout, setLayout] = useState('card');
 	const [page, setPage] = useState(1);
+	const [savedVersion, setSavedVersion] = useState(0);
 	const [conflictCourseData, setConflictCourseData] = useState<string[]>([]);
 	const viewYear = year || dataset.year;
 	const viewSem = sem || dataset.sem;
+	const savedCourseIds = useMemo(
+		() => getMyCourseIds(viewYear, viewSem),
+		[getMyCourseIds, viewYear, viewSem, savedVersion],
+	);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -83,7 +89,7 @@ export function CourseList({
 		return () => {
 			cancelled = true;
 		};
-	}, [courses, viewYear, viewSem, dataset.department]);
+	}, [courses, viewYear, viewSem, dataset.department, savedVersion]);
 
 	const filteredCourse = useMemo(() => {
 		if (!courses) return [];
@@ -94,6 +100,10 @@ export function CourseList({
 
 	const pageCount = Math.max(Math.ceil(filteredCourse.length / PAGE_SIZE), 1);
 	const pageItems = filteredCourse.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+	useEffect(() => {
+		setPage(1);
+	}, [courses, showConflictCourse]);
 
 	useEffect(() => {
 		if (page > pageCount) setPage(1);
@@ -109,6 +119,22 @@ export function CourseList({
 		if (nextPage === page) return;
 		setPage(nextPage);
 		window.scrollTo({ top: 0 });
+	}
+
+	function toggleSavedCourse(course: Course) {
+		const saved = savedCourseIds.includes(course.id);
+		if (saved) {
+			removeCourse(course.id, viewYear, viewSem);
+			toast.success('已從我的課程移除', {
+				description: `${course.id} ${course.name?.zh || '未命名課程'}`,
+			});
+		} else {
+			addCourse(course.id, viewYear, viewSem);
+			toast.success('已加入我的課程', {
+				description: `${course.id} ${course.name?.zh || '未命名課程'}`,
+			});
+		}
+		setSavedVersion((value) => value + 1);
 	}
 
 	if (!courses) return null;
@@ -134,56 +160,81 @@ export function CourseList({
 			{layout === 'card' ? (
 				<>
 					<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
-						{pageItems.map((course) => (
-							<Card
-								key={course.id}
-								to={`/course/${viewYear}/${viewSem}/${course.id}`}
-								className='cursor-pointer px-4 py-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
-							>
-								<CardTitle spaceBetween>
-									<CourseDisplayHeading course={course} />
-									{conflictCourseData.includes(course.id) ? (
-										<Tag color='rgba(var(--vs-danger),0.15)' textColor={`rgb(var(--vs-danger))`}>
-											<CircleAlert className='size-4' />
-											衝堂
-										</Tag>
-									) : null}
-								</CardTitle>
-								<CourseTags course={course} />
-								<div className='mt-2 grid grid-cols-[repeat(auto-fit,minmax(64px,1fr))] gap-2'>
-									<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
-										<CardTitle>{course.id}</CardTitle>
-										<p>課號</p>
-									</Card>
-									<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
-										<CardTitle>{course.credit}</CardTitle>
-										<p>學分</p>
-									</Card>
-									{parseCourseTime(course.time).map((item) => (
-										<Card
-											key={item.title}
-											className='border-0 bg-transparent px-0 py-1 shadow-none'
-										>
-											<CardTitle>{item.content}</CardTitle>
-											<p>{item.title}</p>
-										</Card>
-									))}
-									{!parseCourseTime(course.time).length ? (
-										<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
-											<CardTitle>無資料</CardTitle>
-											<p>上課時間</p>
-										</Card>
-									) : null}
-								</div>
-								<p>
-									班級：{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
-									<br />
-									教師：{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 13)}
-									<br />
-									備註：{trimEllip(course.notes, 15)}
-								</p>
-							</Card>
-						))}
+						{pageItems.map((course) => {
+							const saved = savedCourseIds.includes(course.id);
+							return (
+								<Card
+									key={course.id}
+									className='hoverable px-4 py-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
+								>
+									<Link
+										to={`/course/${viewYear}/${viewSem}/${course.id}`}
+										aria-label={`查看 ${courseTitle(course)} 課程詳情`}
+										className='absolute inset-0 z-0 rounded-lg focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
+									/>
+									<div className='pointer-events-none relative z-[1]'>
+										<CardTitle spaceBetween>
+											<CourseDisplayHeading course={course} />
+											<span className='pointer-events-auto flex shrink-0 items-center gap-1'>
+												{conflictCourseData.includes(course.id) ? (
+													<Tag
+														color='rgba(var(--vs-danger),0.15)'
+														textColor={`rgb(var(--vs-danger))`}
+													>
+														<CircleAlert className='size-4' />
+														衝堂
+													</Tag>
+												) : null}
+												<Button
+													icon
+													active={saved}
+													className='m-0 size-8'
+													aria-label={saved ? '從我的課程移除' : '加入我的課程'}
+													onClick={() => toggleSavedCourse(course)}
+												>
+													{saved ? <Minus className='size-4' /> : <Plus className='size-4' />}
+												</Button>
+											</span>
+										</CardTitle>
+										<CourseTags course={course} />
+										<div className='mt-2 grid grid-cols-[repeat(auto-fit,minmax(64px,1fr))] gap-2'>
+											<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
+												<CardTitle>{course.id}</CardTitle>
+												<p>課號</p>
+											</Card>
+											<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
+												<CardTitle>{course.credit}</CardTitle>
+												<p>學分</p>
+											</Card>
+											{parseCourseTime(course.time).map((item) => (
+												<Card
+													key={item.title}
+													className='border-0 bg-transparent px-0 py-1 shadow-none'
+												>
+													<CardTitle>{item.content}</CardTitle>
+													<p>{item.title}</p>
+												</Card>
+											))}
+											{!parseCourseTime(course.time).length ? (
+												<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
+													<CardTitle>無資料</CardTitle>
+													<p>上課時間</p>
+												</Card>
+											) : null}
+										</div>
+										<p>
+											班級：
+											{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
+											<br />
+											教師：
+											{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 13)}
+											<br />
+											備註：{trimEllip(course.notes, 15)}
+										</p>
+									</div>
+								</Card>
+							);
+						})}
 					</div>
 					{!filteredCourse.length ? (
 						<div className='flex items-center justify-center p-5'>
@@ -206,37 +257,54 @@ export function CourseList({
 									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>教師</th>
 									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>班級</th>
 									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>備註</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+										我的課程
+									</th>
 								</tr>
 							</thead>
 							<tbody>
-								{pageItems.map((course) => (
-									<tr
-										key={course.id}
-										className='transition-colors hover:bg-[rgba(var(--vs-text),0.04)]'
-									>
-										<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
-											{course.id}
-										</td>
-										<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
-											<Link to={`/course/${viewYear}/${viewSem}/${course.id}`}>
-												{courseTitle(course)}
-											</Link>
-										</td>
-										<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
-											{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 9)}
-										</td>
-										<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
-											{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
-										</td>
-										<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
-											{conflictCourseData.includes(course.id) ? (
-												<span className='text-[rgb(var(--vs-danger))]'>衝堂</span>
-											) : (
-												course.notes
-											)}
-										</td>
-									</tr>
-								))}
+								{pageItems.map((course) => {
+									const saved = savedCourseIds.includes(course.id);
+									return (
+										<tr
+											key={course.id}
+											className='transition-colors hover:bg-[rgba(var(--vs-text),0.04)]'
+										>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+												{course.id}
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+												<Link to={`/course/${viewYear}/${viewSem}/${course.id}`}>
+													{courseTitle(course)}
+												</Link>
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+												{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 9)}
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+												{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+												{conflictCourseData.includes(course.id) ? (
+													<span className='text-[rgb(var(--vs-danger))]'>衝堂</span>
+												) : (
+													course.notes
+												)}
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+												<Button
+													icon
+													active={saved}
+													className='m-0 size-8'
+													aria-label={saved ? '從我的課程移除' : '加入我的課程'}
+													onClick={() => toggleSavedCourse(course)}
+												>
+													{saved ? <Minus className='size-4' /> : <Plus className='size-4' />}
+												</Button>
+											</td>
+										</tr>
+									);
+								})}
 							</tbody>
 						</table>
 					</div>

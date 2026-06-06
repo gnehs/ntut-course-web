@@ -51,9 +51,12 @@ export function Layout() {
 			ref={rootRef}
 			className='flex min-h-screen flex-col bg-[#f4f7f8] font-sans text-black dark:bg-[#1d1d1d] dark:text-white'
 		>
-			{!isIframe && !isAdvancedSearch ? (
+			{!isIframe ? (
 				<nav
-					className='sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]'
+					className={cn(
+						'sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]',
+						isAdvancedSearch && 'lg:hidden',
+					)}
 					style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
 				>
 					<Link

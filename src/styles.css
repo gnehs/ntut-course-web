@@ -2,6 +2,7 @@
 
 :root {
 	--vs-primary: 25, 91, 255;
+	--vs-primary-foreground: 255, 255, 255;
 	--vs-text: 44, 62, 80;
 	--vs-background: 255, 255, 255;
 	--vs-gray-1: 244, 247, 248;
@@ -13,7 +14,8 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--vs-primary: 247, 250, 255;
+		--vs-primary: 92, 170, 255;
+		--vs-primary-foreground: 8, 14, 24;
 		--vs-text: 255, 255, 255;
 		--vs-background: 16, 16, 16;
 		--vs-gray-1: 32, 32, 32;

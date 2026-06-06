@@ -15,14 +15,18 @@ export function TimetableSelector({
 	return (
 		<div
 			className={cn(
-				'overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgba(var(--vs-text),0.03)]',
+				'overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgba(var(--vs-text),0.08)]',
 				className,
 			)}
 		>
-			<div className='grid grid-cols-[42px_repeat(5,minmax(0,1fr))]'>
-				<SelectorButton onClick={() => onToggle()} />
+			<div className='grid grid-cols-[42px_repeat(5,minmax(0,1fr))] gap-px'>
+				<SelectorButton aria-label='切換所有平日時段的排除狀態' onClick={() => onToggle()} />
 				{days.map((day) => (
-					<SelectorButton key={day} onClick={() => onToggle(day)}>
+					<SelectorButton
+						key={day}
+						aria-label={`切換${dateEng2zh[day]}所有節次的排除狀態`}
+						onClick={() => onToggle(day)}
+					>
 						{dateEng2zh[day].slice(1)}
 					</SelectorButton>
 				))}
@@ -43,17 +47,24 @@ export function TimetableSelector({
 function TimetableRow({ slot, dayKeys, selected, onToggle }) {
 	return (
 		<>
-			<SelectorButton onClick={() => onToggle(null, slot)}>{slot}</SelectorButton>
+			<SelectorButton
+				aria-label={`切換第 ${slot} 節所有平日的排除狀態`}
+				onClick={() => onToggle(null, slot)}
+			>
+				{slot}
+			</SelectorButton>
 			{dayKeys.map((day) => {
 				const active = selected[day]?.includes(slot);
+				const label = active
+					? `已排除${dateEng2zh[day]}第 ${slot} 節，點擊改為允許`
+					: `允許${dateEng2zh[day]}第 ${slot} 節，點擊改為排除`;
 				return (
-					<div
-						key={`${day}-${slot}`}
-						className='border-t border-l border-[rgba(var(--vs-text),0.08)] first:border-l-0'
-					>
+					<div key={`${day}-${slot}`}>
 						<button
 							type='button'
 							aria-pressed={active}
+							aria-label={label}
+							title={label}
 							onClick={() => onToggle(day, slot)}
 							className={cn(
 								'flex h-full min-h-[52px] w-full items-center justify-center px-2 py-2 text-2xl transition-colors',
@@ -80,7 +91,7 @@ function SelectorButton({
 		<button
 			type='button'
 			className={cn(
-				'flex min-h-[52px] items-center justify-center border-t border-l border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.04)] text-sm font-medium text-[rgb(var(--vs-text))] transition-colors hover:bg-[rgba(var(--vs-text),0.08)]',
+				'flex min-h-[52px] items-center justify-center bg-[rgb(var(--vs-gray-1))] text-sm font-medium text-[rgb(var(--vs-text))] transition-colors hover:bg-[rgba(var(--vs-text),0.08)]',
 				className,
 			)}
 			{...props}

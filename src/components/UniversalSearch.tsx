@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 import { ArrowRight, History, Loader, Search, X } from 'lucide-react';
 import { courseTitle, searchCourseList } from '../lib/courseUtils';
@@ -12,6 +12,8 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 	const navigate = useNavigate();
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const resultsRef = useRef<HTMLDivElement | null>(null);
+	const searchId = useId();
+	const resultsId = `${searchId}-results`;
 	const [input, setInput] = useState('');
 	const [courseData, setCourseData] = useState<Course[] | null>(null);
 	const [focused, setFocused] = useState(false);
@@ -99,7 +101,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 		} else if (event.key === 'ArrowUp') {
 			event.preventDefault();
 			setCurrentSelectionIndex((value) => Math.max(value - 1, 0));
-		} else if (event.key === 'Enter' || event.key === 'Tab') {
+		} else if (event.key === 'Enter') {
 			if (currentSelectionIndex >= 0) {
 				event.preventDefault();
 				selectItem(items[currentSelectionIndex]);
@@ -130,6 +132,13 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				<input
 					ref={inputRef}
 					type='text'
+					role='combobox'
+					aria-autocomplete='list'
+					aria-expanded={focused && items.length > 0}
+					aria-controls={resultsId}
+					aria-activedescendant={
+						currentSelectionIndex >= 0 ? `${resultsId}-item-${currentSelectionIndex}` : undefined
+					}
 					placeholder='搜尋課程、教師、課號、班級'
 					autoComplete='off'
 					value={input}
@@ -149,6 +158,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				/>
 				<button
 					type='button'
+					aria-label={input ? '清除搜尋' : '搜尋'}
 					className={cn(
 						'flex shrink-0 items-center justify-center text-[rgba(var(--vs-text),0.8)] transition-all duration-200 hover:text-[rgb(var(--vs-text))]',
 						navbar ? 'px-3 py-2' : 'px-4 py-3',
@@ -171,8 +181,11 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				</button>
 			</div>
 			<div
+				id={resultsId}
 				ref={resultsRef}
 				data-search-results
+				role='listbox'
+				aria-label='搜尋建議'
 				className={cn(
 					'absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto rounded-lg bg-[rgb(var(--vs-background))] shadow-[0_20px_20px_0_rgba(0,0,0,var(--vs-background-opacity,0.02))] transition-all duration-200',
 					focused
@@ -184,8 +197,11 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				{focused &&
 					items.map((item, index) => (
 						<Link
+							id={`${resultsId}-item-${index}`}
 							key={item.key || item.to || `${item.category}-${item.text}-${index}`}
 							to={item.to || '/'}
+							role='option'
+							aria-selected={currentSelectionIndex === index}
 							data-search-result-item
 							data-active={currentSelectionIndex === index ? 'true' : 'false'}
 							className={cn(

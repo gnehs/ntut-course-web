@@ -529,7 +529,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 									aria-pressed={active}
 									className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors ${
 										active
-											? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-white'
+											? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
 											: count
 												? 'border-[rgba(var(--vs-primary),0.35)] bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
 												: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
@@ -733,7 +733,9 @@ function FilterSectionContent({
 
 	return (
 		<div className='grid gap-2'>
-			<MiniNotify>點擊星期或節次可一次選取整個行或列，左上角可一次切換整張課表。</MiniNotify>
+			<MiniNotify>
+				紅色 X 代表排除該時段；點擊星期或節次可一次切換整個行或列，左上角可一次切換整張課表。
+			</MiniNotify>
 			<TimetableSelector value={props.timetableFilter} onToggle={props.onToggleTimetable} />
 		</div>
 	);
