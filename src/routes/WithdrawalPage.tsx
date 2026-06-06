@@ -143,9 +143,9 @@ export function WithdrawalPage() {
 							{groupedRows
 								.filter((group) => group.rows.length)
 								.map((group) => (
-									<section key={group.title} className='grid gap-3'>
-										<div className='flex items-baseline justify-between gap-3'>
-											<h2 className='m-0 text-xl font-semibold'>{group.title}</h2>
+									<section key={group.title} className='relative grid'>
+										<div className='sticky top-14.5 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
+											<h2 className='text-lg font-semibold'>{group.title}</h2>
 											<div className='text-sm opacity-70'>{group.rows.length} 位教師</div>
 										</div>
 										<div className='grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2'>
@@ -187,32 +187,14 @@ function WithdrawalTeacherCard({
 		.join('、');
 
 	return (
-		<Card
-			to={`/teacher/${item.name}`}
-			className='padding hoverable [&_h3]:!m-0 [&_h3]:!text-base [&_h3]:!leading-normal [&_h3]:!text-inherit'
-		>
+		<Card to={`/teacher/${item.name}`} className='padding hoverable'>
 			<CardTitle>{item.name}</CardTitle>
-			<div className='flex flex-wrap items-center gap-2'>
-				<div className='text-lg font-semibold'>{formatWithdrawalRate(rateValue(item))}%</div>
-				<WithdrawalRateBadge level={classification.level} label={classification.label} />
-			</div>
+			<div className='text-lg font-semibold'>{formatWithdrawalRate(rateValue(item))}%</div>
 			<p>
 				{item.withdraw ?? 0} 人退選 / {item.people ?? 0} 人選課
 			</p>
 			{courseSummary ? <p>{courseSummary}</p> : null}
 		</Card>
-	);
-}
-
-function WithdrawalRateBadge({ level, label }: { level: WithdrawalRateLevel; label: string }) {
-	const className =
-		level === 'high'
-			? 'border-[rgba(var(--vs-danger),0.28)] bg-[rgba(var(--vs-danger),0.12)] text-[rgb(var(--vs-danger))]'
-			: level === 'low'
-				? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-				: 'border-[rgba(var(--vs-text),0.12)] bg-[rgba(var(--vs-text),0.06)] text-[rgba(var(--vs-text),0.78)]';
-	return (
-		<span className={`rounded border px-1.5 py-0.5 text-xs font-medium ${className}`}>{label}</span>
 	);
 }
 

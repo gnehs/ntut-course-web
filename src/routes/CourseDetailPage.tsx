@@ -296,17 +296,14 @@ function WithdrawalRateCard({
 
 	return (
 		<Card>
-			<CardTitle>
+			<CardTitle className='flex flex-wrap items-start justify-between gap-2'>
 				{withdrawalRate ? `${formatWithdrawalRate(withdrawalRate)}%` : '無資料'}
+				{withdrawalRate ? (
+					<WithdrawalRateBadge level={classification.level} label={classification.label} />
+				) : null}
 			</CardTitle>
 			<p>
-				退選率
-				{withdrawalRate ? (
-					<>
-						{' '}
-						<WithdrawalRateBadge level={classification.level} label={classification.label} />
-					</>
-				) : null}{' '}
+				退選率{' '}
 				<TooltipProvider>
 					<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
 						<TooltipTrigger
@@ -354,15 +351,11 @@ function WithdrawalRateCard({
 function WithdrawalRateBadge({ level, label }: { level: WithdrawalRateLevel; label: string }) {
 	const className =
 		level === 'high'
-			? 'border-[rgba(var(--vs-danger),0.28)] bg-[rgba(var(--vs-danger),0.12)] text-[rgb(var(--vs-danger))]'
+			? 'text-[rgb(var(--vs-danger))]'
 			: level === 'low'
-				? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-				: 'border-[rgba(var(--vs-text),0.12)] bg-[rgba(var(--vs-text),0.06)] text-[rgba(var(--vs-text),0.78)]';
-	return (
-		<span className={`inline-flex rounded border px-1.5 py-0.5 text-xs font-medium ${className}`}>
-			{label}
-		</span>
-	);
+				? 'text-emerald-700 dark:text-emerald-300'
+				: 'text-[rgba(var(--vs-text),0.78)]';
+	return <span className={`text-xs font-medium ${className}`}>{label}</span>;
 }
 
 function withdrawalRateDescription(distribution: WithdrawalRateDistribution | null) {

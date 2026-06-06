@@ -27,7 +27,7 @@ export function Card({ to, className = '', children, ...props }: CardProps) {
 			: !isBorderless && 'border border-[rgba(var(--vs-text),0.1)] shadow-none',
 		isBorderless ? 'px-0 py-1' : isPadding ? 'px-4 py-3' : 'px-3 py-2',
 		isInteractive &&
-			'cursor-pointer will-change-transform hover:!text-black dark:hover:!text-white',
+			'cursor-pointer will-change-transform focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none hover:!text-black dark:hover:!text-white',
 		normalizedClassName,
 	);
 
