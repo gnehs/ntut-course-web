@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
@@ -30,6 +30,7 @@ import { createSearchObject, createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import type { Course, DepartmentGroup, QueryValue, WithdrawalRateMap } from '../types/course';
 import { errorMessage } from '../lib/error';
+import { animateFilterSection } from '../lib/motion';
 
 const emptyTimetableFilter: Record<string, string[]> = {
 	mon: [],
@@ -748,12 +749,35 @@ function SearchSection({
 	children: React.ReactNode;
 }) {
 	const [expanded, setExpanded] = useState(open);
+	const [rendered, setRendered] = useState(open);
+	const contentRef = useRef<HTMLDivElement | null>(null);
+	const iconRef = useRef<SVGSVGElement | null>(null);
+	const mountedRef = useRef(false);
+	const initiallyRenderedRef = useRef(open);
 	const section = getFilterSection(sectionId);
 	const Icon = section.icon;
 
 	useEffect(() => {
-		if (open) setExpanded(true);
+		if (open) {
+			setRendered(true);
+			setExpanded(true);
+		}
 	}, [open]);
+
+	useEffect(() => {
+		if (!rendered) return undefined;
+		const cleanup = animateFilterSection(
+			contentRef.current,
+			iconRef.current,
+			expanded,
+			!mountedRef.current && initiallyRenderedRef.current,
+			() => {
+				if (!expanded) setRendered(false);
+			},
+		);
+		mountedRef.current = true;
+		return cleanup;
+	}, [expanded, rendered]);
 
 	return (
 		<section className='border-t border-[rgba(var(--vs-text),0.08)] pt-3'>
@@ -761,17 +785,25 @@ function SearchSection({
 				type='button'
 				className='flex w-full cursor-pointer items-center justify-between gap-2 border-0 bg-transparent p-0 text-left font-semibold text-[rgb(var(--vs-text))]'
 				aria-expanded={expanded}
-				onClick={() => setExpanded((value) => !value)}
+				onClick={() => {
+					if (expanded) setExpanded(false);
+					else {
+						setRendered(true);
+						setExpanded(true);
+					}
+				}}
 			>
 				<span className='flex min-w-0 items-center gap-2'>
 					<Icon className='size-4 shrink-0 text-[rgb(var(--vs-primary))]' />
 					<span>{section.title}</span>
 				</span>
-				<ChevronDown
-					className={`size-4 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-				/>
+				<ChevronDown ref={iconRef} className='size-4 shrink-0' />
 			</button>
-			{expanded ? <div className='mt-3 grid gap-2'>{children}</div> : null}
+			{rendered ? (
+				<div ref={contentRef} aria-hidden={!expanded} className='overflow-hidden'>
+					<div className='mt-3 grid gap-2'>{children}</div>
+				</div>
+			) : null}
 		</section>
 	);
 }

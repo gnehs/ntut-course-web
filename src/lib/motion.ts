@@ -125,3 +125,76 @@ export function animateSearchResults(element, visible) {
 
 	return () => gsap.killTweensOf(element);
 }
+
+export function animateFilterSection(
+	element,
+	icon,
+	expanded,
+	immediate = false,
+	onRest = () => {},
+) {
+	if (!element) return () => {};
+
+	const targets = [element, icon].filter(Boolean);
+
+	if (isReducedMotion()) {
+		gsap.killTweensOf(targets);
+		gsap.set(element, {
+			autoAlpha: expanded ? 1 : 0,
+			clearProps: expanded ? 'height,overflow,transform' : 'transform',
+			display: expanded ? 'block' : 'none',
+			height: expanded ? 'auto' : 0,
+		});
+		if (icon) gsap.set(icon, { rotate: expanded ? 180 : 0, transformOrigin: '50% 50%' });
+		onRest();
+		return () => {};
+	}
+
+	gsap.killTweensOf(targets);
+	if (icon) {
+		gsap.to(icon, {
+			rotate: expanded ? 180 : 0,
+			duration: immediate ? 0 : 0.2,
+			ease: 'power3.out',
+			transformOrigin: '50% 50%',
+			overwrite: 'auto',
+		});
+	}
+
+	if (expanded) {
+		gsap.set(element, { display: 'block', height: 'auto', overflow: 'hidden' });
+		const height = element.offsetHeight;
+		gsap.fromTo(
+			element,
+			{ autoAlpha: immediate ? 1 : 0, height: immediate ? 'auto' : 0, y: immediate ? 0 : -6 },
+			{
+				autoAlpha: 1,
+				height,
+				y: 0,
+				duration: immediate ? 0 : 0.26,
+				ease: 'power3.out',
+				overwrite: 'auto',
+				onComplete: () => {
+					gsap.set(element, { clearProps: 'height,overflow,transform' });
+					onRest();
+				},
+			},
+		);
+	} else {
+		gsap.set(element, { display: 'block', height: element.offsetHeight, overflow: 'hidden' });
+		gsap.to(element, {
+			autoAlpha: 0,
+			height: 0,
+			y: -4,
+			duration: immediate ? 0 : 0.18,
+			ease: 'power2.inOut',
+			overwrite: 'auto',
+			onComplete: () => {
+				gsap.set(element, { display: 'none', clearProps: 'overflow,transform' });
+				onRest();
+			},
+		});
+	}
+
+	return () => gsap.killTweensOf(targets);
+}
