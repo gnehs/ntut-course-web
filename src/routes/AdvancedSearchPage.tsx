@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popove
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
 import {
+	Check,
 	ChevronDown,
 	Clock3,
 	GraduationCap,
@@ -488,10 +489,13 @@ function getFilterSection(id: SearchSectionId) {
 
 function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 	const [activeSection, setActiveSection] = useState<SearchSectionId | null>(null);
+	const hasActiveCondition =
+		props.searchCourseKeyword.trim().length > 0 ||
+		filterSections.some((section) => getFilterSectionCount(section.id, props) > 0);
 
 	return (
 		<section className='mb-4 grid gap-3 lg:hidden'>
-			<div className='flex items-center gap-2'>
+			<div className='flex items-center'>
 				<label className='relative min-w-0 flex-1'>
 					<span className='sr-only'>搜尋關鍵字</span>
 					<Search className='pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[rgba(var(--vs-text),0.5)]' />
@@ -502,9 +506,6 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 						className='h-11 rounded-xl pr-3 pl-9 text-base'
 					/>
 				</label>
-				<Button className='m-0 h-11 px-3' onClick={props.onReset}>
-					重設
-				</Button>
 			</div>
 			<SuggestedKeywords
 				keywords={props.recommandKeyword}
@@ -513,10 +514,21 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 				scrollable
 			/>
 			<div className='flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain pb-1 [-webkit-overflow-scrolling:touch]'>
+				{hasActiveCondition ? (
+					<button
+						type='button'
+						className='inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-colors'
+						onClick={props.onReset}
+					>
+						<X className='size-4 shrink-0' />
+						<span>重設</span>
+					</button>
+				) : null}
 				{filterSections.map((section) => {
 					const count = getFilterSectionCount(section.id, props);
 					const active = activeSection === section.id;
 					const Icon = section.icon;
+					const TriggerIcon = count ? Check : Icon;
 					return (
 						<Popover
 							key={section.id}
@@ -535,13 +547,8 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 												: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
 									}`}
 								>
-									<Icon className='size-4 shrink-0' />
+									<TriggerIcon className='size-4 shrink-0' />
 									<span>{section.label}</span>
-									{count ? (
-										<span className='rounded-full bg-current px-1.5 py-0.5 text-[0.68rem] leading-none text-[rgb(var(--vs-background))]'>
-											{count}
-										</span>
-									) : null}
 								</button>
 							</PopoverTrigger>
 							<PopoverContent>
