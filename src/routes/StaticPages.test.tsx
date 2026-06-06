@@ -27,6 +27,14 @@ describe('StatusPage', () => {
 							created_at: '2026-06-03T11:55:00.000Z',
 							html_url: 'https://github.com/gnehs/ntut-course-crawler-node/actions/runs/1',
 						},
+						{
+							id: 2,
+							name: 'fetch current mprograms',
+							status: 'completed',
+							event: 'schedule',
+							created_at: '2026-06-03T11:50:00.000Z',
+							html_url: 'https://github.com/gnehs/ntut-course-crawler-node/actions/runs/2',
+						},
 					],
 				}),
 			}),
@@ -35,6 +43,7 @@ describe('StatusPage', () => {
 		render(<StatusPage />);
 
 		expect(await screen.findByText('取得本學期課程')).toBeInTheDocument();
+		expect(screen.getByText('取得本學期微學程')).toBeInTheDocument();
 		expect(screen.getByText('5 分鐘', { exact: false })).toBeInTheDocument();
 	});
 
