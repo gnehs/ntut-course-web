@@ -24,6 +24,14 @@ import { coursePageTitle, usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
 import type { Course, SyllabusItem } from '../types/course';
 import { errorMessage } from '../lib/error';
+import {
+	classifyWithdrawalRate,
+	createWithdrawalRateDistribution,
+	formatWithdrawalRate,
+	formatWithdrawalThreshold,
+	type WithdrawalRateDistribution,
+	type WithdrawalRateLevel,
+} from '../lib/withdrawalStats';
 
 type InfoCardItem = [string, React.ReactNode];
 
@@ -34,6 +42,8 @@ export function CourseDetailPage() {
 	const [syllabus, setSyllabus] = useState<SyllabusItem[]>([]);
 	const [relatedCourses, setRelatedCourses] = useState<Course[]>([]);
 	const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
+	const [withdrawalDistribution, setWithdrawalDistribution] =
+		useState<WithdrawalRateDistribution | null>(null);
 	const [selectedSyllabusIndex, setSelectedSyllabusIndex] = useState('0');
 	const [error, setError] = useState<unknown>(null);
 	const [version, setVersion] = useState(0);
@@ -64,6 +74,7 @@ export function CourseDetailPage() {
 				setSyllabus(detailItems);
 				setRelatedCourses(courses);
 				setWithdrawalRate(calcedWithdrawalRate > 0 ? calcedWithdrawalRate : null);
+				setWithdrawalDistribution(createWithdrawalRateDistribution(Object.values(rate)));
 			} catch (e) {
 				if (!cancelled) setError(e);
 			}
@@ -154,7 +165,10 @@ export function CourseDetailPage() {
 						<CardTitle>{course.credit}</CardTitle>
 						<p>學分</p>
 					</Card>
-					<WithdrawalRateCard withdrawalRate={withdrawalRate} />
+					<WithdrawalRateCard
+						withdrawalRate={withdrawalRate}
+						distribution={withdrawalDistribution}
+					/>
 				</div>
 				<div className='mt-3 grid gap-3 lg:grid-cols-3'>
 					<InfoCard
@@ -270,14 +284,29 @@ function InfoCard({
 	);
 }
 
-function WithdrawalRateCard({ withdrawalRate }: { withdrawalRate: number | null }) {
+function WithdrawalRateCard({
+	withdrawalRate,
+	distribution,
+}: {
+	withdrawalRate: number | null;
+	distribution: WithdrawalRateDistribution | null;
+}) {
 	const [tooltipOpen, setTooltipOpen] = useState(false);
+	const classification = classifyWithdrawalRate(withdrawalRate, distribution);
 
 	return (
 		<Card>
-			<CardTitle>{withdrawalRate ? `${withdrawalRate}%` : '無資料'}</CardTitle>
+			<CardTitle>
+				{withdrawalRate ? `${formatWithdrawalRate(withdrawalRate)}%` : '無資料'}
+			</CardTitle>
 			<p>
-				退選率{' '}
+				退選率
+				{withdrawalRate ? (
+					<>
+						{' '}
+						<WithdrawalRateBadge level={classification.level} label={classification.label} />
+					</>
+				) : null}{' '}
 				<TooltipProvider>
 					<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
 						<TooltipTrigger
@@ -312,10 +341,7 @@ function WithdrawalRateCard({ withdrawalRate }: { withdrawalRate: number | null 
 								<h4 className='mt-2 text-sm font-semibold'>如果有多名教師，退選率會怎麼顯示？</h4>
 								<div>若該課程有多名教師，則會顯示最高退選率之教師。</div>
 								<h4 className='mt-2 text-sm font-semibold'>退選率多少算高？</h4>
-								<div>
-									根據近三年的統計資料，有半數教師退選率高於 1.20%；四分之一教師退選率高於
-									2.91%，也就是說如果你看到退選率超過 3%，你就要小心了！
-								</div>
+								<div>{withdrawalRateDescription(distribution)}</div>
 							</div>
 						</TooltipContent>
 					</Tooltip>
@@ -323,6 +349,27 @@ function WithdrawalRateCard({ withdrawalRate }: { withdrawalRate: number | null 
 			</p>
 		</Card>
 	);
+}
+
+function WithdrawalRateBadge({ level, label }: { level: WithdrawalRateLevel; label: string }) {
+	const className =
+		level === 'high'
+			? 'border-[rgba(var(--vs-danger),0.28)] bg-[rgba(var(--vs-danger),0.12)] text-[rgb(var(--vs-danger))]'
+			: level === 'low'
+				? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+				: 'border-[rgba(var(--vs-text),0.12)] bg-[rgba(var(--vs-text),0.06)] text-[rgba(var(--vs-text),0.78)]';
+	return (
+		<span className={`inline-flex rounded border px-1.5 py-0.5 text-xs font-medium ${className}`}>
+			{label}
+		</span>
+	);
+}
+
+function withdrawalRateDescription(distribution: WithdrawalRateDistribution | null) {
+	if (!distribution || distribution.sampleSize < 2 || distribution.standardDeviation === 0) {
+		return '資料不足時會先標示為一般退選率。';
+	}
+	return `系統會以目前退選率資料計算平均 ${formatWithdrawalThreshold(distribution.mean)} 與標準差 ${formatWithdrawalThreshold(distribution.standardDeviation)}；高於平均加一個標準差會標為高退選率，低於平均減一個標準差會標為低退選率，其餘為一般退選率。`;
 }
 
 function infoItem(title: string, content: React.ReactNode): InfoCardItem {
