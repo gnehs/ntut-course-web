@@ -33,6 +33,8 @@ import type { Course, DepartmentGroup, QueryValue, WithdrawalRateMap } from '../
 import { errorMessage } from '../lib/error';
 import { animateFilterSection } from '../lib/motion';
 
+type CourseStandardSymbol = keyof typeof courseStandard;
+
 const emptyTimetableFilter: Record<string, string[]> = {
 	mon: [],
 	tue: [],
@@ -68,6 +70,7 @@ type AdvancedSearchControlsProps = {
 	categoryFilter: string[];
 	courseStandardFilter: Record<string, boolean>;
 	courseStandardFilterEnabled: boolean;
+	courseStandardOptions: CourseStandardSymbol[];
 	onClose?: () => void;
 	onKeywordChange: (value: string) => void;
 	onReset: () => void;
@@ -137,6 +140,12 @@ export function AdvancedSearchPage() {
 	const year = params.get('year') || dataset.year;
 	const sem = params.get('sem') || dataset.sem;
 	const department = params.get('d') || dataset.department;
+	const courseStandardOptions = useMemo(() => {
+		const standardSymbols = Object.keys(courseStandard) as CourseStandardSymbol[];
+		if (!allCourses) return standardSymbols;
+		const availableSymbols = new Set(allCourses.map((course) => course.courseType).filter(Boolean));
+		return standardSymbols.filter((symbol) => availableSymbols.has(symbol));
+	}, [allCourses]);
 
 	const academyList = useMemo<string[]>(
 		() => [...new Set<string>((departmentData || []).map((item) => item.category))],
@@ -164,6 +173,22 @@ export function AdvancedSearchPage() {
 		setAcademyFilter(restoredQuery.af ? String(restoredQuery.af).split(',') : []);
 		setTimetableFilter(restoredQuery.tf || structuredClone(emptyTimetableFilter));
 	}, [restoredQuery]);
+
+	useEffect(() => {
+		if (!allCourses) return;
+		setCourseStandardFilter((current) => {
+			const availableSymbols = new Set(courseStandardOptions);
+			let changed = false;
+			const next = { ...current };
+			for (const symbol of Object.keys(next)) {
+				if (next[symbol] && !availableSymbols.has(symbol)) {
+					next[symbol] = false;
+					changed = true;
+				}
+			}
+			return changed ? next : current;
+		});
+	}, [allCourses, courseStandardOptions]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -422,6 +447,7 @@ export function AdvancedSearchPage() {
 		categoryFilter,
 		courseStandardFilter,
 		courseStandardFilterEnabled,
+		courseStandardOptions,
 		onKeywordChange: setSearchCourseKeyword,
 		onReset: reset,
 		onToggleAcademy: (item) => setAcademyFilter((items) => toggleArrayValue(items, item)),
@@ -476,7 +502,7 @@ function getFilterSectionCount(id: SearchSectionId, props: AdvancedSearchControl
 		);
 	}
 	if (id === 'standard') {
-		return Object.values(props.courseStandardFilter).filter(Boolean).length;
+		return props.courseStandardOptions.filter((symbol) => props.courseStandardFilter[symbol]).length;
 	}
 	if (id === 'category') return props.categoryFilter.length;
 	if (id === 'academy') return props.academyFilter.length;
@@ -687,17 +713,21 @@ function FilterSectionContent({
 	if (id === 'standard') {
 		return (
 			<div className='grid gap-2'>
-				{Object.entries(courseStandard).map(([symbol, text]) => (
-					<label key={symbol} className='flex min-h-7 cursor-pointer items-center gap-2'>
-						<Checkbox
-							checked={Boolean(props.courseStandardFilter[symbol])}
-							onCheckedChange={(checked) => props.onToggleStandard(symbol, checked)}
-						/>
-						<span>
-							{symbol} {text}
-						</span>
-					</label>
-				))}
+				{props.courseStandardOptions.length ? (
+					props.courseStandardOptions.map((symbol) => (
+						<label key={symbol} className='flex min-h-7 cursor-pointer items-center gap-2'>
+							<Checkbox
+								checked={Boolean(props.courseStandardFilter[symbol])}
+								onCheckedChange={(checked) => props.onToggleStandard(symbol, checked)}
+							/>
+							<span>
+								{symbol} {courseStandard[symbol]}
+							</span>
+						</label>
+					))
+				) : (
+					<p className='m-0 text-sm opacity-70'>這個資料集沒有可用的課程標準。</p>
+				)}
 			</div>
 		);
 	}

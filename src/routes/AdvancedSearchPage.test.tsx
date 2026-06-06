@@ -12,7 +12,15 @@ vi.mock('../state/AppContext', () => ({
 		departmentItems: ['日間部'],
 		datasetDialogOpen: false,
 		setDatasetDialogOpen: vi.fn(),
-		getCourses: vi.fn().mockResolvedValue([]),
+		getCourses: vi.fn().mockResolvedValue([
+			{
+				id: '123456',
+				courseType: '○',
+				name: { zh: '共同必修' },
+				class: [],
+				teacher: [],
+			},
+		]),
 		getMyCourseIds: vi.fn(() => []),
 	}),
 }));
@@ -86,6 +94,7 @@ describe('AdvancedSearchPage navigation', () => {
 		expect(screen.queryByRole('button', { name: '搜尋' })).not.toBeInTheDocument();
 		await user.click(screen.getByRole('button', { name: '課程標準' }));
 		expect(await screen.findByText('○ 部訂共同必修')).toBeInTheDocument();
+		expect(screen.queryByText('△ 校訂共同必修')).not.toBeInTheDocument();
 		expect(screen.getByRole('button', { name: '博雅類別' })).toBeInTheDocument();
 	});
 
