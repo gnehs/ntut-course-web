@@ -73,6 +73,22 @@ describe('AdvancedSearchPage navigation', () => {
 		expect((router.state.location.search as Record<string, unknown>).q).toEqual({ sph: true });
 	});
 
+	it('shows mobile search input and filter chips without a drawer trigger', async () => {
+		const history = createMemoryHistory({
+			initialEntries: ['/advanced-search?year=115&sem=1&d=main'],
+		});
+		const router = createAppRouter({ history });
+		const user = userEvent.setup();
+
+		render(<RouterProvider router={router} />);
+
+		expect(await screen.findByPlaceholderText('搜尋課程、教師、課號、班級')).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: '搜尋' })).not.toBeInTheDocument();
+		await user.click(screen.getByRole('button', { name: '課程標準' }));
+		expect(await screen.findByText('○ 部訂共同必修')).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: '博雅類別' })).toBeInTheDocument();
+	});
+
 	it('keeps accumulated filters after multiple option changes', async () => {
 		const history = createMemoryHistory({
 			initialEntries: ['/advanced-search?year=115&sem=1&d=main'],

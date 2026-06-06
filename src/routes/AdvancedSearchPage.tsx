@@ -2,9 +2,20 @@ import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
-import { ChevronDown, Search, X } from 'lucide-react';
+import {
+	ChevronDown,
+	Clock3,
+	GraduationCap,
+	LibraryBig,
+	ListFilter,
+	Search,
+	Shapes,
+	X,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { TimetableSelector } from '../components/TimetableSelector';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -47,6 +58,46 @@ type AdvancedSearchQuery = {
 	sph?: boolean;
 };
 
+type SearchSectionId = 'display' | 'standard' | 'category' | 'academy' | 'time';
+
+type AdvancedSearchControlsProps = {
+	academyFilter: string[];
+	academyList: string[];
+	categoryFilter: string[];
+	courseStandardFilter: Record<string, boolean>;
+	courseStandardFilterEnabled: boolean;
+	onClose?: () => void;
+	onKeywordChange: (value: string) => void;
+	onReset: () => void;
+	onToggleAcademy: (item: string) => void;
+	onToggleCategory: (value: string) => void;
+	onToggleConflict: (checked: unknown) => void;
+	onTogglePlaceholder: (checked: unknown) => void;
+	onToggleStandard: (symbol: string, checked: unknown) => void;
+	onToggleTimetable: (date?: string | null, slot?: string) => void;
+	recommandKeyword: string[];
+	searchCourseKeyword: string;
+	setSortBy: (value: string) => void;
+	showCloseButton?: boolean;
+	showConflictCourse: boolean;
+	showPlaceholder: boolean;
+	sortBy: string;
+	timetableFilter: Record<string, string[]>;
+};
+
+const filterSections: {
+	id: SearchSectionId;
+	label: string;
+	title: string;
+	icon: LucideIcon;
+}[] = [
+	{ id: 'display', label: '顯示與排序', title: '顯示與排序', icon: ListFilter },
+	{ id: 'standard', label: '課程標準', title: '依課程標準篩選', icon: GraduationCap },
+	{ id: 'category', label: '博雅類別', title: '依博雅類別篩選課程', icon: Shapes },
+	{ id: 'academy', label: '學院', title: '依學院篩選', icon: LibraryBig },
+	{ id: 'time', label: '時間', title: '依時間篩選', icon: Clock3 },
+];
+
 export function AdvancedSearchPage() {
 	const { location } = useRouterState();
 	const navigate = useNavigate();
@@ -56,7 +107,6 @@ export function AdvancedSearchPage() {
 		() => safeParseJson(params.get('q'), {}),
 		[location.search],
 	);
-	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [searchCourseKeyword, setSearchCourseKeyword] = useState(restoredQuery.k || '');
 	const [showConflictCourse, setShowConflictCourse] = useState(restoredQuery.c ?? true);
 	const [showPlaceholder, setShowPlaceholder] = useState(restoredQuery.sph ?? false);
@@ -337,7 +387,7 @@ export function AdvancedSearchPage() {
 		setTimetableFilter(structuredClone(emptyTimetableFilter));
 	}
 
-	function toggleLesson(date, slot) {
+	function toggleLesson(date?: string | null, slot?: string) {
 		setTimetableFilter((current) => {
 			const next = structuredClone(current);
 			if (date && slot) {
@@ -364,58 +414,37 @@ export function AdvancedSearchPage() {
 		});
 	}
 
+	const searchControlsProps: AdvancedSearchControlsProps = {
+		academyFilter,
+		academyList,
+		categoryFilter,
+		courseStandardFilter,
+		courseStandardFilterEnabled,
+		onKeywordChange: setSearchCourseKeyword,
+		onReset: reset,
+		onToggleAcademy: (item) => setAcademyFilter((items) => toggleArrayValue(items, item)),
+		onToggleCategory: (value) => setCategoryFilter((items) => toggleArrayValue(items, value)),
+		onTogglePlaceholder: (checked) => setShowPlaceholder(Boolean(checked)),
+		onToggleStandard: (symbol, checked) =>
+			setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) })),
+		onToggleTimetable: toggleLesson,
+		onToggleConflict: (checked) => setShowConflictCourse(Boolean(checked)),
+		recommandKeyword,
+		searchCourseKeyword,
+		showConflictCourse,
+		showPlaceholder,
+		sortBy,
+		timetableFilter,
+		setSortBy,
+	};
+
 	return (
-		<div className='grid gap-[18px] lg:grid-cols-[340px_1fr]'>
-			<button
-				type='button'
-				aria-label='關閉搜尋側欄'
-				className={`fixed inset-0 z-[29] transition-colors duration-200 lg:hidden ${sidebarOpen ? 'pointer-events-auto bg-black/20' : 'pointer-events-none bg-transparent'}`}
-				onClick={() => setSidebarOpen(false)}
-			/>
-			<aside
-				className={`fixed inset-y-0 left-0 z-30 h-screen w-[min(340px,90vw)] overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] lg:sticky lg:top-0 lg:z-auto lg:w-auto lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-[105%]'}`}
-			>
-				<AdvancedSearchSidebarContent
-					academyFilter={academyFilter}
-					academyList={academyList}
-					categoryFilter={categoryFilter}
-					courseStandardFilter={courseStandardFilter}
-					courseStandardFilterEnabled={courseStandardFilterEnabled}
-					onClose={() => setSidebarOpen(false)}
-					onKeywordChange={setSearchCourseKeyword}
-					onReset={reset}
-					onToggleAcademy={(item) => setAcademyFilter((items) => toggleArrayValue(items, item))}
-					onToggleCategory={(value) => setCategoryFilter((items) => toggleArrayValue(items, value))}
-					onTogglePlaceholder={(checked) => setShowPlaceholder(Boolean(checked))}
-					onToggleStandard={(symbol, checked) =>
-						setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) }))
-					}
-					onToggleTimetable={toggleLesson}
-					onToggleConflict={(checked) => setShowConflictCourse(Boolean(checked))}
-					recommandKeyword={recommandKeyword}
-					searchCourseKeyword={searchCourseKeyword}
-					showCloseButton
-					showConflictCourse={showConflictCourse}
-					showPlaceholder={showPlaceholder}
-					sortBy={sortBy}
-					timetableFilter={timetableFilter}
-					setSortBy={setSortBy}
-				/>
+		<div className='grid min-w-0 gap-[18px] lg:grid-cols-[340px_minmax(0,1fr)]'>
+			<aside className='hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] lg:sticky lg:top-0 lg:block lg:w-auto'>
+				<AdvancedSearchSidebarContent {...searchControlsProps} />
 			</aside>
-			<main className='px-3 pt-[74px] pb-10 lg:px-0 lg:pt-0 lg:pb-10'>
-				<div className='flex items-center justify-between gap-3'>
-					<Button
-						className='m-0 inline-flex lg:hidden'
-						active={sidebarOpen}
-						onClick={() => setSidebarOpen((value) => !value)}
-					>
-						<Search className='size-4' />
-						搜尋
-					</Button>
-				</div>
-				<MiniNotify className='mt-3 lg:hidden'>
-					<strong>第一次來嗎？</strong> 使用右上角按鈕進行搜尋
-				</MiniNotify>
+			<main className='min-w-0 px-3 pt-4 pb-10 lg:px-0 lg:pt-0 lg:pb-10'>
+				<AdvancedSearchMobileControls {...searchControlsProps} />
 				{onError ? (
 					<Alert danger>
 						<strong>搜尋時發生錯誤</strong>
@@ -436,30 +465,138 @@ export function AdvancedSearchPage() {
 	);
 }
 
-function AdvancedSearchSidebarContent({
-	academyFilter,
-	academyList,
-	categoryFilter,
-	courseStandardFilter,
-	courseStandardFilterEnabled,
-	onClose,
-	onKeywordChange,
-	onReset,
-	onToggleAcademy,
-	onToggleCategory,
-	onToggleConflict,
-	onTogglePlaceholder,
-	onToggleStandard,
-	onToggleTimetable,
-	recommandKeyword,
-	searchCourseKeyword,
-	setSortBy,
-	showCloseButton,
-	showConflictCourse,
-	showPlaceholder,
-	sortBy,
-	timetableFilter,
+function getFilterSectionCount(id: SearchSectionId, props: AdvancedSearchControlsProps) {
+	if (id === 'display') {
+		return (
+			Number(!props.showConflictCourse) +
+			Number(props.showPlaceholder) +
+			Number(props.sortBy !== 'default')
+		);
+	}
+	if (id === 'standard') {
+		return Object.values(props.courseStandardFilter).filter(Boolean).length;
+	}
+	if (id === 'category') return props.categoryFilter.length;
+	if (id === 'academy') return props.academyFilter.length;
+	return Object.values(props.timetableFilter).reduce((sum, items) => sum + items.length, 0);
+}
+
+function getFilterSection(id: SearchSectionId) {
+	return filterSections.find((section) => section.id === id) ?? filterSections[0];
+}
+
+function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
+	const [activeSection, setActiveSection] = useState<SearchSectionId | null>(null);
+
+	return (
+		<section className='mb-4 grid gap-3 lg:hidden'>
+			<div className='flex items-center gap-2'>
+				<label className='relative min-w-0 flex-1'>
+					<span className='sr-only'>搜尋關鍵字</span>
+					<Search className='pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[rgba(var(--vs-text),0.5)]' />
+					<Input
+						value={props.searchCourseKeyword}
+						onChange={(event) => props.onKeywordChange(event.target.value)}
+						placeholder='搜尋課程、教師、課號、班級'
+						className='h-11 rounded-xl pr-3 pl-9 text-base'
+					/>
+				</label>
+				<Button className='m-0 h-11 px-3' onClick={props.onReset}>
+					重設
+				</Button>
+			</div>
+			<SuggestedKeywords
+				keywords={props.recommandKeyword}
+				value={props.searchCourseKeyword}
+				onSelect={props.onKeywordChange}
+				scrollable
+			/>
+			<div className='flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain pb-1 [-webkit-overflow-scrolling:touch]'>
+				{filterSections.map((section) => {
+					const count = getFilterSectionCount(section.id, props);
+					const active = activeSection === section.id;
+					const Icon = section.icon;
+					return (
+						<Popover
+							key={section.id}
+							open={active}
+							onOpenChange={(open) => setActiveSection(open ? section.id : null)}
+						>
+							<PopoverTrigger asChild>
+								<button
+									type='button'
+									aria-pressed={active}
+									className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors ${
+										active
+											? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-white'
+											: count
+												? 'border-[rgba(var(--vs-primary),0.35)] bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
+												: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
+									}`}
+								>
+									<Icon className='size-4 shrink-0' />
+									<span>{section.label}</span>
+									{count ? (
+										<span className='rounded-full bg-current px-1.5 py-0.5 text-[0.68rem] leading-none text-[rgb(var(--vs-background))]'>
+											{count}
+										</span>
+									) : null}
+								</button>
+							</PopoverTrigger>
+							<PopoverContent>
+								<div className='mb-3 flex items-center gap-2 font-semibold'>
+									<Icon className='size-4 text-[rgb(var(--vs-primary))]' />
+									<span>{section.label}</span>
+								</div>
+								<FilterSectionContent id={section.id} {...props} />
+							</PopoverContent>
+						</Popover>
+					);
+				})}
+			</div>
+		</section>
+	);
+}
+
+function SuggestedKeywords({
+	keywords,
+	value,
+	onSelect,
+	scrollable = false,
+}: {
+	keywords: string[];
+	value: string;
+	onSelect: (keyword: string) => void;
+	scrollable?: boolean;
 }) {
+	if (!keywords.length) return null;
+
+	return (
+		<div
+			className={`flex min-w-0 items-center gap-2 text-sm ${
+				scrollable
+					? 'overflow-x-auto overscroll-x-contain pb-1 [-webkit-overflow-scrolling:touch]'
+					: 'flex-wrap'
+			}`}
+		>
+			<span className='shrink-0 text-xs font-medium tracking-normal text-[rgba(var(--vs-text),0.58)]'>
+				快速搜尋
+			</span>
+			{keywords.map((keyword) => (
+				<Button
+					key={keyword}
+					active={value === keyword}
+					className='m-0 h-8 rounded-full px-3'
+					onClick={() => onSelect(keyword)}
+				>
+					{keyword}
+				</Button>
+			))}
+		</div>
+	);
+}
+
+function AdvancedSearchSidebarContent(props: AdvancedSearchControlsProps) {
 	return (
 		<div className='grid gap-3'>
 			<div className='flex items-center justify-between gap-3'>
@@ -470,11 +607,11 @@ function AdvancedSearchSidebarContent({
 					🍤 北科課程好朋友
 				</Link>
 				<div className='flex items-center gap-1'>
-					<Button className='m-0' onClick={onReset}>
+					<Button className='m-0' onClick={props.onReset}>
 						重設
 					</Button>
-					{showCloseButton ? (
-						<Button icon className='m-0 lg:hidden' onClick={onClose}>
+					{props.showCloseButton ? (
+						<Button icon className='m-0 lg:hidden' onClick={props.onClose}>
 							<X className='size-4' />
 						</Button>
 					) : null}
@@ -482,96 +619,137 @@ function AdvancedSearchSidebarContent({
 			</div>
 			<Field label='搜尋關鍵字'>
 				<Input
-					value={searchCourseKeyword}
-					onChange={(event) => onKeywordChange(event.target.value)}
+					value={props.searchCourseKeyword}
+					onChange={(event) => props.onKeywordChange(event.target.value)}
 					placeholder='課程名稱、教師、課號、班級'
 				/>
 			</Field>
-			<div className='flex flex-wrap items-center gap-1 text-sm'>
-				<span className='opacity-75'>建議：</span>
-				{recommandKeyword.map((keyword) => (
-					<Button
-						key={keyword}
-						active={searchCourseKeyword === keyword}
-						className='m-0 h-auto px-3 py-1.5'
-						onClick={() => onKeywordChange(keyword)}
-					>
-						{keyword}
-					</Button>
-				))}
-			</div>
-			<SearchSection title='顯示與排序' open>
+			<SuggestedKeywords
+				keywords={props.recommandKeyword}
+				value={props.searchCourseKeyword}
+				onSelect={props.onKeywordChange}
+			/>
+			<SearchSection sectionId='display' open>
+				<FilterSectionContent id='display' {...props} />
+			</SearchSection>
+			<SearchSection sectionId='standard' open={props.courseStandardFilterEnabled}>
+				<FilterSectionContent id='standard' {...props} />
+			</SearchSection>
+			<SearchSection sectionId='category' open={props.categoryFilter.length > 0}>
+				<FilterSectionContent id='category' {...props} />
+			</SearchSection>
+			<SearchSection sectionId='academy' open={props.academyFilter.length > 0}>
+				<FilterSectionContent id='academy' {...props} />
+			</SearchSection>
+			<SearchSection
+				sectionId='time'
+				open={(Object.values(props.timetableFilter) as string[][]).some((items) => items.length)}
+			>
+				<FilterSectionContent id='time' {...props} />
+			</SearchSection>
+		</div>
+	);
+}
+
+function FilterSectionContent({
+	id,
+	...props
+}: AdvancedSearchControlsProps & { id: SearchSectionId }) {
+	if (id === 'display') {
+		return (
+			<div className='grid gap-2'>
 				<label className='flex min-h-7 cursor-pointer items-center gap-2'>
-					<Checkbox checked={showConflictCourse} onCheckedChange={onToggleConflict} />
+					<Checkbox checked={props.showConflictCourse} onCheckedChange={props.onToggleConflict} />
 					顯示衝堂課程
 				</label>
 				<label className='flex min-h-7 cursor-pointer items-center gap-2'>
-					<Checkbox checked={showPlaceholder} onCheckedChange={onTogglePlaceholder} />
+					<Checkbox checked={props.showPlaceholder} onCheckedChange={props.onTogglePlaceholder} />
 					顯示佔位課程
 				</label>
 				<Field label='排序依照'>
-					<Select value={sortBy} onChange={(value) => setSortBy(value)}>
+					<Select value={props.sortBy} onChange={(value) => props.setSortBy(value)}>
 						<SelectOption value='default'>預設</SelectOption>
 						<SelectOption value='withdrawal'>退選率（由低到高）</SelectOption>
 					</Select>
 				</Field>
-			</SearchSection>
-			<SearchSection title='依課程標準篩選' open={courseStandardFilterEnabled}>
+			</div>
+		);
+	}
+
+	if (id === 'standard') {
+		return (
+			<div className='grid gap-2'>
 				{Object.entries(courseStandard).map(([symbol, text]) => (
 					<label key={symbol} className='flex min-h-7 cursor-pointer items-center gap-2'>
 						<Checkbox
-							checked={Boolean(courseStandardFilter[symbol])}
-							onCheckedChange={(checked) => onToggleStandard(symbol, checked)}
+							checked={Boolean(props.courseStandardFilter[symbol])}
+							onCheckedChange={(checked) => props.onToggleStandard(symbol, checked)}
 						/>
 						<span>
 							{symbol} {text}
 						</span>
 					</label>
 				))}
-			</SearchSection>
-			<SearchSection title='依博雅類別篩選課程' open={categoryFilter.length > 0}>
+			</div>
+		);
+	}
+
+	if (id === 'category') {
+		return (
+			<div className='grid gap-2'>
 				{Object.entries(categoryFilterList).map(([key, value]) => (
 					<label key={value} className='flex min-h-7 cursor-pointer items-center gap-2'>
 						<Checkbox
-							checked={categoryFilter.includes(value)}
-							onCheckedChange={() => onToggleCategory(value)}
+							checked={props.categoryFilter.includes(value)}
+							onCheckedChange={() => props.onToggleCategory(value)}
 						/>
 						<span>{key}</span>
 					</label>
 				))}
-			</SearchSection>
-			<SearchSection title='依學院篩選' open={academyFilter.length > 0}>
-				{academyList.map((item) => (
-					<label key={item} className='flex min-h-7 cursor-pointer items-center gap-2'>
-						<Checkbox
-							checked={academyFilter.includes(item)}
-							onCheckedChange={() => onToggleAcademy(item)}
-						/>
-						<span>{item}</span>
-					</label>
-				))}
-			</SearchSection>
-			<SearchSection
-				title='依時間篩選'
-				open={(Object.values(timetableFilter) as string[][]).some((items) => items.length)}
-			>
-				<MiniNotify>點擊星期或節次可一次選取整個行或列，左上角可一次切換整張課表。</MiniNotify>
-				<TimetableSelector value={timetableFilter} onToggle={onToggleTimetable} />
-			</SearchSection>
+			</div>
+		);
+	}
+
+	if (id === 'academy') {
+		return (
+			<div className='grid gap-2'>
+				{props.academyList.length ? (
+					props.academyList.map((item) => (
+						<label key={item} className='flex min-h-7 cursor-pointer items-center gap-2'>
+							<Checkbox
+								checked={props.academyFilter.includes(item)}
+								onCheckedChange={() => props.onToggleAcademy(item)}
+							/>
+							<span>{item}</span>
+						</label>
+					))
+				) : (
+					<p className='m-0 text-sm opacity-70'>學院資料載入後即可篩選。</p>
+				)}
+			</div>
+		);
+	}
+
+	return (
+		<div className='grid gap-2'>
+			<MiniNotify>點擊星期或節次可一次選取整個行或列，左上角可一次切換整張課表。</MiniNotify>
+			<TimetableSelector value={props.timetableFilter} onToggle={props.onToggleTimetable} />
 		</div>
 	);
 }
 
 function SearchSection({
-	title,
+	sectionId,
 	open = false,
 	children,
 }: {
-	title: string;
+	sectionId: SearchSectionId;
 	open?: boolean;
 	children: React.ReactNode;
 }) {
 	const [expanded, setExpanded] = useState(open);
+	const section = getFilterSection(sectionId);
+	const Icon = section.icon;
 
 	useEffect(() => {
 		if (open) setExpanded(true);
@@ -585,9 +763,12 @@ function SearchSection({
 				aria-expanded={expanded}
 				onClick={() => setExpanded((value) => !value)}
 			>
-				<span>{title}</span>
+				<span className='flex min-w-0 items-center gap-2'>
+					<Icon className='size-4 shrink-0 text-[rgb(var(--vs-primary))]' />
+					<span>{section.title}</span>
+				</span>
 				<ChevronDown
-					className={`size-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+					className={`size-4 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
 				/>
 			</button>
 			{expanded ? <div className='mt-3 grid gap-2'>{children}</div> : null}
