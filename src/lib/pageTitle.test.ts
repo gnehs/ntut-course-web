@@ -1,5 +1,13 @@
+import { render } from '@testing-library/react';
+import React from 'react';
 import { describe, expect, it } from 'vitest';
-import { coursePageTitle, pageTitleForPath, stylizeCourseId } from './pageTitle';
+import {
+	SITE_TITLE,
+	coursePageTitle,
+	pageTitleForPath,
+	stylizeCourseId,
+	usePageTitle,
+} from './pageTitle';
 import type { Course } from '../types/course';
 
 describe('pageTitle', () => {
@@ -18,7 +26,22 @@ describe('pageTitle', () => {
 			'𝟯𝟲𝟬𝟳𝟰𝟰 國文',
 		);
 	});
+
+	it('restores the site title after leaving a page with a custom title', () => {
+		const title = '𝟯𝟲𝟬𝟳𝟰𝟰 國文';
+		document.title = SITE_TITLE;
+		const { unmount } = render(React.createElement(PageTitleTestComponent, { title }));
+
+		expect(document.title).toBe(title);
+		unmount();
+		expect(document.title).toBe(SITE_TITLE);
+	});
 });
+
+function PageTitleTestComponent({ title }: { title: string }) {
+	usePageTitle(title);
+	return null;
+}
 
 function course(override: Partial<Course>): Course {
 	return {

@@ -46,5 +46,10 @@ export function usePageTitle(title: string | undefined | null) {
 	useEffect(() => {
 		if (!title) return;
 		document.title = title;
+		return () => {
+			if (document.title === title) {
+				document.title = SITE_TITLE;
+			}
+		};
 	}, [title]);
 }
