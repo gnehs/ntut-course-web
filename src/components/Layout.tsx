@@ -66,7 +66,7 @@ export function Layout() {
 						🍤 北科課程好朋友
 					</Link>
 					<div className='hidden md:block'>
-						<UniversalSearch navbar />
+						{!isAdvancedSearch ? <UniversalSearch navbar /> : null}
 					</div>
 					<div className='flex justify-end'>
 						<Button className='whitespace-nowrap' onClick={() => setDatasetDialogOpen(true)}>

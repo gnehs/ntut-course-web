@@ -165,25 +165,28 @@ export function MProgramDetailPage() {
 	if (!courses) return <ClassDetailSkeleton />;
 	return (
 		<div className='space-y-4'>
-			<div className='flex flex-wrap items-center justify-between gap-2'>
+			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
 				<div>
 					<h1>{programName}</h1>
+					<p className='m-0 text-sm opacity-75'>{courses.length} 門課程</p>
 				</div>
-				<div className='flex flex-wrap justify-end gap-2'>
+				<div className='flex flex-wrap items-center gap-2 sm:justify-end'>
 					<Button
 						active={showConflictCourse}
+						aria-pressed={showConflictCourse}
+						className='min-h-11 px-4 text-sm'
 						onClick={() => setShowConflictCourse((value) => !value)}
 					>
 						{showConflictCourse ? <Check className='size-4' /> : <X className='size-4' />}
 						衝堂課程
 					</Button>
 					{!isInMyCourse ? (
-						<Button primary onClick={addProgramCourses}>
+						<Button primary className='min-h-11 px-4 text-sm' onClick={addProgramCourses}>
 							<Plus className='size-4' />
 							加入我的課程
 						</Button>
 					) : (
-						<Button danger onClick={removeProgramCourses}>
+						<Button danger className='min-h-11 px-4 text-sm' onClick={removeProgramCourses}>
 							<Minus className='size-4' />
 							從我的課程移除
 						</Button>
@@ -197,13 +200,15 @@ export function MProgramDetailPage() {
 				</Alert>
 			) : null}
 			{courses.length ? (
-				<CourseList
-					courses={courses}
-					showTimetable
-					showConflictCourse={showConflictCourse}
-					year={year}
-					sem={sem}
-				/>
+				<div className='[&>div>div:first-child_button]:min-h-11 [&>div>div:first-child_button]:px-4 [&>div>div:first-child_button]:text-sm'>
+					<CourseList
+						courses={courses}
+						showTimetable
+						showConflictCourse={showConflictCourse}
+						year={year}
+						sem={sem}
+					/>
+				</div>
 			) : null}
 			{!courses.length && program ? (
 				<Alert>

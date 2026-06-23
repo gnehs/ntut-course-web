@@ -1,5 +1,6 @@
+import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Clipboard, PlaySquare, RefreshCw } from 'lucide-react';
+import { AlertCircle, Clipboard, Clock, PlaySquare, RefreshCw, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +50,8 @@ export function WidgetPage() {
 	}, [dataset.year, dataset.sem, dataset.department]);
 	const code = useMemo(() => createScriptableCode(courses || []), [courses]);
 	if (!courses) return <StepsPageSkeleton codeBlock />;
+	const hasCourses = courses.length > 0;
+	const displayedCode = hasCourses ? code : '加入課程後，這裡會產生可貼到 Scriptable 的程式碼。';
 	return (
 		<div className='flex flex-col gap-5'>
 			<section className='flex flex-col gap-4'>
@@ -62,45 +65,74 @@ export function WidgetPage() {
 				<AlertTitle>課表變更後要重新設定</AlertTitle>
 				<AlertDescription>加退選或修改課程後，課表變更後請重新複製程式碼。</AlertDescription>
 			</Alert>
-			{!courses.length ? (
-				<Alert variant='destructive'>
+			{!hasCourses ? (
+				<Alert>
 					<AlertCircle />
-					<AlertTitle>沒有課程資料</AlertTitle>
-					<AlertDescription>請先新增課程資料，產生的小工具才會有課表內容。</AlertDescription>
+					<AlertTitle>先新增課程</AlertTitle>
+					<AlertDescription>
+						小工具會讀取「我的課程」內容；先從搜尋或班級課表加入課程後，再回來複製程式碼。
+						<div className='mt-3 flex flex-wrap gap-2'>
+							<Button
+								as={Link}
+								primary
+								to={`/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`}
+							>
+								<Search className='size-4' data-icon='inline-start' />
+								前往搜尋
+							</Button>
+							<Button as={Link} to='/class'>
+								<Clock className='size-4' data-icon='inline-start' />
+								班級課表
+							</Button>
+						</div>
+					</AlertDescription>
 				</Alert>
 			) : null}
-			<Card className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+			<Card
+				className={`overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm ${!hasCourses ? 'opacity-70' : ''}`}
+			>
 				<CardHeader className='gap-3 border-b border-[rgba(var(--vs-text),0.08)] p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='min-w-0'>
-						<CardTitle className='text-base font-semibold'>1. 複製 Scriptable 程式碼</CardTitle>
-						<CardDescription>包含 {courses.length} 門課程資料。</CardDescription>
+						<CardTitle className='text-base font-semibold'>
+							{hasCourses ? '1. 複製 Scriptable 程式碼' : '1. 加入課程後再複製程式碼'}
+						</CardTitle>
+						<CardDescription>
+							{hasCourses
+								? `包含 ${courses.length} 門課程資料。`
+								: '目前沒有課程資料，複製功能已停用。'}
+						</CardDescription>
 					</div>
-					<Button
-						active
-						size='sm'
-						onClick={async () => {
-							try {
-								await copyCode(code);
-								toast.success('已複製', {
-									description: '請到 Scriptable 貼上程式碼即可使用小工具',
-								});
-							} catch {
-								toast.error('複製失敗', {
-									description: '請嘗試手動複製',
-								});
-							}
-						}}
-					>
-						<Clipboard className='size-4' data-icon='inline-start' />
-						複製
-					</Button>
+					<div className='flex flex-wrap items-center gap-2'>
+						<Badge variant='outline'>{courses.length} 門課</Badge>
+						<Button
+							active
+							disabled={!hasCourses}
+							size='sm'
+							onClick={async () => {
+								if (!hasCourses) return;
+								try {
+									await copyCode(code);
+									toast.success('已複製', {
+										description: '請到 Scriptable 貼上程式碼即可使用小工具',
+									});
+								} catch {
+									toast.error('複製失敗', {
+										description: '請嘗試手動複製',
+									});
+								}
+							}}
+						>
+							<Clipboard className='size-4' data-icon='inline-start' />
+							複製
+						</Button>
+					</div>
 				</CardHeader>
 				<CardContent className='p-0'>
 					<pre
 						id='scriptable-code'
-						className='h-[512px] overflow-auto bg-[rgb(var(--vs-gray-1))] p-4 text-sm leading-6 whitespace-pre-wrap'
+						className={`${hasCourses ? 'h-[512px]' : 'h-28'} overflow-auto bg-[rgb(var(--vs-gray-1))] p-4 text-sm leading-6 whitespace-pre-wrap`}
 					>
-						{code}
+						{displayedCode}
 					</pre>
 				</CardContent>
 			</Card>

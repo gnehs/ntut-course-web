@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
@@ -19,6 +20,10 @@ import type { WithdrawalResponse, WithdrawalStat } from '../types/course';
 type SortMode = 'rate-desc' | 'rate-asc' | 'withdraw-desc' | 'people-desc' | 'name-asc';
 type GroupMode = 'risk' | 'none';
 
+const WITHDRAWAL_DESKTOP_MEDIA_QUERY = '(min-width: 768px)';
+const MOBILE_WITHDRAWAL_BATCH_SIZE = 40;
+const DESKTOP_WITHDRAWAL_BATCH_SIZE = 120;
+
 export function WithdrawalPage() {
 	const [period, setPeriod] = useState('-recent-3-years');
 	const [keyword, setKeyword] = useState('');
@@ -26,7 +31,10 @@ export function WithdrawalPage() {
 	const [groupBy, setGroupBy] = useState<GroupMode>('risk');
 	const [data, setData] = useState<WithdrawalStat[] | null>(null);
 	const [stat, setStat] = useState<WithdrawalResponse['stat'] | null>(null);
+	const batchSize = useWithdrawalBatchSize();
+	const [visibleCount, setVisibleCount] = useState(batchSize);
 	const suffix = period === 'all' ? '' : period;
+	const resetVisibleRows = () => setVisibleCount(batchSize);
 	useEffect(() => {
 		let cancelled = false;
 		setData(null);
@@ -48,6 +56,9 @@ export function WithdrawalPage() {
 			cancelled = true;
 		};
 	}, [suffix]);
+	useEffect(() => {
+		setVisibleCount(batchSize);
+	}, [batchSize]);
 	const rows = useMemo(() => data || [], [data]);
 	const distribution = useMemo(
 		() => createWithdrawalRateDistribution(rows.map((item) => rateValue(item))),
@@ -67,6 +78,24 @@ export function WithdrawalPage() {
 				: [{ title: '全部教師', rows: filteredRows }],
 		[filteredRows, groupBy, distribution],
 	);
+	const visibleRows = useMemo(
+		() => filteredRows.slice(0, visibleCount),
+		[filteredRows, visibleCount],
+	);
+	const visibleRowSet = useMemo(() => new Set(visibleRows), [visibleRows]);
+	const visibleGroupedRows = useMemo(
+		() =>
+			groupedRows.map((group) => ({
+				title: group.title,
+				rows: group.rows.filter((item) => visibleRowSet.has(item)),
+				totalRows: group.rows.length,
+			})),
+		[groupedRows, visibleRowSet],
+	);
+	const renderedCount = visibleRows.length;
+	const matchingCount = filteredRows.length;
+	const hiddenCount = Math.max(matchingCount - renderedCount, 0);
+	const nextBatchCount = Math.min(batchSize, hiddenCount);
 	return (
 		<div className='space-y-4'>
 			<h1>退選率</h1>
@@ -76,13 +105,24 @@ export function WithdrawalPage() {
 					<span>搜尋教師或課程</span>
 					<Input
 						value={keyword}
-						onChange={(event) => setKeyword(event.target.value)}
+						onChange={(event) => {
+							setKeyword(event.target.value);
+							resetVisibleRows();
+						}}
 						placeholder='輸入教師、課程名稱'
+						className='min-h-11 md:min-h-9'
 					/>
 				</label>
 				<label className='grid gap-1 text-sm font-medium'>
 					<span>期間</span>
-					<Select value={period} onChange={(value) => setPeriod(value)}>
+					<Select
+						value={period}
+						onChange={(value) => {
+							setPeriod(value);
+							resetVisibleRows();
+						}}
+						className='min-h-11 md:min-h-9'
+					>
 						<SelectOption value='-recent-3-years'>過去三年</SelectOption>
 						<SelectOption value='-recent-5-years'>過去五年</SelectOption>
 						<SelectOption value='all'>所有期間</SelectOption>
@@ -90,7 +130,14 @@ export function WithdrawalPage() {
 				</label>
 				<label className='grid gap-1 text-sm font-medium'>
 					<span>排序</span>
-					<Select value={sortBy} onChange={(value) => setSortBy(value as SortMode)}>
+					<Select
+						value={sortBy}
+						onChange={(value) => {
+							setSortBy(value as SortMode);
+							resetVisibleRows();
+						}}
+						className='min-h-11 md:min-h-9'
+					>
 						<SelectOption value='rate-desc'>退選率高到低</SelectOption>
 						<SelectOption value='rate-asc'>退選率低到高</SelectOption>
 						<SelectOption value='withdraw-desc'>退選人數多到少</SelectOption>
@@ -100,7 +147,14 @@ export function WithdrawalPage() {
 				</label>
 				<label className='grid gap-1 text-sm font-medium'>
 					<span>分組</span>
-					<Select value={groupBy} onChange={(value) => setGroupBy(value as GroupMode)}>
+					<Select
+						value={groupBy}
+						onChange={(value) => {
+							setGroupBy(value as GroupMode);
+							resetVisibleRows();
+						}}
+						className='min-h-11 md:min-h-9'
+					>
 						<SelectOption value='risk'>依退選率</SelectOption>
 						<SelectOption value='none'>不分組</SelectOption>
 					</Select>
@@ -127,9 +181,10 @@ export function WithdrawalPage() {
 									))}
 						</div>
 					) : null}
-					<div className='flex items-center justify-between gap-3 text-sm opacity-75'>
+					<div className='flex flex-col gap-2 text-sm opacity-75 sm:flex-row sm:items-center sm:justify-between'>
 						<div>
-							顯示 {filteredRows.length} / {rows.length} 位教師
+							已呈現 {renderedCount} / {matchingCount} 位符合條件教師
+							{matchingCount !== rows.length ? `（全部 ${rows.length} 位）` : null}
 						</div>
 						{distribution ? (
 							<div className='text-right'>
@@ -140,13 +195,17 @@ export function WithdrawalPage() {
 					</div>
 					{filteredRows.length ? (
 						<div className='grid gap-5'>
-							{groupedRows
+							{visibleGroupedRows
 								.filter((group) => group.rows.length)
 								.map((group) => (
 									<section key={group.title} className='relative grid'>
 										<div className='sticky top-14.5 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
 											<h2 className='text-lg font-semibold'>{group.title}</h2>
-											<div className='text-sm opacity-70'>{group.rows.length} 位教師</div>
+											<div className='text-sm opacity-70'>
+												{group.rows.length === group.totalRows
+													? `${group.totalRows} 位教師`
+													: `${group.rows.length} / ${group.totalRows} 位教師`}
+											</div>
 										</div>
 										<div className='grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2'>
 											{group.rows.map((item) => (
@@ -159,6 +218,21 @@ export function WithdrawalPage() {
 										</div>
 									</section>
 								))}
+							{hiddenCount ? (
+								<div className='flex flex-col items-center gap-3 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 text-center sm:flex-row sm:justify-between sm:text-left'>
+									<div className='text-sm opacity-75'>
+										已呈現 {renderedCount} / {matchingCount} 位符合條件教師
+									</div>
+									<Button
+										className='min-h-11 w-full px-4 text-sm sm:w-auto md:min-h-9'
+										onClick={() =>
+											setVisibleCount((count) => Math.min(count + batchSize, matchingCount))
+										}
+									>
+										載入更多（再顯示 {nextBatchCount} 位）
+									</Button>
+								</div>
+							) : null}
 						</div>
 					) : (
 						<Card>
@@ -170,6 +244,37 @@ export function WithdrawalPage() {
 			)}
 		</div>
 	);
+}
+
+function useWithdrawalBatchSize() {
+	const [batchSize, setBatchSize] = useState(getWithdrawalBatchSize);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined;
+		const mediaQuery = window.matchMedia(WITHDRAWAL_DESKTOP_MEDIA_QUERY);
+		const updateBatchSize = () => {
+			setBatchSize(
+				mediaQuery.matches ? DESKTOP_WITHDRAWAL_BATCH_SIZE : MOBILE_WITHDRAWAL_BATCH_SIZE,
+			);
+		};
+		updateBatchSize();
+		if (typeof mediaQuery.addEventListener === 'function') {
+			mediaQuery.addEventListener('change', updateBatchSize);
+			return () => mediaQuery.removeEventListener('change', updateBatchSize);
+		}
+		mediaQuery.addListener(updateBatchSize);
+		return () => mediaQuery.removeListener(updateBatchSize);
+	}, []);
+
+	return batchSize;
+}
+
+function getWithdrawalBatchSize() {
+	if (typeof window === 'undefined' || typeof window.matchMedia !== 'function')
+		return DESKTOP_WITHDRAWAL_BATCH_SIZE;
+	return window.matchMedia(WITHDRAWAL_DESKTOP_MEDIA_QUERY).matches
+		? DESKTOP_WITHDRAWAL_BATCH_SIZE
+		: MOBILE_WITHDRAWAL_BATCH_SIZE;
 }
 
 function WithdrawalTeacherCard({

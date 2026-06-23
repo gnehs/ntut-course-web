@@ -1,13 +1,24 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
-import { BookOpen, Calendar, Clock, FileInput, FileOutput, Puzzle, Shapes } from 'lucide-react';
+import {
+	BookOpen,
+	Calendar,
+	Clock,
+	FileInput,
+	FileOutput,
+	Puzzle,
+	Search,
+	Shapes,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons';
+import { formatCredit } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
 import type { Course } from '../types/course';
 
@@ -115,6 +126,20 @@ export function MyCoursePage() {
 					你可以在班級頁面或是課程頁面右上方找到「加入我的課程」按鈕！
 					<br />
 					若這裡沒有先前加入的課程，可能是選擇了錯誤的資料集，請嘗試於右上按鈕切換資料集。
+					<div className='mt-3 flex flex-wrap gap-2'>
+						<Button
+							as={Link}
+							primary
+							to={`/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`}
+						>
+							<Search className='size-4' />
+							前往搜尋
+						</Button>
+						<Button as={Link} to='/class'>
+							<Clock className='size-4' />
+							班級課表
+						</Button>
+					</div>
 				</Alert>
 			) : null}
 			{courses.length ? (
@@ -135,7 +160,7 @@ export function MyCoursePage() {
 					<h3>課程</h3>
 					<div className='grid grid-cols-3 gap-3'>
 						<Card>
-							<CardTitle>{credit}</CardTitle>
+							<CardTitle>{formatCredit(credit)}</CardTitle>
 							<p>學分</p>
 							<BookOpen data-card-icon />
 						</Card>

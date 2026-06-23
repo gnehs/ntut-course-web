@@ -23,9 +23,9 @@ export function Button({
 	...props
 }: ButtonProps) {
 	const classes = cn(
-		'inline-flex h-[34px] shrink-0 items-center justify-center gap-1 rounded-lg px-[10px] text-[0.8em] font-normal leading-none transition-all duration-200',
+		'inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-normal leading-none transition-all duration-200',
 		'border-0 no-underline focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
-		icon && 'w-[34px] px-0',
+		icon && 'size-11 px-0',
 		active &&
 			'bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))] hover:bg-[rgb(var(--vs-primary))]',
 		!active &&

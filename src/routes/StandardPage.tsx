@@ -14,8 +14,8 @@ import type {
 	StandardYearData,
 } from '../types/course';
 import { errorMessage } from '../lib/error';
-import { courseStandard, isZeroCreditValue } from '../lib/courseUtils';
-import { BookOpen, Building2, Calendar, GraduationCap, ListChecks, Search } from 'lucide-react';
+import { courseStandard, formatCredit, isZeroCreditValue } from '../lib/courseUtils';
+import { BookOpen, Building2, Calendar, ListChecks, Search } from 'lucide-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
 
@@ -186,6 +186,10 @@ export function StandardPage() {
 				</div>
 			) : null}
 
+			{years && !current && (!year || standardData) ? (
+				<StandardGuide year={year} system={system} department={department} />
+			) : null}
+
 			{year && !standardData ? <StandardPickerSkeleton content /> : null}
 
 			{department && current ? (
@@ -195,7 +199,7 @@ export function StandardPage() {
 						<div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
 							{creditItems.map(([key, value]) => (
 								<Card key={key}>
-									<CardTitle className='tabular-nums'>{value}</CardTitle>
+									<CardTitle className='tabular-nums'>{formatCredit(value)}</CardTitle>
 									<p>{key}</p>
 								</Card>
 							))}
@@ -242,7 +246,7 @@ export function StandardPage() {
 																<span className='truncate'>{item.name}</span>
 															</span>
 															<span className='shrink-0 text-sm tabular-nums opacity-60'>
-																{item.credit} 學分
+																{formatCredit(item.credit)} 學分
 															</span>
 														</div>
 													))}
@@ -274,6 +278,78 @@ export function StandardPage() {
 				</>
 			) : null}
 		</div>
+	);
+}
+
+function StandardGuide({
+	year,
+	system,
+	department,
+}: {
+	year: string;
+	system: string;
+	department: string;
+}) {
+	const steps = [
+		{
+			title: '1. 選入學年度',
+			text: year ? formatRocYear(year) : '選擇年度',
+			done: Boolean(year),
+			icon: Calendar,
+		},
+		{
+			title: '2. 選學制',
+			text: system || '選擇學制',
+			done: Boolean(system),
+			icon: Building2,
+		},
+		{
+			title: '3. 選系所',
+			text: department || '選擇系所',
+			done: Boolean(department),
+			icon: ListChecks,
+		},
+	];
+
+	return (
+		<section className='space-y-4'>
+			<div>
+				<h2 className='!text-lg !leading-6 font-semibold'>查詢流程</h2>
+				<p className='!my-0 text-sm leading-5 opacity-60'>
+					依序完成上方三個選項，就能查看對應的課程標準。
+				</p>
+			</div>
+			<div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
+				{steps.map((step) => {
+					const Icon = step.icon;
+					return (
+						<Card
+							key={step.title}
+							className={`px-4 py-3 ${step.done ? 'border-[rgba(var(--vs-primary),0.28)]' : ''}`}
+						>
+							<CardTitle>{step.title}</CardTitle>
+							<p>{step.text}</p>
+							<Icon data-card-icon />
+						</Card>
+					);
+				})}
+			</div>
+			<div>
+				<h2 className='!text-lg !leading-6 font-semibold'>常用入口</h2>
+				<div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+					<Card className='px-4 py-3' to='/advanced-search'>
+						<CardTitle>搜尋課程</CardTitle>
+						<p>先找課程，再回來比對標準。</p>
+						<Search data-card-icon />
+					</Card>
+					<Card className='px-4 py-3' to='/class'>
+						<CardTitle>班級課表</CardTitle>
+						<p>查看各班課表與必修安排。</p>
+						<BookOpen data-card-icon />
+					</Card>
+				</div>
+			</div>
+		</section>
 	);
 }
 

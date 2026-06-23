@@ -142,7 +142,7 @@ export function AdvancedSearchPage() {
 	const department = params.get('d') || dataset.department;
 	const courseStandardOptions = useMemo(() => {
 		const standardSymbols = Object.keys(courseStandard) as CourseStandardSymbol[];
-		if (!allCourses) return standardSymbols;
+		if (!allCourses) return [];
 		const availableSymbols = new Set(allCourses.map((course) => course.courseType).filter(Boolean));
 		return standardSymbols.filter((symbol) => availableSymbols.has(symbol));
 	}, [allCourses]);
@@ -180,7 +180,7 @@ export function AdvancedSearchPage() {
 			const availableSymbols = new Set(courseStandardOptions);
 			let changed = false;
 			const next = { ...current };
-			for (const symbol of Object.keys(next)) {
+			for (const symbol of Object.keys(next) as CourseStandardSymbol[]) {
 				if (next[symbol] && !availableSymbols.has(symbol)) {
 					next[symbol] = false;
 					changed = true;
@@ -471,7 +471,8 @@ export function AdvancedSearchPage() {
 			<aside className='hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] lg:sticky lg:top-0 lg:block lg:w-auto'>
 				<AdvancedSearchSidebarContent {...searchControlsProps} />
 			</aside>
-			<main className='min-w-0 px-3 pt-4 pb-10 lg:px-0 lg:pt-0 lg:pb-10'>
+			<main className='min-w-0 px-3 pt-4 pb-10 lg:pt-0 lg:pr-4 lg:pb-10 lg:pl-0'>
+				<h1 className='sr-only'>搜尋課程</h1>
 				<AdvancedSearchMobileControls {...searchControlsProps} />
 				{onError ? (
 					<Alert danger>
@@ -502,7 +503,8 @@ function getFilterSectionCount(id: SearchSectionId, props: AdvancedSearchControl
 		);
 	}
 	if (id === 'standard') {
-		return props.courseStandardOptions.filter((symbol) => props.courseStandardFilter[symbol]).length;
+		return props.courseStandardOptions.filter((symbol) => props.courseStandardFilter[symbol])
+			.length;
 	}
 	if (id === 'category') return props.categoryFilter.length;
 	if (id === 'academy') return props.academyFilter.length;
@@ -515,13 +517,49 @@ function getFilterSection(id: SearchSectionId) {
 
 function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 	const [activeSection, setActiveSection] = useState<SearchSectionId | null>(null);
+	const filterScrollRef = useRef<HTMLDivElement | null>(null);
+	const [filterScrollHint, setFilterScrollHint] = useState({ left: false, right: false });
 	const hasActiveCondition =
 		props.searchCourseKeyword.trim().length > 0 ||
 		filterSections.some((section) => getFilterSectionCount(section.id, props) > 0);
 
+	useEffect(() => {
+		const scrollElement = filterScrollRef.current;
+		if (!scrollElement) return undefined;
+
+		let frame = 0;
+		const updateScrollHint = () => {
+			window.cancelAnimationFrame(frame);
+			frame = window.requestAnimationFrame(() => {
+				const maxScroll = scrollElement.scrollWidth - scrollElement.clientWidth;
+				const next = {
+					left: scrollElement.scrollLeft > 2,
+					right: maxScroll - scrollElement.scrollLeft > 2,
+				};
+				setFilterScrollHint((current) =>
+					current.left === next.left && current.right === next.right ? current : next,
+				);
+			});
+		};
+
+		updateScrollHint();
+		scrollElement.addEventListener('scroll', updateScrollHint, { passive: true });
+		window.addEventListener('resize', updateScrollHint);
+		const observer =
+			typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(updateScrollHint);
+		observer?.observe(scrollElement);
+
+		return () => {
+			window.cancelAnimationFrame(frame);
+			scrollElement.removeEventListener('scroll', updateScrollHint);
+			window.removeEventListener('resize', updateScrollHint);
+			observer?.disconnect();
+		};
+	}, [hasActiveCondition, props.courseStandardOptions.length, props.academyList.length]);
+
 	return (
-		<section className='mb-4 grid gap-3 lg:hidden'>
-			<div className='flex items-center'>
+		<section className='mb-4 grid min-w-0 gap-3 lg:hidden'>
+			<div className='flex min-w-0 items-center'>
 				<label className='relative min-w-0 flex-1'>
 					<span className='sr-only'>搜尋關鍵字</span>
 					<Search className='pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[rgba(var(--vs-text),0.5)]' />
@@ -539,54 +577,71 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 				onSelect={props.onKeywordChange}
 				scrollable
 			/>
-			<div className='flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain pb-1 [-webkit-overflow-scrolling:touch]'>
-				{hasActiveCondition ? (
-					<button
-						type='button'
-						className='inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-colors'
-						onClick={props.onReset}
-					>
-						<X className='size-4 shrink-0' />
-						<span>重設</span>
-					</button>
+			<div className='relative min-w-0'>
+				{filterScrollHint.left ? (
+					<div
+						aria-hidden='true'
+						className='pointer-events-none absolute top-0 left-0 z-[1] h-full w-10 bg-linear-to-r from-[#f4f7f8] to-transparent dark:from-[#1d1d1d]'
+					/>
 				) : null}
-				{filterSections.map((section) => {
-					const count = getFilterSectionCount(section.id, props);
-					const active = activeSection === section.id;
-					const Icon = section.icon;
-					const TriggerIcon = count ? Check : Icon;
-					return (
-						<Popover
-							key={section.id}
-							open={active}
-							onOpenChange={(open) => setActiveSection(open ? section.id : null)}
+				{filterScrollHint.right ? (
+					<div
+						aria-hidden='true'
+						className='pointer-events-none absolute top-0 right-0 z-[1] h-full w-10 bg-linear-to-l from-[#f4f7f8] to-transparent dark:from-[#1d1d1d]'
+					/>
+				) : null}
+				<div
+					ref={filterScrollRef}
+					className='flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [-webkit-overflow-scrolling:touch]'
+				>
+					{hasActiveCondition ? (
+						<button
+							type='button'
+							className='inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-colors'
+							onClick={props.onReset}
 						>
-							<PopoverTrigger asChild>
-								<button
-									type='button'
-									aria-pressed={active}
-									className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors ${
-										active
-											? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
-											: count
-												? 'border-[rgba(var(--vs-primary),0.35)] bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
-												: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
-									}`}
-								>
-									<TriggerIcon className='size-4 shrink-0' />
-									<span>{section.label}</span>
-								</button>
-							</PopoverTrigger>
-							<PopoverContent>
-								<div className='mb-3 flex items-center gap-2 font-semibold'>
-									<Icon className='size-4 text-[rgb(var(--vs-primary))]' />
-									<span>{section.label}</span>
-								</div>
-								<FilterSectionContent id={section.id} {...props} />
-							</PopoverContent>
-						</Popover>
-					);
-				})}
+							<X className='size-4 shrink-0' />
+							<span>重設</span>
+						</button>
+					) : null}
+					{filterSections.map((section) => {
+						const count = getFilterSectionCount(section.id, props);
+						const active = activeSection === section.id;
+						const Icon = section.icon;
+						const TriggerIcon = count ? Check : Icon;
+						return (
+							<Popover
+								key={section.id}
+								open={active}
+								onOpenChange={(open) => setActiveSection(open ? section.id : null)}
+							>
+								<PopoverTrigger asChild>
+									<button
+										type='button'
+										aria-pressed={active}
+										className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors ${
+											active
+												? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
+												: count
+													? 'border-[rgba(var(--vs-primary),0.35)] bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
+													: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
+										}`}
+									>
+										<TriggerIcon className='size-4 shrink-0' />
+										<span>{section.label}</span>
+									</button>
+								</PopoverTrigger>
+								<PopoverContent>
+									<div className='mb-3 flex items-center gap-2 font-semibold'>
+										<Icon className='size-4 text-[rgb(var(--vs-primary))]' />
+										<span>{section.label}</span>
+									</div>
+									<FilterSectionContent id={section.id} {...props} />
+								</PopoverContent>
+							</Popover>
+						);
+					})}
+				</div>
 			</div>
 		</section>
 	);
@@ -620,7 +675,7 @@ function SuggestedKeywords({
 				<Button
 					key={keyword}
 					active={value === keyword}
-					className='m-0 h-8 rounded-full px-3'
+					className={`m-0 rounded-full px-3 ${scrollable ? 'min-h-11' : 'min-h-8 text-xs'}`}
 					onClick={() => onSelect(keyword)}
 				>
 					{keyword}
@@ -636,6 +691,7 @@ function AdvancedSearchSidebarContent(props: AdvancedSearchControlsProps) {
 			<div className='flex items-center justify-between gap-3'>
 				<Link
 					to='/'
+					aria-label='回首頁'
 					className='font-semibold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
 				>
 					🍤 北科課程好朋友

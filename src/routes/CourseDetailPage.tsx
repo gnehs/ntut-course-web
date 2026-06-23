@@ -15,6 +15,7 @@ import { SportsCourseIcon } from '../components/SportsCourseIcon';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import {
 	courseStandard,
+	formatCredit,
 	getSportsCourseTitle,
 	hasTimeConflict,
 	isSportsCourse,
@@ -123,9 +124,9 @@ export function CourseDetailPage() {
 		<div className='space-y-4'>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<div>
-					<h2 className='text-2xl font-semibold'>
+					<h1 className='!text-xl !leading-tight font-semibold'>
 						<CourseDetailTitle course={currentCourse} />
-					</h2>
+					</h1>
 					<div className='text-base font-normal opacity-80'>{currentCourse.name?.en}</div>
 				</div>
 				<div>
@@ -162,7 +163,7 @@ export function CourseDetailPage() {
 						<p>課號</p>
 					</Card>
 					<Card>
-						<CardTitle>{course.credit}</CardTitle>
+						<CardTitle>{formatCredit(course.credit)}</CardTitle>
 						<p>學分</p>
 					</Card>
 					<WithdrawalRateCard
@@ -170,8 +171,12 @@ export function CourseDetailPage() {
 						distribution={withdrawalDistribution}
 					/>
 				</div>
-				<div className='mt-3 grid gap-3 lg:grid-cols-3'>
+				<div
+					className='-mx-4 mt-3 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 [-webkit-overflow-scrolling:touch] lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0'
+					aria-label='課程詳細資訊'
+				>
 					<InfoCard
+						className='min-w-[82vw] snap-start sm:min-w-[22rem] lg:min-w-0 lg:snap-none'
 						icon={<Info />}
 						title='課程資訊'
 						items={[
@@ -188,6 +193,7 @@ export function CourseDetailPage() {
 						]}
 					/>
 					<InfoCard
+						className='min-w-[82vw] snap-start sm:min-w-[22rem] lg:min-w-0 lg:snap-none'
 						icon={<User />}
 						title='授課資訊'
 						items={[
@@ -214,6 +220,7 @@ export function CourseDetailPage() {
 						]}
 					/>
 					<InfoCard
+						className='min-w-[82vw] snap-start sm:min-w-[22rem] lg:min-w-0 lg:snap-none'
 						icon={<MapPin />}
 						title='上課資訊'
 						items={[
@@ -260,16 +267,20 @@ export function CourseDetailPage() {
 }
 
 function InfoCard({
+	className = '',
 	icon,
 	title,
 	items,
 }: {
+	className?: string;
 	icon: React.ReactNode;
 	title: string;
 	items: InfoCardItem[];
 }) {
 	return (
-		<section className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5]'>
+		<section
+			className={`rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5] ${className}`}
+		>
 			<div>{icon}</div>
 			<div className='my-2 text-base font-semibold'>{title}</div>
 			<div className='grid gap-2 md:grid-cols-2'>
@@ -293,58 +304,52 @@ function WithdrawalRateCard({
 }) {
 	const [tooltipOpen, setTooltipOpen] = useState(false);
 	const classification = classifyWithdrawalRate(withdrawalRate, distribution);
+	const withdrawalRateLabel = withdrawalRate
+		? `${formatWithdrawalRate(withdrawalRate)}%`
+		: '無資料';
 
 	return (
-		<Card>
-			<CardTitle className='flex flex-wrap items-start justify-between gap-2'>
-				{withdrawalRate ? `${formatWithdrawalRate(withdrawalRate)}%` : '無資料'}
-				{withdrawalRate ? (
-					<WithdrawalRateBadge level={classification.level} label={classification.label} />
-				) : null}
-			</CardTitle>
-			<p>
-				退選率{' '}
-				<TooltipProvider>
-					<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-						<TooltipTrigger
-							asChild
-							onBlur={() => setTooltipOpen(false)}
-							onClick={() => setTooltipOpen(true)}
-							onFocus={() => setTooltipOpen(true)}
-							onMouseEnter={() => setTooltipOpen(true)}
-							onMouseLeave={() => setTooltipOpen(false)}
-							onPointerEnter={() => setTooltipOpen(true)}
-							onPointerLeave={() => setTooltipOpen(false)}
-						>
-							<button
-								type='button'
-								aria-label='退選率說明'
-								className='inline-flex cursor-help rounded align-[-0.125em] text-current outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--vs-primary))] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(var(--vs-background))]'
-							>
-								<Info className='size-[1em]' />
-							</button>
-						</TooltipTrigger>
-						<TooltipContent
-							side='bottom'
-							align='center'
-							sideOffset={8}
-							className='max-w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] p-3 text-left text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(0,0,0,var(--vs-shadow-opacity,0.16))]'
-						>
-							<div className='flex flex-col gap-1'>
-								<h4 className='text-sm font-semibold'>什麼是退選率？</h4>
-								<div>這項資料由教師之退選人數計算而來。</div>
-								<h4 className='mt-2 text-sm font-semibold'>退選率如何計算？</h4>
-								<div>總退選人數 / 總選課人數</div>
-								<h4 className='mt-2 text-sm font-semibold'>如果有多名教師，退選率會怎麼顯示？</h4>
-								<div>若該課程有多名教師，則會顯示最高退選率之教師。</div>
-								<h4 className='mt-2 text-sm font-semibold'>退選率多少算高？</h4>
-								<div>{withdrawalRateDescription(distribution)}</div>
-							</div>
-						</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-			</p>
-		</Card>
+		<TooltipProvider>
+			<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+				<Card className='cursor-help'>
+					<TooltipTrigger asChild>
+						<button
+							type='button'
+							aria-label={`退選率 ${withdrawalRateLabel}，${classification.label}，查看退選率說明`}
+							className='absolute inset-0 z-10 cursor-help rounded-lg border-0 bg-transparent p-0 focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
+							onClick={() => setTooltipOpen((open) => !open)}
+						/>
+					</TooltipTrigger>
+					<CardTitle className='flex flex-wrap items-start justify-between gap-2'>
+						{withdrawalRateLabel}
+						{withdrawalRate ? (
+							<WithdrawalRateBadge level={classification.level} label={classification.label} />
+						) : null}
+					</CardTitle>
+					<p className='inline-flex items-center gap-1'>
+						退選率
+						<Info aria-hidden='true' className='inline size-[1em] align-[-0.125em] opacity-70' />
+					</p>
+				</Card>
+				<TooltipContent
+					side='bottom'
+					align='center'
+					sideOffset={8}
+					className='max-w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] p-3 text-left text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(0,0,0,var(--vs-shadow-opacity,0.16))]'
+				>
+					<div className='flex flex-col gap-1'>
+						<h4 className='text-sm font-semibold'>什麼是退選率？</h4>
+						<div>這項資料由教師之退選人數計算而來。</div>
+						<h4 className='mt-2 text-sm font-semibold'>退選率如何計算？</h4>
+						<div>總退選人數 / 總選課人數</div>
+						<h4 className='mt-2 text-sm font-semibold'>如果有多名教師，退選率會怎麼顯示？</h4>
+						<div>若該課程有多名教師，則會顯示最高退選率之教師。</div>
+						<h4 className='mt-2 text-sm font-semibold'>退選率多少算高？</h4>
+						<div>{withdrawalRateDescription(distribution)}</div>
+					</div>
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	);
 }
 
@@ -393,7 +398,10 @@ function InlineLinks({
 	return items.map((item, index) => (
 		<span key={item.to}>
 			{index > 0 ? '、' : ''}
-			<Link className='text-[rgb(var(--vs-primary))] underline underline-offset-2' to={item.to}>
+			<Link
+				className='rounded-sm text-[rgb(var(--vs-primary))] underline underline-offset-2 transition-colors hover:bg-[rgba(var(--vs-primary),0.08)] focus-visible:ring-2 focus-visible:ring-[rgb(var(--vs-primary))] focus-visible:outline-none'
+				to={item.to}
+			>
 				{item.label}
 			</Link>
 		</span>

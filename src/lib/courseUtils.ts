@@ -229,6 +229,14 @@ export function isZeroCreditValue(value: string | number) {
 	return Number.isFinite(credit) && credit === 0;
 }
 
+export function formatCredit(value: string | number | null | undefined) {
+	const text = normalizeCreditText(String(value ?? '')).trim();
+	if (!text) return '';
+	const credit = Number(text);
+	if (!Number.isFinite(credit)) return text;
+	return Number.isInteger(credit) ? String(credit) : text;
+}
+
 export function createIcsEvent({
 	title,
 	location,

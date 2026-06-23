@@ -1,8 +1,8 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
-import { Star } from 'lucide-react';
+import { Minus, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -115,7 +115,7 @@ export function ClassIndexPage() {
 				<>
 					<h3>建議</h3>
 					<p>根據你先前儲存的班級所提供的建議</p>
-					<div className='grid grid-cols-3 gap-3 lg:grid-cols-5'>
+					<div className='grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-3 lg:grid-cols-5'>
 						{recommendClass.map((item, index) => (
 							<Card
 								className='px-4 py-3'
@@ -133,7 +133,7 @@ export function ClassIndexPage() {
 			{(filteredDepartmentData || []).map((department) => (
 				<div key={department.name} className='space-y-2'>
 					<h3>{department.name}</h3>
-					<div className='grid grid-cols-3 gap-3 lg:grid-cols-5'>
+					<div className='grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-3 lg:grid-cols-5'>
 						{(department.class || []).map(({ name }) => (
 							<Card
 								className='px-4 py-3'
@@ -212,68 +212,36 @@ export function ClassDetailPage() {
 	}
 
 	if (!courses) return <ClassDetailSkeleton />;
-	const courseGroups = groupClassCourses(courses);
 
 	return (
 		<div className='space-y-4'>
-			<div className='flex flex-wrap items-center justify-between gap-2'>
+			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
 				<div>
 					<h1>{id}</h1>
+					<p className='m-0 text-sm opacity-75'>{courses.length} 門課程</p>
 				</div>
-				<div className='flex flex-wrap justify-end'>
+				<div className='flex flex-wrap items-center gap-2 sm:justify-end'>
 					{!isInMyCourse ? (
-						<Button primary onClick={addClassCourses}>
+						<Button primary className='min-h-11 px-4 text-sm' onClick={addClassCourses}>
+							<Plus className='size-4' />
 							加入到我的課程
 						</Button>
 					) : (
-						<Button danger onClick={removeClassCourses}>
+						<Button danger className='min-h-11 px-4 text-sm' onClick={removeClassCourses}>
+							<Minus className='size-4' />
 							從我的課程中移除
 						</Button>
 					)}
 				</div>
 			</div>
 			{!courses.length && classData ? <Alert>此班級目前沒有課程。</Alert> : null}
-			<div className='divide-y divide-[rgba(var(--vs-text),0.1)]'>
-				{courseGroups.map((group) => (
-					<section key={group.title} className='py-8'>
-						<h3 className='text-2xl font-semibold'>{group.title}</h3>
-						<CourseList courses={group.courses} showTimetable year={year} sem={sem} />
-					</section>
-				))}
-			</div>
+			{courses.length ? (
+				<div className='[&>div>div:first-child_button]:min-h-11 [&>div>div:first-child_button]:px-4 [&>div>div:first-child_button]:text-sm'>
+					<CourseList courses={courses} showTimetable year={year} sem={sem} />
+				</div>
+			) : null}
 			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />
 		</div>
 	);
-}
-
-function groupClassCourses(courses: Course[]) {
-	const groups = [
-		{
-			title: '共同必修',
-			match: (course: Course) => ['○', '△'].includes(course.courseType || ''),
-			courses: [] as Course[],
-		},
-		{
-			title: '專業必修',
-			match: (course: Course) => ['●', '▲'].includes(course.courseType || ''),
-			courses: [] as Course[],
-		},
-		{
-			title: '選修',
-			match: (course: Course) => ['☆', '★'].includes(course.courseType || ''),
-			courses: [] as Course[],
-		},
-		{
-			title: '博雅課程',
-			match: (course: Course) => (course.class || []).some((item) => /^博雅/.test(item.name)),
-			courses: [] as Course[],
-		},
-		{ title: '其他課程', match: () => true, courses: [] as Course[] },
-	];
-	for (const course of courses) {
-		const group = groups.find((item) => item.match(course));
-		group?.courses.push(course);
-	}
-	return groups.filter((group) => group.courses.length);
 }

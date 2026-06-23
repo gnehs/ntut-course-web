@@ -1,5 +1,6 @@
+import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Download, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Download, RefreshCw, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,6 +87,7 @@ export function AddCalendarPage() {
 	}
 
 	if (!courses) return <StepsPageSkeleton />;
+	const hasCourses = courses.length > 0;
 	return (
 		<div className='flex flex-col gap-5'>
 			<section className='flex flex-col gap-4'>
@@ -101,11 +103,27 @@ export function AddCalendarPage() {
 					下載的 ICS 是一次性檔案；加退選或修改課程後，請重新下載並匯入新的行事曆檔案。
 				</AlertDescription>
 			</Alert>
-			{!courses.length ? (
-				<Alert variant='destructive'>
+			{!hasCourses ? (
+				<Alert>
 					<AlertCircle />
-					<AlertTitle>沒有課程資料</AlertTitle>
-					<AlertDescription>請先新增課程資料，才能產生可匯入的行事曆。</AlertDescription>
+					<AlertTitle>先新增課程</AlertTitle>
+					<AlertDescription>
+						行事曆檔案會從「我的課程」產生；先從搜尋或班級課表加入課程後，再回來下載 ICS。
+						<div className='mt-3 flex flex-wrap gap-2'>
+							<Button
+								as={Link}
+								primary
+								to={`/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`}
+							>
+								<Search className='size-4' data-icon='inline-start' />
+								前往搜尋
+							</Button>
+							<Button as={Link} to='/class'>
+								<Clock className='size-4' data-icon='inline-start' />
+								班級課表
+							</Button>
+						</div>
+					</AlertDescription>
 				</Alert>
 			) : null}
 			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
@@ -121,63 +139,86 @@ export function AddCalendarPage() {
 					</div>
 				</CardHeader>
 				<CardContent className='p-4 pt-0 sm:px-5'>
-					<div className='grid gap-2 md:grid-cols-2'>
-						{courses.map((course) => {
-							const checked = selectedIds.includes(course.id);
-							return (
-								<label
-									key={course.id}
-									htmlFor={`calendar-course-${course.id}`}
-									className='flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3 transition-colors hover:bg-[rgba(var(--vs-primary),0.06)]'
-								>
-									<Checkbox
-										id={`calendar-course-${course.id}`}
-										checked={checked}
-										onCheckedChange={(value) =>
-											setSelectedIds((ids) =>
-												value === true
-													? ids.includes(course.id)
-														? ids
-														: [...ids, course.id]
-													: ids.filter((id) => id !== course.id),
-											)
-										}
-									/>
-									<span className='min-w-0 flex-1'>
-										<span className='block truncate font-medium'>{course.name}</span>
-										<span className='mt-1 block truncate text-sm text-[rgb(var(--vs-text))]/65'>
-											{[course.teacher, course.classroom].filter(Boolean).join(' · ') || '課程資料'}
+					{hasCourses ? (
+						<div className='grid gap-2 md:grid-cols-2'>
+							{courses.map((course) => {
+								const checked = selectedIds.includes(course.id);
+								return (
+									<label
+										key={course.id}
+										htmlFor={`calendar-course-${course.id}`}
+										className='flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3 transition-colors hover:bg-[rgba(var(--vs-primary),0.06)]'
+									>
+										<Checkbox
+											id={`calendar-course-${course.id}`}
+											checked={checked}
+											onCheckedChange={(value) =>
+												setSelectedIds((ids) =>
+													value === true
+														? ids.includes(course.id)
+															? ids
+															: [...ids, course.id]
+														: ids.filter((id) => id !== course.id),
+												)
+											}
+										/>
+										<span className='min-w-0 flex-1'>
+											<span className='block truncate font-medium'>{course.name}</span>
+											<span className='mt-1 block truncate text-sm text-[rgb(var(--vs-text))]/65'>
+												{[course.teacher, course.classroom].filter(Boolean).join(' · ') ||
+													'課程資料'}
+											</span>
 										</span>
-									</span>
-								</label>
-							);
-						})}
-					</div>
+									</label>
+								);
+							})}
+						</div>
+					) : (
+						<div className='rounded-lg border border-dashed border-[rgba(var(--vs-text),0.16)] bg-[rgb(var(--vs-gray-1))] p-4 text-sm text-[rgb(var(--vs-text))]/65'>
+							加入課程後，這裡會列出可匯入行事曆的課程。
+						</div>
+					)}
 				</CardContent>
 			</Card>
-			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+			<Card
+				className={`rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm ${!hasCourses ? 'opacity-70' : ''}`}
+			>
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>2. 確認日期並下載</CardTitle>
 					<CardDescription>
-						通常會自動填上開學日與最後上課日；若學校行事曆有異動可手動修改。
+						{hasCourses
+							? '通常會自動填上開學日與最後上課日；若學校行事曆有異動可手動修改。'
+							: '目前沒有課程資料，下載功能已停用。'}
 					</CardDescription>
 				</CardHeader>
 				<CardContent className='grid gap-4 p-4 pt-0 sm:grid-cols-2 sm:px-5'>
 					<label className='flex flex-col gap-2'>
 						<span className='text-sm font-medium'>開學日</span>
-						<Input type='date' value={start} onChange={(event) => setStart(event.target.value)} />
+						<Input
+							type='date'
+							value={start}
+							disabled={!hasCourses}
+							onChange={(event) => setStart(event.target.value)}
+						/>
 					</label>
 					<label className='flex flex-col gap-2'>
 						<span className='text-sm font-medium'>最後上課日</span>
-						<Input type='date' value={until} onChange={(event) => setUntil(event.target.value)} />
+						<Input
+							type='date'
+							value={until}
+							disabled={!hasCourses}
+							onChange={(event) => setUntil(event.target.value)}
+						/>
 					</label>
 				</CardContent>
 				<Separator className='bg-[rgba(var(--vs-text),0.08)]' />
 				<CardContent className='flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='text-sm text-[rgb(var(--vs-text))]/70'>
-						將下載 `{dataset.year}-{dataset.sem}-course.ics`，內含 {selectedCourses.length} 門課程。
+						{hasCourses
+							? `將下載 \`${dataset.year}-${dataset.sem}-course.ics\`，內含 ${selectedCourses.length} 門課程。`
+							: '尚未有課程可下載。'}
 					</div>
-					<Button active disabled={!selectedCourses.length} onClick={downloadIcs}>
+					<Button active disabled={!selectedCourses.length || !hasCourses} onClick={downloadIcs}>
 						<Download className='size-4' data-icon='inline-start' />
 						下載 ICS
 					</Button>

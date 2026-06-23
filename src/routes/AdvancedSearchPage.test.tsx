@@ -4,6 +4,19 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { createAppRouter } from '../router';
 
+const mockGetCourses = vi.hoisted(() =>
+	vi.fn().mockResolvedValue([
+		{
+			id: '123456',
+			courseType: '○',
+			name: { zh: '共同必修' },
+			class: [],
+			teacher: [],
+		},
+	]),
+);
+const mockGetMyCourseIds = vi.hoisted(() => vi.fn(() => []));
+
 vi.mock('../state/AppContext', () => ({
 	useApp: () => ({
 		dataset: { year: '115', sem: '1', department: 'main' },
@@ -12,16 +25,8 @@ vi.mock('../state/AppContext', () => ({
 		departmentItems: ['日間部'],
 		datasetDialogOpen: false,
 		setDatasetDialogOpen: vi.fn(),
-		getCourses: vi.fn().mockResolvedValue([
-			{
-				id: '123456',
-				courseType: '○',
-				name: { zh: '共同必修' },
-				class: [],
-				teacher: [],
-			},
-		]),
-		getMyCourseIds: vi.fn(() => []),
+		getCourses: mockGetCourses,
+		getMyCourseIds: mockGetMyCourseIds,
 	}),
 }));
 

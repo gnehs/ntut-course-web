@@ -20,6 +20,16 @@ const courseStandardList: Record<string, string> = {
 	'★': '專業選修',
 };
 
+function formatCredit(value: string | number | null | undefined) {
+	const text = String(value ?? '')
+		.replace(/[０-９]/g, (char) => String(char.charCodeAt(0) - 0xff10))
+		.trim();
+	if (!text) return '0';
+	const credit = Number(text);
+	if (!Number.isFinite(credit)) return text;
+	return Number.isInteger(credit) ? String(credit) : text;
+}
+
 type OgImageConfig = {
 	apiBase?: string;
 };
@@ -100,7 +110,7 @@ function renderCourseImage(year: string, sem: string, course: Course) {
 				<SubTitle>{course.name?.en || ''}</SubTitle>
 				<Tags>
 					<Tag>{courseStandard}</Tag>
-					<Tag>{`🎓 ${Number.parseFloat(course.credit || '0')} 學分`}</Tag>
+					<Tag>{`🎓 ${formatCredit(course.credit)} 學分`}</Tag>
 					{(course.classroom || [])
 						.map((item) => `🚪 ${item.name}`)
 						.map((item) => (

@@ -7,6 +7,7 @@ import { cn } from '../lib/utils';
 import {
 	courseTitle,
 	dateEng2zh,
+	formatCredit,
 	getCourseDisplayTitle,
 	getGeneralCourseTags,
 	getSportsCourseTitle,
@@ -162,6 +163,7 @@ export function CourseList({
 					<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
 						{pageItems.map((course) => {
 							const saved = savedCourseIds.includes(course.id);
+							const timeItems = parseCourseTime(course.time);
 							return (
 								<Card
 									key={course.id}
@@ -172,10 +174,10 @@ export function CourseList({
 										aria-label={`查看 ${courseTitle(course)} 課程詳情`}
 										className='absolute inset-0 z-0 rounded-lg focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 									/>
-									<div className='pointer-events-none relative z-[1]'>
-										<CardTitle spaceBetween>
-											<CourseDisplayHeading course={course} />
-											<span className='pointer-events-auto flex shrink-0 items-center gap-1'>
+									<div className='pointer-events-none relative z-[1] flex h-full min-h-[10.25rem] flex-col'>
+										<div className='relative pr-14'>
+											<CardTitle className='flex-wrap gap-1 leading-snug [overflow-wrap:anywhere]'>
+												<CourseDisplayHeading course={course} />
 												{conflictCourseData.includes(course.id) ? (
 													<Tag
 														color='rgba(var(--vs-danger),0.15)'
@@ -185,52 +187,33 @@ export function CourseList({
 														衝堂
 													</Tag>
 												) : null}
-												<Button
-													icon
-													active={saved}
-													className='m-0 size-8'
-													aria-label={saved ? '從我的課程移除' : '加入我的課程'}
-													onClick={() => toggleSavedCourse(course)}
-												>
-													{saved ? <Minus className='size-4' /> : <Plus className='size-4' />}
-												</Button>
-											</span>
-										</CardTitle>
-										<CourseTags course={course} />
-										<div className='mt-2 grid grid-cols-[repeat(auto-fit,minmax(64px,1fr))] gap-2'>
-											<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
-												<CardTitle>{course.id}</CardTitle>
-												<p>課號</p>
-											</Card>
-											<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
-												<CardTitle>{course.credit}</CardTitle>
-												<p>學分</p>
-											</Card>
-											{parseCourseTime(course.time).map((item) => (
-												<Card
-													key={item.title}
-													className='border-0 bg-transparent px-0 py-1 shadow-none'
-												>
-													<CardTitle>{item.content}</CardTitle>
-													<p>{item.title}</p>
-												</Card>
-											))}
-											{!parseCourseTime(course.time).length ? (
-												<Card className='border-0 bg-transparent px-0 py-1 shadow-none'>
-													<CardTitle>無資料</CardTitle>
-													<p>上課時間</p>
-												</Card>
-											) : null}
+											</CardTitle>
+											<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
 										</div>
-										<p>
-											班級：
-											{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
-											<br />
-											教師：
-											{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 13)}
-											<br />
-											備註：{trimEllip(course.notes, 15)}
-										</p>
+										<CourseTags course={course} />
+										<div className='mt-3 grid grid-cols-[repeat(auto-fit,minmax(4.25rem,1fr))] gap-x-3 gap-y-2'>
+											<CourseMetric title='課號' value={course.id} />
+											<CourseMetric title='學分' value={formatCredit(course.credit)} />
+											{timeItems.map((item) => (
+												<CourseMetric key={item.title} title={item.title} value={item.content} />
+											))}
+											{!timeItems.length ? <CourseMetric title='上課時間' value='無資料' /> : null}
+										</div>
+										<dl className='mt-3 grid gap-1 text-sm leading-5'>
+											<CourseMetaLine label='班級'>
+												{trimEllip((course.class || []).map((item) => item.name).join('、'), 9) ||
+													'無資料'}
+											</CourseMetaLine>
+											<CourseMetaLine label='教師'>
+												{trimEllip(
+													(course.teacher || []).map((item) => item.name).join('、'),
+													13,
+												) || '無資料'}
+											</CourseMetaLine>
+											<CourseMetaLine label='備註'>
+												{trimEllip(course.notes, 15) || '無'}
+											</CourseMetaLine>
+										</dl>
 									</div>
 								</Card>
 							);
@@ -247,7 +230,7 @@ export function CourseList({
 			{layout === 'table' ? (
 				<Card className='overflow-hidden p-0'>
 					<div className='overflow-x-auto'>
-						<table className='w-full border-collapse text-left'>
+						<table className='w-full min-w-[720px] border-collapse text-left'>
 							<thead>
 								<tr>
 									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>課號</th>
@@ -295,7 +278,7 @@ export function CourseList({
 												<Button
 													icon
 													active={saved}
-													className='m-0 size-8'
+													className='m-0'
 													aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 													onClick={() => toggleSavedCourse(course)}
 												>
@@ -341,6 +324,45 @@ function CourseTags({ course }: { course: Course }) {
 					{tag.name}
 				</Tag>
 			))}
+		</div>
+	);
+}
+
+function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => void }) {
+	const Icon = saved ? Minus : Plus;
+	return (
+		<button
+			type='button'
+			aria-label={saved ? '從我的課程移除' : '加入我的課程'}
+			className={cn(
+				'pointer-events-auto absolute -top-1 -right-1 grid size-11 place-items-center rounded-lg border-0 bg-transparent p-0 transition-colors',
+				'text-[rgb(var(--vs-primary))] outline-none before:absolute before:inset-1.5 before:rounded-lg before:transition-colors',
+				'focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)]',
+				saved
+					? 'text-[rgb(var(--vs-primary-foreground))] before:bg-[rgb(var(--vs-primary))]'
+					: 'before:bg-[rgba(var(--vs-primary),0.15)] hover:before:bg-[rgba(var(--vs-primary),0.22)]',
+			)}
+			onClick={onClick}
+		>
+			<Icon className='relative z-[1] size-4' />
+		</button>
+	);
+}
+
+function CourseMetric({ title, value }: { title: string; value: React.ReactNode }) {
+	return (
+		<div className='min-w-0'>
+			<div className='truncate text-lg leading-tight font-semibold tabular-nums'>{value}</div>
+			<div className='mt-0.5 text-xs leading-tight opacity-75'>{title}</div>
+		</div>
+	);
+}
+
+function CourseMetaLine({ label, children }: { label: string; children: React.ReactNode }) {
+	return (
+		<div className='flex min-w-0 gap-1'>
+			<dt className='shrink-0 font-medium'>{label}：</dt>
+			<dd className='m-0 min-w-0 truncate opacity-75'>{children}</dd>
 		</div>
 	);
 }

@@ -10,7 +10,6 @@ export function Pagination({ page, length, onChange }) {
 				icon
 				disabled={page <= 1}
 				aria-label='上一頁'
-				className='size-9'
 				onClick={() => onChange(Math.max(page - 1, 1))}
 			>
 				<ChevronLeft className='size-4' />
@@ -19,7 +18,7 @@ export function Pagination({ page, length, onChange }) {
 				item === 'ellipsis' ? (
 					<span
 						key={`ellipsis-${index}`}
-						className='inline-flex h-9 min-w-9 items-center justify-center px-1 text-[0.8em] opacity-60'
+						className='inline-flex h-11 min-w-11 items-center justify-center px-1 text-[0.8em] opacity-60'
 					>
 						...
 					</span>
@@ -27,7 +26,7 @@ export function Pagination({ page, length, onChange }) {
 					<Button
 						key={item}
 						active={item === page}
-						className='h-9 min-w-9'
+						className='min-w-11'
 						onClick={() => onChange(item)}
 					>
 						{item}
@@ -38,7 +37,6 @@ export function Pagination({ page, length, onChange }) {
 				icon
 				disabled={page >= length}
 				aria-label='下一頁'
-				className='size-9'
 				onClick={() => onChange(Math.min(page + 1, length))}
 			>
 				<ChevronRight className='size-4' />

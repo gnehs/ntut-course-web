@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	buildCourseCalendar,
 	filterPlaceholderCourses,
+	formatCredit,
 	isZeroCreditValue,
 	parseCourseTime,
 	parseYearSemVal,
@@ -55,6 +56,14 @@ describe('courseUtils', () => {
 		expect(isZeroCreditValue('１')).toBe(false);
 		expect(isZeroCreditValue('128')).toBe(false);
 		expect(isZeroCreditValue('')).toBe(false);
+	});
+
+	it('formats integral credits without decimal points', () => {
+		expect(formatCredit('3.0')).toBe('3');
+		expect(formatCredit(2)).toBe('2');
+		expect(formatCredit('１.０')).toBe('1');
+		expect(formatCredit('1.5')).toBe('1.5');
+		expect(formatCredit('無資料')).toBe('無資料');
 	});
 
 	it('builds weekly course calendar events with Taipei timezone', () => {
