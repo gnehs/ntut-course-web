@@ -274,9 +274,9 @@ function InfoCard({
 			<div className='my-2 text-base font-semibold'>{title}</div>
 			<div className='grid gap-2 md:grid-cols-2'>
 				{items.map(([itemTitle, content]) => (
-					<div className='grid gap-0 md:gap-1' key={itemTitle}>
+					<div className='grid min-w-0 gap-0 md:gap-1' key={itemTitle}>
 						<div className='text-sm font-semibold whitespace-nowrap'>{itemTitle}</div>
-						<div className='text-sm opacity-75'>{content}</div>
+						<div className='min-w-0 text-sm opacity-75'>{content}</div>
 					</div>
 				))}
 			</div>
@@ -400,7 +400,7 @@ function InlineLinks({
 	));
 }
 
-function HtmlText({
+export function HtmlText({
 	text,
 	as: Component = 'span',
 }: {
@@ -408,14 +408,59 @@ function HtmlText({
 	as?: keyof React.JSX.IntrinsicElements;
 }) {
 	return (
-		<Component dangerouslySetInnerHTML={{ __html: parseTextarea(text) }} className='leading-5' />
+		<Component className='min-w-0 leading-5 break-words whitespace-pre-wrap'>
+			{renderTextWithLinks(text)}
+		</Component>
 	);
 }
 
-function parseTextarea(text) {
-	return String(text || '')
-		.replace(/\t/g, '　　')
-		.replace(/\n/g, '<br/>');
+const urlPattern = /https?:\/\/[^\s<>"'`]+/gi;
+const trailingUrlPunctuation = /[.,;:!?。，、；：！？)\]}）】》」』]+$/u;
+const courseTextLinkClassName =
+	'break-all text-[rgb(var(--vs-primary))] underline underline-offset-2 [overflow-wrap:anywhere]';
+
+function renderTextWithLinks(text: string) {
+	const value = String(text || '').replace(/\t/g, '　　');
+	const nodes: React.ReactNode[] = [];
+	let lastIndex = 0;
+
+	for (const match of value.matchAll(urlPattern)) {
+		const rawUrl = match[0];
+		const matchIndex = match.index ?? 0;
+		const { url, suffix } = splitUrlSuffix(rawUrl);
+
+		if (matchIndex > lastIndex) nodes.push(value.slice(lastIndex, matchIndex));
+		if (url) {
+			nodes.push(
+				<a
+					key={`${url}-${matchIndex}`}
+					href={url}
+					target='_blank'
+					rel='noreferrer'
+					className={courseTextLinkClassName}
+				>
+					{url}
+				</a>,
+			);
+		}
+		if (suffix) nodes.push(suffix);
+		lastIndex = matchIndex + rawUrl.length;
+	}
+
+	if (lastIndex < value.length) nodes.push(value.slice(lastIndex));
+	return nodes.length ? nodes : value;
+}
+
+function splitUrlSuffix(rawUrl: string) {
+	let url = rawUrl;
+	let suffix = '';
+
+	while (url && trailingUrlPunctuation.test(url.slice(-1))) {
+		suffix = `${url.slice(-1)}${suffix}`;
+		url = url.slice(0, -1);
+	}
+
+	return { url, suffix };
 }
 
 function SyllabusDetail({ item }) {
