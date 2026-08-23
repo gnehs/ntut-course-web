@@ -4,7 +4,7 @@
 - 啟用嵌入功能後，導航欄與頁尾將會被隱藏。
 - 在任一網址後方加入 `?mode=iframe` 即可使用嵌入功能。
 - 如：<code v-pre>&lt;iframe src="https://{{ $config.domainName }}/course/111/1/305013?mode=iframe"&gt;&lt;/iframe&gt;</code>，效果如下。
-<iframe src="https://{{ $config.domainName }}/course/111/1/305013?mode=iframe" width="386px" height="512px" frameborder="0" style="border-radius: 8px;margin: 0 auto;display: block;border: 1px solid rgba(0, 0, 0, 0.1);"></iframe>
+<iframe :src="`https://{{ $config.domainName }}/course/111/1/305013?mode=iframe`" width="386px" height="512px" frameborder="0" style="border-radius: 8px;margin: 0 auto;display: block;border: 1px solid rgba(0, 0, 0, 0.1);"></iframe>
 
 # API 文件
 ## 注意
