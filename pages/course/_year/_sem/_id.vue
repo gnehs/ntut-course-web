@@ -463,7 +463,8 @@ export default {
       loading.close();
     },
     parseTextarea(t) {
-      t = t.replace(/\t/g, "　　");
+      if (!t) return ""; 
+      t = t.replace(/\t/g, "  ");
       t = t.replace(/\n/g, "<br/>");
       return t;
     },
