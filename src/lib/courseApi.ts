@@ -3,9 +3,13 @@ import { getStore, setStore } from './storage';
 import type {
 	CalendarEvent,
 	Course,
+	CompetencyDepartment,
 	DepartmentGroup,
 	MicroProgram,
+	Program,
 	StandardYearData,
+	SyllabusItem,
+	SyllabusIndex,
 	WithdrawalRateMap,
 	WithdrawalResponse,
 	YearSemData,
@@ -39,11 +43,15 @@ export async function fetchCourse(
 	return data;
 }
 
-export async function fetchCourseDetail(year: string, sem: string, id: string): Promise<Course> {
+export async function fetchCourseDetail(
+	year: string,
+	sem: string,
+	id: string,
+): Promise<SyllabusItem[]> {
 	const key = `course_detail_${year}_${sem}_${id}`;
 	const cached = await getStore(key);
-	if (cached) return cached as Course;
-	const data = await fetchJson<Course>(`${API_BASE}/${year}/${sem}/course/${id}.json`);
+	if (cached) return cached as SyllabusItem[];
+	const data = await fetchJson<SyllabusItem[]>(`${API_BASE}/${year}/${sem}/course/${id}.json`);
 	await setStore(key, data);
 	return data;
 }
@@ -100,4 +108,28 @@ export async function fetchMicroPrograms(year: string, sem: string): Promise<Mic
 	const data = await fetchJson<MicroProgram[]>(`${API_BASE}/${year}/${sem}/mprogram.json`);
 	await setStore(key, data, 30);
 	return data;
+}
+
+async function fetchOptionalDataset<T>(path: string): Promise<T | null> {
+	const key = `optional_${path}`;
+	const cached = await getStore(key);
+	if (cached) return cached as T;
+	const response = await fetch(`${API_BASE}/${path}`);
+	if (response.status === 404) return null;
+	if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+	const data = (await response.json()) as T;
+	await setStore(key, data);
+	return data;
+}
+
+export function fetchPrograms(year: string, sem: string): Promise<Program[] | null> {
+	return fetchOptionalDataset(`${year}/${sem}/programs.json`);
+}
+
+export function fetchCompetencies(): Promise<CompetencyDepartment[] | null> {
+	return fetchOptionalDataset('competencies.json');
+}
+
+export function fetchSyllabusIndex(year: string, sem: string): Promise<SyllabusIndex | null> {
+	return fetchOptionalDataset(`${year}/${sem}/syllabus-index.json`);
 }

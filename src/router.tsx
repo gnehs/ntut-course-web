@@ -17,6 +17,8 @@ import { CourseDetailPage } from './routes/CourseDetailPage';
 import { EmptyRoomPage } from './routes/EmptyRoomPage';
 import { HomePage } from './routes/HomePage';
 import { MProgramDetailPage, MProgramIndexPage } from './routes/MProgramPage';
+import { ProgramDetailPage, ProgramIndexPage } from './routes/ProgramPages';
+import { CompetenciesPage } from './routes/CompetenciesPage';
 import { MyCoursePage } from './routes/MyCoursePage';
 import { StandardPage } from './routes/StandardPage';
 import { TeacherPage } from './routes/TeacherPage';
@@ -42,6 +44,9 @@ const routeTree = rootRoute.addChildren([
 	route('/class/$year/$sem/$id', ClassDetailPage),
 	route('/mprogram', MProgramIndexPage),
 	route('/mprogram/$year/$sem/$id', MProgramDetailPage),
+	route('/program', ProgramIndexPage),
+	route('/program/$year/$sem/$id', ProgramDetailPage),
+	route('/competencies', CompetenciesPage),
 	route('/my-course', MyCoursePage),
 	route('/emptyroom', EmptyRoomPage),
 	route('/withdrawal', WithdrawalPage),

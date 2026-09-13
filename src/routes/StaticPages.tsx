@@ -26,6 +26,15 @@ type ChangelogEntry = {
 };
 
 const changelogEntries: ChangelogEntry[] = [
+	{
+		date: '2026-09-13',
+		changes: [
+			{ title: '補齊課綱的 AI、SDGs、延伸教學資源與教師諮商時間。' },
+			{ title: '新增授課語言、AI 教學方式與 SDGs 篩選。' },
+			{ title: '新增一般學程與系所核心能力對照。' },
+			{ title: '改善跨部別課程儲存、教室使用明細與缺少資料的顯示。' },
+		],
+	},
 	{ date: '2026-06-05', changes: [{ title: '更新圖示系統，改用更現代的圖示庫。' }] },
 	{ date: '2026-06-04', changes: [{ title: '改善整體使用者介面與互動體驗。' }] },
 	{ date: '2025-11-13', changes: [{ title: '修正課表時間解析錯誤。' }] },
@@ -271,7 +280,11 @@ export function DocPage() {
 			{[
 				'/main.json 取得所有可用之年份與學期',
 				'/{year}/{sem}/{system}.json 取得某學期某學制課程資料',
-				'/{year}/{sem}/course/{id}.json 取得課程詳細資料',
+				'/{year}/{sem}/course/{id}.json 取得教師課綱陣列',
+				'/{year}/{sem}/syllabus-index.json 取得 AI、SDGs 與教學資源搜尋索引',
+				'/{year}/{sem}/programs.json 取得一般學程與開課課號',
+				'/{year}/{sem}/mprogram.json 取得微學程',
+				'/competencies.json 取得系所課程核心能力對照',
 				'/{year}/{sem}/department.json 取得系所班級清單',
 				'/standards.json 取得課程標準可用年份',
 				'/calendar.json 取得行事曆',
@@ -565,6 +578,7 @@ function parseName(name: string) {
 	if (name === 'fetch current courses') return '取得本學期課程';
 	if (name === 'fetch current departments') return '取得本學期科系';
 	if (name === 'fetch current mprograms') return '取得本學期微學程';
+	if (name === 'fetch current programs') return '取得本學期一般學程與微學程';
 	if (name === 'fetch standards') return '取得課程標準';
 	if (name === 'pages build and deployment') return 'API 資料建置與部署';
 	if (name === 'Run Analytics & Fatch calendar') return '分析課程資料與取得行事曆';

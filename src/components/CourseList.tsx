@@ -33,6 +33,9 @@ type CourseListProps = {
 	showConflictCourse?: boolean;
 	year?: string;
 	sem?: string;
+	department?: string;
+	savedVersion?: number;
+	onSavedChange?: () => void;
 };
 
 type TimetableCourseItem = Course & {
@@ -53,6 +56,9 @@ export function CourseList({
 	showConflictCourse = true,
 	year,
 	sem,
+	department,
+	savedVersion: externalSavedVersion = 0,
+	onSavedChange,
 }: CourseListProps) {
 	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
 	const [layout, setLayout] = useState('card');
@@ -61,18 +67,19 @@ export function CourseList({
 	const [conflictCourseData, setConflictCourseData] = useState<string[]>([]);
 	const viewYear = year || dataset.year;
 	const viewSem = sem || dataset.sem;
+	const viewDepartment = department || dataset.department;
 	const savedCourseIds = useMemo(
-		() => getMyCourseIds(viewYear, viewSem),
-		[getMyCourseIds, viewYear, viewSem, savedVersion],
+		() => getMyCourseIds(viewYear, viewSem, viewDepartment),
+		[getMyCourseIds, viewYear, viewSem, viewDepartment, savedVersion, externalSavedVersion],
 	);
 
 	useEffect(() => {
 		let cancelled = false;
 		async function checkConflict() {
-			const ids = getMyCourseIds(viewYear, viewSem);
-			const myCourses = (await getCourses({ year: viewYear, sem: viewSem })).filter((course) =>
-				ids.includes(course.id),
-			);
+			const ids = getMyCourseIds(viewYear, viewSem, viewDepartment);
+			const myCourses = (
+				await getCourses({ year: viewYear, sem: viewSem, department: viewDepartment })
+			).filter((course) => ids.includes(course.id));
 			const conflicts: string[] = [];
 			for (const course of courses || []) {
 				for (const myCourse of myCourses) {
@@ -90,7 +97,7 @@ export function CourseList({
 		return () => {
 			cancelled = true;
 		};
-	}, [courses, viewYear, viewSem, dataset.department, savedVersion]);
+	}, [courses, viewYear, viewSem, viewDepartment, savedVersion, externalSavedVersion]);
 
 	const filteredCourse = useMemo(() => {
 		if (!courses) return [];
@@ -125,17 +132,18 @@ export function CourseList({
 	function toggleSavedCourse(course: Course) {
 		const saved = savedCourseIds.includes(course.id);
 		if (saved) {
-			removeCourse(course.id, viewYear, viewSem);
+			removeCourse(course.id, viewYear, viewSem, viewDepartment);
 			toast.success('已從我的課程移除', {
 				description: `${course.id} ${course.name?.zh || '未命名課程'}`,
 			});
 		} else {
-			addCourse(course.id, viewYear, viewSem);
+			addCourse(course.id, viewYear, viewSem, viewDepartment);
 			toast.success('已加入我的課程', {
 				description: `${course.id} ${course.name?.zh || '未命名課程'}`,
 			});
 		}
 		setSavedVersion((value) => value + 1);
+		onSavedChange?.();
 	}
 
 	if (!courses) return null;

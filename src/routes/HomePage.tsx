@@ -116,6 +116,13 @@ export function HomePage() {
 							icon: Search,
 						},
 						{ to: '/class', title: '班級課表', text: '查看各班上課時間表', icon: Clock },
+						{ to: '/program', title: '一般學程', text: '查看學程規劃與開課課程', icon: BookOpen },
+						{
+							to: `/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${encodeURIComponent(dataset.department)}&language=English`,
+							title: '英語授課',
+							text: '尋找以英語授課的課程',
+							icon: Search,
+						},
 						{
 							to: '/mprogram',
 							title: '微學程',
@@ -140,6 +147,12 @@ export function HomePage() {
 							title: '尋找空教室',
 							text: '查看沒有課程進行的教室',
 							icon: Ghost,
+						},
+						{
+							to: '/competencies',
+							title: '核心能力',
+							text: '查看系所課程與核心能力對照',
+							icon: GraduationCap,
 						},
 						{
 							to: '/withdrawal',

@@ -13,8 +13,11 @@ import { Select, SelectOption } from '../components/ui-kit/Select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
+import { hasMeaningfulValue } from '../lib/courseFilters';
 import {
 	courseStandard,
+	departmentItems,
+	storageDepartment,
 	formatCredit,
 	getSportsCourseTitle,
 	hasTimeConflict,
@@ -23,7 +26,7 @@ import {
 } from '../lib/courseUtils';
 import { coursePageTitle, usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
-import type { Course, SyllabusItem } from '../types/course';
+import type { Course, CovidCourseInfo, SyllabusItem } from '../types/course';
 import { errorMessage } from '../lib/error';
 import {
 	classifyWithdrawalRate,
@@ -38,7 +41,8 @@ type InfoCardItem = [string, React.ReactNode];
 
 export function CourseDetailPage() {
 	const { year, sem, id } = useParams({ from: '/course/$year/$sem/$id' });
-	const { getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
+	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
+	const [courseDepartment, setCourseDepartment] = useState(dataset.department);
 	const [course, setCourse] = useState<Course | null>(null);
 	const [syllabus, setSyllabus] = useState<SyllabusItem[]>([]);
 	const [relatedCourses, setRelatedCourses] = useState<Course[]>([]);
@@ -47,34 +51,74 @@ export function CourseDetailPage() {
 		useState<WithdrawalRateDistribution | null>(null);
 	const [selectedSyllabusIndex, setSelectedSyllabusIndex] = useState('0');
 	const [error, setError] = useState<unknown>(null);
+	const [syllabusError, setSyllabusError] = useState(false);
 	const [version, setVersion] = useState(0);
 
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
 			setError(null);
+			setCourse(null);
+			setSyllabusError(false);
+			setSelectedSyllabusIndex('0');
 			try {
-				const [detail, courses, rate] = await Promise.all([
+				const [detailResult, coursesResult, rateResult] = await Promise.allSettled([
 					fetchCourseDetail(year, sem, id),
 					getCourses({ year, sem }),
 					fetchWithdrawalRate(''),
 				]);
 				if (cancelled) return;
-				const found = courses.find((item) => item.id === id);
+				let courses = coursesResult.status === 'fulfilled' ? coursesResult.value : [];
+				let foundDepartment = dataset.department;
+				const rate = rateResult.status === 'fulfilled' ? rateResult.value : {};
+				let found = courses.find((item) => item.id === id);
+				if (!found) {
+					const departments = departmentItems
+						.map(storageDepartment)
+						.filter((item) => item !== dataset.department);
+					const results = await Promise.allSettled(
+						departments.map((department) => getCourses({ year, sem, department })),
+					);
+					if (cancelled) return;
+					for (let index = 0; index < results.length; index++) {
+						const result = results[index];
+						if (result.status !== 'fulfilled') continue;
+						const match = result.value.find((item) => item.id === id);
+						if (match) {
+							found = match;
+							courses = result.value;
+							foundDepartment = departments[index];
+							break;
+						}
+					}
+					if (
+						!found &&
+						(coursesResult.status === 'rejected' ||
+							results.some((result) => result.status === 'rejected'))
+					) {
+						throw new Error('部分部別資料無法載入，請稍後再試');
+					}
+				}
 				if (!found) throw new Error('找不到課程');
+				setCourseDepartment(foundDepartment);
 				if ((found.teacher || []).some((teacher) => teacher.name === '朴維鎮')) {
 					globalThis.location.href = '/not-found';
 					return;
 				}
-				const detailItems = Array.isArray(detail) ? detail : [];
-				const calcedWithdrawalRate = Math.max(
-					...detailItems.map((item) => rate[item.name] ?? null).filter(Boolean),
-					-1,
-				);
+				const detailItems =
+					detailResult.status === 'fulfilled' && Array.isArray(detailResult.value)
+						? detailResult.value
+						: [];
+				setSyllabusError(detailResult.status === 'rejected');
+				const teacherRates = (found.teacher || [])
+					.map((item) => rate[item.name])
+					.filter((value) => value !== null && value !== undefined && String(value).trim() !== '')
+					.map(Number)
+					.filter((value) => Number.isFinite(value) && value >= 0);
 				setCourse(found);
 				setSyllabus(detailItems);
 				setRelatedCourses(courses);
-				setWithdrawalRate(calcedWithdrawalRate > 0 ? calcedWithdrawalRate : null);
+				setWithdrawalRate(teacherRates.length ? Math.max(...teacherRates) : null);
 				setWithdrawalDistribution(createWithdrawalRateDistribution(Object.values(rate)));
 			} catch (e) {
 				if (!cancelled) setError(e);
@@ -84,16 +128,16 @@ export function CourseDetailPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [year, sem, id]);
+	}, [year, sem, id, dataset.department]);
 
-	const isInMyCourse = getMyCourseIds(year, sem).includes(id);
+	const isInMyCourse = getMyCourseIds(year, sem, courseDepartment).includes(id);
 	const conflictCourses = useMemo(() => {
 		if (!course) return [];
-		const ids = getMyCourseIds(year, sem);
+		const ids = getMyCourseIds(year, sem, courseDepartment);
 		return relatedCourses.filter(
 			(item) => ids.includes(item.id) && item.id !== course.id && hasTimeConflict(course, item),
 		);
-	}, [course, relatedCourses, version]);
+	}, [course, relatedCourses, courseDepartment, version]);
 	const conflicted = conflictCourses.length > 0;
 	const selectedSyllabus = syllabus[Number(selectedSyllabusIndex)] || null;
 	const isEarlyEight = parseCourseTime(course?.time).some((item) =>
@@ -107,12 +151,12 @@ export function CourseDetailPage() {
 
 	function toggleCourse() {
 		if (isInMyCourse) {
-			removeCourse(currentCourse.id);
+			removeCourse(currentCourse.id, year, sem, courseDepartment);
 			toast.success('已從我的課程移除', {
 				description: `${currentCourse.id} ${currentCourse.name?.zh || '未命名課程'}`,
 			});
 		} else {
-			addCourse(currentCourse.id);
+			addCourse(currentCourse.id, year, sem, courseDepartment);
 			toast.success('已加入我的課程', {
 				description: `${currentCourse.id} ${currentCourse.name?.zh || '未命名課程'}`,
 			});
@@ -121,7 +165,7 @@ export function CourseDetailPage() {
 	}
 
 	return (
-		<div className='space-y-4'>
+		<div className='flex flex-col gap-4'>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<div>
 					<h1 className='!text-xl !leading-tight font-semibold'>
@@ -184,12 +228,12 @@ export function CourseDetailPage() {
 								'課程標準',
 								`${course.courseType || ''} ${course.courseType ? courseStandard[course.courseType] || '' : ''}`,
 							),
-							infoItem('人數', `${course.people ?? '無資料'} 人`),
-							...(Number(course.peopleWithdraw) > 0
-								? [infoItem('退選', `${course.peopleWithdraw} 人`)]
-								: []),
-							infoItem('時數', `${course.hours ?? '無資料'} 小時`),
-							...(Number(course.stage) > 1 ? [infoItem('階段', course.stage)] : []),
+							...optionalInfoItem('課程代碼', course.code),
+							infoItem('人數', formatQuantity(course.people, '人')),
+							...optionalInfoItem('退選', course.peopleWithdraw, '人'),
+							infoItem('時數', formatQuantity(course.hours, '小時')),
+							...optionalInfoItem('階段', course.stage),
+							...courseAttributeItems(course),
 						]}
 					/>
 					<InfoCard
@@ -216,6 +260,8 @@ export function CourseDetailPage() {
 									}))}
 								/>,
 							),
+							...optionalInfoItem('助教', course.ta?.map((item) => item.name).join('、')),
+							...optionalInfoItem('授課語言', course.language),
 							infoItem('備註', <HtmlText text={course.notes || '無'} />),
 						]}
 					/>
@@ -240,8 +286,11 @@ export function CourseDetailPage() {
 			<h3 className='mt-5'>贊助商廣告</h3>
 			<AdsByGoogle />
 			<h3>課程概述</h3>
-			<HtmlText text={course.description?.zh || ''} as='p' />
-			<HtmlText text={course.description?.en || ''} as='p' />
+			<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
+			<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
+			<CourseSourceLinks course={course} />
+			{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試或查看原始課綱。</Alert> : null}
+			{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
 			{syllabus.length > 1 ? (
 				<Alert>
 					<strong>含有多項資料</strong>
@@ -250,12 +299,13 @@ export function CourseDetailPage() {
 					<br />
 					<br />
 					<Select
+						aria-label='選擇課綱教師'
 						value={selectedSyllabusIndex}
 						onChange={(value) => setSelectedSyllabusIndex(value)}
 					>
 						{syllabus.map((item, index) => (
 							<SelectOption key={`${item.name}-${index}`} value={String(index)}>
-								{item.name}
+								{item.name || `課綱 ${index + 1}`}
 							</SelectOption>
 						))}
 					</Select>
@@ -287,7 +337,9 @@ function InfoCard({
 				{items.map(([itemTitle, content]) => (
 					<div className='grid min-w-0 gap-0 md:gap-1' key={itemTitle}>
 						<div className='text-sm font-semibold whitespace-nowrap'>{itemTitle}</div>
-						<div className='min-w-0 text-sm opacity-75'>{content}</div>
+						<div className='min-w-0 text-sm [overflow-wrap:anywhere] break-words whitespace-pre-wrap opacity-75'>
+							{content}
+						</div>
 					</div>
 				))}
 			</div>
@@ -304,9 +356,8 @@ function WithdrawalRateCard({
 }) {
 	const [tooltipOpen, setTooltipOpen] = useState(false);
 	const classification = classifyWithdrawalRate(withdrawalRate, distribution);
-	const withdrawalRateLabel = withdrawalRate
-		? `${formatWithdrawalRate(withdrawalRate)}%`
-		: '無資料';
+	const withdrawalRateLabel =
+		withdrawalRate !== null ? `${formatWithdrawalRate(withdrawalRate)}%` : '無資料';
 
 	return (
 		<TooltipProvider>
@@ -315,14 +366,14 @@ function WithdrawalRateCard({
 					<TooltipTrigger asChild>
 						<button
 							type='button'
-							aria-label={`退選率 ${withdrawalRateLabel}，${classification.label}，查看退選率說明`}
+							aria-label={`退選率 ${withdrawalRateLabel}${withdrawalRate !== null ? `，${classification.label}` : ''}，查看退選率說明`}
 							className='absolute inset-0 z-10 cursor-help rounded-lg border-0 bg-transparent p-0 focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 							onClick={() => setTooltipOpen((open) => !open)}
 						/>
 					</TooltipTrigger>
 					<CardTitle className='flex flex-wrap items-start justify-between gap-2'>
 						{withdrawalRateLabel}
-						{withdrawalRate ? (
+						{withdrawalRate !== null ? (
 							<WithdrawalRateBadge level={classification.level} label={classification.label} />
 						) : null}
 					</CardTitle>
@@ -389,7 +440,7 @@ function CourseDetailTitle({ course }: { course: Course }) {
 
 function InlineLinks({
 	items,
-	fallback = '',
+	fallback = '無資料',
 }: {
 	items: { to: string; label: string }[];
 	fallback?: React.ReactNode;
@@ -471,112 +522,194 @@ function splitUrlSuffix(rawUrl: string) {
 	return { url, suffix };
 }
 
-function SyllabusDetail({ item }) {
+const syllabusTextFields = {
+	objective: '課程大綱',
+	schedule: '課程進度',
+	scorePolicy: '評量標準',
+	materials: '使用教材、參考書目或其他',
+	consultation: '課程諮詢管道',
+	remarks: '備註',
+} as const;
+
+const syllabusMetadata = new Set([
+	'name',
+	'email',
+	'officeHoursLink',
+	'latestUpdate',
+	'foreignLanguageTextbooks',
+	'covid19',
+]);
+
+function SyllabusDetail({ item }: { item: SyllabusItem }) {
+	const officeHoursUrl = officialCourseUrl(item.officeHoursLink, 'mobile');
+	const additionalFields = Object.entries(item).filter(
+		([key]) => !syllabusMetadata.has(key) && !Object.hasOwn(syllabusTextFields, key),
+	);
 	return (
-		<div className='space-y-4'>
+		<div className='flex flex-col gap-4'>
 			{item.covid19 ? <CovidInfo covid19={item.covid19} /> : null}
 			<h3>教師</h3>
-			<p>
-				{item.name} {item.email}
-			</p>
-			<h3>課程大綱</h3>
-			<HtmlText as='p' text={item.objective} />
-			<h3>課程進度</h3>
-			<HtmlText as='p' text={item.schedule} />
-			<h3>評量標準</h3>
-			<HtmlText as='p' text={item.scorePolicy} />
-			<h3>使用教材、參考書目或其他</h3>
-			<HtmlText as='p' text={item.materials} />
-			{item.consultation ? (
-				<>
-					<h3>課程諮詢管道</h3>
-					<HtmlText as='p' text={item.consultation} />
-				</>
+			<HtmlText as='p' text={[item.name, item.email].filter(Boolean).join(' ') || '無資料'} />
+			{officeHoursUrl ? (
+				<a
+					href={officeHoursUrl}
+					className={courseTextLinkClassName}
+					target='_blank'
+					rel='noreferrer'
+				>
+					教師諮商時間
+				</a>
 			) : null}
-			{item.remarks ? (
-				<>
-					<h3>備註</h3>
-					<HtmlText as='p' text={item.remarks} />
-				</>
+			{Object.entries(syllabusTextFields).map(([key, label]) => (
+				<TextSection key={key} label={label} value={item[key]} />
+			))}
+			{additionalFields.map(([key, value]) => (
+				<TextSection key={key} label={key} value={value} />
+			))}
+			{/* The crawler also emits false when the school's answer is blank. */}
+			{item.foreignLanguageTextbooks === true ? <h3>使用外文原文書籍：是</h3> : null}
+			{item.latestUpdate?.trim() ? (
+				<section className='flex flex-col gap-2'>
+					<h3>最後更新</h3>
+					<p>{formatLatestUpdate(item.latestUpdate)}</p>
+				</section>
 			) : null}
-			<h3>使用外文原文書籍：{item.foreignLanguageTextbooks ? '是' : '否'}</h3>
-			<h3>最後更新</h3>
-			<p>
-				{timeSince(new Date(item.latestUpdate))}前 <small>{item.latestUpdate}</small>
-			</p>
 		</div>
 	);
 }
 
-function CovidInfo({ covid19 }) {
+const emptySyllabusText = new Set(['無', '● 無 (None)', '無（None）', '● 無（None）']);
+
+function TextSection({ label, value }: { label: string; value: unknown }) {
+	const text =
+		typeof value === 'string'
+			? value.trim()
+			: typeof value === 'boolean'
+				? value
+					? '是'
+					: '否'
+				: typeof value === 'number' && Number.isFinite(value)
+					? String(value)
+					: '';
+	if (!text || emptySyllabusText.has(text)) return null;
 	return (
-		<div className='mt-4 rounded-[16px] border border-[rgba(var(--vs-text),0.2)] bg-[rgb(var(--vs-background))] px-4 py-3'>
+		<section className='flex min-w-0 flex-col gap-2'>
+			<h3>{label}</h3>
+			<HtmlText
+				as='p'
+				text={text.replace(/([^\n])●/g, '$1\n●').replace(/([)）])\s*(?=SDG\d+[:：])/g, '$1\n')}
+			/>
+		</section>
+	);
+}
+
+const covidFields = {
+	lv2Method: '二級警戒上課方式',
+	lv2Description: '二級警戒上課說明',
+	courseScoreMethod: '評量方式',
+	courseInfo: '課程訊息公告',
+	courseURL: '上課網址',
+	contactInfo: '學生加退選簽核及諮詢課程問題管道',
+	additionalInfo: '補充說明資訊',
+};
+
+function CovidInfo({ covid19 }: { covid19: CovidCourseInfo }) {
+	if (
+		!Object.values(covid19).some((value) => value?.trim() && !emptySyllabusText.has(value.trim()))
+	)
+		return null;
+	return (
+		<section className='flex min-w-0 flex-col gap-4'>
 			<h2>因應疫情所致之上課方式</h2>
 			<p>實際實施日期與上課方式，依學校公布之訊息為主</p>
-			<div className='mt-3 border-l-4 border-[#e6e6e6] pl-3'>
-				<div className='font-semibold'>
-					若疫情為 <strong>ㄧ級</strong>警戒
-				</div>
-				<div>實體授課</div>
-			</div>
-			<div className='mt-3 border-l-4 border-[#e6e6e6] pl-3'>
-				<div className='font-semibold'>
-					若疫情為 <strong>二級</strong>警戒
-				</div>
-				<HtmlText as='div' text={covid19.lv2Method || covid19.lv2Description || '尚無對策'} />
-			</div>
-			<div className='mt-3 border-l-4 border-[#e6e6e6] pl-3'>
-				<div className='font-semibold'>
-					若疫情為 <strong>三級</strong>警戒
-				</div>
-				<div>遠距上課</div>
-			</div>
-			{covid19.courseScoreMethod ? (
-				<>
-					<h3>評量方式</h3>
-					<HtmlText as='p' text={covid19.courseScoreMethod} />
-				</>
-			) : null}
-			{covid19.courseInfo ? (
-				<>
-					<h3>課程訊息公告</h3>
-					<HtmlText as='p' text={covid19.courseInfo} />
-				</>
-			) : null}
-			{covid19.courseURL ? (
-				<>
-					<h3>上課網址</h3>
-					<HtmlText as='p' text={covid19.courseURL} />
-				</>
-			) : null}
-			{covid19.contactInfo ? (
-				<>
-					<h3>學生加退選簽核及諮詢課程問題管道</h3>
-					<HtmlText as='p' text={covid19.contactInfo} />
-				</>
-			) : null}
-			{covid19.additionalInfo ? (
-				<>
-					<h3>補充說明資訊</h3>
-					<HtmlText as='p' text={covid19.additionalInfo} />
-				</>
-			) : null}
-		</div>
+			{Object.entries(covid19).map(([key, value]) => (
+				<TextSection key={key} label={covidFields[key] || key} value={value} />
+			))}
+		</section>
 	);
 }
 
-function timeSince(date: Date) {
+function optionalInfoItem(label: string, value: string | undefined, unit?: string): InfoCardItem[] {
+	return value?.trim() ? [infoItem(label, unit ? formatQuantity(value, unit) : value)] : [];
+}
+
+function courseAttributeItems(course: Course): InfoCardItem[] {
+	return (
+		[
+			['audit', '隨班附讀'],
+			['lab', '實驗實習'],
+			['interdisciplinary', '跨領域'],
+		] as const
+	).flatMap(([key, label]) => {
+		const value = course[key]?.trim();
+		return value && hasMeaningfulValue(value) ? [infoItem(label, value)] : [];
+	});
+}
+
+function formatQuantity(value: string | undefined, unit: string) {
+	return value?.trim() ? `${value} ${unit}` : '無資料';
+}
+
+function formatLatestUpdate(value: string | undefined) {
+	if (!value?.trim()) return '無資料';
+	const date = new Date(value);
+	if (!Number.isFinite(date.getTime())) return value;
 	const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+	if (seconds < 0) return value;
 	const intervals: [string, number][] = [
-		[' 年', 31536000],
-		[' 月', 2592000],
-		[' 天', 86400],
-		[' 小時', 3600],
-		[' 分鐘', 60],
+		['年', 31536000],
+		['月', 2592000],
+		['天', 86400],
+		['小時', 3600],
+		['分鐘', 60],
+		['秒', 1],
 	];
-	for (const [label, size] of intervals) {
-		const value = seconds / size;
-		if (value > 1) return `${Math.floor(value)}${label}`;
+	const [label, size] = intervals.find(([, size]) => seconds >= size) || ['秒', 1];
+	return `${Math.floor(seconds / size)} ${label}前（${value}）`;
+}
+
+function officialCourseUrl(value: string | undefined, section: 'tw' | 'mobile') {
+	if (!value?.trim()) return null;
+	try {
+		const url = new URL(value, `https://aps.ntut.edu.tw/course/${section}/`);
+		return ['https:', 'http:'].includes(url.protocol) ? url.href : null;
+	} catch {
+		return null;
 	}
-	return `${Math.floor(seconds)} 秒`;
+}
+
+function CourseSourceLinks({ course }: { course: Course }) {
+	const links = [
+		{ label: '原始課程概述', url: officialCourseUrl(course.courseDescriptionLink, 'tw') },
+		...(course.syllabusLinks || []).map((link, index) => ({
+			label: `原始課綱 ${index + 1}`,
+			url: officialCourseUrl(link, 'mobile'),
+		})),
+		...(['teacher', 'class', 'classroom', 'ta'] as const).flatMap((key) =>
+			(course[key] || []).map((item) => ({
+				label: `${{ teacher: '教師', class: '班級', classroom: '教室', ta: '助教' }[key]}：${item.name}`,
+				url: officialCourseUrl(item.link, 'tw'),
+			})),
+		),
+	].filter((link) => link.url !== null);
+	if (!links.length) return null;
+	return (
+		<section className='flex min-w-0 flex-col gap-2'>
+			<h3>學校原始資料</h3>
+			<ul className='flex flex-wrap gap-x-4 gap-y-2'>
+				{links.map((link, index) => (
+					<li key={`${link.url}-${index}`}>
+						<a
+							className={courseTextLinkClassName}
+							href={link.url!}
+							target='_blank'
+							rel='noreferrer'
+						>
+							{link.label}
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	);
 }

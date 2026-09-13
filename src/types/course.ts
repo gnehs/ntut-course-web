@@ -4,13 +4,14 @@ export type CourseTime = Partial<Record<WeekdayKey | string, string[]>>;
 
 export type NamedCourseItem = {
 	id?: string;
+	code?: string;
 	name: string;
 	link?: string;
 };
 
 export type CourseName = {
 	zh: string;
-	en?: string;
+	en?: string | null;
 };
 
 export type CourseDescription = {
@@ -19,11 +20,33 @@ export type CourseDescription = {
 };
 
 export type SyllabusItem = {
+	[field: string]: unknown;
 	name?: string;
-	filename?: string;
-	url?: string;
-	text?: string;
-	semester?: string;
+	email?: string;
+	officeHoursLink?: string;
+	latestUpdate?: string;
+	objective?: string;
+	schedule?: string;
+	scorePolicy?: string;
+	materials?: string;
+	consultation?: string;
+	remarks?: string;
+	延伸教學與資源?: string;
+	課程對應SDGs指標?: string;
+	課程是否導入AI?: string;
+	foreignLanguageTextbooks?: boolean | null;
+	covid19?: CovidCourseInfo | null;
+};
+
+export type CovidCourseInfo = {
+	[field: string]: string | null | undefined;
+	lv2Method?: string | null;
+	lv2Description?: string | null;
+	courseScoreMethod?: string | null;
+	courseInfo?: string | null;
+	courseURL?: string | null;
+	contactInfo?: string | null;
+	additionalInfo?: string | null;
 };
 
 export type Course = {
@@ -44,8 +67,11 @@ export type Course = {
 	peopleWithdraw: string;
 	ta: NamedCourseItem[];
 	language: string;
+	audit?: string;
+	lab?: string;
+	interdisciplinary?: string;
 	courseDescriptionLink: string;
-	syllabusLinks: SyllabusItem[];
+	syllabusLinks: string[];
 	syllabus?: SyllabusItem[];
 };
 
@@ -79,7 +105,7 @@ export type DepartmentGroup = {
 
 export type YearSemData = Record<string, number[]>;
 
-export type WithdrawalRateMap = Record<string, number>;
+export type WithdrawalRateMap = Record<string, string | number>;
 
 export type WithdrawalStat = {
 	name: string;
@@ -153,6 +179,32 @@ export type MicroProgram = {
 	courses?: string[];
 	course?: string[];
 };
+
+export type Program = {
+	id: string;
+	name: string;
+	href: string;
+	courses: string[];
+	description?: string;
+};
+
+export type CompetencyDepartment = {
+	id: string;
+	name: string;
+	href: string;
+	abilities: { id: string; name: string }[];
+	courses: { code: string; name: string; abilityIds: string[] }[];
+};
+
+export type SyllabusIndex = Record<
+	string,
+	{
+		ai: string[];
+		sdgs: number[];
+		resources: string[];
+		hasSyllabus: boolean;
+	}
+>;
 
 export type WorkflowRun = {
 	id: number;

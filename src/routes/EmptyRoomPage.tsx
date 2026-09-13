@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -27,17 +28,21 @@ export function EmptyRoomPage() {
 	const [todayDayOfWeek, setTodayDayOfWeek] = useState(
 		Object.keys(dateEng2zh)[new Date().getDay()],
 	);
-	const [emptyroomDetailDialog, setEmptyroomDetailDialog] = useState(false);
-	const [emptyroomDetailData, setEmptyroomDetailData] = useState<EmptyRoom | null>(null);
+	const [emptyroomDetailRoomName, setEmptyroomDetailRoomName] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
 		setCourses(null);
 		setOnError(null);
+		setEmptyroomDetailRoomName(null);
 		Promise.all([
-			getCourses({ department: '研究所(日間部、進修部、週末碩士班)' }),
-			getCourses({ department: '進修部' }),
-			getCourses({ department: 'main' }),
+			getCourses({
+				year: dataset.year,
+				sem: dataset.sem,
+				department: '研究所(日間部、進修部、週末碩士班)',
+			}),
+			getCourses({ year: dataset.year, sem: dataset.sem, department: '進修部' }),
+			getCourses({ year: dataset.year, sem: dataset.sem, department: 'main' }),
 		])
 			.then((data) => {
 				if (cancelled) return;
@@ -63,8 +68,13 @@ export function EmptyRoomPage() {
 
 		const roomMap = new Map<string, EmptyRoom>();
 		const categorySet = new Set<string>();
+		const courseMap = new Map<string, Course>();
 
 		for (const course of courses) {
+			if (!courseMap.has(course.id)) courseMap.set(course.id, course);
+		}
+
+		for (const course of courseMap.values()) {
 			for (const classroom of course.classroom || []) {
 				if (!classroom?.name) continue;
 				const category = classroom.name.match(/^(\D.)/)?.[1] || classroom.name.slice(0, 2);
@@ -75,25 +85,50 @@ export function EmptyRoomPage() {
 						category,
 						timetable: [...timetableSlots],
 						link: classroom.link || '',
+						coursesBySlot: Object.fromEntries(timetableSlots.map((slot) => [slot, []])) as Record<
+							string,
+							EmptyRoomCourse[]
+						>,
 					});
 				}
 			}
 		}
 
-		for (const course of courses) {
+		for (const course of courseMap.values()) {
 			for (const classroom of course.classroom || []) {
 				const room = roomMap.get(classroom.name);
 				if (!room) continue;
 				const occupiedSlots = course.time?.[todayDayOfWeek] || [];
-				room.timetable = room.timetable.filter((slot) => !occupiedSlots.includes(String(slot)));
-				if (classroom.link) room.link = classroom.link;
+				const courseItem = {
+					id: course.id,
+					name: course.name?.zh || course.name?.en || course.id,
+				};
+				if (classroom.link && !resolveRoomSourceUrl(room.link)) room.link = classroom.link;
+				for (const slot of occupiedSlots) {
+					const slotCourses = room.coursesBySlot[String(slot)];
+					if (!slotCourses || slotCourses.some((item) => item.id === courseItem.id)) continue;
+					slotCourses.push(courseItem);
+				}
 			}
 		}
 
 		result.categoryList = [...categorySet].sort();
-		result.roomList = [...roomMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+		result.roomList = [...roomMap.values()]
+			.map((room) => ({
+				...room,
+				timetable: timetableSlots.filter((slot) => room.coursesBySlot[slot].length === 0),
+			}))
+			.sort((a, b) => a.name.localeCompare(b.name));
 		return result;
 	}, [courses, todayDayOfWeek]);
+	const emptyroomDetailData = useMemo(
+		() =>
+			emptyroomDetailRoomName
+				? roomList.find((room) => room.name === emptyroomDetailRoomName) || null
+				: null,
+		[emptyroomDetailRoomName, roomList],
+	);
+	const emptyroomDetailDialog = Boolean(emptyroomDetailData);
 
 	if (!courses) return <EmptyRoomSkeleton />;
 
@@ -130,10 +165,18 @@ export function EmptyRoomPage() {
 								.map((room) => (
 									<Card
 										key={room.name}
-										className='px-4 py-3'
+										className='hoverable px-4 py-3'
+										role='button'
+										tabIndex={0}
+										aria-haspopup='dialog'
+										aria-label={`查看「${room.name}」詳細上課資訊`}
 										onClick={() => {
-											setEmptyroomDetailData(room);
-											setEmptyroomDetailDialog(true);
+											setEmptyroomDetailRoomName(room.name);
+										}}
+										onKeyDown={(event) => {
+											if (event.key !== 'Enter' && event.key !== ' ') return;
+											event.preventDefault();
+											setEmptyroomDetailRoomName(room.name);
 										}}
 									>
 										<CardTitle>{room.name}</CardTitle>
@@ -156,12 +199,12 @@ export function EmptyRoomPage() {
 			<Dialog
 				open={emptyroomDetailDialog}
 				title={emptyroomDetailData ? `「${emptyroomDetailData.name}」詳細上課資訊` : '詳細上課資訊'}
-				onClose={() => setEmptyroomDetailDialog(false)}
+				onClose={() => setEmptyroomDetailRoomName(null)}
 				footer={
-					emptyroomDetailData?.link ? (
+					resolveRoomSourceUrl(emptyroomDetailData?.link) ? (
 						<Button
 							as='a'
-							href={`https://aps.ntut.edu.tw/course/tw/${emptyroomDetailData.link}`}
+							href={resolveRoomSourceUrl(emptyroomDetailData?.link) || undefined}
 							target='_blank'
 							rel='noreferrer'
 							className='m-0'
@@ -181,7 +224,22 @@ export function EmptyRoomPage() {
 								<div>
 									{slot} - {slotToTime(slot)}
 								</div>
-								<div>{emptyroomDetailData.timetable.includes(slot) ? '空堂' : '有課程進行'}</div>
+								{emptyroomDetailData.coursesBySlot[slot].length ? (
+									<ul className='grid gap-1 text-right'>
+										{emptyroomDetailData.coursesBySlot[slot].map((course) => (
+											<li key={course.id}>
+												<Link
+													to={`/course/${dataset.year}/${dataset.sem}/${course.id}`}
+													className='text-[rgb(var(--vs-primary))] underline underline-offset-2'
+												>
+													{course.name}
+												</Link>
+											</li>
+										))}
+									</ul>
+								) : (
+									<div>空堂</div>
+								)}
 							</div>
 						))}
 					</div>
@@ -189,6 +247,17 @@ export function EmptyRoomPage() {
 			</Dialog>
 		</div>
 	);
+}
+
+export function resolveRoomSourceUrl(link?: string) {
+	const value = link?.trim();
+	if (!value) return null;
+	try {
+		const url = new URL(value, 'https://aps.ntut.edu.tw/course/tw/');
+		return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
+	} catch {
+		return null;
+	}
 }
 
 function slotToTime(slot) {
@@ -215,4 +284,10 @@ type EmptyRoom = {
 	category: string;
 	timetable: string[];
 	link: string;
+	coursesBySlot: Record<string, EmptyRoomCourse[]>;
+};
+
+type EmptyRoomCourse = {
+	id: string;
+	name: string;
 };

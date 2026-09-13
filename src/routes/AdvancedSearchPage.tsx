@@ -10,10 +10,13 @@ import {
 	ChevronDown,
 	Clock3,
 	GraduationCap,
+	Languages,
 	LibraryBig,
 	ListFilter,
 	Search,
 	Shapes,
+	Sparkles,
+	Tags,
 	X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -26,10 +29,29 @@ import { AdvancedSearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { MiniNotify } from '../components/ui-kit/MiniNotify';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils';
-import { fetchDepartment, fetchWithdrawalRate } from '../lib/courseApi';
+import { fetchDepartment, fetchSyllabusIndex, fetchWithdrawalRate } from '../lib/courseApi';
+import {
+	AI_ANY_FILTER,
+	ALL_LANGUAGE_FILTER,
+	courseAttributeLabels,
+	filterCoursesByMetadata,
+	getCourseAttributeOptions,
+	getLanguageOptions,
+	getSyllabusFilterOptions,
+	languageLabel,
+	parseMetadataFilterState,
+	serializeMetadataFilterState,
+} from '../lib/courseFilters';
+import type { CourseAttribute } from '../lib/courseFilters';
 import { createSearchObject, createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
-import type { Course, DepartmentGroup, QueryValue, WithdrawalRateMap } from '../types/course';
+import type {
+	Course,
+	DepartmentGroup,
+	QueryValue,
+	SyllabusIndex,
+	WithdrawalRateMap,
+} from '../types/course';
 import { errorMessage } from '../lib/error';
 import { animateFilterSection } from '../lib/motion';
 
@@ -60,28 +82,51 @@ type AdvancedSearchQuery = {
 	tf?: Record<string, string[]>;
 	af?: string;
 	sph?: boolean;
+	ai?: boolean | string[];
+	sdgs?: number[];
+	attrs?: string[];
 };
 
-type SearchSectionId = 'display' | 'standard' | 'category' | 'academy' | 'time';
+type SearchSectionId =
+	| 'display'
+	| 'language'
+	| 'standard'
+	| 'category'
+	| 'academy'
+	| 'attributes'
+	| 'syllabus'
+	| 'time';
 
 type AdvancedSearchControlsProps = {
 	academyFilter: string[];
 	academyList: string[];
+	aiFilter: string[];
+	aiOptions: string[];
+	attributeFilter: CourseAttribute[];
+	attributeOptions: CourseAttribute[];
 	categoryFilter: string[];
 	courseStandardFilter: Record<string, boolean>;
 	courseStandardFilterEnabled: boolean;
 	courseStandardOptions: CourseStandardSymbol[];
+	languageFilter: string;
+	languageOptions: string[];
 	onClose?: () => void;
 	onKeywordChange: (value: string) => void;
+	onLanguageChange: (value: string) => void;
 	onReset: () => void;
+	onToggleAi: (value: string) => void;
 	onToggleAcademy: (item: string) => void;
+	onToggleAttribute: (value: CourseAttribute) => void;
 	onToggleCategory: (value: string) => void;
 	onToggleConflict: (checked: unknown) => void;
 	onTogglePlaceholder: (checked: unknown) => void;
+	onToggleSdgs: (value: number) => void;
 	onToggleStandard: (symbol: string, checked: unknown) => void;
 	onToggleTimetable: (date?: string | null, slot?: string) => void;
 	recommandKeyword: string[];
 	searchCourseKeyword: string;
+	sdgsFilter: number[];
+	sdgsOptions: number[];
 	setSortBy: (value: string) => void;
 	showCloseButton?: boolean;
 	showConflictCourse: boolean;
@@ -97,9 +142,12 @@ const filterSections: {
 	icon: LucideIcon;
 }[] = [
 	{ id: 'display', label: '顯示與排序', title: '顯示與排序', icon: ListFilter },
+	{ id: 'language', label: '語言', title: '依授課語言篩選', icon: Languages },
 	{ id: 'standard', label: '課程標準', title: '依課程標準篩選', icon: GraduationCap },
 	{ id: 'category', label: '博雅類別', title: '依博雅類別篩選課程', icon: Shapes },
 	{ id: 'academy', label: '學院', title: '依學院篩選', icon: LibraryBig },
+	{ id: 'attributes', label: '課程屬性', title: '依課程屬性篩選', icon: Tags },
+	{ id: 'syllabus', label: '課綱主題', title: '依課綱主題篩選', icon: Sparkles },
 	{ id: 'time', label: '時間', title: '依時間篩選', icon: Clock3 },
 ];
 
@@ -112,10 +160,26 @@ export function AdvancedSearchPage() {
 		() => safeParseJson(params.get('q'), {}),
 		[location.search],
 	);
+	const restoredMetadata = useMemo(
+		() =>
+			parseMetadataFilterState({
+				language: params.get('language'),
+				ai: restoredQuery.ai,
+				sdgs: restoredQuery.sdgs,
+				attrs: restoredQuery.attrs,
+			}),
+		[params, restoredQuery],
+	);
 	const [searchCourseKeyword, setSearchCourseKeyword] = useState(restoredQuery.k || '');
 	const [showConflictCourse, setShowConflictCourse] = useState(restoredQuery.c ?? true);
 	const [showPlaceholder, setShowPlaceholder] = useState(restoredQuery.sph ?? false);
 	const [sortBy, setSortBy] = useState(restoredQuery.sb || 'default');
+	const [languageFilter, setLanguageFilter] = useState(restoredMetadata.language);
+	const [aiFilter, setAiFilter] = useState(restoredMetadata.ai);
+	const [sdgsFilter, setSdgsFilter] = useState(restoredMetadata.sdgs);
+	const [attributeFilter, setAttributeFilter] = useState<CourseAttribute[]>(
+		restoredMetadata.attributes,
+	);
 	const [categoryFilter, setCategoryFilter] = useState<string[]>(restoredQuery.cf || []);
 	const [courseStandardFilter, setCourseStandardFilter] = useState(() => {
 		const next = { ...emptyStandardFilter };
@@ -132,8 +196,12 @@ export function AdvancedSearchPage() {
 		restoredQuery.tf || structuredClone(emptyTimetableFilter),
 	);
 	const [allCourses, setAllCourses] = useState<Course[] | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 	const [departmentData, setDepartmentData] = useState<DepartmentGroup[] | null>(null);
 	const [withdrawalRate, setWithdrawalRate] = useState<WithdrawalRateMap | null>(null);
+	const [syllabusIndex, setSyllabusIndex] = useState<SyllabusIndex | null>(null);
+	const [syllabusIndexLoaded, setSyllabusIndexLoaded] = useState(false);
+	const [syllabusIndexError, setSyllabusIndexError] = useState<unknown>(null);
 	const [onError, setOnError] = useState<unknown>(null);
 	const [recommandKeyword, setRecommandKeyword] = useState(['體育', '博雅']);
 
@@ -151,6 +219,12 @@ export function AdvancedSearchPage() {
 		() => [...new Set<string>((departmentData || []).map((item) => item.category))],
 		[departmentData],
 	);
+	const languageOptions = useMemo(() => getLanguageOptions(allCourses || []), [allCourses]);
+	const attributeOptions = useMemo(() => getCourseAttributeOptions(allCourses || []), [allCourses]);
+	const syllabusFilterOptions = useMemo(
+		() => getSyllabusFilterOptions(syllabusIndex),
+		[syllabusIndex],
+	);
 	const courseStandardFilterEnabled = useMemo(
 		() => Object.values(courseStandardFilter).some((item) => item),
 		[courseStandardFilter],
@@ -161,6 +235,10 @@ export function AdvancedSearchPage() {
 		setShowConflictCourse(restoredQuery.c ?? true);
 		setShowPlaceholder(restoredQuery.sph ?? false);
 		setSortBy(restoredQuery.sb || 'default');
+		setLanguageFilter(restoredMetadata.language);
+		setAiFilter(restoredMetadata.ai);
+		setSdgsFilter(restoredMetadata.sdgs);
+		setAttributeFilter(restoredMetadata.attributes);
 		setCategoryFilter(restoredQuery.cf || []);
 		setCourseStandardFilter(() => {
 			const next = { ...emptyStandardFilter };
@@ -172,7 +250,7 @@ export function AdvancedSearchPage() {
 		});
 		setAcademyFilter(restoredQuery.af ? String(restoredQuery.af).split(',') : []);
 		setTimetableFilter(restoredQuery.tf || structuredClone(emptyTimetableFilter));
-	}, [restoredQuery]);
+	}, [restoredMetadata, restoredQuery]);
 
 	useEffect(() => {
 		if (!allCourses) return;
@@ -193,18 +271,33 @@ export function AdvancedSearchPage() {
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
+			setIsLoading(true);
+			setOnError(null);
 			try {
 				setAllCourses(null);
 				setDepartmentData(null);
-				const [departments, rate, courses] = await Promise.all([
+				setSyllabusIndex(null);
+				setSyllabusIndexLoaded(false);
+				setSyllabusIndexError(null);
+				const syllabusIndexPromise =
+					typeof fetchSyllabusIndex === 'function'
+						? fetchSyllabusIndex(year, sem).catch((error) => {
+								if (!cancelled) setSyllabusIndexError(error);
+								return null;
+							})
+						: Promise.resolve(null);
+				const [departments, rate, courses, index] = await Promise.all([
 					fetchDepartment(year, sem),
 					fetchWithdrawalRate(''),
 					getCourses({ year, sem, department }),
+					syllabusIndexPromise,
 				]);
 				if (cancelled) return;
 				setDepartmentData(departments);
 				setWithdrawalRate(rate);
 				setAllCourses(courses);
+				setSyllabusIndex(index);
+				setSyllabusIndexLoaded(true);
 				const classData = departments.flatMap((item) => item.class || []);
 				const classID = localStorage.getItem('my-class');
 				const className = classData.find((item) => item.id === classID)?.name;
@@ -214,7 +307,15 @@ export function AdvancedSearchPage() {
 					);
 				}
 			} catch (e) {
-				if (!cancelled) setOnError(e);
+				if (!cancelled) {
+					setAllCourses([]);
+					setDepartmentData(null);
+					setSyllabusIndex(null);
+					setSyllabusIndexLoaded(false);
+					setOnError(e);
+				}
+			} finally {
+				if (!cancelled) setIsLoading(false);
 			}
 		}
 		load();
@@ -226,7 +327,13 @@ export function AdvancedSearchPage() {
 	const searchResult = useMemo(() => {
 		if (!allCourses) return null;
 		try {
-			let filtered = [...allCourses];
+			let filtered = filterCoursesByMetadata(allCourses, {
+				language: languageFilter,
+				ai: aiFilter,
+				sdgs: sdgsFilter,
+				attributes: attributeFilter,
+				syllabusIndex,
+			});
 
 			if (searchCourseKeyword.length) {
 				if (!Number.isNaN(Number(searchCourseKeyword)) && searchCourseKeyword.length >= 3) {
@@ -318,8 +425,8 @@ export function AdvancedSearchPage() {
 						...course,
 						withdrawalRate: Math.max(
 							...(course.teacher || [])
-								.map((item) => withdrawalRate[item.name] || 0)
-								.filter((item) => item),
+								.map((item) => Number(withdrawalRate[item.name] ?? 0))
+								.filter(Number.isFinite),
 							0,
 						),
 					}))
@@ -340,7 +447,6 @@ export function AdvancedSearchPage() {
 				});
 			}
 
-			setOnError(null);
 			return filtered;
 		} catch (e) {
 			setOnError(e);
@@ -348,6 +454,11 @@ export function AdvancedSearchPage() {
 		}
 	}, [
 		allCourses,
+		languageFilter,
+		aiFilter,
+		sdgsFilter,
+		attributeFilter,
+		syllabusIndex,
 		searchCourseKeyword,
 		courseStandardFilterEnabled,
 		courseStandardFilter,
@@ -361,6 +472,40 @@ export function AdvancedSearchPage() {
 		showPlaceholder,
 	]);
 
+	const metadataWarnings = useMemo(() => {
+		if (!allCourses || onError) return [];
+		const warnings: string[] = [];
+		if (languageFilter && languageOptions.length === 0)
+			warnings.push('目前學期沒有可用的授課語言資料，語言條件未套用。');
+
+		if (
+			(aiFilter.length || sdgsFilter.length) &&
+			syllabusIndexLoaded &&
+			(syllabusIndexError || syllabusIndex == null)
+		) {
+			if (syllabusIndexError) {
+				warnings.push('課綱分析資料暫時無法載入，AI 與 SDGs 條件未套用。');
+			} else {
+				warnings.push('目前學期沒有課綱索引資料，AI 與 SDGs 條件未套用。');
+			}
+		}
+
+		if (attributeFilter.length && attributeOptions.length === 0)
+			warnings.push('目前學期沒有可用的課程屬性資料，課程屬性條件未套用。');
+		return warnings;
+	}, [
+		aiFilter,
+		allCourses,
+		attributeFilter,
+		attributeOptions,
+		languageFilter,
+		languageOptions,
+		onError,
+		sdgsFilter,
+		syllabusIndex,
+		syllabusIndexError,
+		syllabusIndexLoaded,
+	]);
 	useEffect(() => {
 		if (location.pathname !== '/advanced-search') return;
 		const q: Record<string, QueryValue | undefined> = {};
@@ -376,12 +521,22 @@ export function AdvancedSearchPage() {
 		if (Object.values(timetableFilter).some((items) => items.length)) q.tf = timetableFilter;
 		if (academyFilter.length) q.af = academyFilter.join(',');
 		if (showPlaceholder) q.sph = showPlaceholder;
+		const metadataQuery = serializeMetadataFilterState({
+			language: languageFilter,
+			ai: aiFilter,
+			sdgs: sdgsFilter,
+			attributes: attributeFilter,
+		});
+		if (metadataQuery.ai !== undefined) q.ai = metadataQuery.ai;
+		if (metadataQuery.sdgs !== undefined) q.sdgs = metadataQuery.sdgs as unknown as QueryValue;
+		if (metadataQuery.attrs !== undefined) q.attrs = metadataQuery.attrs;
 		void navigate({
 			to: '/advanced-search',
 			search: createSearchObject({
 				year,
 				sem,
 				d: department,
+				language: metadataQuery.language,
 				...(Object.keys(q).length ? { q } : {}),
 			}),
 			replace: true,
@@ -395,6 +550,10 @@ export function AdvancedSearchPage() {
 		searchCourseKeyword,
 		showConflictCourse,
 		showPlaceholder,
+		languageFilter,
+		aiFilter,
+		sdgsFilter,
+		attributeFilter,
 		sortBy,
 		categoryFilter,
 		courseStandardFilter,
@@ -408,6 +567,10 @@ export function AdvancedSearchPage() {
 		setShowConflictCourse(true);
 		setShowPlaceholder(false);
 		setSortBy('default');
+		setLanguageFilter('');
+		setAiFilter([]);
+		setSdgsFilter([]);
+		setAttributeFilter([]);
 		setCategoryFilter([]);
 		setCourseStandardFilter({ ...emptyStandardFilter });
 		setAcademyFilter([]);
@@ -444,21 +607,43 @@ export function AdvancedSearchPage() {
 	const searchControlsProps: AdvancedSearchControlsProps = {
 		academyFilter,
 		academyList,
+		aiFilter,
+		aiOptions: syllabusFilterOptions.ai,
+		attributeFilter,
+		attributeOptions,
 		categoryFilter,
 		courseStandardFilter,
 		courseStandardFilterEnabled,
 		courseStandardOptions,
+		languageFilter,
+		languageOptions,
 		onKeywordChange: setSearchCourseKeyword,
+		onLanguageChange: (value) => setLanguageFilter(value === ALL_LANGUAGE_FILTER ? '' : value),
 		onReset: reset,
+		onToggleAi: (value) =>
+			setAiFilter((items) => {
+				if (value === AI_ANY_FILTER) return items.includes(value) ? [] : [value];
+				const next = items.filter((item) => item !== AI_ANY_FILTER);
+				return toggleArrayValue(next, value);
+			}),
 		onToggleAcademy: (item) => setAcademyFilter((items) => toggleArrayValue(items, item)),
+		onToggleAttribute: (value) => setAttributeFilter((items) => toggleArrayValue(items, value)),
 		onToggleCategory: (value) => setCategoryFilter((items) => toggleArrayValue(items, value)),
 		onTogglePlaceholder: (checked) => setShowPlaceholder(Boolean(checked)),
+		onToggleSdgs: (value) =>
+			setSdgsFilter((items) =>
+				items.includes(value)
+					? items.filter((item) => item !== value)
+					: [...items, value].sort((a, b) => a - b),
+			),
 		onToggleStandard: (symbol, checked) =>
 			setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) })),
 		onToggleTimetable: toggleLesson,
 		onToggleConflict: (checked) => setShowConflictCourse(Boolean(checked)),
 		recommandKeyword,
 		searchCourseKeyword,
+		sdgsFilter,
+		sdgsOptions: syllabusFilterOptions.sdgs,
 		showConflictCourse,
 		showPlaceholder,
 		sortBy,
@@ -480,10 +665,19 @@ export function AdvancedSearchPage() {
 						<pre>{errorMessage(onError)}</pre>
 					</Alert>
 				) : null}
-				{!searchResult ? (
+				{metadataWarnings.map((warning) => (
+					<Alert key={warning}>{warning}</Alert>
+				))}
+				{onError ? null : isLoading || !searchResult ? (
 					<AdvancedSearchPageSkeleton />
 				) : (
-					<CourseList courses={searchResult} showConflictCourse={showConflictCourse} />
+					<CourseList
+						courses={searchResult}
+						showConflictCourse={showConflictCourse}
+						year={year}
+						sem={sem}
+						department={department}
+					/>
 				)}
 				<div className='grid gap-3'>
 					<h3 className='mb-4'>贊助商廣告</h3>
@@ -502,17 +696,31 @@ function getFilterSectionCount(id: SearchSectionId, props: AdvancedSearchControl
 			Number(props.sortBy !== 'default')
 		);
 	}
+	if (id === 'language') return Number(Boolean(props.languageFilter));
 	if (id === 'standard') {
 		return props.courseStandardOptions.filter((symbol) => props.courseStandardFilter[symbol])
 			.length;
 	}
 	if (id === 'category') return props.categoryFilter.length;
 	if (id === 'academy') return props.academyFilter.length;
+	if (id === 'attributes') return props.attributeFilter.length;
+	if (id === 'syllabus') return Number(props.aiFilter.length > 0) + props.sdgsFilter.length;
 	return Object.values(props.timetableFilter).reduce((sum, items) => sum + items.length, 0);
 }
 
 function getFilterSection(id: SearchSectionId) {
 	return filterSections.find((section) => section.id === id) ?? filterSections[0];
+}
+
+function isFilterSectionVisible(id: SearchSectionId, props: AdvancedSearchControlsProps) {
+	if (id === 'language') return props.languageOptions.length > 0;
+	if (id === 'attributes') return props.attributeOptions.length > 0;
+	if (id === 'syllabus') return props.aiOptions.length > 0 || props.sdgsOptions.length > 0;
+	return true;
+}
+
+function getVisibleFilterSections(props: AdvancedSearchControlsProps) {
+	return filterSections.filter((section) => isFilterSectionVisible(section.id, props));
 }
 
 function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
@@ -521,7 +729,8 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 	const [filterScrollHint, setFilterScrollHint] = useState({ left: false, right: false });
 	const hasActiveCondition =
 		props.searchCourseKeyword.trim().length > 0 ||
-		filterSections.some((section) => getFilterSectionCount(section.id, props) > 0);
+		getVisibleFilterSections(props).some((section) => getFilterSectionCount(section.id, props) > 0);
+	const visibleSections = getVisibleFilterSections(props);
 
 	useEffect(() => {
 		const scrollElement = filterScrollRef.current;
@@ -555,7 +764,12 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 			window.removeEventListener('resize', updateScrollHint);
 			observer?.disconnect();
 		};
-	}, [hasActiveCondition, props.courseStandardOptions.length, props.academyList.length]);
+	}, [
+		hasActiveCondition,
+		props.courseStandardOptions.length,
+		props.academyList.length,
+		visibleSections.length,
+	]);
 
 	return (
 		<section className='mb-4 grid min-w-0 gap-3 lg:hidden'>
@@ -604,7 +818,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 							<span>重設</span>
 						</button>
 					) : null}
-					{filterSections.map((section) => {
+					{visibleSections.map((section) => {
 						const count = getFilterSectionCount(section.id, props);
 						const active = activeSection === section.id;
 						const Icon = section.icon;
@@ -719,24 +933,15 @@ function AdvancedSearchSidebarContent(props: AdvancedSearchControlsProps) {
 				value={props.searchCourseKeyword}
 				onSelect={props.onKeywordChange}
 			/>
-			<SearchSection sectionId='display' open>
-				<FilterSectionContent id='display' {...props} />
-			</SearchSection>
-			<SearchSection sectionId='standard' open={props.courseStandardFilterEnabled}>
-				<FilterSectionContent id='standard' {...props} />
-			</SearchSection>
-			<SearchSection sectionId='category' open={props.categoryFilter.length > 0}>
-				<FilterSectionContent id='category' {...props} />
-			</SearchSection>
-			<SearchSection sectionId='academy' open={props.academyFilter.length > 0}>
-				<FilterSectionContent id='academy' {...props} />
-			</SearchSection>
-			<SearchSection
-				sectionId='time'
-				open={(Object.values(props.timetableFilter) as string[][]).some((items) => items.length)}
-			>
-				<FilterSectionContent id='time' {...props} />
-			</SearchSection>
+			{getVisibleFilterSections(props).map((section) => (
+				<SearchSection
+					key={section.id}
+					sectionId={section.id}
+					open={getFilterSectionCount(section.id, props) > 0 || section.id === 'display'}
+				>
+					<FilterSectionContent id={section.id} {...props} />
+				</SearchSection>
+			))}
 		</div>
 	);
 }
@@ -763,6 +968,25 @@ function FilterSectionContent({
 					</Select>
 				</Field>
 			</div>
+		);
+	}
+
+	if (id === 'language') {
+		return (
+			<Field label='授課語言'>
+				<Select
+					aria-label='授課語言'
+					value={props.languageFilter || ALL_LANGUAGE_FILTER}
+					onChange={props.onLanguageChange}
+				>
+					<SelectOption value={ALL_LANGUAGE_FILTER}>不限</SelectOption>
+					{props.languageOptions.map((value) => (
+						<SelectOption key={value} value={value}>
+							{languageLabel(value)}
+						</SelectOption>
+					))}
+				</Select>
+			</Field>
 		);
 	}
 
@@ -820,6 +1044,67 @@ function FilterSectionContent({
 				) : (
 					<p className='m-0 text-sm opacity-70'>學院資料載入後即可篩選。</p>
 				)}
+			</div>
+		);
+	}
+
+	if (id === 'attributes') {
+		return (
+			<fieldset className='grid gap-2 border-0 p-0'>
+				<legend className='text-sm font-medium'>課程屬性</legend>
+				{props.attributeOptions.map((key) => (
+					<label key={key} className='flex min-h-7 cursor-pointer items-center gap-2'>
+						<Checkbox
+							checked={props.attributeFilter.includes(key)}
+							onCheckedChange={() => props.onToggleAttribute(key)}
+						/>
+						<span>{courseAttributeLabels[key]}</span>
+					</label>
+				))}
+			</fieldset>
+		);
+	}
+
+	if (id === 'syllabus') {
+		return (
+			<div className='grid gap-3'>
+				{props.aiOptions.length ? (
+					<fieldset className='grid gap-2 border-0 p-0'>
+						<legend className='text-sm font-medium'>AI 教學方式</legend>
+						<label className='flex min-h-7 cursor-pointer items-center gap-2'>
+							<Checkbox
+								checked={props.aiFilter.includes(AI_ANY_FILTER)}
+								onCheckedChange={() => props.onToggleAi(AI_ANY_FILTER)}
+							/>
+							<span>有導入 AI</span>
+						</label>
+						{props.aiOptions.map((value) => (
+							<label key={value} className='flex min-h-7 cursor-pointer items-center gap-2'>
+								<Checkbox
+									checked={props.aiFilter.includes(value)}
+									onCheckedChange={() => props.onToggleAi(value)}
+								/>
+								<span>{value}</span>
+							</label>
+						))}
+					</fieldset>
+				) : null}
+				{props.sdgsOptions.length ? (
+					<fieldset className='grid gap-2 border-0 p-0'>
+						<legend className='text-sm font-medium'>聯合國永續發展目標（SDGs）</legend>
+						<div className='grid grid-cols-2 gap-x-3 gap-y-2'>
+							{props.sdgsOptions.map((value) => (
+								<label key={value} className='flex min-h-7 cursor-pointer items-center gap-2'>
+									<Checkbox
+										checked={props.sdgsFilter.includes(value)}
+										onCheckedChange={() => props.onToggleSdgs(value)}
+									/>
+									<span>SDG {value}</span>
+								</label>
+							))}
+						</div>
+					</fieldset>
+				) : null}
 			</div>
 		);
 	}
@@ -903,7 +1188,7 @@ function SearchSection({
 	);
 }
 
-function toggleArrayValue(values: string[], value: string) {
+function toggleArrayValue<T>(values: T[], value: T) {
 	return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
 }
 

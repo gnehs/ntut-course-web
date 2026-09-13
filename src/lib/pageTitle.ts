@@ -8,6 +8,8 @@ const routeTitles: [RegExp, string][] = [
 	[/^\/advanced-search\/?$/, '搜尋'],
 	[/^\/class\/?$/, '班級課表'],
 	[/^\/mprogram\/?$/, '微學程'],
+	[/^\/program\/?$/, '一般學程'],
+	[/^\/competencies\/?$/, '核心能力'],
 	[/^\/my-course\/?$/, '我的課程'],
 	[/^\/emptyroom\/?$/, '尋找空教室'],
 	[/^\/withdrawal\/?$/, '退選率'],

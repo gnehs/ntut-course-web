@@ -45,4 +45,13 @@ $ pnpm test
 
 ## 技術棧
 
-本站目前使用 React、Vite、Tailwind CSS 與 TanStack Router 建置。靜態資產放在 `static/`，應用程式入口在 `src/main.jsx`，路由定義在 `src/router.jsx`。
+本站目前使用 React、Vite、Tailwind CSS 與 TanStack Router 建置。靜態資產放在 `static/`，應用程式入口在 `src/main.tsx`，路由定義在 `src/router.tsx`。
+
+## 課程資料功能
+
+- 課程詳情包含授課語言、隨班附讀、實驗實習、跨領域、教師諮商時間與課綱原始連結；空白或無作用的欄位隱藏。
+- 進階搜尋支援授課語言、AI 教學方式、SDGs 與課程屬性，使用每學期單一 `syllabus-index.json`，不逐門下載課綱。
+- `/program` 提供一般學程；`/competencies` 提供系所核心能力對照。
+- 新增 API 尚未發布的舊學期會顯示未提供資料，不將其視為沒有開課或沒有導入 AI。
+
+欄位語意、相容性及驗證記錄請見 [欄位盤點](docs/course-field-audit.md)。
