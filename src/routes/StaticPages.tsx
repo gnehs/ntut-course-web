@@ -487,6 +487,33 @@ export function NotFoundPage() {
 	);
 }
 
+function SettingsSection({
+	id,
+	title,
+	description,
+	children,
+}: {
+	id: string;
+	title: string;
+	description: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<section
+			aria-labelledby={id}
+			className='rounded-panel space-y-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-text))]'
+		>
+			<div className='space-y-1'>
+				<h2 id={id} className='m-0 text-base leading-6 font-semibold'>
+					{title}
+				</h2>
+				<p className='m-0 text-base leading-6'>{description}</p>
+			</div>
+			{children}
+		</section>
+	);
+}
+
 export function SettingsPage() {
 	const [done, setDone] = useState(false);
 	const [backupError, setBackupError] = useState<string | null>(null);
@@ -614,16 +641,11 @@ export function SettingsPage() {
 	return (
 		<div className='space-y-4'>
 			<h1>設定</h1>
-			<section
-				aria-labelledby='my-course-backup-title'
-				className='rounded-panel space-y-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-text))]'
+			<SettingsSection
+				id='my-course-backup-title'
+				title='我的課程備份'
+				description='匯出或匯入所有學期、學制的課程、班級與微學程選擇。'
 			>
-				<div>
-					<h2 id='my-course-backup-title' className='mb-1'>
-						我的課程備份
-					</h2>
-					<p className='m-0'>匯出或匯入所有學期、學制的課程、班級與微學程選擇。</p>
-				</div>
 				<div className='flex flex-wrap gap-2'>
 					<Button onClick={exportBackup}>
 						<Download className='size-4' />
@@ -716,15 +738,16 @@ export function SettingsPage() {
 						</div>
 					</Card>
 				) : null}
-			</section>
-			<Alert>
-				<strong>快取資料</strong>
-				<br />
-				清空快取資料並不會清空您儲存的課表，僅會清空已被快取課程資料，並在下次使用時重新下載，在通常情況下，您不需要清空快取資料。
-				<div className='mt-3'>
+			</SettingsSection>
+			<SettingsSection
+				id='cache-settings-title'
+				title='快取資料'
+				description='清空快取資料並不會清空您儲存的課表，僅會清空已被快取課程資料，並在下次使用時重新下載，在通常情況下，您不需要清空快取資料。'
+			>
+				<div>
 					<Button onClick={clear}>清空網站快取</Button>
 				</div>
-			</Alert>
+			</SettingsSection>
 			{done ? <Alert className='mt-3'>已清空網站快取。</Alert> : null}
 		</div>
 	);
