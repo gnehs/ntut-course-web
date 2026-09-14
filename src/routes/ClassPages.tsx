@@ -1,5 +1,5 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
-import { useParams } from '@tanstack/react-router';
+import { useParams, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
 import { Minus, Plus, Star } from 'lucide-react';
@@ -11,10 +11,20 @@ import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
 import { ClassDetailSkeleton, ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCourse, fetchDepartment } from '../lib/courseApi';
+import { departmentItems, storageDepartment } from '../lib/courseUtils';
 import { usePageTitle } from '../lib/pageTitle';
+import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import type { Course, DepartmentClass, DepartmentGroup } from '../types/course';
 import { errorMessage } from '../lib/error';
+
+const validClassDepartments = new Set(departmentItems.map(storageDepartment));
+
+function resolveClassDepartment(queryDepartment: string | null, fallback: string) {
+	if (!queryDepartment) return fallback;
+	const department = storageDepartment(queryDepartment);
+	return validClassDepartments.has(department) ? department : fallback;
+}
 
 export function ClassIndexPage() {
 	const { dataset, myCourseClassKey, getCourses } = useApp();
@@ -153,7 +163,14 @@ export function ClassIndexPage() {
 
 export function ClassDetailPage() {
 	const { year, sem, id } = useParams({ from: '/class/$year/$sem/$id' });
+	const { location } = useRouterState();
 	const { dataset, addCourse, removeCourse, myCourseClassKey } = useApp();
+	const searchParams = useMemo(() => createSearchParams(location.search), [location.search]);
+	const requestedDepartment = searchParams.get('d');
+	const department = useMemo(
+		() => resolveClassDepartment(requestedDepartment, dataset.department),
+		[requestedDepartment, dataset.department],
+	);
 	const [courses, setCourses] = useState<Course[] | null>(null);
 	const [classData, setClassData] = useState<DepartmentClass | null>(null);
 	const [version, setVersion] = useState(0);
@@ -165,7 +182,7 @@ export function ClassDetailPage() {
 		async function load() {
 			const [departments, allCourses] = await Promise.all([
 				fetchDepartment(year, sem),
-				fetchCourse(year, sem, dataset.department),
+				fetchCourse(year, sem, department),
 			]);
 			const foundClass = departments
 				.flatMap((item) => item.class || [])
@@ -182,7 +199,7 @@ export function ClassDetailPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [year, sem, id, version, dataset.department]);
+	}, [year, sem, id, version, department]);
 
 	function addClassCourses() {
 		const previous = localStorage.getItem(myCourseClassKey(year, sem));
@@ -195,7 +212,7 @@ export function ClassDetailPage() {
 		}
 		localStorage.setItem('my-class', classData?.id || id);
 		localStorage.setItem(myCourseClassKey(year, sem), id);
-		for (const course of courses || []) addCourse(course.id, year, sem, dataset.department);
+		for (const course of courses || []) addCourse(course.id, year, sem, department);
 		toast.success(`已加入 ${courses?.length || 0} 門課程`, {
 			description: `${id} 已加入我的課程`,
 		});
@@ -203,7 +220,7 @@ export function ClassDetailPage() {
 	}
 
 	function removeClassCourses() {
-		for (const course of courses || []) removeCourse(course.id, year, sem, dataset.department);
+		for (const course of courses || []) removeCourse(course.id, year, sem, department);
 		localStorage.removeItem(myCourseClassKey(year, sem));
 		toast.success(`已移除 ${courses?.length || 0} 門課程`, {
 			description: `${id} 已從我的課程移除`,
@@ -235,7 +252,9 @@ export function ClassDetailPage() {
 				</div>
 			</div>
 			{!courses.length && classData ? <Alert>此班級目前沒有課程。</Alert> : null}
-			{courses.length ? <CourseList courses={courses} showTimetable year={year} sem={sem} /> : null}
+			{courses.length ? (
+				<CourseList courses={courses} showTimetable year={year} sem={sem} department={department} />
+			) : null}
 			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />
 		</div>

@@ -7,6 +7,7 @@ import {
 import { cache } from '@cf-wasm/og/workerd';
 import { WORKER_PREVIEW_CACHE_CONTROL } from './worker/cache';
 import { handleOgImageRequest } from './worker/ogImage';
+import { handleSitemapRequest } from './worker/sitemap';
 
 type AssetFetcher = {
 	fetch(request: Request): Promise<Response>;
@@ -49,6 +50,16 @@ export default {
 
 		cache.setExecutionContext(ctx);
 		const url = new URL(request.url);
+		const sitemapResponse = await handleSitemapRequest(
+			request,
+			{
+				apiBase: env.API_BASE,
+				origin: env.DOMAIN_NAME ? `https://${env.DOMAIN_NAME}` : url.origin,
+			},
+			ctx,
+		);
+		if (sitemapResponse) return sitemapResponse;
+
 		const imageResponse = await handleOgImageRequest(request, { apiBase: env.API_BASE });
 		if (imageResponse) return imageResponse;
 
