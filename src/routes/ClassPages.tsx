@@ -216,18 +216,18 @@ export function ClassDetailPage() {
 	return (
 		<div className='space-y-4'>
 			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-				<div>
+				<div className='flex flex-col gap-1'>
 					<h1>{id}</h1>
 					<p className='m-0 text-sm opacity-75'>{courses.length} 門課程</p>
 				</div>
 				<div className='flex flex-wrap items-center gap-2 sm:justify-end'>
 					{!isInMyCourse ? (
-						<Button primary className='min-h-11 px-4 text-sm' onClick={addClassCourses}>
+						<Button primary onClick={addClassCourses}>
 							<Plus className='size-4' />
 							加入到我的課程
 						</Button>
 					) : (
-						<Button danger className='min-h-11 px-4 text-sm' onClick={removeClassCourses}>
+						<Button danger onClick={removeClassCourses}>
 							<Minus className='size-4' />
 							從我的課程中移除
 						</Button>
@@ -235,11 +235,7 @@ export function ClassDetailPage() {
 				</div>
 			</div>
 			{!courses.length && classData ? <Alert>此班級目前沒有課程。</Alert> : null}
-			{courses.length ? (
-				<div className='[&>div>div:first-child_button]:min-h-11 [&>div>div:first-child_button]:px-4 [&>div>div:first-child_button]:text-sm'>
-					<CourseList courses={courses} showTimetable year={year} sem={sem} />
-				</div>
-			) : null}
+			{courses.length ? <CourseList courses={courses} showTimetable year={year} sem={sem} /> : null}
 			<h3 className='mb-4'>贊助商廣告</h3>
 			<AdsByGoogle />
 		</div>

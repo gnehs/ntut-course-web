@@ -255,6 +255,19 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		}
 	});
 
+	it('preserves meaningful syllabus line breaks while limiting repeated blank lines', async () => {
+		await renderCourseDetail([
+			{
+				...baseSyllabus,
+				materials: '第一段\r\n \n \n第二段\r\n第三段',
+			},
+		]);
+
+		const heading = screen.getByRole('heading', { name: '使用教材、參考書目或其他' });
+		const content = heading.nextElementSibling;
+		expect(content?.textContent).toBe('第一段\n\n第二段\n第三段');
+	});
+
 	it('renders populated audit, lab, and interdisciplinary course attributes', async () => {
 		mocks.getCourses.mockResolvedValue([
 			{

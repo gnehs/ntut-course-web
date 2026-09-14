@@ -1,5 +1,44 @@
 @import 'tailwindcss';
 
+/* Defaults stay below utilities so each page can set its own type scale and spacing. */
+@layer components {
+	.content-surface :where(h1, h2, h3, h4, h5, h6) {
+		font-weight: 600;
+		line-height: 1.4;
+		overflow-wrap: anywhere;
+	}
+
+	.content-surface :where(h1) {
+		font-size: 1.75rem;
+	}
+
+	.content-surface :where(h2) {
+		font-size: 1.375rem;
+	}
+
+	.content-surface :where(h3) {
+		font-size: 1.125rem;
+	}
+
+	.content-surface :where(h4) {
+		font-size: 1rem;
+	}
+
+	.content-surface :where(h5, h6) {
+		font-size: 0.875rem;
+	}
+
+	.content-surface :where(p) {
+		margin-block: 1em;
+		line-height: 1.7;
+		overflow-wrap: anywhere;
+	}
+
+	.content-surface :where(h1, h2, h3, h4, h5, h6) + p {
+		margin-top: 0.5rem;
+	}
+}
+
 :root {
 	--vs-primary: 25, 91, 255;
 	--vs-primary-foreground: 255, 255, 255;

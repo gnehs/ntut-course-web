@@ -120,7 +120,7 @@ export function CompetenciesPage() {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div>
+			<div className='flex flex-col gap-1'>
 				<h1>核心能力</h1>
 				<p className='m-0 text-sm opacity-70'>查看系所課程與核心能力的對照關係</p>
 			</div>
@@ -181,7 +181,7 @@ export function CompetenciesPage() {
 					{selectedDepartment ? (
 						<div className='flex flex-col gap-4'>
 							<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-								<div>
+								<div className='flex flex-col gap-1'>
 									<h2 className='text-lg font-semibold'>{selectedDepartment.name}</h2>
 									<p className='m-0 text-sm opacity-65'>
 										{visibleCourses.length} 門課程・{visibleAbilities.length} 項核心能力
@@ -244,20 +244,25 @@ export function CompetenciesPage() {
 															</Link>
 															<CardTitle className='mt-1'>{course.name}</CardTitle>
 														</div>
-														<div
-															className='flex flex-wrap gap-1'
+														<ul
+															className='m-0 flex list-none flex-col gap-2 p-0'
 															aria-label={`${course.name}的核心能力`}
 														>
 															{abilities.length ? (
 																abilities.map((ability) => (
-																	<Badge key={ability!.id} variant='secondary'>
-																		{ability!.name}
-																	</Badge>
+																	<li key={ability!.id} className='flex items-start gap-2'>
+																		<Badge variant='outline' className='font-mono'>
+																			{ability!.id}
+																		</Badge>
+																		<span className='min-w-0 text-sm leading-relaxed [overflow-wrap:anywhere]'>
+																			{ability!.name}
+																		</span>
+																	</li>
 																))
 															) : (
-																<span className='text-sm opacity-65'>未提供核心能力對應</span>
+																<li className='text-sm opacity-65'>未提供核心能力對應</li>
 															)}
-														</div>
+														</ul>
 													</Card>
 												);
 											})

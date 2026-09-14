@@ -167,8 +167,8 @@ export function CourseDetailPage() {
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<div>
-					<h1 className='!text-xl !leading-tight font-semibold'>
+				<div className='flex flex-col gap-1'>
+					<h1 className='text-xl leading-snug font-semibold'>
 						<CourseDetailTitle course={currentCourse} />
 					</h1>
 					<div className='text-base font-normal opacity-80'>{currentCourse.name?.en}</div>
@@ -285,9 +285,11 @@ export function CourseDetailPage() {
 			</div>
 			<h3 className='mt-5'>贊助商廣告</h3>
 			<AdsByGoogle />
-			<h3>課程概述</h3>
-			<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
-			<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
+			<section className='flex flex-col gap-2'>
+				<h3>課程概述</h3>
+				<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
+				<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
+			</section>
 			<CourseSourceLinks course={course} />
 			{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試或查看原始課綱。</Alert> : null}
 			{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
@@ -467,7 +469,7 @@ export function HtmlText({
 	as?: keyof React.JSX.IntrinsicElements;
 }) {
 	return (
-		<Component className='min-w-0 leading-5 break-words whitespace-pre-wrap'>
+		<Component className='my-0 min-w-0 leading-relaxed break-words whitespace-pre-wrap'>
 			{renderTextWithLinks(text)}
 		</Component>
 	);
@@ -479,7 +481,7 @@ const courseTextLinkClassName =
 	'break-all text-[rgb(var(--vs-primary))] underline underline-offset-2 [overflow-wrap:anywhere]';
 
 function renderTextWithLinks(text: string) {
-	const value = String(text || '').replace(/\t/g, '　　');
+	const value = normaliseDisplayText(text);
 	const nodes: React.ReactNode[] = [];
 	let lastIndex = 0;
 
@@ -548,18 +550,20 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 	return (
 		<div className='flex flex-col gap-4'>
 			{item.covid19 ? <CovidInfo covid19={item.covid19} /> : null}
-			<h3>教師</h3>
-			<HtmlText as='p' text={[item.name, item.email].filter(Boolean).join(' ') || '無資料'} />
-			{officeHoursUrl ? (
-				<a
-					href={officeHoursUrl}
-					className={courseTextLinkClassName}
-					target='_blank'
-					rel='noreferrer'
-				>
-					教師諮商時間
-				</a>
-			) : null}
+			<section className='flex flex-col gap-2'>
+				<h3>教師</h3>
+				<HtmlText as='p' text={[item.name, item.email].filter(Boolean).join(' ') || '無資料'} />
+				{officeHoursUrl ? (
+					<a
+						href={officeHoursUrl}
+						className={courseTextLinkClassName}
+						target='_blank'
+						rel='noreferrer'
+					>
+						教師諮商時間
+					</a>
+				) : null}
+			</section>
 			{Object.entries(syllabusTextFields).map(([key, label]) => (
 				<TextSection key={key} label={label} value={item[key]} />
 			))}
@@ -571,7 +575,7 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 			{item.latestUpdate?.trim() ? (
 				<section className='flex flex-col gap-2'>
 					<h3>最後更新</h3>
-					<p>{formatLatestUpdate(item.latestUpdate)}</p>
+					<p className='my-0'>{formatLatestUpdate(item.latestUpdate)}</p>
 				</section>
 			) : null}
 		</div>
@@ -595,12 +599,20 @@ function TextSection({ label, value }: { label: string; value: unknown }) {
 	return (
 		<section className='flex min-w-0 flex-col gap-2'>
 			<h3>{label}</h3>
-			<HtmlText
-				as='p'
-				text={text.replace(/([^\n])●/g, '$1\n●').replace(/([)）])\s*(?=SDG\d+[:：])/g, '$1\n')}
-			/>
+			<HtmlText as='p' text={formatSyllabusText(text)} />
 		</section>
 	);
+}
+
+function formatSyllabusText(text: string) {
+	return text.replace(/([^\n])●/g, '$1\n●').replace(/([)）])[ \t]*(?=SDG\d+[:：])/g, '$1\n');
+}
+
+function normaliseDisplayText(text: string) {
+	return String(text || '')
+		.replace(/\r\n?/g, '\n')
+		.replace(/\n[ \t]*(?:\n[ \t]*){2,}/g, '\n\n')
+		.replace(/\t/g, '　　');
 }
 
 const covidFields = {
@@ -621,7 +633,7 @@ function CovidInfo({ covid19 }: { covid19: CovidCourseInfo }) {
 	return (
 		<section className='flex min-w-0 flex-col gap-4'>
 			<h2>因應疫情所致之上課方式</h2>
-			<p>實際實施日期與上課方式，依學校公布之訊息為主</p>
+			<p className='my-0'>實際實施日期與上課方式，依學校公布之訊息為主</p>
 			{Object.entries(covid19).map(([key, value]) => (
 				<TextSection key={key} label={covidFields[key] || key} value={value} />
 			))}
