@@ -161,6 +161,8 @@ export type StandardCourse = {
 };
 
 export type StandardDepartment = {
+	division?: string;
+	matric?: string;
 	credits?: Record<string, string | number>;
 	rules?: string[];
 	courses?: StandardCourse[];

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { API_BASE } from './courseUtils';
-import { fetchCompetencies, fetchPrograms, fetchSyllabusIndex } from './courseApi';
+import {
+	fetchCompetencies,
+	fetchPrograms,
+	fetchSyllabusIndex,
+	fetchStandardDepartments,
+} from './courseApi';
 
 const mocks = vi.hoisted(() => ({
 	fetch: vi.fn(),
@@ -112,5 +117,42 @@ describe('optional course datasets', () => {
 
 		await expect(request.call()).rejects.toThrow('500 Server Error');
 		expect(mocks.setStore).not.toHaveBeenCalled();
+	});
+});
+
+describe('student prefix department index', () => {
+	const entries = [{ system: '四技', department: '測試系', division: 'AB0', matric: '7' }];
+
+	it('fetches and caches the year index without a student identifier', async () => {
+		mocks.fetch.mockResolvedValue(response(entries));
+		await expect(fetchStandardDepartments('109')).resolves.toEqual(entries);
+		expect(mocks.fetch).toHaveBeenCalledWith(`${API_BASE}/109/standard-departments.json`);
+		expect(mocks.setStore).toHaveBeenCalledWith('standard_departments_109', entries, 1);
+	});
+
+	it('reports an unpublished index without falling back or caching the failure', async () => {
+		mocks.fetch.mockResolvedValue(response(null, 404));
+		await expect(fetchStandardDepartments('109')).rejects.toThrow();
+		expect(mocks.fetch).toHaveBeenCalledTimes(1);
+		expect(mocks.setStore).not.toHaveBeenCalled();
+	});
+
+	it('rejects malformed index data without caching it', async () => {
+		mocks.fetch.mockResolvedValue(response({ departments: [] }));
+		await expect(fetchStandardDepartments('109')).rejects.toThrow();
+		expect(mocks.setStore).not.toHaveBeenCalled();
+	});
+
+	it('rejects student identifiers and paths before network or storage access', async () => {
+		await expect(fetchStandardDepartments('109ab')).rejects.toThrow();
+		await expect(fetchStandardDepartments('../109')).rejects.toThrow();
+		expect(mocks.fetch).not.toHaveBeenCalled();
+		expect(mocks.getStore).not.toHaveBeenCalled();
+	});
+
+	it('returns a valid cached index without another request', async () => {
+		mocks.getStore.mockResolvedValue(entries);
+		await expect(fetchStandardDepartments('109')).resolves.toEqual(entries);
+		expect(mocks.fetch).not.toHaveBeenCalled();
 	});
 });

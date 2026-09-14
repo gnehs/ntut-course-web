@@ -1,5 +1,6 @@
 import { API_BASE } from './courseUtils';
 import { getStore, setStore } from './storage';
+import type { StandardDepartmentEntry } from './studentPrefix';
 import type {
 	CalendarEvent,
 	Course,
@@ -98,6 +99,28 @@ export async function fetchStandardYear(year: string): Promise<StandardYearData>
 	if (cached) return cached as StandardYearData;
 	const data = await fetchJson<StandardYearData>(`${API_BASE}/${year}/standard.json`);
 	await setStore(key, data, 30);
+	return data;
+}
+
+/** Only the admission year is sent; student identifiers stay in the input. */
+export async function fetchStandardDepartments(year: string): Promise<StandardDepartmentEntry[]> {
+	if (!/^\d{2,3}$/.test(year)) throw new Error('無效的入學年度');
+	const key = `standard_departments_${year}`;
+	const valid = (data: unknown): data is StandardDepartmentEntry[] =>
+		Array.isArray(data) &&
+		data.length > 0 &&
+		data.every(
+			(entry) =>
+				entry &&
+				['system', 'department', 'division', 'matric'].every(
+					(field) => typeof entry[field] === 'string' && entry[field].length > 0,
+				),
+		);
+	const cached = await getStore(key);
+	if (valid(cached)) return cached;
+	const data = await fetchJson<unknown>(`${API_BASE}/${year}/standard-departments.json`);
+	if (!valid(data)) throw new Error('系所索引格式不正確');
+	await setStore(key, data, 1);
 	return data;
 }
 

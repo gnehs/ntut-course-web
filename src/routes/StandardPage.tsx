@@ -4,6 +4,7 @@ import { Alert } from '../components/ui-kit/Alert';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons';
+import { StudentPrefixSearch } from '../components/StudentPrefixSearch';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchStandards, fetchStandardYear } from '../lib/courseApi';
 import { createSearchObject, createSearchParams } from '../lib/urlState';
@@ -41,13 +42,21 @@ export function StandardPage() {
 
 	useEffect(() => {
 		if (!year) return;
+		let cancelled = false;
 		setStandardData(null);
+		setError(null);
 		fetchStandardYear(year)
-			.then(setStandardData)
+			.then((data) => {
+				if (!cancelled) setStandardData(data);
+			})
 			.catch((value) => {
+				if (cancelled) return;
 				setError(value);
 				setStandardData({});
 			});
+		return () => {
+			cancelled = true;
+		};
 	}, [year]);
 
 	const systems = Object.keys(standardData || {});
@@ -125,6 +134,8 @@ export function StandardPage() {
 			) : null}
 
 			{!years ? <StandardPickerSkeleton /> : null}
+
+			{years ? <StudentPrefixSearch years={yearItems} onSelect={setQuery} /> : null}
 
 			{years ? (
 				<div className='grid gap-3 sm:grid-cols-3'>
@@ -232,6 +243,19 @@ export function StandardPage() {
 
 					<div>
 						<h2 className='text-lg font-semibold'>課程列表</h2>
+						<dl
+							aria-label='課程類型圖例'
+							className='mt-2 mb-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:gap-x-5'
+						>
+							{courseStandardEntries.map(([symbol, label]) => (
+								<div key={symbol} className='flex items-center gap-2'>
+									<dt className='flex size-5 shrink-0 items-center justify-center text-base leading-none'>
+										{symbol}
+									</dt>
+									<dd className='m-0 text-[rgba(var(--vs-text),0.8)]'>{label}</dd>
+								</div>
+							))}
+						</dl>
 						<div className='grid gap-4 lg:grid-cols-2'>
 							{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
 								<div key={courseYear} className='space-y-3'>
@@ -262,23 +286,6 @@ export function StandardPage() {
 											</div>
 										),
 									)}
-								</div>
-							))}
-						</div>
-					</div>
-
-					<div className='rounded-surface border border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.02)] p-4'>
-						<h3 className='mb-2.5 text-xs font-medium'>課程類型圖例</h3>
-						<div className='flex flex-wrap gap-2'>
-							{courseStandardEntries.map(([symbol, label]) => (
-								<div
-									key={symbol}
-									className='inline-flex items-center gap-1.5 rounded border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-2 py-1 text-xs'
-								>
-									<span className='rounded bg-[rgba(var(--vs-primary),0.08)] px-1 py-0.5 text-xs font-medium'>
-										{symbol}
-									</span>
-									<span className='opacity-60'>{label}</span>
 								</div>
 							))}
 						</div>
