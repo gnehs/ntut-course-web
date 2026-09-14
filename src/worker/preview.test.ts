@@ -6,7 +6,7 @@ import {
 	parsePreviewRoute,
 	previewTags,
 } from './preview';
-import type { Course, DepartmentGroup, WithdrawalStat } from '../types/course';
+import type { Course, DepartmentClass, WithdrawalStat } from '../types/course';
 
 const config = {
 	origin: 'https://ntut-course.gnehs.net',
@@ -70,19 +70,16 @@ describe('preview metadata', () => {
 	});
 
 	it('creates class metadata with course summary and class og image id', () => {
-		const department: DepartmentGroup = {
-			category: '電資學院',
-			name: '資訊工程系',
-			href: '',
-			class: [{ id: 'ABCD', name: '四技資工一' }],
+		const classData: DepartmentClass = {
+			id: 'ABCD',
+			name: '四技資工一',
 		};
 		const courses = [
 			{ name: { zh: '資料結構' }, class: [{ name: '四技資工一' }] },
 			{ name: { zh: '離散數學' }, class: [{ name: '四技資工一' }] },
 		] as Course[];
 		const meta = createClassPreview(
-			department.class?.[0] || { id: 'ABCD', name: '四技資工一' },
-			department,
+			classData,
 			courses,
 			{ type: 'class', year: '115', sem: '1', id: '四技資工一', department: 'main' },
 			config,

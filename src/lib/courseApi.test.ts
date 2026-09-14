@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { API_BASE } from './courseUtils';
 import {
+	fetchCourse,
+	fetchCourseDetail,
 	fetchCompetencies,
+	fetchDepartment,
+	fetchMicroPrograms,
 	fetchPrograms,
 	fetchSyllabusIndex,
 	fetchStandardDepartments,
@@ -116,6 +120,21 @@ describe('optional course datasets', () => {
 		mocks.fetch.mockResolvedValue(response(null, 500));
 
 		await expect(request.call()).rejects.toThrow('500 Server Error');
+		expect(mocks.setStore).not.toHaveBeenCalled();
+	});
+});
+
+describe('semester datasets without a selected semester', () => {
+	it('does not access storage or network for an empty semester', async () => {
+		await expect(fetchCourse('', '', 'main')).resolves.toEqual([]);
+		await expect(fetchCourseDetail('', '', 'course-001')).resolves.toEqual([]);
+		await expect(fetchDepartment('', '')).resolves.toEqual([]);
+		await expect(fetchMicroPrograms('', '')).resolves.toEqual([]);
+		await expect(fetchPrograms('', '')).resolves.toBeNull();
+		await expect(fetchSyllabusIndex('', '')).resolves.toBeNull();
+
+		expect(mocks.fetch).not.toHaveBeenCalled();
+		expect(mocks.getStore).not.toHaveBeenCalled();
 		expect(mocks.setStore).not.toHaveBeenCalled();
 	});
 });

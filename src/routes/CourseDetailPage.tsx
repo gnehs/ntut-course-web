@@ -13,6 +13,7 @@ import { Select, SelectOption } from '../components/ui-kit/Select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
+import { isCourseHidden } from '../lib/contentVisibility';
 import { hasMeaningfulValue } from '../lib/courseFilters';
 import {
 	courseStandard,
@@ -101,7 +102,7 @@ export function CourseDetailPage() {
 				}
 				if (!found) throw new Error('找不到課程');
 				setCourseDepartment(foundDepartment);
-				if ((found.teacher || []).some((teacher) => teacher.name === '朴維鎮')) {
+				if (isCourseHidden(found)) {
 					globalThis.location.href = '/not-found';
 					return;
 				}

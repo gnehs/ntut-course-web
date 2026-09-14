@@ -13,7 +13,6 @@ import {
 	formatWithdrawalThreshold,
 	numberValue,
 	type WithdrawalRateDistribution,
-	type WithdrawalRateLevel,
 } from '../lib/withdrawalStats';
 import type { WithdrawalResponse, WithdrawalStat } from '../types/course';
 
@@ -209,11 +208,7 @@ export function WithdrawalPage() {
 										</div>
 										<div className='grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2'>
 											{group.rows.map((item) => (
-												<WithdrawalTeacherCard
-													item={item}
-													distribution={distribution}
-													key={item.name}
-												/>
+												<WithdrawalTeacherCard item={item} key={item.name} />
 											))}
 										</div>
 									</section>
@@ -277,14 +272,7 @@ function getWithdrawalBatchSize() {
 		: MOBILE_WITHDRAWAL_BATCH_SIZE;
 }
 
-function WithdrawalTeacherCard({
-	item,
-	distribution,
-}: {
-	item: WithdrawalStat;
-	distribution: WithdrawalRateDistribution | null;
-}) {
-	const classification = classifyWithdrawalRate(rateValue(item), distribution);
+function WithdrawalTeacherCard({ item }: { item: WithdrawalStat }) {
 	const courseSummary = (item.course || [])
 		.map((course) => course.name?.zh)
 		.filter(Boolean)

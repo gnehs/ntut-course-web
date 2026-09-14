@@ -36,6 +36,7 @@ export async function fetchCourse(
 	sem: string,
 	department = 'main',
 ): Promise<Course[]> {
+	if (!year || !sem) return [];
 	const dataKey = `course_${year}_${sem}_${department}`;
 	const cached = await getStore(dataKey);
 	if (cached) return cached as Course[];
@@ -49,6 +50,7 @@ export async function fetchCourseDetail(
 	sem: string,
 	id: string,
 ): Promise<SyllabusItem[]> {
+	if (!year || !sem) return [];
 	const key = `course_detail_${year}_${sem}_${id}`;
 	const cached = await getStore(key);
 	if (cached) return cached as SyllabusItem[];
@@ -58,6 +60,7 @@ export async function fetchCourseDetail(
 }
 
 export async function fetchDepartment(year: string, sem: string): Promise<DepartmentGroup[]> {
+	if (!year || !sem) return [];
 	const key = `department_${year}_${sem}`;
 	const cached = await getStore(key);
 	if (cached) return cached as DepartmentGroup[];
@@ -125,6 +128,7 @@ export async function fetchStandardDepartments(year: string): Promise<StandardDe
 }
 
 export async function fetchMicroPrograms(year: string, sem: string): Promise<MicroProgram[]> {
+	if (!year || !sem) return [];
 	const key = `mprogram_${year}_${sem}`;
 	const cached = await getStore(key);
 	if (cached) return cached as MicroProgram[];
@@ -146,6 +150,7 @@ async function fetchOptionalDataset<T>(path: string): Promise<T | null> {
 }
 
 export function fetchPrograms(year: string, sem: string): Promise<Program[] | null> {
+	if (!year || !sem) return Promise.resolve(null);
 	return fetchOptionalDataset(`${year}/${sem}/programs.json`);
 }
 
@@ -154,5 +159,6 @@ export function fetchCompetencies(): Promise<CompetencyDepartment[] | null> {
 }
 
 export function fetchSyllabusIndex(year: string, sem: string): Promise<SyllabusIndex | null> {
+	if (!year || !sem) return Promise.resolve(null);
 	return fetchOptionalDataset(`${year}/${sem}/syllabus-index.json`);
 }

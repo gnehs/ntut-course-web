@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import type React from 'react';
 import { fetchCourse, fetchYearData } from '../lib/courseApi';
 import { departmentItems, storageDepartment } from '../lib/courseUtils';
@@ -20,6 +28,7 @@ type AppContextValue = {
 	setDatasetDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	loadingDataset: boolean;
 	error: unknown;
+	retryDataset: () => Promise<void>;
 	getCourses: (override?: Partial<Dataset>) => Promise<Course[]>;
 	getMyCourseIds: (year?: string, sem?: string, department?: string) => string[];
 	addCourse: (id: string, year?: string, sem?: string, department?: string) => void;
@@ -44,6 +53,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 	const [datasetDialogOpen, setDatasetDialogOpen] = useState(false);
 	const [loadingDataset, setLoadingDataset] = useState(true);
 	const [error, setError] = useState<unknown>(null);
+	const datasetRequestRef = useRef(0);
 
 	const setDataset = useCallback((next: Partial<Dataset>) => {
 		setDatasetState((current) => {
@@ -59,40 +69,48 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 		});
 	}, []);
 
-	useEffect(() => {
-		let cancelled = false;
-		async function init() {
-			setLoadingDataset(true);
-			try {
-				const years = await fetchYearData();
-				const items: string[] = [];
-				for (const year of Object.keys(years).reverse()) {
-					for (const sem of [...years[year]].reverse()) items.push(`${year}-${sem}`);
-				}
-				if (cancelled) return;
-				setYearSemItems(items);
-				if (!dataset.year || !dataset.sem) {
-					const latestYear = Object.keys(years).at(-1);
-					const latestSem = latestYear ? years[latestYear].at(-1) : undefined;
-					setDataset({
-						year: latestYear,
-						sem: latestSem ? String(latestSem) : '',
-						department: dataset.department || 'main',
-					});
-				}
-			} catch (e) {
-				setError(e);
-				if (!dataset.year || !dataset.sem)
-					setDataset({ year: '112', sem: '1', department: 'main' });
-			} finally {
-				if (!cancelled) setLoadingDataset(false);
+	const retryDataset = useCallback(async () => {
+		const requestId = ++datasetRequestRef.current;
+		setLoadingDataset(true);
+		setError(null);
+
+		try {
+			const years = await fetchYearData();
+			const items: string[] = [];
+			for (const year of Object.keys(years).reverse()) {
+				for (const sem of [...years[year]].reverse()) items.push(`${year}-${sem}`);
 			}
+			if (requestId !== datasetRequestRef.current) return;
+			if (!items.length) throw new Error('目前沒有可用的學期資料。');
+
+			setYearSemItems(items);
+			setDatasetState((current) => {
+				if (current.year && current.sem) return current;
+				const [latestYear, latestSem] = items[0].split('-');
+				if (!latestYear || !latestSem) return current;
+				const next = {
+					year: latestYear,
+					sem: latestSem,
+					department: storageDepartment(current.department || 'main'),
+				};
+				localStorage.setItem('data-year', next.year);
+				localStorage.setItem('data-sem', next.sem);
+				localStorage.setItem('data-department', next.department);
+				return next;
+			});
+		} catch (e) {
+			if (requestId === datasetRequestRef.current) setError(e);
+		} finally {
+			if (requestId === datasetRequestRef.current) setLoadingDataset(false);
 		}
-		init();
-		return () => {
-			cancelled = true;
-		};
 	}, []);
+
+	useEffect(() => {
+		void retryDataset();
+		return () => {
+			datasetRequestRef.current += 1;
+		};
+	}, [retryDataset]);
 
 	const getCourses = useCallback(
 		(override: Partial<Dataset> = {}) => {
@@ -153,6 +171,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 			setDatasetDialogOpen,
 			loadingDataset,
 			error,
+			retryDataset,
 			getCourses,
 			getMyCourseIds,
 			addCourse,
@@ -167,6 +186,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 			datasetDialogOpen,
 			loadingDataset,
 			error,
+			retryDataset,
 			getCourses,
 			getMyCourseIds,
 			addCourse,

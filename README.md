@@ -47,6 +47,8 @@ $ pnpm test
 
 本站目前使用 React、Vite、Tailwind CSS 與 TanStack Router 建置。靜態資產放在 `static/`，應用程式入口在 `src/main.tsx`，路由定義在 `src/router.tsx`。
 
+`static/` 內的檔案會直接複製到網站根目錄，例如 `static/robots.txt` 對應 `/robots.txt`。文件與設計原始檔不放在公開目錄；圖示設計原始檔保存在 `docs/design/icon.psd`。
+
 ## 課程資料功能
 
 - 課程詳情包含授課語言、隨班附讀、實驗實習、跨領域、教師諮商時間與課綱原始連結；空白或無作用的欄位隱藏。

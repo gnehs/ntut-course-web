@@ -1,4 +1,5 @@
 import type { Course, DepartmentGroup, WithdrawalResponse, YearSemData } from '../types/course';
+import { isCourseHidden, isTeacherHidden } from '../lib/contentVisibility';
 import { WORKER_SITEMAP_CACHE_CONTROL } from './cache';
 
 const DEFAULT_API_BASE = 'https://gnehs.github.io/ntut-course-crawler-node';
@@ -108,7 +109,7 @@ export async function generateSitemapXml(
 	if (route.type === 'teachers') {
 		const withdrawal = await fetchJson<WithdrawalResponse>('/analytics/withdrawal.json');
 		const urls = (withdrawal.data || [])
-			.filter((teacher) => Boolean(teacher.name))
+			.filter((teacher) => Boolean(teacher.name) && !isTeacherHidden(teacher.name))
 			.map((teacher) => absoluteUrl(config, `/teacher/${encodeURIComponent(teacher.name)}`));
 		return renderUrlSet(urls);
 	}
@@ -128,7 +129,7 @@ export async function generateSitemapXml(
 		const department = COURSE_DEPARTMENTS[index];
 		const classNames = new Set<string>();
 		for (const course of courses) {
-			if (course.id && !courseUrls.has(course.id)) {
+			if (course.id && !isCourseHidden(course) && !courseUrls.has(course.id)) {
 				const url = new URL(
 					`/course/${route.year}/${route.sem}/${encodeURIComponent(course.id)}`,
 					config.origin,

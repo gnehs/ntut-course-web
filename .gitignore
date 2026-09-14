@@ -6,7 +6,6 @@ npm-debug.log
 
 # build output
 dist
-static/sw.js 
 .DS_Store
 .pnpm-store
 .wrangler

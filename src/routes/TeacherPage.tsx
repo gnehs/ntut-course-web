@@ -7,6 +7,7 @@ import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { TeacherSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchWithdrawal, fetchWithdrawalRate } from '../lib/courseApi';
+import { isTeacherHidden } from '../lib/contentVisibility';
 import { usePageTitle } from '../lib/pageTitle';
 import type { TeacherWithdrawalCourse, WithdrawalRateMap, WithdrawalStat } from '../types/course';
 
@@ -49,7 +50,7 @@ export function TeacherPage() {
 			cancelled = true;
 		};
 	}, [id]);
-	if (id === '朴維鎮') {
+	if (isTeacherHidden(id)) {
 		globalThis.location.href = '/not-found';
 		return null;
 	}

@@ -309,13 +309,10 @@ export function AdvancedSearchPage() {
 				setSyllabusIndex(null);
 				setSyllabusIndexLoaded(false);
 				setSyllabusIndexError(null);
-				const syllabusIndexPromise =
-					typeof fetchSyllabusIndex === 'function'
-						? fetchSyllabusIndex(year, sem).catch((error) => {
-								if (!cancelled) setSyllabusIndexError(error);
-								return null;
-							})
-						: Promise.resolve(null);
+				const syllabusIndexPromise = fetchSyllabusIndex(year, sem).catch((error) => {
+					if (!cancelled) setSyllabusIndexError(error);
+					return null;
+				});
 				const [departments, rate, courses, index] = await Promise.all([
 					fetchDepartment(year, sem),
 					fetchWithdrawalRate(''),

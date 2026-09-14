@@ -6,6 +6,7 @@ import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import { GitBranch } from 'lucide-react';
 import { Button } from './ui-kit/Button';
+import { Alert } from './ui-kit/Alert';
 import { ContentSurface } from './ui-kit/ContentSurface';
 import { cn } from '@/lib/utils';
 import { Dialog } from './ui-kit/Dialog';
@@ -26,13 +27,21 @@ export function Layout() {
 		departmentItems,
 		datasetDialogOpen,
 		setDatasetDialogOpen,
+		loadingDataset,
+		error,
+		retryDataset,
 	} = useApp();
 	const viewYear = isAdvancedSearch ? searchParams.get('year') || dataset.year : dataset.year;
 	const viewSem = isAdvancedSearch ? searchParams.get('sem') || dataset.sem : dataset.sem;
 	const viewDepartment = isAdvancedSearch
 		? searchParams.get('d') || dataset.department
 		: dataset.department;
-	const yearSemLabel = parseYearSemVal(`${viewYear}-${viewSem}`);
+	const hasDataset = Boolean(viewYear && viewSem);
+	const yearSemLabel = hasDataset
+		? parseYearSemVal(`${viewYear}-${viewSem}`)
+		: loadingDataset
+			? '正在載入學期'
+			: '選擇學期';
 
 	usePageTitle(pageTitleForPath(location.pathname));
 
@@ -96,6 +105,25 @@ export function Layout() {
 					isIframe ? 'pt-0' : '',
 				)}
 			>
+				{error ? (
+					<Alert danger className='mb-4 flex items-center justify-between gap-3'>
+						<div>
+							<p className='font-medium'>
+								{hasDataset ? '學期資料暫時無法更新。' : '目前無法載入學期資料。'}
+							</p>
+							<p className='mt-1 text-sm'>
+								{hasDataset
+									? '目前仍保留已選的學期，請稍後重試。'
+									: '請確認網路連線後重試，載入成功後才能瀏覽課程。'}
+							</p>
+						</div>
+						<Button onClick={() => void retryDataset()} disabled={loadingDataset}>
+							重試
+						</Button>
+					</Alert>
+				) : loadingDataset && !hasDataset ? (
+					<Alert className='mb-4'>正在載入學期資料…</Alert>
+				) : null}
 				<Outlet />
 			</ContentSurface>
 			{isIframe && !isAdvancedSearch ? (

@@ -86,7 +86,6 @@ export function createCoursePreview(
 
 export function createClassPreview(
 	classData: DepartmentClass,
-	department: DepartmentGroup | null,
 	courses: Course[],
 	route: Extract<PreviewRoute, { type: 'class' }>,
 	config: PreviewConfig,
@@ -178,7 +177,7 @@ async function resolveClassPreview(
 		const classData = (department.class || []).find(
 			(item) => item.name === route.id || item.id === route.id,
 		);
-		if (classData) return createClassPreview(classData, department, courses, route, config);
+		if (classData) return createClassPreview(classData, courses, route, config);
 	}
 	return null;
 }

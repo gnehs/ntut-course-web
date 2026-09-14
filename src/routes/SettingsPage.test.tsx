@@ -105,7 +105,7 @@ describe('SettingsPage my course backup', () => {
 		await waitFor(() =>
 			expect(screen.queryByRole('button', { name: '確認匯入' })).not.toBeInTheDocument(),
 		);
-		expect(screen.getByText('備份操作失敗')).toBeInTheDocument();
+		expect(await screen.findByText('備份操作失敗')).toBeInTheDocument();
 
 		await user.upload(
 			input,

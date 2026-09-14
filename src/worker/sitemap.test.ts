@@ -166,6 +166,32 @@ describe('sitemap XML', () => {
 		}
 	});
 
+	it('excludes requested takedowns from teacher and course sitemaps', async () => {
+		const hiddenTeacher = '朴維鎮';
+		const fetchJson = async <T>(path: string): Promise<T> => {
+			if (path === '/analytics/withdrawal.json') {
+				return { data: [{ name: hiddenTeacher }, { name: '測試教師' }] } as T;
+			}
+			if (path.endsWith('/main.json')) {
+				return [
+					{ id: '100001', teacher: [{ name: hiddenTeacher }] },
+					{ id: '100002', teacher: [{ name: '測試教師' }] },
+				] as T;
+			}
+			return [] as T;
+		};
+		const teacherXml = await generateSitemapXml({ type: 'teachers' }, config, fetchJson);
+		expect(teacherXml).not.toContain(encodeURIComponent(hiddenTeacher));
+		expect(teacherXml).toContain(encodeURIComponent('測試教師'));
+		const courseXml = await generateSitemapXml(
+			{ type: 'period', year: '115', sem: '1' },
+			config,
+			fetchJson,
+		);
+		expect(courseXml).not.toContain('/course/115/1/100001');
+		expect(courseXml).toContain('/course/115/1/100002');
+	});
+
 	it('creates teacher and static sitemaps', async () => {
 		const withdrawal: WithdrawalResponse = {
 			data: [
