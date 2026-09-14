@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { CircleAlert, Clock, Minus, PanelTop, Plus, Table } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,6 +29,11 @@ const PAGE_SIZE = 54;
 
 type CourseListProps = {
 	courses: Course[] | null;
+	emptyState?: React.ReactNode;
+	layout?: CourseListLayout;
+	onLayoutChange?: (layout: CourseListLayout) => void;
+	onPageChange?: (page: number) => void;
+	page?: number;
 	showTimetable?: boolean;
 	showConflictCourse?: boolean;
 	year?: string;
@@ -37,6 +42,8 @@ type CourseListProps = {
 	savedVersion?: number;
 	onSavedChange?: () => void;
 };
+
+export type CourseListLayout = 'card' | 'table' | 'timetable';
 
 type TimetableCourseItem = Course & {
 	date: string;
@@ -52,6 +59,11 @@ type TimetableCourseItem = Course & {
 
 export function CourseList({
 	courses,
+	emptyState,
+	layout: controlledLayout,
+	onLayoutChange,
+	onPageChange,
+	page: controlledPage,
 	showTimetable = false,
 	showConflictCourse = true,
 	year,
@@ -61,8 +73,11 @@ export function CourseList({
 	onSavedChange,
 }: CourseListProps) {
 	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
-	const [layout, setLayout] = useState('card');
-	const [page, setPage] = useState(1);
+	const [internalLayout, setInternalLayout] = useState<CourseListLayout>('card');
+	const [internalPage, setInternalPage] = useState(1);
+	const layout = controlledLayout ?? internalLayout;
+	const page = controlledPage ?? internalPage;
+	const hasMountedRef = useRef(false);
 	const [savedVersion, setSavedVersion] = useState(0);
 	const [conflictCourseData, setConflictCourseData] = useState<string[]>([]);
 	const viewYear = year || dataset.year;
@@ -93,7 +108,9 @@ export function CourseList({
 			}
 			if (!cancelled) setConflictCourseData(conflicts);
 		}
-		checkConflict().catch(() => setConflictCourseData([]));
+		checkConflict().catch(() => {
+			if (!cancelled) setConflictCourseData([]);
+		});
 		return () => {
 			cancelled = true;
 		};
@@ -110,22 +127,34 @@ export function CourseList({
 	const pageItems = filteredCourse.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
 	useEffect(() => {
-		setPage(1);
-	}, [courses, showConflictCourse]);
+		if (controlledPage !== undefined) return;
+		if (!hasMountedRef.current) {
+			hasMountedRef.current = true;
+			return;
+		}
+		setInternalPage(1);
+	}, [controlledPage, courses, showConflictCourse]);
 
 	useEffect(() => {
-		if (page > pageCount) setPage(1);
+		if (page > pageCount) updatePage(1);
 	}, [page, pageCount]);
 
-	function changeLayout(nextLayout: string) {
+	function updatePage(nextPage: number) {
+		if (nextPage === page) return;
+		if (onPageChange) onPageChange(nextPage);
+		else setInternalPage(nextPage);
+	}
+
+	function changeLayout(nextLayout: CourseListLayout) {
 		if (nextLayout === layout) return;
-		setLayout(nextLayout);
-		setPage(1);
+		if (onLayoutChange) onLayoutChange(nextLayout);
+		else setInternalLayout(nextLayout);
+		updatePage(1);
 	}
 
 	function changePage(nextPage: number) {
 		if (nextPage === page) return;
-		setPage(nextPage);
+		updatePage(nextPage);
 		window.scrollTo({ top: 0 });
 	}
 
@@ -151,16 +180,30 @@ export function CourseList({
 	return (
 		<div>
 			<div className='flex flex-wrap items-center justify-center gap-1 py-4'>
-				<Button active={layout === 'table'} className='m-0' onClick={() => changeLayout('table')}>
+				<Button
+					active={layout === 'table'}
+					aria-pressed={layout === 'table'}
+					className='m-0'
+					onClick={() => changeLayout('table')}
+				>
 					<Table className='size-4' />
 					表格
 				</Button>
-				<Button active={layout === 'card'} className='m-0' onClick={() => changeLayout('card')}>
+				<Button
+					active={layout === 'card'}
+					aria-pressed={layout === 'card'}
+					className='m-0'
+					onClick={() => changeLayout('card')}
+				>
 					<PanelTop className='size-4' />
 					卡片
 				</Button>
 				{showTimetable ? (
-					<Button active={layout === 'timetable'} onClick={() => changeLayout('timetable')}>
+					<Button
+						active={layout === 'timetable'}
+						aria-pressed={layout === 'timetable'}
+						onClick={() => changeLayout('timetable')}
+					>
 						<Clock className='size-4' />
 						課表
 					</Button>
@@ -180,7 +223,7 @@ export function CourseList({
 									<Link
 										to={`/course/${viewYear}/${viewSem}/${course.id}`}
 										aria-label={`查看 ${courseTitle(course)} 課程詳情`}
-										className='absolute inset-0 z-0 rounded-lg focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
+										className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 									/>
 									<div className='pointer-events-none relative z-[1] flex h-full min-h-[10.25rem] flex-col'>
 										<div className='relative pr-14'>
@@ -218,8 +261,8 @@ export function CourseList({
 													13,
 												) || '無資料'}
 											</CourseMetaLine>
-											<CourseMetaLine label='備註'>
-												{trimEllip(course.notes, 15) || '無'}
+											<CourseMetaLine label='備註' truncate={false}>
+												{course.notes || '無'}
 											</CourseMetaLine>
 										</dl>
 									</div>
@@ -229,7 +272,7 @@ export function CourseList({
 					</div>
 					{!filteredCourse.length ? (
 						<div className='flex items-center justify-center p-5'>
-							<p>查無資料</p>
+							{emptyState || <p>查無資料</p>}
 						</div>
 					) : null}
 					<Pagination page={page} length={pageCount} onChange={changePage} />
@@ -285,7 +328,7 @@ export function CourseList({
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
 												<Button
 													icon
-													active={saved}
+													danger={saved}
 													className='m-0'
 													aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 													onClick={() => toggleSavedCourse(course)}
@@ -299,6 +342,11 @@ export function CourseList({
 							</tbody>
 						</table>
 					</div>
+					{!filteredCourse.length ? (
+						<div className='flex items-center justify-center p-5'>
+							{emptyState || <p>查無資料</p>}
+						</div>
+					) : null}
 					<Pagination page={page} length={pageCount} onChange={changePage} />
 				</Card>
 			) : null}
@@ -343,11 +391,11 @@ function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => v
 			type='button'
 			aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 			className={cn(
-				'pointer-events-auto absolute -top-1 -right-1 grid size-11 place-items-center rounded-lg border-0 bg-transparent p-0 transition-colors',
-				'text-[rgb(var(--vs-primary))] outline-none before:absolute before:inset-1.5 before:rounded-lg before:transition-colors',
+				'rounded-control pointer-events-auto absolute -top-1 -right-1 grid size-11 place-items-center border-0 bg-transparent p-0 transition-colors',
+				'before:rounded-control text-[rgb(var(--vs-primary))] outline-none before:absolute before:inset-1.5 before:transition-colors',
 				'focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)]',
 				saved
-					? 'text-[rgb(var(--vs-primary-foreground))] before:bg-[rgb(var(--vs-primary))]'
+					? 'text-[rgb(var(--vs-danger))] before:bg-[rgba(var(--vs-danger),0.15)] hover:before:bg-[rgba(var(--vs-danger),0.2)]'
 					: 'before:bg-[rgba(var(--vs-primary),0.15)] hover:before:bg-[rgba(var(--vs-primary),0.22)]',
 			)}
 			onClick={onClick}
@@ -366,11 +414,26 @@ function CourseMetric({ title, value }: { title: string; value: React.ReactNode 
 	);
 }
 
-function CourseMetaLine({ label, children }: { label: string; children: React.ReactNode }) {
+function CourseMetaLine({
+	label,
+	children,
+	truncate = true,
+}: {
+	label: string;
+	children: React.ReactNode;
+	truncate?: boolean;
+}) {
 	return (
 		<div className='flex min-w-0 gap-1'>
 			<dt className='shrink-0 font-medium'>{label}：</dt>
-			<dd className='m-0 min-w-0 truncate opacity-75'>{children}</dd>
+			<dd
+				className={cn(
+					'm-0 min-w-0 opacity-75',
+					truncate ? 'truncate' : 'break-words whitespace-pre-wrap',
+				)}
+			>
+				{children}
+			</dd>
 		</div>
 	);
 }

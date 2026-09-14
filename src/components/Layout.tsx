@@ -1,5 +1,5 @@
-import { Link, Outlet, useRouterState } from '@tanstack/react-router';
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
+import { useState } from 'react';
 import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/courseUtils';
 import { pageTitleForPath, usePageTitle } from '../lib/pageTitle';
 import { createSearchParams } from '../lib/urlState';
@@ -15,6 +15,7 @@ import { UniversalSearch } from './UniversalSearch';
 
 export function Layout() {
 	const { location } = useRouterState();
+	const navigate = useNavigate();
 	const searchParams = createSearchParams(location.search);
 	const isIframe = searchParams.get('mode') === 'iframe';
 	const isAdvancedSearch = location.pathname === '/advanced-search';
@@ -26,32 +27,41 @@ export function Layout() {
 		datasetDialogOpen,
 		setDatasetDialogOpen,
 	} = useApp();
-	const [yearSemValue, setYearSemValue] = useState(`${dataset.year}-${dataset.sem}`);
-	const [departmentValue, setDepartmentValue] = useState(displayDepartment(dataset.department));
-
-	const rootRef = useRef<HTMLDivElement>(null);
-
-	useLayoutEffect(() => {
-		if (rootRef.current) {
-			rootRef.current.style.setProperty('min-height', '100svh', 'important');
-		}
-	}, []);
-
-	const yearSemLabel = useMemo(() => parseYearSemVal(`${dataset.year}-${dataset.sem}`), [dataset]);
+	const viewYear = isAdvancedSearch ? searchParams.get('year') || dataset.year : dataset.year;
+	const viewSem = isAdvancedSearch ? searchParams.get('sem') || dataset.sem : dataset.sem;
+	const viewDepartment = isAdvancedSearch
+		? searchParams.get('d') || dataset.department
+		: dataset.department;
+	const yearSemLabel = parseYearSemVal(`${viewYear}-${viewSem}`);
 
 	usePageTitle(pageTitleForPath(location.pathname));
 
-	function applyDataset() {
-		const [year, sem] = yearSemValue.split('-');
-		setDataset({ year, sem, department: storageDepartment(departmentValue) });
+	function applyDataset(nextDataset: { year: string; sem: string; department: string }) {
+		setDataset(nextDataset);
+		if (isAdvancedSearch) {
+			void navigate({
+				to: '/advanced-search',
+				search: (previous) => ({
+					...previous,
+					year: nextDataset.year,
+					sem: nextDataset.sem,
+					d: nextDataset.department,
+					page: undefined,
+				}),
+				resetScroll: true,
+			});
+		}
 		setDatasetDialogOpen(false);
 	}
 
 	return (
-		<div
-			ref={rootRef}
-			className='flex min-h-screen flex-col bg-[#f4f7f8] font-sans text-black dark:bg-[#1d1d1d] dark:text-white'
-		>
+		<div className='flex min-h-svh flex-col bg-[#f4f7f8] font-sans text-black dark:bg-[#1d1d1d] dark:text-white'>
+			<a
+				href='#main-content'
+				className='sr-only fixed top-2 left-2 z-50 rounded-lg bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] shadow-lg focus:not-sr-only'
+			>
+				跳至主要內容
+			</a>
 			{!isIframe ? (
 				<nav
 					className={cn(
@@ -78,8 +88,10 @@ export function Layout() {
 			) : null}
 			<ContentSurface
 				as='main'
+				id='main-content'
+				tabIndex={-1}
 				className={cn(
-					`flex-1`,
+					'flex-1 scroll-mt-20',
 					isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 py-8',
 					isIframe ? 'pt-0' : '',
 				)}
@@ -115,6 +127,7 @@ export function Layout() {
 									as='a'
 									icon
 									href='https://github.com/gnehs/ntut-course-web'
+									aria-label='查看 GitHub 原始碼'
 									target='_blank'
 									rel='noreferrer'
 								>
@@ -127,35 +140,55 @@ export function Layout() {
 			) : null}
 			<Dialog
 				open={datasetDialogOpen}
-				title='選擇資料集'
+				title='選擇學期與學制'
 				onClose={() => setDatasetDialogOpen(false)}
-				footer={
-					<Button primary className='m-0 w-full' onClick={applyDataset}>
-						完成
-					</Button>
-				}
 			>
-				<div className='grid gap-3'>
-					<Field label='學期'>
-						<Select value={yearSemValue} onChange={(value) => setYearSemValue(value)}>
-							{yearSemItems.map((item) => (
-								<SelectOption key={item} value={item}>
-									{parseYearSemVal(item)}
-								</SelectOption>
-							))}
-						</Select>
-					</Field>
-					<Field label='學制'>
-						<Select value={departmentValue} onChange={(value) => setDepartmentValue(value)}>
-							{departmentItems.map((item) => (
-								<SelectOption key={item} value={item}>
-									{item}
-								</SelectOption>
-							))}
-						</Select>
-					</Field>
-				</div>
+				<DatasetForm
+					year={viewYear}
+					sem={viewSem}
+					department={viewDepartment}
+					yearSemItems={yearSemItems}
+					departmentItems={departmentItems}
+					onSubmit={applyDataset}
+				/>
 			</Dialog>
 		</div>
+	);
+}
+
+function DatasetForm({ year, sem, department, yearSemItems, departmentItems, onSubmit }) {
+	const [yearSemValue, setYearSemValue] = useState(`${year}-${sem}`);
+	const [departmentValue, setDepartmentValue] = useState(displayDepartment(department));
+	return (
+		<form
+			className='grid gap-4'
+			onSubmit={(event) => {
+				event.preventDefault();
+				const [nextYear, nextSem] = yearSemValue.split('-');
+				onSubmit({ year: nextYear, sem: nextSem, department: storageDepartment(departmentValue) });
+			}}
+		>
+			<Field label='學期'>
+				<Select value={yearSemValue} onChange={setYearSemValue}>
+					{yearSemItems.map((item) => (
+						<SelectOption key={item} value={item}>
+							{parseYearSemVal(item)}
+						</SelectOption>
+					))}
+				</Select>
+			</Field>
+			<Field label='學制'>
+				<Select value={departmentValue} onChange={setDepartmentValue}>
+					{departmentItems.map((item) => (
+						<SelectOption key={item} value={item}>
+							{item}
+						</SelectOption>
+					))}
+				</Select>
+			</Field>
+			<Button primary type='submit' className='w-full'>
+				套用學期與學制
+			</Button>
+		</form>
 	);
 }

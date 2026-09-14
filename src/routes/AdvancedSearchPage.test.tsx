@@ -61,11 +61,10 @@ describe('AdvancedSearchPage navigation', () => {
 		render(<RouterProvider router={router} />);
 
 		await waitFor(() => expect(router.state.location.pathname).toBe('/advanced-search'));
-		expect(router.state.location.search).toEqual({
-			year: '115',
-			sem: '1',
-			d: 'main',
-		});
+		const search = router.state.location.search as Record<string, unknown>;
+		expect(search).toMatchObject({ d: 'main' });
+		expect(String(search.year)).toBe('115');
+		expect(String(search.sem)).toBe('1');
 	});
 
 	it('returns to the home page when the site title is clicked', async () => {
@@ -331,5 +330,103 @@ describe('AdvancedSearchPage navigation', () => {
 		expect(await screen.findByRole('alert')).toHaveTextContent('課程資料暫時無法取得');
 		expect(screen.queryByText('查無資料')).not.toBeInTheDocument();
 		expect(document.querySelector('.animate-pulse')).not.toBeInTheDocument();
+	});
+
+	it('restores result page and layout from the URL without resetting them on mount', async () => {
+		mockGetCourses.mockResolvedValue(
+			Array.from({ length: 108 }, (_, index) => ({
+				id: String(index + 1),
+				courseType: '○',
+				name: { zh: `新關鍵字 課程 ${index + 1}` },
+				class: [],
+				teacher: [],
+			})),
+		);
+		const history = createMemoryHistory({
+			initialEntries: ['/advanced-search?year=115&sem=1&d=main&page=2&view=table'],
+		});
+		const router = createAppRouter({ history });
+		const user = userEvent.setup();
+
+		render(<RouterProvider router={router} />);
+
+		expect(await screen.findByRole('link', { name: /課程 55/ })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: '表格' })).toHaveAttribute('aria-pressed', 'true');
+		expect(screen.getByRole('button', { name: '第 2 頁' })).toHaveAttribute('aria-current', 'page');
+
+		await user.click(screen.getByRole('button', { name: '卡片' }));
+		await waitFor(() => {
+			expect(router.state.location.search).not.toHaveProperty('page');
+			expect(router.state.location.search).not.toHaveProperty('view');
+		});
+	});
+
+	it('applies a newly navigated URL before syncing local filter state back', async () => {
+		mockGetCourses.mockResolvedValue(
+			Array.from({ length: 108 }, (_, index) => ({
+				id: String(index + 1),
+				courseType: '○',
+				name: { zh: `新關鍵字 課程 ${index + 1}` },
+				class: [],
+				teacher: [],
+			})),
+		);
+		const history = createMemoryHistory({
+			initialEntries: ['/advanced-search?year=115&sem=1&d=main&q=%7B%22k%22%3A%22舊關鍵字%22%7D'],
+		});
+		const router = createAppRouter({ history });
+
+		render(<RouterProvider router={router} />);
+		expect(await screen.findAllByDisplayValue('舊關鍵字')).toHaveLength(2);
+
+		await router.navigate({
+			to: '/advanced-search',
+			search: {
+				year: '114',
+				sem: '2',
+				d: 'night',
+				page: 2,
+				view: 'table',
+				q: { k: '新關鍵字' },
+			},
+		});
+
+		await waitFor(() => {
+			expect(screen.getAllByDisplayValue('新關鍵字')).toHaveLength(2);
+			expect(router.state.location.search).toMatchObject({
+				year: '114',
+				sem: '2',
+				d: 'night',
+				page: 2,
+				view: 'table',
+			});
+		});
+	});
+
+	it('keeps a cleared keyword cleared in the URL and both search inputs', async () => {
+		mockGetCourses.mockResolvedValue([
+			{
+				id: '1',
+				courseType: '○',
+				name: { zh: '舊關鍵字課程' },
+				class: [],
+				teacher: [],
+			},
+		]);
+		const history = createMemoryHistory({
+			initialEntries: ['/advanced-search?year=115&sem=1&d=main&q=%7B%22k%22%3A%22舊關鍵字%22%7D'],
+		});
+		const router = createAppRouter({ history });
+		const user = userEvent.setup();
+
+		render(<RouterProvider router={router} />);
+		const inputs = await screen.findAllByDisplayValue('舊關鍵字');
+
+		await user.clear(inputs[0]);
+
+		await waitFor(() => {
+			expect(screen.queryAllByDisplayValue('舊關鍵字')).toHaveLength(0);
+			expect(router.state.location.search).not.toHaveProperty('q');
+		});
 	});
 });

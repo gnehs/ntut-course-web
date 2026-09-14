@@ -31,5 +31,6 @@ describe('HomePage', () => {
 		expect(screen.getByText('搜尋')).toBeInTheDocument();
 		expect(screen.getByText('我的課程')).toBeInTheDocument();
 		expect(screen.getByText('尋找空教室')).toBeInTheDocument();
+		expect(screen.queryByText('英語授課')).not.toBeInTheDocument();
 	});
 });

@@ -15,7 +15,7 @@ import type {
 } from '../types/course';
 import { errorMessage } from '../lib/error';
 import { courseStandard, formatCredit, isZeroCreditValue } from '../lib/courseUtils';
-import { BookOpen, Building2, Calendar, ListChecks, Search } from 'lucide-react';
+import { Building2, Calendar, Search } from 'lucide-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
 
@@ -109,11 +109,13 @@ export function StandardPage() {
 	}
 
 	return (
-		<div className='mx-auto max-w-5xl space-y-4'>
-			<h1 className='text-2xl font-semibold tracking-tight'>課程標準</h1>
-			<p className='text-sm opacity-60'>
-				選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
-			</p>
+		<div className='flex flex-col gap-4'>
+			<div className='flex flex-col gap-1'>
+				<h1>課程標準</h1>
+				<p className='m-0 text-sm opacity-70'>
+					選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
+				</p>
+			</div>
 
 			{error ? (
 				<Alert danger>
@@ -125,69 +127,75 @@ export function StandardPage() {
 			{!years ? <StandardPickerSkeleton /> : null}
 
 			{years ? (
-				<div className='space-y-4'>
-					<div className='flex flex-col gap-3 sm:flex-row'>
-						<div className='flex-1 space-y-1.5'>
-							<label className='flex items-center gap-1.5 text-xs font-medium opacity-50'>
-								<Calendar className='size-3.5' />
-								入學年度
-							</label>
-							<Select
-								value={year}
-								onChange={(v) => setQuery({ year: v, system: '', department: '' })}
-								placeholder='選擇入學年度'
-							>
-								{yearItems.map((item) => (
-									<SelectOption key={item} value={item}>
-										{formatRocYear(item)}
-									</SelectOption>
-								))}
-							</Select>
-						</div>
+				<div className='grid gap-3 sm:grid-cols-3'>
+					<div className='flex flex-col gap-1'>
+						<label
+							htmlFor='standard-year'
+							className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+						>
+							<Calendar className='size-3.5' />
+							入學年度
+						</label>
+						<Select
+							id='standard-year'
+							value={year}
+							onChange={(v) => setQuery({ year: v, system: '', department: '' })}
+							placeholder='選擇入學年度'
+						>
+							{yearItems.map((item) => (
+								<SelectOption key={item} value={item}>
+									{formatRocYear(item)}
+								</SelectOption>
+							))}
+						</Select>
+					</div>
 
-						<div className='flex-1 space-y-1.5'>
-							<label className='flex items-center gap-1.5 text-xs font-medium opacity-50'>
-								<Building2 className='size-3.5' />
-								學制
-							</label>
-							<Select
-								value={system}
-								onChange={(v) => setQuery({ system: v, department: '' })}
-								placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
-								disabled={!year || !standardData}
-							>
-								{systems.map((item) => (
-									<SelectOption key={item} value={item}>
-										{item}
-									</SelectOption>
-								))}
-							</Select>
-						</div>
+					<div className='flex flex-col gap-1'>
+						<label
+							htmlFor='standard-system'
+							className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+						>
+							<Building2 className='size-3.5' />
+							學制
+						</label>
+						<Select
+							id='standard-system'
+							value={system}
+							onChange={(v) => setQuery({ system: v, department: '' })}
+							placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
+							disabled={!year || !standardData}
+						>
+							{systems.map((item) => (
+								<SelectOption key={item} value={item}>
+									{item}
+								</SelectOption>
+							))}
+						</Select>
+					</div>
 
-						<div className='flex-1 space-y-1.5'>
-							<label className='flex items-center gap-1.5 text-xs font-medium opacity-50'>
-								<Search className='size-3.5' />
-								系所
-							</label>
-							<Select
-								value={department}
-								onChange={(v) => setQuery({ department: v })}
-								placeholder={!system ? '請先選擇學制' : '選擇系所'}
-								disabled={!system}
-							>
-								{departments.map((item) => (
-									<SelectOption key={item} value={item}>
-										{item}
-									</SelectOption>
-								))}
-							</Select>
-						</div>
+					<div className='flex flex-col gap-1'>
+						<label
+							htmlFor='standard-department'
+							className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+						>
+							<Search className='size-3.5' />
+							系所
+						</label>
+						<Select
+							id='standard-department'
+							value={department}
+							onChange={(v) => setQuery({ department: v })}
+							placeholder={!system ? '請先選擇學制' : '選擇系所'}
+							disabled={!system}
+						>
+							{departments.map((item) => (
+								<SelectOption key={item} value={item}>
+									{item}
+								</SelectOption>
+							))}
+						</Select>
 					</div>
 				</div>
-			) : null}
-
-			{years && !current && (!year || standardData) ? (
-				<StandardGuide year={year} system={system} department={department} />
 			) : null}
 
 			{year && !standardData ? <StandardPickerSkeleton content /> : null}
@@ -209,7 +217,7 @@ export function StandardPage() {
 					<div>
 						<h2 className='text-lg font-semibold'>相關規定事項</h2>
 						{current.rules?.length ? (
-							<ul className='space-y-2 rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-4'>
+							<ul className='rounded-surface space-y-2 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-4'>
 								{current.rules.map((item) => (
 									<li key={item} className='flex items-start gap-2 text-sm leading-relaxed'>
 										<span className='mt-1.5 block size-1.5 shrink-0 rounded-full bg-[rgb(var(--vs-primary))]' />
@@ -233,7 +241,7 @@ export function StandardPage() {
 												<h3 className='text-sm font-semibold opacity-70'>
 													{gradeLabel(courseYear, sem)}
 												</h3>
-												<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
+												<div className='rounded-surface overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
 													{items.map((item, index) => (
 														<div
 															className={`flex items-center justify-between gap-2 px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
@@ -259,7 +267,7 @@ export function StandardPage() {
 						</div>
 					</div>
 
-					<div className='rounded-lg border border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.02)] p-4'>
+					<div className='rounded-surface border border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.02)] p-4'>
 						<h3 className='mb-2.5 text-xs font-medium'>課程類型圖例</h3>
 						<div className='flex flex-wrap gap-2'>
 							{courseStandardEntries.map(([symbol, label]) => (
@@ -278,78 +286,6 @@ export function StandardPage() {
 				</>
 			) : null}
 		</div>
-	);
-}
-
-function StandardGuide({
-	year,
-	system,
-	department,
-}: {
-	year: string;
-	system: string;
-	department: string;
-}) {
-	const steps = [
-		{
-			title: '1. 選入學年度',
-			text: year ? formatRocYear(year) : '選擇年度',
-			done: Boolean(year),
-			icon: Calendar,
-		},
-		{
-			title: '2. 選學制',
-			text: system || '選擇學制',
-			done: Boolean(system),
-			icon: Building2,
-		},
-		{
-			title: '3. 選系所',
-			text: department || '選擇系所',
-			done: Boolean(department),
-			icon: ListChecks,
-		},
-	];
-
-	return (
-		<section className='space-y-4'>
-			<div>
-				<h2 className='!text-lg !leading-6 font-semibold'>查詢流程</h2>
-				<p className='!my-0 text-sm leading-5 opacity-60'>
-					依序完成上方三個選項，就能查看對應的課程標準。
-				</p>
-			</div>
-			<div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
-				{steps.map((step) => {
-					const Icon = step.icon;
-					return (
-						<Card
-							key={step.title}
-							className={`px-4 py-3 ${step.done ? 'border-[rgba(var(--vs-primary),0.28)]' : ''}`}
-						>
-							<CardTitle>{step.title}</CardTitle>
-							<p>{step.text}</p>
-							<Icon data-card-icon />
-						</Card>
-					);
-				})}
-			</div>
-			<div>
-				<h2 className='!text-lg !leading-6 font-semibold'>常用入口</h2>
-				<div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
-					<Card className='px-4 py-3' to='/advanced-search'>
-						<CardTitle>搜尋課程</CardTitle>
-						<p>先找課程，再回來比對標準。</p>
-						<Search data-card-icon />
-					</Card>
-					<Card className='px-4 py-3' to='/class'>
-						<CardTitle>班級課表</CardTitle>
-						<p>查看各班課表與必修安排。</p>
-						<BookOpen data-card-icon />
-					</Card>
-				</div>
-			</div>
-		</section>
 	);
 }
 

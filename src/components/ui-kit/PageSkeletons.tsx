@@ -13,7 +13,7 @@ function SkeletonCard({
 }) {
 	return (
 		<div
-			className={`rounded-lg bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] ${className}`}
+			className={`rounded-surface bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] ${className}`}
 		>
 			{children}
 		</div>
@@ -58,7 +58,7 @@ function StatCardsSkeleton({
 
 function ListRowsSkeleton({ rows = 6, compact = false }: { rows?: number; compact?: boolean }) {
 	return (
-		<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
+		<div className='rounded-surface overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
 			{Array.from({ length: rows }, (_, index) => (
 				<div
 					key={index}
@@ -205,7 +205,7 @@ export function CalendarSkeleton() {
 	return (
 		<div>
 			<SkeletonHeading withActions />
-			<div className='mt-4 overflow-hidden rounded-[4px] border border-[rgba(var(--vs-text),0.1)]'>
+			<div className='rounded-surface mt-4 overflow-hidden border border-[rgba(var(--vs-text),0.1)]'>
 				{Array.from({ length: 8 }, (_, index) => (
 					<div
 						key={index}

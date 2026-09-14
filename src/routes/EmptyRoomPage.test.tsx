@@ -63,9 +63,15 @@ describe('EmptyRoomPage room details', () => {
 			department: 'main',
 		});
 		const user = userEvent.setup();
-		await user.click(screen.getByRole('button', { name: '一' }));
+		const mondayButton = screen.getByRole('button', { name: '週一' });
+		await user.click(mondayButton);
+		expect(mondayButton).toHaveAttribute('aria-pressed', 'true');
+		expect(screen.getByRole('group', { name: '節次狀態圖例' })).toHaveTextContent('空堂');
+		expect(screen.getByRole('group', { name: '節次狀態圖例' })).toHaveTextContent('有課程');
 
 		const roomCard = screen.getByRole('button', { name: '查看「A101」詳細上課資訊' });
+		const statusId = roomCard.getAttribute('aria-describedby');
+		expect(statusId && document.getElementById(statusId)).toHaveTextContent('1 有課程');
 		expect(
 			screen.queryByRole('button', { name: '查看「B202」詳細上課資訊' }),
 		).not.toBeInTheDocument();
@@ -100,7 +106,7 @@ describe('EmptyRoomPage room details', () => {
 
 		await renderPage();
 		const user = userEvent.setup();
-		await user.click(screen.getByRole('button', { name: '一' }));
+		await user.click(screen.getByRole('button', { name: '週一' }));
 		await user.click(screen.getByRole('button', { name: '查看「A101」詳細上課資訊' }));
 		const dialog = await screen.findByRole('dialog');
 		expect(
@@ -126,7 +132,7 @@ describe('EmptyRoomPage room details', () => {
 
 		const { rerender } = await renderPage();
 		const user = userEvent.setup();
-		await user.click(screen.getByRole('button', { name: '一' }));
+		await user.click(screen.getByRole('button', { name: '週一' }));
 		await user.click(screen.getByRole('button', { name: '查看「A101」詳細上課資訊' }));
 		expect(await screen.findByRole('link', { name: '舊學期課程' })).toHaveAttribute(
 			'href',
@@ -143,7 +149,7 @@ describe('EmptyRoomPage room details', () => {
 			department: 'main',
 		});
 
-		await user.click(screen.getByRole('button', { name: '一' }));
+		await user.click(screen.getByRole('button', { name: '週一' }));
 		await user.click(screen.getByRole('button', { name: '查看「A101」詳細上課資訊' }));
 		expect(await screen.findByRole('link', { name: '新學期課程' })).toHaveAttribute(
 			'href',

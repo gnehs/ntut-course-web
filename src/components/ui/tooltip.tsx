@@ -26,7 +26,7 @@ function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimiti
 
 function TooltipContent({
 	className,
-	sideOffset = 0,
+	sideOffset = 6,
 	children,
 	...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
@@ -36,13 +36,12 @@ function TooltipContent({
 				data-slot='tooltip-content'
 				sideOffset={sideOffset}
 				className={cn(
-					'animate-in bg-foreground text-background fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance',
+					'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 max-h-[min(24rem,var(--radix-tooltip-content-available-height))] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-panel border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-1.5 text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(15,23,42,0.18)] origin-(--radix-tooltip-content-transform-origin)',
 					className,
 				)}
 				{...props}
 			>
 				{children}
-				<TooltipPrimitive.Arrow className='bg-foreground fill-foreground z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]' />
 			</TooltipPrimitive.Content>
 		</TooltipPrimitive.Portal>
 	);

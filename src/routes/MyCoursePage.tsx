@@ -2,50 +2,44 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
-import {
-	BookOpen,
-	Calendar,
-	Clock,
-	FileInput,
-	FileOutput,
-	Puzzle,
-	Search,
-	Shapes,
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { BookOpen, Calendar, Clock, Puzzle, Search, Shapes } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons';
 import { formatCredit } from '../lib/courseUtils';
+import { errorMessage } from '../lib/error';
 import { useApp } from '../state/AppContext';
 import type { Course } from '../types/course';
 
-type MyCourseExportData = {
-	key?: unknown;
-	data?: unknown;
-	classKey?: unknown;
-	classData?: unknown;
-};
-
 export function MyCoursePage() {
-	const { dataset, getCourses, getMyCourseIds, myCourseKey, myCourseClassKey } = useApp();
+	const { dataset, getCourses, getMyCourseIds } = useApp();
 	const [courses, setCourses] = useState<Course[] | null>(null);
+	const [loadError, setLoadError] = useState<unknown>(null);
 	const [version, setVersion] = useState(0);
 
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
-			const ids = getMyCourseIds();
-			const all = await getCourses();
-			if (!cancelled) setCourses(all.filter((course) => ids.includes(course.id)));
+			setCourses(null);
+			setLoadError(null);
+			try {
+				const ids = getMyCourseIds();
+				const all = await getCourses();
+				if (!cancelled) setCourses(all.filter((course) => ids.includes(course.id)));
+			} catch (error) {
+				if (!cancelled) {
+					setLoadError(error);
+					setCourses(null);
+				}
+			}
 		}
-		load().catch(() => setCourses([]));
+		load();
 		return () => {
 			cancelled = true;
 		};
-	}, [dataset.year, dataset.sem, dataset.department, version]);
+	}, [dataset.year, dataset.sem, dataset.department, getCourses, getMyCourseIds, version]);
 
 	const credit = useMemo(
 		() => (courses || []).reduce((sum, course) => sum + Number(course.credit || 0), 0),
@@ -56,38 +50,26 @@ export function MyCoursePage() {
 		[courses],
 	);
 
-	function exportData() {
-		const payload = {
-			key: myCourseKey(),
-			data: localStorage.getItem(myCourseKey()),
-			classKey: myCourseClassKey(),
-			classData: localStorage.getItem(myCourseClassKey()),
-		};
-		prompt('請複製以下資料：', JSON.stringify(payload));
-	}
-
-	function importData() {
-		const raw = prompt('請貼上先前複製的資料：');
-		if (!raw) return;
-		try {
-			const data = JSON.parse(raw) as MyCourseExportData;
-			if (typeof data.key === 'string' && typeof data.data === 'string') {
-				localStorage.setItem(data.key, data.data);
-			}
-			if (typeof data.classKey === 'string' && typeof data.classData === 'string') {
-				localStorage.setItem(data.classKey, data.classData);
-			}
-			const importedCourses = typeof data.data === 'string' ? JSON.parse(data.data) : [];
-			const importedCourseCount = Array.isArray(importedCourses) ? importedCourses.length : 0;
-			toast.success('匯入完成', {
-				description: `已匯入 ${importedCourseCount} 筆課程到我的課程`,
-			});
-			setVersion((value) => value + 1);
-		} catch {
-			toast.error('匯入失敗', {
-				description: '請確認貼上的資料格式是否正確',
-			});
-		}
+	if (loadError) {
+		return (
+			<div className='space-y-4'>
+				<div className='flex flex-wrap items-center justify-between gap-2'>
+					<h1 className='m-0'>我的課程</h1>
+				</div>
+				<Alert danger>
+					<strong>我的課程資料載入失敗</strong>
+					<p className='mt-1 mb-0'>暫時無法取得課程資料，請稍後再試。</p>
+					<p className='mt-1 mb-0 text-sm opacity-75'>{errorMessage(loadError)}</p>
+					<div className='mt-3'>
+						<Button primary onClick={() => setVersion((value) => value + 1)}>
+							重新載入
+						</Button>
+					</div>
+				</Alert>
+				<h3 className='mb-4'>贊助商廣告</h3>
+				<AdsByGoogle />
+			</div>
+		);
 	}
 
 	if (!courses) return <ClassDetailSkeleton />;
@@ -105,19 +87,12 @@ export function MyCoursePage() {
 				<div>
 					<h1>我的課程</h1>
 				</div>
-				<div className='flex flex-wrap justify-end gap-2'>
-					<Button onClick={exportData}>
-						<FileOutput className='size-4' />
-						匯出
-					</Button>
-					<Button onClick={importData}>
-						<FileInput className='size-4' />
-						匯入
-					</Button>
-				</div>
 			</div>
 			<p style={{ marginTop: '-1em' }}>
 				你可以在這裡儲存一些課程供未來選課時參考用，在此處的課程會與其他課程比對並顯示是否衝堂。
+			</p>
+			<p className='m-0 text-sm opacity-75'>
+				需要備份或移轉所有學期的資料嗎？請到 <Link to='/settings'>設定</Link> 管理我的課程備份。
 			</p>
 			{!courses.length ? (
 				<Alert>

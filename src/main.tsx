@@ -15,7 +15,7 @@ if (!root) {
 createRoot(root).render(
 	<React.StrictMode>
 		<AppProvider>
-			<Toaster richColors closeButton position='top-center' />
+			<Toaster richColors closeButton position='bottom-right' />
 			<RouterProvider router={router} />
 		</AppProvider>
 	</React.StrictMode>,

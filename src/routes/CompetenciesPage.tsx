@@ -187,16 +187,6 @@ export function CompetenciesPage() {
 										{visibleCourses.length} 門課程・{visibleAbilities.length} 項核心能力
 									</p>
 								</div>
-								{safeCompetencyHref(selectedDepartment.href) ? (
-									<a
-										href={safeCompetencyHref(selectedDepartment.href)!}
-										target='_blank'
-										rel='noreferrer'
-										className='inline-flex items-center gap-1 text-sm underline underline-offset-2'
-									>
-										學校原始資料 <ExternalLink className='size-4' />
-									</a>
-								) : null}
 							</div>
 
 							<div className='grid gap-4 lg:grid-cols-[minmax(14rem,0.8fr)_minmax(0,1.6fr)]'>
@@ -272,6 +262,18 @@ export function CompetenciesPage() {
 									</div>
 								</section>
 							</div>
+							{safeCompetencyHref(selectedDepartment.href) ? (
+								<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+									<a
+										href={safeCompetencyHref(selectedDepartment.href)!}
+										target='_blank'
+										rel='noreferrer'
+										className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
+									>
+										學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
+									</a>
+								</div>
+							) : null}
 						</div>
 					) : null}
 				</>

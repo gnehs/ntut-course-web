@@ -151,6 +151,15 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		);
 	});
 
+	it('keeps school source links after the internal course content', async () => {
+		await renderCourseDetail();
+
+		const headings = Array.from(document.querySelectorAll('h2, h3')).map((heading) =>
+			heading.textContent?.trim(),
+		);
+		expect(headings.at(-1)).toBe('學校原始資料');
+	});
+
 	it('accepts a zero withdrawal rate returned as a string', async () => {
 		await renderCourseDetail();
 
@@ -162,6 +171,30 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		await renderCourseDetail();
 
 		expect(screen.getByRole('button', { name: /退選率 12\.5%/ })).toBeInTheDocument();
+	});
+
+	it('opens the withdrawal explanation as a keyboard-dismissible surface', async () => {
+		await renderCourseDetail();
+
+		const user = userEvent.setup();
+		await user.click(screen.getByRole('button', { name: /退選率 0%/ }));
+		const explanations = await screen.findAllByText('什麼是退選率？');
+		const content = explanations
+			.map((explanation) => explanation.closest('[data-slot="tooltip-content"]'))
+			.find(Boolean);
+		expect(content).toHaveClass('rounded-panel');
+
+		await user.keyboard('{Escape}');
+		expect(screen.queryAllByText('什麼是退選率？')).toHaveLength(0);
+	});
+
+	it('uses the danger treatment when removing a saved course', async () => {
+		mocks.getMyCourseIds.mockReturnValue(['COURSE-001']);
+		await renderCourseDetail();
+
+		expect(screen.getByRole('button', { name: '從我的課程移除' })).toHaveClass(
+			'text-[rgb(var(--vs-danger))]',
+		);
 	});
 
 	it('renders an unknown Chinese syllabus field with its original label', async () => {
@@ -426,7 +459,7 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		expect(await screen.findByRole('heading', { name: '測試課程' })).toBeInTheDocument();
 		expect(screen.getByText('CODE-001', { exact: true })).toBeInTheDocument();
 		expect(screen.getByRole('alert')).toHaveTextContent(
-			'課程大綱暫時無法載入，請稍後再試或查看原始課綱。',
+			'課程大綱暫時無法載入，請稍後再試。',
 		);
 	});
 });

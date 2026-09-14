@@ -8,6 +8,10 @@ export function isReducedMotion() {
 
 export function bindInteractiveCard(element) {
 	if (!element || isReducedMotion()) return () => {};
+	const canHover =
+		typeof window !== 'undefined' &&
+		typeof window.matchMedia === 'function' &&
+		window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 	const icon = element.querySelector(':scope > [data-card-icon]');
 	const shadowOpacity =
@@ -77,26 +81,26 @@ export function bindInteractiveCard(element) {
 	}
 
 	function release() {
-		if (hovered) enter();
+		if (canHover && hovered) enter();
 		else leave();
 	}
 
-	element.addEventListener('pointerenter', enter);
-	element.addEventListener('pointerleave', leave);
+	if (canHover) {
+		element.addEventListener('pointerenter', enter);
+		element.addEventListener('pointerleave', leave);
+	}
 	element.addEventListener('pointerdown', press);
 	element.addEventListener('pointerup', release);
 	element.addEventListener('pointercancel', leave);
-	element.addEventListener('focus', enter);
-	element.addEventListener('blur', leave);
 
 	return () => {
-		element.removeEventListener('pointerenter', enter);
-		element.removeEventListener('pointerleave', leave);
+		if (canHover) {
+			element.removeEventListener('pointerenter', enter);
+			element.removeEventListener('pointerleave', leave);
+		}
 		element.removeEventListener('pointerdown', press);
 		element.removeEventListener('pointerup', release);
 		element.removeEventListener('pointercancel', leave);
-		element.removeEventListener('focus', enter);
-		element.removeEventListener('blur', leave);
 		gsap.killTweensOf([element, icon].filter(Boolean));
 		gsap.set([element, icon].filter(Boolean), { clearProps: 'all' });
 	};

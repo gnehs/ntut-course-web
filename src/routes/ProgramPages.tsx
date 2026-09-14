@@ -343,18 +343,16 @@ export function ProgramDetailPage() {
 					<h1>{program.name}</h1>
 					{program.description ? <p className='m-0 opacity-75'>{program.description}</p> : null}
 				</div>
-				{sourceHref ? (
-					<Button as='a' href={sourceHref} target='_blank' rel='noreferrer'>
-						<ExternalLink className='size-4' />
-						學校原始資料
-					</Button>
-				) : null}
 			</div>
 
 			<div className='flex flex-wrap items-center justify-between gap-3'>
 				<p className='m-0 text-sm opacity-70'>找到 {matchedCourses.length} 門課程</p>
 				{matchedCourses.length ? (
-					<Button primary onClick={allSaved ? removeProgramCourses : addProgramCourses}>
+					<Button
+						primary={!allSaved}
+						danger={allSaved}
+						onClick={allSaved ? removeProgramCourses : addProgramCourses}
+					>
 						{allSaved ? '從我的課程移除全部' : '全部加入我的課程'}
 					</Button>
 				) : null}
@@ -400,6 +398,18 @@ export function ProgramDetailPage() {
 			) : (
 				<Alert>此學程在目前三個學制的課程清單中沒有找到對應課程。</Alert>
 			)}
+			{sourceHref ? (
+				<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+					<a
+						href={sourceHref}
+						target='_blank'
+						rel='noreferrer'
+						className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
+					>
+						學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
+					</a>
+				</div>
+			) : null}
 		</div>
 	);
 }

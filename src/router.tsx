@@ -65,7 +65,12 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 export function createAppRouter(options = {}) {
-	return createRouter({ routeTree, ...options });
+	return createRouter({
+		routeTree,
+		scrollRestoration: true,
+		scrollRestorationBehavior: 'instant',
+		...options,
+	});
 }
 
 export const router = createAppRouter();

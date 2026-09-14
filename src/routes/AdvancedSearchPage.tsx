@@ -5,6 +5,8 @@ import { Checkbox } from '../components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
+import type { CourseListLayout } from '../components/CourseList';
+
 import {
 	Check,
 	ChevronDown,
@@ -156,6 +158,7 @@ export function AdvancedSearchPage() {
 	const navigate = useNavigate();
 	const { dataset, getCourses } = useApp();
 	const params = useMemo(() => createSearchParams(location.search), [location.search]);
+	const locationKey = createLocationKey(location.pathname, location.search);
 	const restoredQuery = useMemo<AdvancedSearchQuery>(
 		() => safeParseJson(params.get('q'), {}),
 		[location.search],
@@ -170,6 +173,8 @@ export function AdvancedSearchPage() {
 			}),
 		[params, restoredQuery],
 	);
+	const restoredPage = parsePage(params.get('page'));
+	const restoredLayout = parseCourseListLayout(params.get('view'));
 	const [searchCourseKeyword, setSearchCourseKeyword] = useState(restoredQuery.k || '');
 	const [showConflictCourse, setShowConflictCourse] = useState(restoredQuery.c ?? true);
 	const [showPlaceholder, setShowPlaceholder] = useState(restoredQuery.sph ?? false);
@@ -204,6 +209,11 @@ export function AdvancedSearchPage() {
 	const [syllabusIndexError, setSyllabusIndexError] = useState<unknown>(null);
 	const [onError, setOnError] = useState<unknown>(null);
 	const [recommandKeyword, setRecommandKeyword] = useState(['體育', '博雅']);
+	const [resultPage, setResultPage] = useState(restoredPage);
+	const [resultLayout, setResultLayout] = useState<CourseListLayout>(restoredLayout);
+	const lastObservedLocationKeyRef = useRef(locationKey);
+	const skipUrlSyncRef = useRef(false);
+	const pendingSearchKeysRef = useRef(new Set<string>());
 
 	const year = params.get('year') || dataset.year;
 	const sem = params.get('sem') || dataset.sem;
@@ -231,6 +241,17 @@ export function AdvancedSearchPage() {
 	);
 
 	useEffect(() => {
+		if (location.pathname !== '/advanced-search') return;
+		const locationChanged = lastObservedLocationKeyRef.current !== locationKey;
+		if (locationChanged) {
+			lastObservedLocationKeyRef.current = locationKey;
+			skipUrlSyncRef.current = true;
+			if (pendingSearchKeysRef.current.has(locationKey)) {
+				pendingSearchKeysRef.current.delete(locationKey);
+				return;
+			}
+			pendingSearchKeysRef.current.clear();
+		}
 		setSearchCourseKeyword(restoredQuery.k || '');
 		setShowConflictCourse(restoredQuery.c ?? true);
 		setShowPlaceholder(restoredQuery.sph ?? false);
@@ -250,7 +271,16 @@ export function AdvancedSearchPage() {
 		});
 		setAcademyFilter(restoredQuery.af ? String(restoredQuery.af).split(',') : []);
 		setTimetableFilter(restoredQuery.tf || structuredClone(emptyTimetableFilter));
-	}, [restoredMetadata, restoredQuery]);
+		setResultPage(restoredPage);
+		setResultLayout(restoredLayout);
+	}, [
+		location.pathname,
+		locationKey,
+		restoredLayout,
+		restoredMetadata,
+		restoredPage,
+		restoredQuery,
+	]);
 
 	useEffect(() => {
 		if (!allCourses) return;
@@ -508,6 +538,12 @@ export function AdvancedSearchPage() {
 	]);
 	useEffect(() => {
 		if (location.pathname !== '/advanced-search') return;
+		// A route navigation can render once with the previous local state. Let the
+		// restore effect above apply the URL first, then sync from the restored state.
+		if (skipUrlSyncRef.current) {
+			skipUrlSyncRef.current = false;
+			return;
+		}
 		const q: Record<string, QueryValue | undefined> = {};
 		if (searchCourseKeyword !== '') q.k = searchCourseKeyword;
 		if (!showConflictCourse) q.c = showConflictCourse;
@@ -530,19 +566,27 @@ export function AdvancedSearchPage() {
 		if (metadataQuery.ai !== undefined) q.ai = metadataQuery.ai;
 		if (metadataQuery.sdgs !== undefined) q.sdgs = metadataQuery.sdgs as unknown as QueryValue;
 		if (metadataQuery.attrs !== undefined) q.attrs = metadataQuery.attrs;
+		const nextSearch = createSearchObject({
+			year,
+			sem,
+			d: department,
+			language: metadataQuery.language,
+			page: resultPage > 1 ? resultPage : undefined,
+			view: resultLayout === 'card' ? undefined : resultLayout,
+			...(Object.keys(q).length ? { q } : {}),
+		});
+		const nextLocationKey = createLocationKey('/advanced-search', nextSearch);
+		if (nextLocationKey === locationKey) return;
+		pendingSearchKeysRef.current.add(nextLocationKey);
 		void navigate({
 			to: '/advanced-search',
-			search: createSearchObject({
-				year,
-				sem,
-				d: department,
-				language: metadataQuery.language,
-				...(Object.keys(q).length ? { q } : {}),
-			}),
+			search: nextSearch,
 			replace: true,
+			resetScroll: false,
 		});
 	}, [
 		location.pathname,
+		locationKey,
 		navigate,
 		year,
 		sem,
@@ -560,6 +604,8 @@ export function AdvancedSearchPage() {
 		academyFilter,
 		timetableFilter,
 		courseStandardFilterEnabled,
+		resultLayout,
+		resultPage,
 	]);
 
 	function reset() {
@@ -575,6 +621,11 @@ export function AdvancedSearchPage() {
 		setCourseStandardFilter({ ...emptyStandardFilter });
 		setAcademyFilter([]);
 		setTimetableFilter(structuredClone(emptyTimetableFilter));
+		setResultPage(1);
+	}
+
+	function resetPage() {
+		setResultPage(1);
 	}
 
 	function toggleLesson(date?: string | null, slot?: string) {
@@ -617,29 +668,59 @@ export function AdvancedSearchPage() {
 		courseStandardOptions,
 		languageFilter,
 		languageOptions,
-		onKeywordChange: setSearchCourseKeyword,
-		onLanguageChange: (value) => setLanguageFilter(value === ALL_LANGUAGE_FILTER ? '' : value),
+		onKeywordChange: (value) => {
+			setSearchCourseKeyword(value);
+			resetPage();
+		},
+		onLanguageChange: (value) => {
+			setLanguageFilter(value === ALL_LANGUAGE_FILTER ? '' : value);
+			resetPage();
+		},
 		onReset: reset,
-		onToggleAi: (value) =>
+		onToggleAi: (value) => {
 			setAiFilter((items) => {
 				if (value === AI_ANY_FILTER) return items.includes(value) ? [] : [value];
 				const next = items.filter((item) => item !== AI_ANY_FILTER);
 				return toggleArrayValue(next, value);
-			}),
-		onToggleAcademy: (item) => setAcademyFilter((items) => toggleArrayValue(items, item)),
-		onToggleAttribute: (value) => setAttributeFilter((items) => toggleArrayValue(items, value)),
-		onToggleCategory: (value) => setCategoryFilter((items) => toggleArrayValue(items, value)),
-		onTogglePlaceholder: (checked) => setShowPlaceholder(Boolean(checked)),
-		onToggleSdgs: (value) =>
+			});
+			resetPage();
+		},
+		onToggleAcademy: (item) => {
+			setAcademyFilter((items) => toggleArrayValue(items, item));
+			resetPage();
+		},
+		onToggleAttribute: (value) => {
+			setAttributeFilter((items) => toggleArrayValue(items, value));
+			resetPage();
+		},
+		onToggleCategory: (value) => {
+			setCategoryFilter((items) => toggleArrayValue(items, value));
+			resetPage();
+		},
+		onTogglePlaceholder: (checked) => {
+			setShowPlaceholder(Boolean(checked));
+			resetPage();
+		},
+		onToggleSdgs: (value) => {
 			setSdgsFilter((items) =>
 				items.includes(value)
 					? items.filter((item) => item !== value)
 					: [...items, value].sort((a, b) => a - b),
-			),
-		onToggleStandard: (symbol, checked) =>
-			setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) })),
-		onToggleTimetable: toggleLesson,
-		onToggleConflict: (checked) => setShowConflictCourse(Boolean(checked)),
+			);
+			resetPage();
+		},
+		onToggleStandard: (symbol, checked) => {
+			setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) }));
+			resetPage();
+		},
+		onToggleTimetable: (date, slot) => {
+			toggleLesson(date, slot);
+			resetPage();
+		},
+		onToggleConflict: (checked) => {
+			setShowConflictCourse(Boolean(checked));
+			resetPage();
+		},
 		recommandKeyword,
 		searchCourseKeyword,
 		sdgsFilter,
@@ -648,15 +729,40 @@ export function AdvancedSearchPage() {
 		showPlaceholder,
 		sortBy,
 		timetableFilter,
-		setSortBy,
+		setSortBy: (value) => {
+			setSortBy(value);
+			resetPage();
+		},
 	};
+
+	const selectedStandards = Object.entries(courseStandardFilter)
+		.filter(([, selected]) => selected)
+		.map(([symbol]) => symbol);
+	const timetableFilterCount = Object.values(timetableFilter).reduce(
+		(sum, items) => sum + items.length,
+		0,
+	);
+	const hasActiveFilter = Boolean(
+		searchCourseKeyword.trim() ||
+		!showConflictCourse ||
+		showPlaceholder ||
+		sortBy !== 'default' ||
+		languageFilter ||
+		selectedStandards.length ||
+		categoryFilter.length ||
+		academyFilter.length ||
+		attributeFilter.length ||
+		aiFilter.length ||
+		sdgsFilter.length ||
+		timetableFilterCount,
+	);
 
 	return (
 		<div className='grid min-w-0 gap-[18px] lg:grid-cols-[340px_minmax(0,1fr)]'>
 			<aside className='hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] lg:sticky lg:top-0 lg:block lg:w-auto'>
 				<AdvancedSearchSidebarContent {...searchControlsProps} />
 			</aside>
-			<main className='min-w-0 px-3 pt-4 pb-10 lg:pt-0 lg:pr-4 lg:pb-10 lg:pl-0'>
+			<section className='min-w-0 px-3 pt-4 pb-10 lg:pt-0 lg:pr-4 lg:pb-10 lg:pl-0'>
 				<h1 className='sr-only'>搜尋課程</h1>
 				<AdvancedSearchMobileControls {...searchControlsProps} />
 				{onError ? (
@@ -677,13 +783,40 @@ export function AdvancedSearchPage() {
 						year={year}
 						sem={sem}
 						department={department}
+						page={resultPage}
+						layout={resultLayout}
+						onPageChange={setResultPage}
+						onLayoutChange={(nextLayout) => {
+							setResultLayout(nextLayout);
+							setResultPage(1);
+						}}
+						emptyState={
+							<div className='grid justify-items-center gap-2 p-5 text-center'>
+								<p className='m-0 font-semibold'>查無資料</p>
+								<p className='m-0 max-w-md text-sm opacity-70'>
+									{hasActiveFilter
+										? '目前沒有符合篩選條件的課程。'
+										: '這個資料集目前沒有可顯示的課程。'}
+								</p>
+								{hasActiveFilter ? (
+									<p className='m-0 max-w-md text-sm opacity-70'>
+										試著移除一個篩選條件，或清除全部篩選。
+									</p>
+								) : null}
+								{hasActiveFilter ? (
+									<Button className='m-0' onClick={reset}>
+										清除篩選條件
+									</Button>
+								) : null}
+							</div>
+						}
 					/>
 				)}
 				<div className='grid gap-3'>
 					<h3 className='mb-4'>贊助商廣告</h3>
 					<AdsByGoogle />
 				</div>
-			</main>
+			</section>
 		</div>
 	);
 }
@@ -781,7 +914,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 						value={props.searchCourseKeyword}
 						onChange={(event) => props.onKeywordChange(event.target.value)}
 						placeholder='搜尋課程、教師、課號、班級'
-						className='h-11 rounded-xl pr-3 pl-9 text-base'
+						className='rounded-control h-11 pr-3 pl-9 text-base'
 					/>
 				</label>
 			</div>
@@ -811,7 +944,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 					{hasActiveCondition ? (
 						<button
 							type='button'
-							className='inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-colors'
+							className='rounded-control inline-flex min-h-11 shrink-0 items-center gap-1.5 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-colors'
 							onClick={props.onReset}
 						>
 							<X className='size-4 shrink-0' />
@@ -833,7 +966,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 									<button
 										type='button'
 										aria-pressed={active}
-										className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border px-3 text-sm transition-colors ${
+										className={`rounded-control inline-flex min-h-11 shrink-0 items-center gap-1.5 border px-3 text-sm transition-colors ${
 											active
 												? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
 												: count
@@ -889,7 +1022,7 @@ function SuggestedKeywords({
 				<Button
 					key={keyword}
 					active={value === keyword}
-					className={`m-0 rounded-full px-3 ${scrollable ? 'min-h-11' : 'min-h-8 text-xs'}`}
+					className={`rounded-control m-0 px-3 ${scrollable ? 'min-h-11' : 'min-h-8 text-xs'}`}
 					onClick={() => onSelect(keyword)}
 				>
 					{keyword}
@@ -1199,4 +1332,18 @@ function safeParseJson<T>(text: string | null, fallback: T): T {
 	} catch {
 		return fallback;
 	}
+}
+
+function parsePage(value: string | null) {
+	const page = Number(value);
+	return Number.isInteger(page) && page > 0 ? page : 1;
+}
+
+function createLocationKey(pathname: string, search: unknown) {
+	const query = createSearchParams(search as Record<string, unknown>).toString();
+	return query ? `${pathname}?${query}` : pathname;
+}
+
+function parseCourseListLayout(value: string | null): CourseListLayout {
+	return value === 'table' ? 'table' : 'card';
 }

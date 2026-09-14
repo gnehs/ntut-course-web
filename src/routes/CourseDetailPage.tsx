@@ -290,8 +290,7 @@ export function CourseDetailPage() {
 				<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
 				<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
 			</section>
-			<CourseSourceLinks course={course} />
-			{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試或查看原始課綱。</Alert> : null}
+			{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
 			{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
 			{syllabus.length > 1 ? (
 				<Alert>
@@ -314,6 +313,7 @@ export function CourseDetailPage() {
 				</Alert>
 			) : null}
 			{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
+			<CourseSourceLinks course={course} />
 		</div>
 	);
 }
@@ -331,7 +331,7 @@ function InfoCard({
 }) {
 	return (
 		<section
-			className={`rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5] ${className}`}
+			className={`rounded-panel border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5] ${className}`}
 		>
 			<div>{icon}</div>
 			<div className='my-2 text-base font-semibold'>{title}</div>
@@ -361,6 +361,16 @@ function WithdrawalRateCard({
 	const withdrawalRateLabel =
 		withdrawalRate !== null ? `${formatWithdrawalRate(withdrawalRate)}%` : '無資料';
 
+	function handleTooltipClick() {
+		if (tooltipOpen) {
+			setTooltipOpen(false);
+			return;
+		}
+		// Radix closes a tooltip when its trigger is activated. Re-open on the
+		// next task so keyboard and touch activation can still inspect the help.
+		window.setTimeout(() => setTooltipOpen(true), 0);
+	}
+
 	return (
 		<TooltipProvider>
 			<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
@@ -369,8 +379,8 @@ function WithdrawalRateCard({
 						<button
 							type='button'
 							aria-label={`退選率 ${withdrawalRateLabel}${withdrawalRate !== null ? `，${classification.label}` : ''}，查看退選率說明`}
-							className='absolute inset-0 z-10 cursor-help rounded-lg border-0 bg-transparent p-0 focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
-							onClick={() => setTooltipOpen((open) => !open)}
+							className='absolute inset-0 z-10 cursor-help rounded-[inherit] border-0 bg-transparent p-0 focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
+							onClick={handleTooltipClick}
 						/>
 					</TooltipTrigger>
 					<CardTitle className='flex flex-wrap items-start justify-between gap-2'>
@@ -388,7 +398,7 @@ function WithdrawalRateCard({
 					side='bottom'
 					align='center'
 					sideOffset={8}
-					className='max-w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] p-3 text-left text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(0,0,0,var(--vs-shadow-opacity,0.16))]'
+					className='rounded-panel max-w-[min(20rem,calc(100vw-2rem))] border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] p-3 text-left text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(15,23,42,0.18)]'
 				>
 					<div className='flex flex-col gap-1'>
 						<h4 className='text-sm font-semibold'>什麼是退選率？</h4>
@@ -706,8 +716,8 @@ function CourseSourceLinks({ course }: { course: Course }) {
 	].filter((link) => link.url !== null);
 	if (!links.length) return null;
 	return (
-		<section className='flex min-w-0 flex-col gap-2'>
-			<h3>學校原始資料</h3>
+		<section className='mt-2 flex min-w-0 flex-col gap-2 border-t border-[rgba(var(--vs-text),0.1)] pt-4 text-sm text-[rgba(var(--vs-text),0.72)]'>
+			<h3 className='text-base font-medium'>學校原始資料</h3>
 			<ul className='flex flex-wrap gap-x-4 gap-y-2'>
 				{links.map((link, index) => (
 					<li key={`${link.url}-${index}`}>

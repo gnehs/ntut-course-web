@@ -9,6 +9,7 @@ import { EmptyRoomSkeleton } from '../components/ui-kit/PageSkeletons';
 import { useApp } from '../state/AppContext';
 import type { Course } from '../types/course';
 import { errorMessage } from '../lib/error';
+import { cn } from '@/lib/utils';
 
 const timetableSlots = ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D'];
 const dateEng2zh = {
@@ -143,11 +144,17 @@ export function EmptyRoomPage() {
 			) : null}
 			<Alert>請注意，此功能僅能列出表定無課程進行的教室，教室可能因其他因素，致無法使用。</Alert>
 			<h1>尋找空教室</h1>
-			<div className='flex flex-wrap items-center justify-center gap-1 py-3'>
+			<div
+				className='flex flex-wrap items-center justify-center gap-1 py-3'
+				role='group'
+				aria-label='選擇星期'
+			>
 				{Object.entries(dateEng2zh).map(([en, zh]) => (
 					<Button
 						key={en}
 						active={todayDayOfWeek === en}
+						aria-label={zh}
+						aria-pressed={todayDayOfWeek === en}
 						className='m-0'
 						onClick={() => setTodayDayOfWeek(en)}
 					>
@@ -155,10 +162,27 @@ export function EmptyRoomPage() {
 					</Button>
 				))}
 			</div>
+			<div
+				className='flex flex-wrap items-center gap-x-4 gap-y-2 text-sm opacity-80'
+				role='group'
+				aria-label='節次狀態圖例'
+			>
+				<div className='flex items-center gap-2'>
+					<span
+						aria-hidden='true'
+						className='size-3 rounded-full border border-dashed border-slate-500 bg-white'
+					/>
+					<span>空堂</span>
+				</div>
+				<div className='flex items-center gap-2'>
+					<span aria-hidden='true' className='size-3 rounded-full bg-[rgb(var(--vs-danger))]' />
+					<span>有課程</span>
+				</div>
+			</div>
 			<div className='space-y-4'>
 				{categoryList.map((category) => (
 					<section key={category}>
-						<h3>{category}</h3>
+						<h2>{category}</h2>
 						<div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
 							{roomList
 								.filter((room) => room.category === category)
@@ -170,6 +194,7 @@ export function EmptyRoomPage() {
 										tabIndex={0}
 										aria-haspopup='dialog'
 										aria-label={`查看「${room.name}」詳細上課資訊`}
+										aria-describedby={`empty-room-status-${encodeURIComponent(room.name)}`}
 										onClick={() => {
 											setEmptyroomDetailRoomName(room.name);
 										}}
@@ -184,12 +209,29 @@ export function EmptyRoomPage() {
 											{timetableSlots.map((slot) => (
 												<div
 													key={slot}
-													className={`flex h-5 w-5 items-center justify-center rounded-full text-xs ${room.timetable.includes(slot) ? 'bg-black/10' : 'bg-red-600 text-white'}`}
+													role='img'
+													aria-label={`${slot}，${room.timetable.includes(slot) ? '空堂' : '有課程'}`}
+													className={cn(
+														'flex size-5 items-center justify-center rounded-full border text-xs',
+														room.timetable.includes(slot)
+															? 'border-dashed border-slate-500 bg-white text-slate-700'
+															: 'border-transparent bg-[rgb(var(--vs-danger))] text-[rgb(var(--vs-primary-foreground))]',
+													)}
 												>
-													{slot}
+													<span aria-hidden='true'>{slot}</span>
 												</div>
 											))}
 										</div>
+										<span
+											id={`empty-room-status-${encodeURIComponent(room.name)}`}
+											className='sr-only'
+										>
+											{timetableSlots
+												.map(
+													(slot) => `${slot} ${room.timetable.includes(slot) ? '空堂' : '有課程'}`,
+												)
+												.join('、')}
+										</span>
 									</Card>
 								))}
 						</div>
@@ -202,15 +244,14 @@ export function EmptyRoomPage() {
 				onClose={() => setEmptyroomDetailRoomName(null)}
 				footer={
 					resolveRoomSourceUrl(emptyroomDetailData?.link) ? (
-						<Button
-							as='a'
+						<a
 							href={resolveRoomSourceUrl(emptyroomDetailData?.link) || undefined}
 							target='_blank'
 							rel='noreferrer'
-							className='m-0'
+							className='text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
 						>
-							到北科課程網站查看
-						</Button>
+							學校原始資料
+						</a>
 					) : null
 				}
 			>

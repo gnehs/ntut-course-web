@@ -1,17 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type React from 'react';
 import { Link } from '@tanstack/react-router';
 import {
 	BadgeQuestionMark,
 	Calendar,
 	CalendarDays,
 	Check,
+	ClipboardPaste,
+	Download,
 	GitCommit,
 	Loader,
 	RefreshCw,
+	Upload,
 } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
+import { Card } from '../components/ui-kit/Card';
+import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StatusSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Textarea } from '../components/ui-kit/Textarea';
+import {
+	createMyCourseBackup,
+	mergeMyCourseBackup,
+	parseMyCourseBackup,
+	serializeMyCourseBackup,
+	summarizeMyCourseBackup,
+	type ParsedMyCourseBackup,
+} from '../lib/myCourseImport';
 import { cleanStore } from '../lib/storage';
 import type { WorkflowRun } from '../types/course';
 
@@ -474,13 +489,234 @@ export function NotFoundPage() {
 
 export function SettingsPage() {
 	const [done, setDone] = useState(false);
+	const [backupError, setBackupError] = useState<string | null>(null);
+	const [backupMessage, setBackupMessage] = useState<string | null>(null);
+	const [pendingBackup, setPendingBackup] = useState<ParsedMyCourseBackup | null>(null);
+	const [pendingSource, setPendingSource] = useState('');
+	const [pasteOpen, setPasteOpen] = useState(false);
+	const [pasteValue, setPasteValue] = useState('');
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const backupReadIdRef = useRef(0);
+
 	async function clear() {
 		await cleanStore();
 		setDone(true);
 	}
+
+	function stageBackup(raw: string, source: string) {
+		backupReadIdRef.current += 1;
+		try {
+			const parsed = parseMyCourseBackup(raw);
+			setPendingBackup(parsed);
+			setPendingSource(source);
+			setBackupError(null);
+			setBackupMessage(null);
+			setPasteOpen(false);
+		} catch (error) {
+			setPendingBackup(null);
+			setBackupError(error instanceof Error ? error.message : '備份資料格式無效');
+		}
+	}
+
+	function clearPendingBackup() {
+		backupReadIdRef.current += 1;
+		setPendingBackup(null);
+		setPendingSource('');
+	}
+
+	function togglePastePanel() {
+		if (!pasteOpen) {
+			clearPendingBackup();
+			setBackupError(null);
+			setBackupMessage(null);
+		}
+		setPasteOpen((value) => !value);
+	}
+
+	function readFileText(file: File) {
+		return new Promise<string>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => {
+				if (typeof reader.result === 'string') resolve(reader.result);
+				else reject(new Error('無法讀取備份檔'));
+			};
+			reader.onerror = () => reject(new Error('無法讀取備份檔'));
+			reader.readAsText(file);
+		});
+	}
+
+	function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+		const file = event.currentTarget.files?.[0];
+		event.currentTarget.value = '';
+		const readId = backupReadIdRef.current + 1;
+		backupReadIdRef.current = readId;
+		setPendingBackup(null);
+		setPendingSource('');
+		setBackupError(null);
+		setBackupMessage(null);
+		if (!file) return;
+		if (file.size > 5 * 1024 * 1024) {
+			setBackupError('備份檔過大，請選擇 5 MB 以下的 JSON 檔案');
+			return;
+		}
+		void readFileText(file)
+			.then((raw) => {
+				if (readId !== backupReadIdRef.current) return;
+				stageBackup(raw, file.name);
+			})
+			.catch((error) => {
+				if (readId !== backupReadIdRef.current) return;
+				setBackupError(error instanceof Error ? error.message : '無法讀取備份檔');
+			});
+	}
+
+	function exportBackup() {
+		try {
+			const payload = createMyCourseBackup();
+			const blob = new Blob([serializeMyCourseBackup(payload)], {
+				type: 'application/json;charset=utf-8',
+			});
+			const url = URL.createObjectURL(blob);
+			const anchor = document.createElement('a');
+			anchor.href = url;
+			anchor.download = `ntut-course-my-course-${new Date().toISOString().slice(0, 10)}.json`;
+			anchor.style.display = 'none';
+			document.body.append(anchor);
+			anchor.click();
+			anchor.remove();
+			window.setTimeout(() => URL.revokeObjectURL(url), 0);
+			setBackupError(null);
+			setBackupMessage(`已下載全部學期的我的課程備份（${payload.courses.length} 組課程資料）。`);
+		} catch (error) {
+			setBackupError(error instanceof Error ? error.message : '備份資料無法匯出');
+		}
+	}
+
+	function applyBackup() {
+		if (!pendingBackup) return;
+		try {
+			const result = mergeMyCourseBackup(pendingBackup);
+			const conflictCount = result.classConflictCount + result.mprogramConflictCount;
+			const conflictMessage = conflictCount ? `，保留 ${conflictCount} 筆現有選擇` : '';
+			setBackupMessage(
+				`匯入完成：新增 ${result.addedCourseCount} 門課程，涵蓋 ${result.termSummaries.length} 個學期${conflictMessage}。`,
+			);
+			setBackupError(null);
+			setPendingBackup(null);
+			setPendingSource('');
+		} catch (error) {
+			setBackupError(error instanceof Error ? error.message : '匯入失敗，原有資料未變更');
+		}
+	}
+
+	const summaries = pendingBackup ? summarizeMyCourseBackup(pendingBackup) : [];
+
 	return (
 		<div className='space-y-4'>
 			<h1>設定</h1>
+			<section
+				aria-labelledby='my-course-backup-title'
+				className='rounded-panel space-y-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-text))]'
+			>
+				<div>
+					<h2 id='my-course-backup-title' className='mb-1'>
+						我的課程備份
+					</h2>
+					<p className='m-0'>匯出或匯入所有學期、學制的課程、班級與微學程選擇。</p>
+				</div>
+				<div className='flex flex-wrap gap-2'>
+					<Button onClick={exportBackup}>
+						<Download className='size-4' />
+						下載全部學期
+					</Button>
+					<Button onClick={() => fileInputRef.current?.click()}>
+						<Upload className='size-4' />
+						選擇備份檔
+					</Button>
+					<Button onClick={togglePastePanel}>
+						<ClipboardPaste className='size-4' />
+						貼上舊版資料
+					</Button>
+					<input
+						ref={fileInputRef}
+						hidden
+						type='file'
+						accept='.json,application/json'
+						onChange={handleFileChange}
+					/>
+				</div>
+				{pasteOpen ? (
+					<Card className='space-y-3 p-4'>
+						<div>
+							<label htmlFor='legacy-backup-data' className='font-medium'>
+								貼上舊版單學期備份內容
+							</label>
+							<p className='mt-1 mb-0 text-sm opacity-75'>
+								只會在你確認匯入後合併，不會直接覆蓋現有課程。
+							</p>
+						</div>
+						<Textarea
+							id='legacy-backup-data'
+							value={pasteValue}
+							onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+								setPasteValue(event.currentTarget.value);
+								clearPendingBackup();
+								setBackupError(null);
+								setBackupMessage(null);
+							}}
+							placeholder='請貼上舊版匯出資料'
+						/>
+						<div className='flex flex-wrap gap-2'>
+							<Button
+								primary
+								disabled={!pasteValue.trim()}
+								onClick={() => stageBackup(pasteValue, '貼上的舊版資料')}
+							>
+								檢查資料
+							</Button>
+							<Button onClick={() => setPasteOpen(false)}>取消</Button>
+						</div>
+					</Card>
+				) : null}
+				{backupError ? (
+					<Alert danger>
+						<strong>備份操作失敗</strong>
+						<p className='m-0 mt-1'>{backupError}</p>
+					</Alert>
+				) : null}
+				{backupMessage ? <Alert>{backupMessage}</Alert> : null}
+				{pendingBackup ? (
+					<Card className='space-y-3 p-4'>
+						<div>
+							<CardTitle>確認匯入</CardTitle>
+							<p className='m-0 text-sm opacity-75'>來源：{pendingSource}</p>
+						</div>
+						<p className='m-0'>
+							共 {pendingBackup.semesterCount} 個學期、{pendingBackup.courseCount}{' '}
+							門課程，匯入時會合併現有收藏。
+						</p>
+						<ul className='m-0 list-disc space-y-1 pl-5'>
+							{summaries.map((summary) => (
+								<li key={`${summary.year}-${summary.sem}`}>
+									{summary.year} 年{summary.sem === '1' ? '上' : '下'}學期：{summary.courseCount}{' '}
+									門課程
+									{summary.classCount ? `、${summary.classCount} 個班級` : ''}
+									{summary.mprogramCount ? `、${summary.mprogramCount} 個微學程` : ''}
+								</li>
+							))}
+						</ul>
+						{pendingBackup.legacy ? (
+							<p className='m-0 text-sm opacity-75'>這是舊版單學期格式，確認後會與目前資料合併。</p>
+						) : null}
+						<div className='flex flex-wrap gap-2'>
+							<Button primary onClick={applyBackup}>
+								確認匯入
+							</Button>
+							<Button onClick={clearPendingBackup}>取消</Button>
+						</div>
+					</Card>
+				) : null}
+			</section>
 			<Alert>
 				<strong>快取資料</strong>
 				<br />

@@ -1,5 +1,21 @@
 @import 'tailwindcss';
 
+/* A compact shared radius scale for controls and their surrounding surfaces. */
+@theme inline {
+	--radius-sm: calc(var(--radius) * 0.5);
+	--radius-md: calc(var(--radius) * 0.75);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.5);
+	--radius-2xl: calc(var(--radius) * 2);
+	--radius-3xl: calc(var(--radius) * 2.5);
+	--radius-4xl: calc(var(--radius) * 3);
+	--radius-control: var(--radius);
+	--radius-popover: calc(var(--radius) * 2);
+	--radius-panel: calc(var(--radius) * 2);
+	--radius-surface: calc(var(--radius) * 2);
+	--radius-overlay: calc(var(--radius) * 3);
+}
+
 /* Defaults stay below utilities so each page can set its own type scale and spacing. */
 @layer components {
 	.content-surface :where(h1, h2, h3, h4, h5, h6) {
@@ -40,6 +56,7 @@
 }
 
 :root {
+	--radius: 0.25rem;
 	--vs-primary: 25, 91, 255;
 	--vs-primary-foreground: 255, 255, 255;
 	--vs-text: 44, 62, 80;
@@ -131,5 +148,16 @@
 	[data-slot='dialog-overlay'][data-state],
 	[data-slot='dialog-content'][data-state] {
 		animation: none;
+	}
+
+	.animate-pulse,
+	.animate-spin {
+		animation: none !important;
+	}
+
+	[data-search-results],
+	[data-search-results] * {
+		transition-duration: 0ms !important;
+		transition-delay: 0ms !important;
 	}
 }

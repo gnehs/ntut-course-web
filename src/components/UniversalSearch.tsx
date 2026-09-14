@@ -60,8 +60,8 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 
 	useEffect(() => {
 		if (currentSelectionIndex < 0) return;
-		const activeNode = document.querySelector('[data-search-results] [data-active=\"true\"]');
-		activeNode?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+		const activeNode = resultsRef.current?.querySelector('[data-active="true"]');
+		activeNode?.scrollIntoView?.({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
 	}, [currentSelectionIndex]);
 
 	useEffect(() => {
@@ -122,7 +122,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 		>
 			<div
 				className={cn(
-					'flex rounded-lg border transition-all duration-200',
+					'rounded-control flex border transition-[background-color,border-color,box-shadow] duration-200',
 					focused
 						? 'border-[rgba(var(--vs-gray-2),1)] bg-[rgb(var(--vs-gray-1))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
 						: 'border-transparent bg-[rgba(var(--vs-text),0.1)] hover:bg-[rgba(var(--vs-text),0.05)]',
@@ -133,6 +133,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					ref={inputRef}
 					type='text'
 					role='combobox'
+					aria-label='搜尋課程、教師、課號、班級'
 					aria-autocomplete='list'
 					aria-expanded={focused && items.length > 0}
 					aria-controls={resultsId}
@@ -160,7 +161,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					type='button'
 					aria-label={input ? '清除搜尋' : '搜尋'}
 					className={cn(
-						'flex shrink-0 items-center justify-center text-[rgba(var(--vs-text),0.8)] transition-all duration-200 hover:text-[rgb(var(--vs-text))]',
+						'flex shrink-0 items-center justify-center text-[rgba(var(--vs-text),0.8)] transition-colors duration-200 hover:text-[rgb(var(--vs-text))]',
 						navbar ? 'px-3 py-2' : 'px-4 py-3',
 					)}
 					onClick={() => {
@@ -174,7 +175,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					{input ? (
 						<X className='text-2xl' />
 					) : loading ? (
-						<Loader className='animate-spin text-2xl' />
+						<Loader aria-hidden='true' className='animate-spin text-2xl' />
 					) : (
 						<Search className='text-2xl' />
 					)}
@@ -187,7 +188,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				role='listbox'
 				aria-label='搜尋建議'
 				className={cn(
-					'absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto rounded-lg bg-[rgb(var(--vs-background))] shadow-[0_20px_20px_0_rgba(0,0,0,var(--vs-background-opacity,0.02))] transition-all duration-200',
+					'rounded-surface absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] shadow-[0_16px_40px_rgba(var(--vs-text),0.16)] transition-[opacity,transform] duration-200',
 					focused
 						? 'pointer-events-auto opacity-100'
 						: 'pointer-events-none -translate-y-2 opacity-0',

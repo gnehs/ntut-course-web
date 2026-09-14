@@ -95,41 +95,49 @@ export function HomePage() {
 			<div className='grid gap-3'>
 				<button
 					type='button'
-					className='inline-flex w-fit items-center rounded-full border border-[rgba(var(--vs-text),0.25)] px-3 py-1 text-sm text-[rgba(var(--vs-text),0.75)] transition-colors hover:bg-[rgba(var(--vs-text),0.05)]'
+					className='rounded-control inline-flex min-h-11 w-fit items-center border border-[rgba(var(--vs-text),0.25)] px-3 py-1 text-sm text-[rgba(var(--vs-text),0.75)] transition-colors hover:bg-[rgba(var(--vs-text),0.05)]'
 					onClick={() => setDatasetDialogOpen(true)}
 				>
 					{displayDepartment(dataset.department)}
 				</button>
-				<div className='text-[32px] leading-tight font-semibold'>
+				<h1 className='m-0 text-[clamp(1.75rem,4vw,2rem)] leading-tight font-semibold'>
 					{dataset.year} 年{dataset.sem === '1' ? '上' : '下'}學期
-				</div>
+				</h1>
 			</div>
 			<UniversalSearch className='block md:hidden' />
+			<section aria-label='常用功能' className='grid gap-3 md:grid-cols-3'>
+				{[
+					{
+						to: `/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`,
+						title: '搜尋',
+						text: '找課程、教師與上課時段',
+						icon: Search,
+					},
+					{ to: '/my-course', title: '我的課程', text: '整理收藏，檢查課表是否衝堂', icon: User },
+					{ to: '/class', title: '班級課表', text: '從班級開始安排這學期', icon: Clock },
+				].map(({ to, title, text, icon: Icon }) => (
+					<Card key={to} to={to} className='flex items-center gap-4 p-4 md:flex-col md:items-start'>
+						<span className='rounded-control grid size-11 shrink-0 place-items-center bg-[rgba(var(--vs-primary),0.12)] text-[rgb(var(--vs-primary))]'>
+							<Icon className='size-5' aria-hidden='true' />
+						</span>
+						<div className='grid min-w-0 gap-1'>
+							<h2 className='m-0 text-xl font-semibold'>{title}</h2>
+							<p>{text}</p>
+						</div>
+					</Card>
+				))}
+			</section>
 			<UpcomingCourse />
-			<PageSection title='課程'>
+			<PageSection title='探索課程'>
 				<HomeCardGrid
 					items={[
-						{
-							to: `/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`,
-							title: '搜尋',
-							text: '依條件搜尋課程',
-							icon: Search,
-						},
-						{ to: '/class', title: '班級課表', text: '查看各班上課時間表', icon: Clock },
 						{ to: '/program', title: '一般學程', text: '查看學程規劃與開課課程', icon: BookOpen },
-						{
-							to: `/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${encodeURIComponent(dataset.department)}&language=English`,
-							title: '英語授課',
-							text: '尋找以英語授課的課程',
-							icon: Search,
-						},
 						{
 							to: '/mprogram',
 							title: '微學程',
 							text: '查詢微學程課程',
 							icon: BookOpen,
 						},
-						{ to: '/my-course', title: '我的課程', text: '查看已儲存的課程', icon: User },
 					]}
 				/>
 			</PageSection>
@@ -260,7 +268,7 @@ function HomeCard({
 		<Card className='px-4 py-3' to={item.to}>
 			<CardTitle>{item.title}</CardTitle>
 			<p>{item.text}</p>
-			<Icon data-card-icon />
+			<Icon data-card-icon aria-hidden='true' />
 		</Card>
 	);
 }

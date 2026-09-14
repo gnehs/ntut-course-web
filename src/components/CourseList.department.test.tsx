@@ -80,3 +80,29 @@ it('refreshes external bulk saves and notifies the parent of single-course chang
 	expect(onSavedChange).toHaveBeenCalledOnce();
 	expect(mocks.removeCourse).toHaveBeenCalledWith('101', '115', '1', 'main');
 });
+
+it('keeps a controlled page when the initial course data is rendered', () => {
+	const courses = Array.from({ length: 55 }, (_, index) => ({
+		...course,
+		id: String(index + 1),
+		code: `A${index + 1}`,
+		name: { zh: `課程 ${index + 1}` },
+	}));
+
+	render(<CourseList courses={courses} page={2} onPageChange={vi.fn()} />);
+
+	expect(screen.getByRole('link', { name: /查看.*課程 55/ })).toBeInTheDocument();
+	expect(screen.queryByRole('link', { name: /查看.*課程 1/ })).not.toBeInTheDocument();
+});
+
+it('shows the empty state after hiding asynchronously detected conflicts', async () => {
+	const conflictingCourse = { ...course, time: { mon: ['1'] } };
+	const savedCourse = { ...course, id: '202', time: { mon: ['1'] } };
+	mocks.getMyCourseIds.mockReturnValue(['202']);
+	mocks.getCourses.mockResolvedValue([savedCourse]);
+
+	render(<CourseList courses={[conflictingCourse]} showConflictCourse={false} />);
+
+	await waitFor(() => expect(screen.getByText('查無資料')).toBeInTheDocument());
+	expect(screen.queryByRole('button', { name: '加入我的課程' })).not.toBeInTheDocument();
+});
