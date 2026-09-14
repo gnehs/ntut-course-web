@@ -2,14 +2,14 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
-import { Check, Minus, Plus, X } from 'lucide-react';
+import { Check, Minus, Plus, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
-import { CardGridSkeleton, ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Skeleton } from '../components/ui/skeleton';
 import { fetchCourse, fetchMicroPrograms } from '../lib/courseApi';
 import { usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
@@ -21,6 +21,7 @@ export function MProgramIndexPage() {
 	const [programs, setPrograms] = useState<MicroProgram[] | null>(null);
 	const [filter, setFilter] = useState('');
 	const [error, setError] = useState<unknown>(null);
+	usePageTitle('微學程');
 
 	useEffect(() => {
 		let cancelled = false;
@@ -42,50 +43,78 @@ export function MProgramIndexPage() {
 	}, [dataset.year, dataset.sem]);
 
 	const filteredPrograms = useMemo(() => {
-		const value = filter.trim();
-		if (!value) return programs || [];
-		return (programs || []).filter(
-			(program) => program.name.includes(value) || program.id.includes(value),
+		const keyword = filter.trim().toLocaleLowerCase();
+		if (!keyword) return programs || [];
+		return (programs || []).filter((program) =>
+			[program.id, program.name].some((value) =>
+				String(value).toLocaleLowerCase().includes(keyword),
+			),
 		);
 	}, [programs, filter]);
 
-	if (!programs)
-		return (
-			<div>
-				<h1>選擇微學程</h1>
-				<div className='grid gap-3 sm:grid-cols-1 lg:grid-cols-4'>
-					<Card>
-						<p>輸入關鍵字來篩選</p>
-						<Input value={filter} onChange={(event) => setFilter(event.target.value)} />
-					</Card>
-				</div>
-				<CardGridSkeleton count={10} />
-			</div>
-		);
+	if (!programs) return <MProgramIndexSkeleton />;
+
 	return (
-		<div className='space-y-4'>
-			<h1>選擇微學程</h1>
-			<Input
-				value={filter}
-				onChange={(event) => setFilter(event.target.value)}
-				placeholder='輸入關鍵字來篩選...'
-			/>
+		<div className='flex flex-col gap-4'>
+			<div>
+				<h1>微學程</h1>
+				<p className='m-0 text-sm opacity-70'>
+					{dataset.year} 年第 {dataset.sem === '1' ? '一' : '二'} 學期
+				</p>
+			</div>
+
+			<div className='relative'>
+				<Search className='pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 opacity-50' />
+				<Input
+					value={filter}
+					onChange={(event) => setFilter(event.target.value)}
+					placeholder='搜尋學程名稱或代碼'
+					aria-label='搜尋微學程'
+					className='pl-10'
+				/>
+			</div>
+
 			{error ? (
 				<Alert danger>
-					<strong>搜尋時發生了錯誤</strong>
-					<pre>{errorMessage(error)}</pre>
+					<strong>微學程資料載入失敗</strong>
+					<p className='mt-1 mb-0 text-sm'>{errorMessage(error)}</p>
 				</Alert>
 			) : null}
-			<div className='grid gap-3 sm:grid-cols-3 lg:grid-cols-5'>
+
+			{!error && !filteredPrograms.length ? (
+				<Alert>{filter.trim() ? '沒有符合的微學程。' : '本學期目前沒有微學程資料。'}</Alert>
+			) : null}
+
+			<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
 				{filteredPrograms.map((program) => (
 					<Card
-						className='cursor-pointer p-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
 						key={program.id}
+						className='flex flex-col gap-2 px-4 py-3 transition-transform duration-200 hover:-translate-y-1'
 						to={`/mprogram/${dataset.year}/${dataset.sem}/${program.id}`}
 					>
-						<p>{program.id}</p>
+						<p className='font-mono text-xs opacity-65'>{program.id}</p>
 						<CardTitle>{program.name}</CardTitle>
+						<p className='mt-auto text-sm opacity-65'>
+							{(program.course || program.courses || []).length} 門課程
+						</p>
 					</Card>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function MProgramIndexSkeleton() {
+	return (
+		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入微學程'>
+			<div className='flex flex-col gap-2'>
+				<Skeleton className='h-8 w-32' />
+				<Skeleton className='h-4 w-48' />
+			</div>
+			<Skeleton className='h-11 w-full' />
+			<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+				{Array.from({ length: 6 }, (_, index) => (
+					<Skeleton key={index} className='h-32 w-full' />
 				))}
 			</div>
 		</div>
@@ -162,31 +191,34 @@ export function MProgramDetailPage() {
 		setVersion((value) => value + 1);
 	}
 
-	if (!courses) return <ClassDetailSkeleton />;
+	if (!courses) return <MProgramDetailSkeleton />;
 	return (
-		<div className='space-y-4'>
-			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+		<div className='flex flex-col gap-4'>
+			<div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
 				<div>
+					<p className='m-0 font-mono text-sm opacity-65'>{id}</p>
 					<h1>{programName}</h1>
-					<p className='m-0 text-sm opacity-75'>{courses.length} 門課程</p>
 				</div>
+			</div>
+
+			<div className='flex flex-wrap items-center justify-between gap-3'>
+				<p className='m-0 text-sm opacity-70'>找到 {courses.length} 門課程</p>
 				<div className='flex flex-wrap items-center gap-2 sm:justify-end'>
 					<Button
 						active={showConflictCourse}
 						aria-pressed={showConflictCourse}
-						className='min-h-11 px-4 text-sm'
 						onClick={() => setShowConflictCourse((value) => !value)}
 					>
 						{showConflictCourse ? <Check className='size-4' /> : <X className='size-4' />}
 						衝堂課程
 					</Button>
 					{!isInMyCourse ? (
-						<Button primary className='min-h-11 px-4 text-sm' onClick={addProgramCourses}>
+						<Button primary onClick={addProgramCourses}>
 							<Plus className='size-4' />
 							加入我的課程
 						</Button>
 					) : (
-						<Button danger className='min-h-11 px-4 text-sm' onClick={removeProgramCourses}>
+						<Button danger onClick={removeProgramCourses}>
 							<Minus className='size-4' />
 							從我的課程移除
 						</Button>
@@ -195,20 +227,18 @@ export function MProgramDetailPage() {
 			</div>
 			{error ? (
 				<Alert danger>
-					<strong>擷取資料時發生了錯誤</strong>
-					<pre>{errorMessage(error)}</pre>
+					<strong>微學程資料載入失敗</strong>
+					<p className='mt-1 mb-0 text-sm'>{errorMessage(error)}</p>
 				</Alert>
 			) : null}
 			{courses.length ? (
-				<div className='[&>div>div:first-child_button]:min-h-11 [&>div>div:first-child_button]:px-4 [&>div>div:first-child_button]:text-sm'>
-					<CourseList
-						courses={courses}
-						showTimetable
-						showConflictCourse={showConflictCourse}
-						year={year}
-						sem={sem}
-					/>
-				</div>
+				<CourseList
+					courses={courses}
+					showTimetable
+					showConflictCourse={showConflictCourse}
+					year={year}
+					sem={sem}
+				/>
 			) : null}
 			{!courses.length && program ? (
 				<Alert>
@@ -228,8 +258,38 @@ export function MProgramDetailPage() {
 					) : null}
 				</Alert>
 			) : null}
-			<h3>贊助商廣告</h3>
-			<AdsByGoogle />
+			<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+				<h3 className='m-0'>贊助商廣告</h3>
+				<AdsByGoogle />
+			</section>
+		</div>
+	);
+}
+
+function MProgramDetailSkeleton() {
+	return (
+		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入微學程'>
+			<div className='flex flex-col gap-2'>
+				<Skeleton className='h-4 w-24' />
+				<Skeleton className='h-8 w-64 max-w-full' />
+			</div>
+			<div className='flex flex-wrap items-center justify-between gap-3'>
+				<Skeleton className='h-4 w-28' />
+				<div className='flex gap-2'>
+					<Skeleton className='h-11 w-24' />
+					<Skeleton className='h-11 w-32' />
+				</div>
+			</div>
+			<div className='flex justify-center gap-1 py-4'>
+				<Skeleton className='h-9 w-20' />
+				<Skeleton className='h-9 w-20' />
+				<Skeleton className='h-9 w-20' />
+			</div>
+			<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
+				{Array.from({ length: 6 }, (_, index) => (
+					<Skeleton key={index} className='h-48 w-full' />
+				))}
+			</div>
 		</div>
 	);
 }
