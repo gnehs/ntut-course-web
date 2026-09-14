@@ -53,9 +53,20 @@ describe('dataset dialog', () => {
 		fixtures.error = null;
 		fixtures.loadingDataset = false;
 		fixtures.dataset = { year: '115', sem: '1', department: 'main' };
+		fixtures.location.pathname = '/advanced-search';
 		fixtures.location.search.year = '114';
 		fixtures.location.search.sem = '2';
 		Element.prototype.scrollIntoView = vi.fn();
+	});
+
+	it.each(['/', '/program'])('opens the shared semester picker on %s', async (pathname) => {
+		const user = userEvent.setup();
+		fixtures.location.pathname = pathname;
+		render(<Layout />);
+
+		await user.click(screen.getByRole('button', { name: '115 年上學期' }));
+		expect(screen.getByRole('dialog', { name: '選擇學期與學制' })).toBeInTheDocument();
+		expect(screen.getByRole('combobox', { name: '學期' })).toHaveTextContent('115 年上學期');
 	});
 
 	it('opens the query semester and discards a cancelled draft on reopening', async () => {

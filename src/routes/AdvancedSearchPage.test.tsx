@@ -79,7 +79,7 @@ describe('AdvancedSearchPage navigation', () => {
 		await user.click(await screen.findByRole('link', { name: /北科課程好朋友/ }));
 
 		await waitFor(() => expect(router.state.location.pathname).toBe('/'));
-		expect(await screen.findByText('實用')).toBeInTheDocument();
+		expect(await screen.findByText('探索與規劃')).toBeInTheDocument();
 	});
 
 	it('keeps the URL valid when filter options change', async () => {
