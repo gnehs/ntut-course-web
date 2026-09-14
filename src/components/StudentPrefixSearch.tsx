@@ -14,7 +14,7 @@ type StudentPrefixSearchProps = {
 	onSelect: (selection: Selection) => void;
 };
 
-const FORMAT_HINT = '格式：入學年度加兩碼系所代碼，例如 109ab';
+const FORMAT_HINT = '格式：先輸入入學年度，例如 109；再輸入一至兩碼系所前綴，例如 109a、109ab';
 
 export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProps) {
 	const inputRef = useRef<HTMLInputElement | null>(null);
@@ -151,27 +151,31 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 		if (!input.trim()) {
 			return (
 				<div className='flex flex-col gap-1 px-4 py-3 text-sm opacity-75'>
-					<span>輸入學號前綴即可尋找課程標準。</span>
-					<span className='text-xs'>僅需前綴，例如 109ab；不會送出完整學號。</span>
+					<span>輸入入學年度或學號前綴即可尋找課程標準。</span>
+					<span className='text-xs'>
+						先輸入年度，例如 109；再輸入系所前綴，例如 109ab。不必輸入完整學號。
+					</span>
 				</div>
 			);
 		}
 		if (!parsed) return <div className='px-4 py-3 text-sm opacity-75'>{FORMAT_HINT}</div>;
 		if (!yearAvailable) {
-			return <div className='px-4 py-3 text-sm opacity-75'>這個入學年度目前沒有可查詢資料。</div>;
+			return <div className='px-4 py-3 text-sm opacity-75'>{year} 年目前沒有可查詢資料。</div>;
 		}
 		if (loadingYear === year) {
 			return (
 				<div className='flex items-center gap-2 px-4 py-3 text-sm opacity-75' role='status'>
 					<Loader aria-hidden='true' className='size-4 animate-spin' />
-					載入 {year} 年的系所選項…
+					載入 {year} 年的系所建議…
 				</div>
 			);
 		}
 		if (errorYear === year) {
 			return (
 				<div className='flex items-center justify-between gap-3 px-4 py-3 text-sm'>
-					<span className='text-[rgb(var(--vs-danger))]'>系所資料載入失敗，請再試一次。</span>
+					<span className='text-[rgb(var(--vs-danger))]'>
+						載入 {year} 年的系所建議失敗，請再試一次。
+					</span>
 					<Button
 						className='shrink-0 px-2 py-1 text-xs'
 						onClick={() => {
@@ -187,7 +191,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 			);
 		}
 		if (!loadedDepartments || loadedDepartments.year !== year) return null;
-		return <div className='px-4 py-3 text-sm opacity-75'>找不到符合的系所前綴。</div>;
+		return <div className='px-4 py-3 text-sm opacity-75'>找不到符合的系所建議。</div>;
 	}
 
 	return (
@@ -209,7 +213,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 		>
 			<div
 				className={cn(
-					'rounded-control flex border transition-[background-color,border-color,box-shadow] duration-200',
+					'rounded-surface flex border transition-[background-color,border-color,box-shadow] duration-200',
 					focused
 						? 'border-[rgba(var(--vs-gray-2),1)] bg-[rgb(var(--vs-gray-1))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
 						: 'border-transparent bg-[rgba(var(--vs-text),0.1)] hover:bg-[rgba(var(--vs-text),0.05)]',
@@ -219,7 +223,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 				<Input
 					ref={inputRef}
 					role='combobox'
-					aria-label='依學號前綴尋找課程標準'
+					aria-label='依入學年度或學號前綴尋找課程標準'
 					aria-describedby={`${searchId}-hint`}
 					aria-autocomplete='list'
 					aria-expanded={focused}
@@ -227,7 +231,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 					aria-activedescendant={
 						currentSelectionIndex >= 0 ? `${resultsId}-item-${currentSelectionIndex}` : undefined
 					}
-					placeholder='輸入學號前綴，例如 109ab'
+					placeholder='輸入入學年度或學號前綴，例如 109、109ab'
 					autoComplete='off'
 					value={input}
 					onFocus={() => {
@@ -242,11 +246,11 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 					}}
 					onKeyDown={onKeyDown}
 					onMouseEnter={() => setCurrentSelectionIndex(-1)}
-					className='min-w-0 flex-1 rounded-none border-0 bg-transparent px-3 py-3 shadow-none focus:border-0 focus-visible:ring-0'
+					className='rounded-surface min-w-0 flex-1 border-0 bg-transparent px-3 py-3 shadow-none focus:border-0 focus-visible:ring-0'
 				/>
 				<button
 					type='button'
-					aria-label={input ? '清除學號前綴' : '搜尋學號前綴'}
+					aria-label={input ? '清除入學年度或學號前綴' : '搜尋入學年度或學號前綴'}
 					className='flex shrink-0 items-center justify-center px-3 text-[rgba(var(--vs-text),0.8)] transition-colors duration-200 hover:text-[rgb(var(--vs-text))]'
 					onClick={() => {
 						if (!input) {
@@ -262,16 +266,16 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 				</button>
 			</div>
 			<p id={`${searchId}-hint`} className='sr-only'>
-				僅需輸入學號前綴，不必輸入完整學號。
+				可先輸入入學年度，再輸入學號前綴；不必輸入完整學號。
 			</p>
 			<div
 				id={resultsId}
 				ref={resultsRef}
 				role='listbox'
-				aria-label='學號前綴搜尋結果'
+				aria-label='入學年度或學號前綴搜尋結果'
 				aria-busy={loadingYear === year}
 				className={cn(
-					'rounded-control absolute top-full right-0 left-0 z-[999] mt-1 max-h-[360px] overflow-y-auto border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] shadow-[0_16px_40px_rgba(var(--vs-text),0.16)] transition-[opacity,transform] duration-200',
+					'rounded-surface absolute top-full right-0 left-0 z-[999] mt-1 max-h-[360px] overflow-y-auto border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] shadow-[0_16px_40px_rgba(var(--vs-text),0.16)] transition-[opacity,transform] duration-200',
 					focused
 						? 'pointer-events-auto opacity-100'
 						: 'pointer-events-none -translate-y-2 opacity-0',

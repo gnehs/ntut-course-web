@@ -1,6 +1,7 @@
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from '../components/ui-kit/Alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons';
@@ -127,9 +128,7 @@ export function StandardPage() {
 		<div className='flex flex-col gap-4'>
 			<div className='flex flex-col gap-1'>
 				<h1>課程標準</h1>
-				<p className='m-0 text-sm opacity-70'>
-					選擇入學年度、學制與科系，查看該科系的課程規劃與畢業學分要求
-				</p>
+				<p className='m-0 text-sm opacity-70'>輸入入學年度或學號前綴，查看課程規劃與畢業學分要求</p>
 			</div>
 
 			{error ? (
@@ -141,78 +140,99 @@ export function StandardPage() {
 
 			{!years ? <StandardPickerSkeleton /> : null}
 
-			{years ? <StudentPrefixSearch years={yearItems} onSelect={setQuery} /> : null}
-
 			{years ? (
-				<div className='grid gap-3 sm:grid-cols-3'>
-					<div className='flex flex-col gap-1'>
-						<label
-							htmlFor='standard-year'
-							className='flex items-center gap-1.5 text-sm font-medium opacity-75'
-						>
-							<Calendar className='size-3.5' />
-							入學年度
-						</label>
-						<Select
-							id='standard-year'
-							value={year}
-							onChange={(v) => setQuery({ year: v, system: '', department: '' })}
-							placeholder='選擇入學年度'
-						>
-							{yearItems.map((item) => (
-								<SelectOption key={item} value={item}>
-									{formatRocYear(item)}
-								</SelectOption>
-							))}
-						</Select>
-					</div>
+				<Tabs defaultValue='search' className='gap-4'>
+					<TabsList aria-label='課程標準查詢方式'>
+						<TabsTrigger value='search'>快速搜尋</TabsTrigger>
+						<TabsTrigger value='manual'>條件選擇</TabsTrigger>
+					</TabsList>
+					<TabsContent value='search'>
+						<StudentPrefixSearch years={yearItems} onSelect={setQuery} />
+					</TabsContent>
+					<TabsContent value='manual'>
+						<div className='grid gap-3 sm:grid-cols-3'>
+							<div className='flex flex-col gap-1'>
+								<label
+									htmlFor='standard-year'
+									className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+								>
+									<Calendar className='size-3.5' />
+									入學年度
+								</label>
+								<Select
+									id='standard-year'
+									className='rounded-surface'
+									value={year}
+									onChange={(v) => setQuery({ year: v, system: '', department: '' })}
+									placeholder='選擇入學年度'
+								>
+									{yearItems.map((item) => (
+										<SelectOption key={item} value={item}>
+											{formatRocYear(item)}
+										</SelectOption>
+									))}
+								</Select>
+							</div>
 
-					<div className='flex flex-col gap-1'>
-						<label
-							htmlFor='standard-system'
-							className='flex items-center gap-1.5 text-sm font-medium opacity-75'
-						>
-							<Building2 className='size-3.5' />
-							學制
-						</label>
-						<Select
-							id='standard-system'
-							value={system}
-							onChange={(v) => setQuery({ system: v, department: '' })}
-							placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
-							disabled={!year || !standardData}
-						>
-							{systems.map((item) => (
-								<SelectOption key={item} value={item}>
-									{item}
-								</SelectOption>
-							))}
-						</Select>
-					</div>
+							<div className='flex flex-col gap-1'>
+								<label
+									htmlFor='standard-system'
+									className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+								>
+									<Building2 className='size-3.5' />
+									學制
+								</label>
+								<Select
+									id='standard-system'
+									className='rounded-surface'
+									value={system}
+									onChange={(v) => setQuery({ system: v, department: '' })}
+									placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
+									disabled={!year || !standardData}
+								>
+									{systems.map((item) => (
+										<SelectOption key={item} value={item}>
+											{item}
+										</SelectOption>
+									))}
+								</Select>
+							</div>
 
-					<div className='flex flex-col gap-1'>
-						<label
-							htmlFor='standard-department'
-							className='flex items-center gap-1.5 text-sm font-medium opacity-75'
-						>
-							<Search className='size-3.5' />
-							系所
-						</label>
-						<Select
-							id='standard-department'
-							value={department}
-							onChange={(v) => setQuery({ department: v })}
-							placeholder={!system ? '請先選擇學制' : '選擇系所'}
-							disabled={!system}
-						>
-							{departments.map((item) => (
-								<SelectOption key={item} value={item}>
-									{item}
-								</SelectOption>
-							))}
-						</Select>
-					</div>
-				</div>
+							<div className='flex flex-col gap-1'>
+								<label
+									htmlFor='standard-department'
+									className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+								>
+									<Search className='size-3.5' />
+									系所
+								</label>
+								<Select
+									id='standard-department'
+									className='rounded-surface'
+									value={department}
+									onChange={(v) => setQuery({ department: v })}
+									placeholder={!system ? '請先選擇學制' : '選擇系所'}
+									disabled={!system}
+								>
+									{departments.map((item) => (
+										<SelectOption key={item} value={item}>
+											{item}
+										</SelectOption>
+									))}
+								</Select>
+							</div>
+						</div>
+					</TabsContent>
+				</Tabs>
+			) : null}
+
+			{year && system && department ? (
+				<p className='m-0 text-sm' aria-live='polite'>
+					<span className='opacity-70'>目前查看：</span>
+					<strong>
+						{formatRocYear(year)}入學 · {system} · {department}
+					</strong>
+				</p>
 			) : null}
 
 			{year && !standardData ? <StandardPickerSkeleton content /> : null}

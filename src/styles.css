@@ -80,6 +80,15 @@
 	}
 }
 
+/* Keep tab selection visible independently of generated utility variants. */
+[data-slot='tabs-trigger'][data-state='active'] {
+	background-color: rgb(var(--vs-background));
+	color: rgb(var(--vs-text));
+	box-shadow:
+		0 1px 3px rgba(var(--vs-text), 0.12),
+		0 0 0 1px rgba(var(--vs-text), 0.04);
+}
+
 [data-slot='dialog-overlay'][data-state='open'] {
 	animation: dialog-overlay-in 180ms ease-out;
 }

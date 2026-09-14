@@ -6,6 +6,24 @@ import {
 } from './studentPrefix';
 
 describe('parseNtutStudentPrefix', () => {
+	it('parses a complete year before a department code is entered', () => {
+		expect(parseNtutStudentPrefix('109')).toEqual({
+			year: '109',
+			departmentCode: '',
+		});
+		expect(parseNtutStudentPrefix(' 99 ')).toEqual({
+			year: '99',
+			departmentCode: '',
+		});
+	});
+
+	it('parses a partial department code for progressive filtering', () => {
+		expect(parseNtutStudentPrefix('109a')).toEqual({
+			year: '109',
+			departmentCode: 'A',
+		});
+	});
+
 	it('parses three-digit years and normalizes case and surrounding whitespace', () => {
 		expect(parseNtutStudentPrefix(' 109ab ')).toEqual({
 			year: '109',
@@ -43,18 +61,8 @@ describe('parseNtutStudentPrefix', () => {
 		});
 	});
 
-	it('rejects incomplete prefixes and non-numeric student-number suffixes', () => {
-		for (const value of [
-			'',
-			'1AB',
-			'1',
-			'79AB',
-			'200AB',
-			'109A',
-			'109AB12C',
-			'109AB-1',
-			'109 AB',
-		]) {
+	it('rejects unsupported years, separators, and non-numeric student-number suffixes', () => {
+		for (const value of ['', '1AB', '1', '79AB', '200AB', '109AB12C', '109AB-1', '109 AB']) {
 			expect(parseNtutStudentPrefix(value)).toBeNull();
 		}
 	});
@@ -86,6 +94,15 @@ describe('findStudentPrefixMatches', () => {
 		expect(findStudentPrefixMatches(parseNtutStudentPrefix('9930'), entries)).toEqual([entries[6]]);
 		expect(findStudentPrefixMatches(parseNtutStudentPrefix('109ZZ'), entries)).toEqual([]);
 		expect(findStudentPrefixMatches(null, entries)).toEqual([]);
+	});
+
+	it('returns all formal departments for a year and narrows them by one code character', () => {
+		expect(findStudentPrefixMatches(parseNtutStudentPrefix('109'), entries)).toEqual(
+			entries.filter((entry) => ['7', '8', '9'].includes(entry.matric)),
+		);
+		expect(findStudentPrefixMatches(parseNtutStudentPrefix('109a'), entries)).toEqual(
+			entries.slice(0, 4),
+		);
 	});
 
 	it('normalizes entry values without changing their order or identity', () => {

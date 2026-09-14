@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, expect, it, vi } from 'vitest';
 import { StandardPage } from './StandardPage';
@@ -69,4 +70,31 @@ it('does not let a slower previous year replace the selected year data', async (
 	expect(await screen.findByText('新年度課程')).toBeInTheDocument();
 	await act(async () => finishOld({ 四技: { 測試系: { courses: [] } } }));
 	expect(screen.getByText('新年度課程')).toBeInTheDocument();
+});
+
+it('shows one query method at a time and preserves the selected result when switching', async () => {
+	mocks.fetchStandardYear.mockResolvedValue({
+		四技: { 測試系: { courses: [{ type: '★', name: '測試課程', credit: 3 }] } },
+	});
+	render(<StandardPage />);
+	fireEvent.click(await screen.findByText('選擇 109 候選'));
+	await screen.findByText('測試課程');
+	expect(screen.queryByRole('combobox', { name: '入學年度' })).not.toBeInTheDocument();
+	const user = userEvent.setup();
+	const manualTab = screen.getByRole('tab', { name: '條件選擇' });
+	const searchTab = screen.getByRole('tab', { name: '快速搜尋' });
+	await user.click(manualTab);
+	expect(manualTab).toHaveAttribute('aria-selected', 'true');
+	expect(searchTab).toHaveAttribute('aria-selected', 'false');
+	expect(screen.queryByText('選擇 109 候選')).not.toBeInTheDocument();
+	expect(screen.getByRole('combobox', { name: '入學年度' })).toHaveTextContent('109 年');
+	expect(screen.getByRole('combobox', { name: '學制' })).toHaveTextContent('四技');
+	expect(screen.getByRole('combobox', { name: '系所' })).toHaveTextContent('測試系');
+	await user.keyboard('{ArrowLeft}');
+	expect(searchTab).toHaveFocus();
+	expect(searchTab).toHaveAttribute('aria-selected', 'true');
+	expect(manualTab).toHaveAttribute('aria-selected', 'false');
+	expect(screen.getByText('選擇 109 候選')).toBeInTheDocument();
+	expect(screen.getByText('測試課程')).toBeInTheDocument();
+	expect(screen.getByText('109 年入學 · 四技 · 測試系')).toBeInTheDocument();
 });

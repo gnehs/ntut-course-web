@@ -19,15 +19,19 @@ const FORMAL_MATRIC_CODES = new Set(['5', '7', '8', '9', 'A', 'D', 'F']);
 // The standard-course data covers modern ROC years. Keeping this range
 // explicit makes numeric two-digit prefixes unambiguous without depending on
 // the current date or guessing from the trailing student-number digits.
-const STUDENT_PREFIX_PATTERN = /^(8\d|9\d|1\d{2})([A-Z0-9]{2})\d*$/;
+//
+// The department code is optional while the user is typing. This lets a
+// complete year (for example, `109`) load suggestions before the user adds a
+// one- or two-character department prefix.
+const STUDENT_PREFIX_PATTERN = /^(8\d|9\d|1\d{2})([A-Z0-9]{0,2})(\d*)$/;
 
 /**
  * Parse a Taiwan ROC student-number prefix.
  *
- * The input is an ROC year (two or three digits), followed by a two-character
- * alphanumeric department code. A complete student number may append digits;
- * those digits are intentionally ignored because they do not identify the
- * study system reliably.
+ * The input starts with an ROC year (two or three digits), followed by zero,
+ * one, or two alphanumeric department-code characters. A complete student
+ * number may append digits; those digits are intentionally ignored because
+ * they do not identify the study system reliably.
  */
 export function parseNtutStudentPrefix(input: string): ParsedStudentPrefix | null {
 	const value = input.trim().toUpperCase();
@@ -53,7 +57,7 @@ export function findStudentPrefixMatches(
 	if (!parsed) return [];
 
 	const departmentCode = parsed.departmentCode.trim().toUpperCase();
-	if (!/^[A-Z0-9]{2}$/.test(departmentCode)) return [];
+	if (!/^[A-Z0-9]{0,2}$/.test(departmentCode)) return [];
 
 	return entries.filter((entry) => {
 		const matric = String(entry.matric ?? '')
@@ -61,11 +65,10 @@ export function findStudentPrefixMatches(
 			.toUpperCase();
 		if (!FORMAL_MATRIC_CODES.has(matric)) return false;
 
-		return (
-			String(entry.division ?? '')
-				.trim()
-				.slice(0, 2)
-				.toUpperCase() === departmentCode
-		);
+		const divisionPrefix = String(entry.division ?? '')
+			.trim()
+			.slice(0, departmentCode.length)
+			.toUpperCase();
+		return divisionPrefix === departmentCode;
 	});
 }

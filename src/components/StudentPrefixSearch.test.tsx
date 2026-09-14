@@ -21,19 +21,24 @@ vi.mock('../lib/studentPrefix', () => ({
 
 const entries = [
 	{ system: '四技', department: '測試系', division: 'AB0', matric: '7' },
+	{ system: '四技', department: '另一測試系', division: 'AC0', matric: '7' },
 	{ system: '碩士', department: '測試所', division: 'AB0', matric: '8' },
 ];
 
 function parsePrefix(value: string) {
-	const match = /^(\d{3})([A-Z0-9]{2})$/.exec(value.trim().toUpperCase());
+	const match = /^(8\d|9\d|1\d{2})([A-Z0-9]{0,2})(\d*)$/.exec(value.trim().toUpperCase());
 	return match ? { year: match[1], departmentCode: match[2] } : null;
 }
 
 function matchEntries(parsed: { departmentCode: string } | null, items: typeof entries) {
 	return parsed
-		? items.filter((entry) => entry.division.slice(0, 2) === parsed.departmentCode)
+		? items.filter(
+				(entry) => entry.division.slice(0, parsed.departmentCode.length) === parsed.departmentCode,
+			)
 		: [];
 }
+
+const isFourTechTestDepartment = (name: string) => name.replace(/\s+/g, '') === '109·四技測試系';
 
 beforeEach(() => {
 	vi.clearAllMocks();
@@ -47,11 +52,13 @@ describe('StudentPrefixSearch', () => {
 		const user = userEvent.setup();
 		render(<StudentPrefixSearch years={['109']} onSelect={mocks.onSelect} />);
 
-		const input = screen.getByRole('combobox', { name: '依學號前綴尋找課程標準' });
+		const input = screen.getByRole('combobox', { name: '依入學年度或學號前綴尋找課程標準' });
 		await user.type(input, '109ab');
 
 		await waitFor(() => expect(mocks.fetchStandardDepartments).toHaveBeenCalledWith('109'));
-		expect(await screen.findByRole('option', { name: /109 · 四技.*測試系/ })).toBeInTheDocument();
+		expect(
+			await screen.findByRole('option', { name: isFourTechTestDepartment }),
+		).toBeInTheDocument();
 		expect(screen.getByRole('option', { name: /109 · 碩士.*測試所/ })).toBeInTheDocument();
 
 		await user.keyboard('{ArrowDown}{Enter}');
@@ -62,13 +69,30 @@ describe('StudentPrefixSearch', () => {
 		});
 	});
 
-	it('does not fetch until the prefix format is complete', async () => {
+	it('fetches when the year is complete and filters suggestions as the code is typed', async () => {
 		const user = userEvent.setup();
 		render(<StudentPrefixSearch years={['109']} onSelect={mocks.onSelect} />);
+		const input = screen.getByRole('combobox');
 
-		await user.type(screen.getByRole('combobox'), '109');
-		expect(await screen.findByText('格式：入學年度加兩碼系所代碼，例如 109ab')).toBeInTheDocument();
-		expect(mocks.fetchStandardDepartments).not.toHaveBeenCalled();
+		await user.type(input, '109');
+		await waitFor(() => expect(mocks.fetchStandardDepartments).toHaveBeenCalledWith('109'));
+		expect(
+			await screen.findByRole('option', { name: isFourTechTestDepartment }),
+		).toBeInTheDocument();
+		expect(screen.getAllByRole('option')).toHaveLength(3);
+
+		await user.type(input, 'a');
+		await waitFor(() =>
+			expect(mocks.findStudentPrefixMatches).toHaveBeenCalledWith(
+				{ year: '109', departmentCode: 'A' },
+				entries,
+			),
+		);
+		expect(screen.getAllByRole('option')).toHaveLength(3);
+
+		await user.type(input, 'b');
+		await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(2));
+		expect(screen.queryByRole('option', { name: /另一測試系/ })).not.toBeInTheDocument();
 	});
 
 	it('ignores a slower response from the previous year', async () => {
@@ -104,9 +128,9 @@ describe('StudentPrefixSearch', () => {
 		const input = screen.getByRole('combobox');
 		await user.type(input, '109ab');
 
-		await screen.findByText('系所資料載入失敗，請再試一次。');
+		await screen.findByText('載入 109 年的系所建議失敗，請再試一次。');
 		await user.click(screen.getByRole('button', { name: '重試' }));
-		await screen.findByRole('option', { name: /109 · 四技.*測試系/ });
+		await screen.findByRole('option', { name: isFourTechTestDepartment });
 
 		expect(mocks.fetchStandardDepartments).toHaveBeenNthCalledWith(1, '109');
 		expect(mocks.fetchStandardDepartments).toHaveBeenNthCalledWith(2, '109');
