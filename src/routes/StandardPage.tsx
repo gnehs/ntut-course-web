@@ -108,6 +108,12 @@ export function StandardPage() {
 		void navigate({ to: '/standard', search: createSearchObject(query) });
 	}
 
+	const legendEntries = useMemo(() => {
+		const courses = standardData?.[system]?.[department]?.courses || [];
+		const usedTypes = new Set(courses.map((course) => course.type));
+		return courseStandardEntries.filter(([symbol]) => usedTypes.has(symbol));
+	}, [standardData, system, department]);
+
 	const creditItems = useMemo(() => {
 		if (!current?.credits) return [];
 		return Object.entries(current.credits).filter(([, value]) => !isZeroCreditValue(value));
@@ -243,19 +249,21 @@ export function StandardPage() {
 
 					<div>
 						<h2 className='text-lg font-semibold'>課程列表</h2>
-						<dl
-							aria-label='課程類型圖例'
-							className='mt-2 mb-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:gap-x-5'
-						>
-							{courseStandardEntries.map(([symbol, label]) => (
-								<div key={symbol} className='flex items-center gap-2'>
-									<dt className='flex size-5 shrink-0 items-center justify-center text-base leading-none'>
-										{symbol}
-									</dt>
-									<dd className='m-0 text-[rgba(var(--vs-text),0.8)]'>{label}</dd>
-								</div>
-							))}
-						</dl>
+						{legendEntries.length > 0 ? (
+							<dl
+								aria-label='課程類型圖例'
+								className='mt-2 mb-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:gap-x-5'
+							>
+								{legendEntries.map(([symbol, label]) => (
+									<div key={symbol} className='flex items-center gap-2'>
+										<dt className='flex size-5 shrink-0 items-center justify-center text-base leading-none'>
+											{symbol}
+										</dt>
+										<dd className='m-0 text-[rgba(var(--vs-text),0.8)]'>{label}</dd>
+									</div>
+								))}
+							</dl>
+						) : null}
 						<div className='grid gap-4 lg:grid-cols-2'>
 							{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
 								<div key={courseYear} className='space-y-3'>
