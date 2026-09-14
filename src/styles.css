@@ -2,6 +2,25 @@
 
 /* A compact shared radius scale for controls and their surrounding surfaces. */
 @theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-page: var(--page);
 	--radius-sm: calc(var(--radius) * 0.5);
 	--radius-md: calc(var(--radius) * 0.75);
 	--radius-lg: var(--radius);
@@ -56,27 +75,62 @@
 }
 
 :root {
+	color-scheme: light;
 	--radius: 0.25rem;
 	--vs-primary: 25, 91, 255;
 	--vs-primary-foreground: 255, 255, 255;
 	--vs-text: 44, 62, 80;
 	--vs-background: 255, 255, 255;
+	--vs-page-background: 244, 247, 248;
 	--vs-gray-1: 244, 247, 248;
 	--vs-gray-2: 228, 233, 236;
 	--vs-danger: 234, 84, 85;
 	--vs-shadow-opacity: 0.05;
+	--background: rgb(var(--vs-background));
+	--foreground: rgb(var(--vs-text));
+	--card: rgb(var(--vs-background));
+	--card-foreground: rgb(var(--vs-text));
+	--popover: rgb(var(--vs-background));
+	--popover-foreground: rgb(var(--vs-text));
+	--primary: rgb(var(--vs-primary));
+	--primary-foreground: rgb(var(--vs-primary-foreground));
+	--secondary: rgb(var(--vs-gray-1));
+	--secondary-foreground: rgb(var(--vs-text));
+	--muted: rgb(var(--vs-gray-1));
+	--muted-foreground: rgba(var(--vs-text), 0.65);
+	--accent: rgb(var(--vs-gray-1));
+	--accent-foreground: rgb(var(--vs-text));
+	--destructive: rgb(var(--vs-danger));
+	--border: rgba(var(--vs-text), 0.12);
+	--input: rgba(var(--vs-text), 0.18);
+	--ring: rgb(var(--vs-primary));
+	--page: rgb(var(--vs-page-background));
 	--font-sans: 'Inter Tight', 'Noto Sans TC', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		color-scheme: dark;
 		--vs-primary: 92, 170, 255;
 		--vs-primary-foreground: 8, 14, 24;
 		--vs-text: 255, 255, 255;
 		--vs-background: 16, 16, 16;
+		--vs-page-background: 29, 29, 29;
 		--vs-gray-1: 32, 32, 32;
 		--vs-gray-2: 48, 48, 48;
 		--vs-shadow-opacity: 0.18;
+	}
+}
+
+@layer base {
+	* {
+		border-color: var(--border);
+	}
+
+	body {
+		margin: 0;
+		background-color: var(--page);
+		color: var(--foreground);
 	}
 }
 

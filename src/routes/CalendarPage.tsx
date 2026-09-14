@@ -93,7 +93,7 @@ export function CalendarPage() {
 							className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
 						>
 							<div
-								className='rounded-control flex size-12 shrink-0 flex-col overflow-hidden bg-gradient-to-b from-white to-[rgba(var(--vs-text),0.04)] text-center shadow-md'
+								className='rounded-control from-background flex size-12 shrink-0 flex-col overflow-hidden bg-gradient-to-b to-[rgba(var(--vs-text),0.04)] text-center shadow-md'
 								style={{
 									opacity: index > 0 && sameCalendarDay(rows[index - 1]?.start, item.start) ? 0 : 1,
 								}}

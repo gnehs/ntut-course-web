@@ -925,13 +925,13 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 				{filterScrollHint.left ? (
 					<div
 						aria-hidden='true'
-						className='pointer-events-none absolute top-0 left-0 z-[1] h-full w-10 bg-linear-to-r from-[#f4f7f8] to-transparent dark:from-[#1d1d1d]'
+						className='from-page pointer-events-none absolute top-0 left-0 z-[1] h-full w-10 bg-linear-to-r to-transparent'
 					/>
 				) : null}
 				{filterScrollHint.right ? (
 					<div
 						aria-hidden='true'
-						className='pointer-events-none absolute top-0 right-0 z-[1] h-full w-10 bg-linear-to-l from-[#f4f7f8] to-transparent dark:from-[#1d1d1d]'
+						className='from-page pointer-events-none absolute top-0 right-0 z-[1] h-full w-10 bg-linear-to-l to-transparent'
 					/>
 				) : null}
 				<div
