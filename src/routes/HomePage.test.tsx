@@ -52,6 +52,11 @@ describe('HomePage', () => {
 
 		const startSection = screen.getByRole('region', { name: '常用功能' });
 		expect(startSection).not.toBeNull();
+		expect(
+			within(startSection!)
+				.getAllByRole('link')
+				.map((link) => link.getAttribute('href')),
+		).toEqual(['/advanced-search?year=112&sem=1&d=main', '/class', '/my-course']);
 		expect(within(startSection!).getByRole('link', { name: /搜尋課程/ })).toHaveAttribute(
 			'href',
 			'/advanced-search?year=112&sem=1&d=main',

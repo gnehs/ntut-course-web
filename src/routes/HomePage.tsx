@@ -127,16 +127,16 @@ export function HomePage() {
 			icon: Search,
 		},
 		{
-			to: '/my-course',
-			title: '我的課程',
-			text: '收藏課程、檢查衝堂',
-			icon: UserRound,
-		},
-		{
 			to: '/class',
 			title: '班級課表',
 			text: '查詢各班開課與課表',
 			icon: UsersRound,
+		},
+		{
+			to: '/my-course',
+			title: '我的課程',
+			text: '收藏課程、檢查衝堂',
+			icon: UserRound,
 		},
 	];
 
