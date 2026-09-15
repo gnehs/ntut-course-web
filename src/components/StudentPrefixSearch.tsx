@@ -231,7 +231,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 					aria-activedescendant={
 						currentSelectionIndex >= 0 ? `${resultsId}-item-${currentSelectionIndex}` : undefined
 					}
-					placeholder='輸入入學年度或學號前綴，例如 109、109ab'
+					placeholder='輸入學號前綴，例如 11432, 109AB'
 					autoComplete='off'
 					value={input}
 					onFocus={() => {
