@@ -1,5 +1,6 @@
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
+import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Card } from '../components/ui-kit/Card';
@@ -319,6 +320,9 @@ export function StandardPage() {
 						</div>
 					</div>
 				</>
+			) : null}
+			{!error && current && Object.keys(current.courses || {}).length > 0 ? (
+				<AdsByGoogle placement='footer' />
 			) : null}
 		</div>
 	);

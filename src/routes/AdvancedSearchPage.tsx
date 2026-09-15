@@ -776,6 +776,7 @@ export function AdvancedSearchPage() {
 				) : (
 					<CourseList
 						courses={searchResult}
+						showMidListAd
 						showConflictCourse={showConflictCourse}
 						year={year}
 						sem={sem}
@@ -809,10 +810,7 @@ export function AdvancedSearchPage() {
 						}
 					/>
 				)}
-				<div className='grid gap-3'>
-					<h3 className='mb-4'>贊助商廣告</h3>
-					<AdsByGoogle />
-				</div>
+				{!onError && !isLoading && searchResult?.length ? <AdsByGoogle placement='footer' /> : null}
 			</section>
 		</div>
 	);

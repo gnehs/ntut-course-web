@@ -1,9 +1,10 @@
 import { CourseListToolbar } from './CourseListToolbar';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { CircleAlert, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { AdsByGoogle } from './AdsByGoogle';
 import { cn } from '../lib/utils';
 import {
 	courseTitle,
@@ -39,6 +40,7 @@ type CourseListProps = {
 	onPageChange?: (page: number) => void;
 	page?: number;
 	showTimetable?: boolean;
+	showMidListAd?: boolean;
 	showConflictCourse?: boolean;
 	year?: string;
 	sem?: string;
@@ -72,6 +74,7 @@ export function CourseList({
 	onPageChange,
 	page: controlledPage,
 	showTimetable = false,
+	showMidListAd = false,
 	showConflictCourse = true,
 	year,
 	sem,
@@ -132,6 +135,7 @@ export function CourseList({
 
 	const pageCount = Math.max(Math.ceil(filteredCourse.length / PAGE_SIZE), 1);
 	const pageItems = filteredCourse.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+	const showSectionAd = showMidListAd && layout === 'card' && pageItems.length >= 12;
 
 	useEffect(() => {
 		if (controlledPage !== undefined) return;
@@ -198,67 +202,73 @@ export function CourseList({
 			{layout === 'card' ? (
 				<>
 					<div className='grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'>
-						{pageItems.map((course) => {
+						{pageItems.map((course, index) => {
 							const saved = savedCourseIds.includes(course.id);
 							const timeItems = parseCourseTime(course.time);
 							return (
-								<Card
-									key={course.id}
-									className='hoverable px-4 py-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
-								>
-									<Link
-										to={`/course/${viewYear}/${viewSem}/${course.id}`}
-										aria-label={`查看 ${courseTitle(course)} 課程詳情`}
-										className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
-									/>
-									<div className='pointer-events-none relative z-[1] flex flex-col'>
-										<div className='relative pr-11'>
-											<div className='flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1'>
-												<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
-													<CourseDisplayHeading course={course} />
-												</CardTitle>
-												{conflictCourseData.includes(course.id) ? (
-													<Tag
-														color='rgba(var(--vs-danger),0.15)'
-														textColor={`rgb(var(--vs-danger))`}
-													>
-														<CircleAlert className='size-4' />
-														衝堂
-													</Tag>
+								<Fragment key={course.id}>
+									{showSectionAd && index === 6 ? (
+										<div className="col-span-full min-w-0 empty:hidden has-[>div[aria-hidden='true']]:hidden">
+											<AdsByGoogle placement='section' />
+										</div>
+									) : null}
+									<Card className='hoverable px-4 py-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'>
+										<Link
+											to={`/course/${viewYear}/${viewSem}/${course.id}`}
+											aria-label={`查看 ${courseTitle(course)} 課程詳情`}
+											className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
+										/>
+										<div className='pointer-events-none relative z-[1] flex flex-col'>
+											<div className='relative pr-11'>
+												<div className='flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1'>
+													<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
+														<CourseDisplayHeading course={course} />
+													</CardTitle>
+													{conflictCourseData.includes(course.id) ? (
+														<Tag
+															color='rgba(var(--vs-danger),0.15)'
+															textColor={`rgb(var(--vs-danger))`}
+														>
+															<CircleAlert className='size-4' />
+															衝堂
+														</Tag>
+													) : null}
+												</div>
+												<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
+												{getGeneralCourseTags(course).length ? (
+													<div className='mt-2'>
+														<CourseTags course={course} />
+													</div>
 												) : null}
 											</div>
-											<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
-											{getGeneralCourseTags(course).length ? (
-												<div className='mt-2'>
-													<CourseTags course={course} />
-												</div>
-											) : null}
+											<div className='mt-3 grid grid-cols-[repeat(auto-fit,minmax(4.25rem,1fr))] gap-x-3 gap-y-2'>
+												<CourseMetric title='課號' value={course.id} />
+												<CourseMetric title='學分' value={formatCredit(course.credit)} />
+												{timeItems.map((item) => (
+													<CourseMetric key={item.title} title={item.title} value={item.content} />
+												))}
+												{!timeItems.length ? (
+													<CourseMetric title='上課時間' value='無資料' />
+												) : null}
+											</div>
+											<dl className='mt-3 grid gap-1 text-sm leading-5'>
+												<CourseMetaLine label='班級'>
+													{trimEllip((course.class || []).map((item) => item.name).join('、'), 9) ||
+														'無資料'}
+												</CourseMetaLine>
+												<CourseMetaLine label='教師'>
+													{trimEllip(
+														(course.teacher || []).map((item) => item.name).join('、'),
+														13,
+													) || '無資料'}
+												</CourseMetaLine>
+												<CourseMetaLine label='備註' truncate={false}>
+													{course.notes || '無'}
+												</CourseMetaLine>
+											</dl>
 										</div>
-										<div className='mt-3 grid grid-cols-[repeat(auto-fit,minmax(4.25rem,1fr))] gap-x-3 gap-y-2'>
-											<CourseMetric title='課號' value={course.id} />
-											<CourseMetric title='學分' value={formatCredit(course.credit)} />
-											{timeItems.map((item) => (
-												<CourseMetric key={item.title} title={item.title} value={item.content} />
-											))}
-											{!timeItems.length ? <CourseMetric title='上課時間' value='無資料' /> : null}
-										</div>
-										<dl className='mt-3 grid gap-1 text-sm leading-5'>
-											<CourseMetaLine label='班級'>
-												{trimEllip((course.class || []).map((item) => item.name).join('、'), 9) ||
-													'無資料'}
-											</CourseMetaLine>
-											<CourseMetaLine label='教師'>
-												{trimEllip(
-													(course.teacher || []).map((item) => item.name).join('、'),
-													13,
-												) || '無資料'}
-											</CourseMetaLine>
-											<CourseMetaLine label='備註' truncate={false}>
-												{course.notes || '無'}
-											</CourseMetaLine>
-										</dl>
-									</div>
-								</Card>
+									</Card>
+								</Fragment>
 							);
 						})}
 					</div>

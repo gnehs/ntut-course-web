@@ -198,6 +198,7 @@ export function HomePage() {
 			</section>
 
 			<UpcomingCourse />
+			<AdsByGoogle placement='section' />
 
 			<div className='grid items-start gap-6 md:grid-cols-2'>
 				<PageSection title='探索與規劃'>
@@ -214,7 +215,7 @@ export function HomePage() {
 				<h2 id='source-heading' className='sr-only'>
 					廣告與資料來源
 				</h2>
-				<AdsByGoogle />
+				<AdsByGoogle placement='footer' />
 				<p className='text-muted-foreground m-0 text-center text-xs leading-relaxed'>
 					本站資料擷取自{' '}
 					<a href='https://aps.ntut.edu.tw/course/tw/course.jsp' target='_blank' rel='noreferrer'>

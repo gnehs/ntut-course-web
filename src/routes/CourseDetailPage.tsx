@@ -284,13 +284,17 @@ export function CourseDetailPage() {
 					/>
 				</div>
 			</div>
-			<h3 className='mt-5'>贊助商廣告</h3>
-			<AdsByGoogle />
 			<section className='flex flex-col gap-2'>
 				<h3>課程概述</h3>
 				<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
 				<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
 			</section>
+			{selectedSyllabus &&
+			[selectedSyllabus.objective, selectedSyllabus.schedule, selectedSyllabus.materials]
+				.join('')
+				.trim().length >= 400 ? (
+				<AdsByGoogle placement='section' />
+			) : null}
 			{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
 			{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
 			{syllabus.length > 1 ? (
@@ -315,6 +319,7 @@ export function CourseDetailPage() {
 			) : null}
 			{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
 			<CourseSourceLinks course={course} />
+			<AdsByGoogle placement='footer' />
 		</div>
 	);
 }

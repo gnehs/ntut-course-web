@@ -14,6 +14,7 @@ import {
 	RefreshCw,
 	Upload,
 } from 'lucide-react';
+import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -304,6 +305,7 @@ export function AboutPage() {
 					</a>
 				</li>
 			</ul>
+			<AdsByGoogle placement='footer' />
 		</div>
 	);
 }
@@ -510,6 +512,7 @@ export function ChangelogPage() {
 					</section>
 				))}
 			</div>
+			<AdsByGoogle placement='footer' />
 		</div>
 	);
 }
@@ -860,6 +863,7 @@ export function StatusPage() {
 					</a>
 				))}
 			</div>
+			{!error && runs.length ? <AdsByGoogle placement='footer' /> : null}
 		</div>
 	);
 }

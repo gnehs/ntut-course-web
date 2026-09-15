@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Search } from 'lucide-react';
+import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
@@ -277,6 +278,12 @@ export function CompetenciesPage() {
 						</div>
 					) : null}
 				</>
+			) : null}
+			{!error &&
+			!unavailable &&
+			selectedDepartment &&
+			(visibleCourses.length > 0 || visibleAbilities.length > 0) ? (
+				<AdsByGoogle placement='footer' />
 			) : null}
 		</div>
 	);

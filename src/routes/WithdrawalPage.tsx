@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
@@ -235,6 +236,7 @@ export function WithdrawalPage() {
 							<p>請調整搜尋關鍵字或期間。</p>
 						</Card>
 					)}
+					{filteredRows.length ? <AdsByGoogle placement='footer' /> : null}
 				</>
 			)}
 		</div>

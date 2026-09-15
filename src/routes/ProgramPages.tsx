@@ -2,6 +2,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -152,6 +153,7 @@ export function ProgramIndexPage() {
 					</Card>
 				))}
 			</div>
+			{filteredPrograms.length ? <AdsByGoogle placement='footer' /> : null}
 		</div>
 	);
 }
@@ -385,18 +387,21 @@ export function ProgramDetailPage() {
 			savedVersion={savedVersion}
 			onSavedChange={() => setSavedVersion((value) => value + 1)}
 			footer={
-				sourceHref ? (
-					<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
-						<a
-							href={sourceHref}
-							target='_blank'
-							rel='noreferrer'
-							className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
-						>
-							學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
-						</a>
-					</div>
-				) : undefined
+				<>
+					{sourceHref ? (
+						<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+							<a
+								href={sourceHref}
+								target='_blank'
+								rel='noreferrer'
+								className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
+							>
+								學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
+							</a>
+						</div>
+					) : null}
+					{matchedCourses.length ? <AdsByGoogle placement='footer' /> : null}
+				</>
 			}
 		/>
 	);
