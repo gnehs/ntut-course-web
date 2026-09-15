@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { Link } from '@tanstack/react-router';
+import { toast } from 'sonner';
 import {
 	BadgeQuestionMark,
 	Calendar,
@@ -553,9 +554,6 @@ function SettingsSection({
 }
 
 export function SettingsPage() {
-	const [done, setDone] = useState(false);
-	const [backupError, setBackupError] = useState<string | null>(null);
-	const [backupMessage, setBackupMessage] = useState<string | null>(null);
 	const [pendingBackup, setPendingBackup] = useState<ParsedMyCourseBackup | null>(null);
 	const [pendingSource, setPendingSource] = useState('');
 	const [pasteOpen, setPasteOpen] = useState(false);
@@ -564,8 +562,20 @@ export function SettingsPage() {
 	const backupReadIdRef = useRef(0);
 
 	async function clear() {
-		await cleanStore();
-		setDone(true);
+		try {
+			await cleanStore();
+			toast.success('已清空網站快取。');
+		} catch (error) {
+			toast.error('清空網站快取失敗', {
+				description: error instanceof Error ? error.message : '請稍後再試',
+			});
+		}
+	}
+
+	function showBackupError(error: unknown, fallback: string) {
+		toast.error('備份操作失敗', {
+			description: error instanceof Error ? error.message : fallback,
+		});
 	}
 
 	function stageBackup(raw: string, source: string) {
@@ -574,12 +584,11 @@ export function SettingsPage() {
 			const parsed = parseMyCourseBackup(raw);
 			setPendingBackup(parsed);
 			setPendingSource(source);
-			setBackupError(null);
-			setBackupMessage(null);
 			setPasteOpen(false);
 		} catch (error) {
 			setPendingBackup(null);
-			setBackupError(error instanceof Error ? error.message : '備份資料格式無效');
+			setPendingSource('');
+			showBackupError(error, '備份資料格式無效');
 		}
 	}
 
@@ -592,8 +601,6 @@ export function SettingsPage() {
 	function togglePastePanel() {
 		if (!pasteOpen) {
 			clearPendingBackup();
-			setBackupError(null);
-			setBackupMessage(null);
 		}
 		setPasteOpen((value) => !value);
 	}
@@ -617,11 +624,9 @@ export function SettingsPage() {
 		backupReadIdRef.current = readId;
 		setPendingBackup(null);
 		setPendingSource('');
-		setBackupError(null);
-		setBackupMessage(null);
 		if (!file) return;
 		if (file.size > 5 * 1024 * 1024) {
-			setBackupError('備份檔過大，請選擇 5 MB 以下的 JSON 檔案');
+			showBackupError(null, '備份檔過大，請選擇 5 MB 以下的 JSON 檔案');
 			return;
 		}
 		void readFileText(file)
@@ -631,7 +636,7 @@ export function SettingsPage() {
 			})
 			.catch((error) => {
 				if (readId !== backupReadIdRef.current) return;
-				setBackupError(error instanceof Error ? error.message : '無法讀取備份檔');
+				showBackupError(error, '無法讀取備份檔');
 			});
 	}
 
@@ -650,10 +655,9 @@ export function SettingsPage() {
 			anchor.click();
 			anchor.remove();
 			window.setTimeout(() => URL.revokeObjectURL(url), 0);
-			setBackupError(null);
-			setBackupMessage(`已下載全部學期的我的課程備份（${payload.courses.length} 組課程資料）。`);
+			toast.success(`已下載全部學期的我的課程備份（${payload.courses.length} 組課程資料）。`);
 		} catch (error) {
-			setBackupError(error instanceof Error ? error.message : '備份資料無法匯出');
+			showBackupError(error, '備份資料無法匯出');
 		}
 	}
 
@@ -663,14 +667,13 @@ export function SettingsPage() {
 			const result = mergeMyCourseBackup(pendingBackup);
 			const conflictCount = result.classConflictCount + result.mprogramConflictCount;
 			const conflictMessage = conflictCount ? `，保留 ${conflictCount} 筆現有選擇` : '';
-			setBackupMessage(
+			toast.success(
 				`匯入完成：新增 ${result.addedCourseCount} 門課程，涵蓋 ${result.termSummaries.length} 個學期${conflictMessage}。`,
 			);
-			setBackupError(null);
 			setPendingBackup(null);
 			setPendingSource('');
 		} catch (error) {
-			setBackupError(error instanceof Error ? error.message : '匯入失敗，原有資料未變更');
+			showBackupError(error, '匯入失敗，原有資料未變更');
 		}
 	}
 
@@ -721,8 +724,6 @@ export function SettingsPage() {
 							onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
 								setPasteValue(event.currentTarget.value);
 								clearPendingBackup();
-								setBackupError(null);
-								setBackupMessage(null);
 							}}
 							placeholder='請貼上舊版匯出資料'
 						/>
@@ -738,13 +739,6 @@ export function SettingsPage() {
 						</div>
 					</Card>
 				) : null}
-				{backupError ? (
-					<Alert danger>
-						<strong>備份操作失敗</strong>
-						<p className='m-0 mt-1'>{backupError}</p>
-					</Alert>
-				) : null}
-				{backupMessage ? <Alert>{backupMessage}</Alert> : null}
 				{pendingBackup ? (
 					<Card className='space-y-3 p-4'>
 						<div>
@@ -786,7 +780,6 @@ export function SettingsPage() {
 					<Button onClick={clear}>清空網站快取</Button>
 				</div>
 			</SettingsSection>
-			{done ? <Alert className='mt-3'>已清空網站快取。</Alert> : null}
 		</div>
 	);
 }

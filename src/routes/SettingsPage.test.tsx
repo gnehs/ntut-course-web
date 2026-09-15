@@ -3,6 +3,23 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SettingsPage } from './StaticPages';
 
+const mocks = vi.hoisted(() => ({
+	cleanStore: vi.fn(),
+	toastSuccess: vi.fn(),
+	toastError: vi.fn(),
+}));
+
+vi.mock('../lib/storage', () => ({
+	cleanStore: mocks.cleanStore,
+}));
+
+vi.mock('sonner', () => ({
+	toast: {
+		success: mocks.toastSuccess,
+		error: mocks.toastError,
+	},
+}));
+
 function backup(overrides: Record<string, unknown> = {}) {
 	return JSON.stringify({
 		format: 'ntut-course-my-course-backup',
@@ -21,6 +38,8 @@ describe('SettingsPage my course backup', () => {
 
 	beforeEach(() => {
 		localStorage.clear();
+		vi.clearAllMocks();
+		mocks.cleanStore.mockResolvedValue(undefined);
 	});
 
 	afterEach(() => {
@@ -47,7 +66,9 @@ describe('SettingsPage my course backup', () => {
 		await user.click(screen.getByRole('button', { name: '下載全部學期' }));
 
 		expect(createObjectURL).toHaveBeenCalledOnce();
-		expect(await screen.findByText(/已下載全部學期的我的課程備份/)).toBeInTheDocument();
+		expect(mocks.toastSuccess).toHaveBeenCalledWith(
+			'已下載全部學期的我的課程備份（1 組課程資料）。',
+		);
 	});
 
 	it('previews a selected file and merges only after confirmation', async () => {
@@ -65,7 +86,7 @@ describe('SettingsPage my course backup', () => {
 		expect(localStorage.getItem('my-couse-data-115-1')).toBe(
 			JSON.stringify(['EXISTING', 'IMPORTED']),
 		);
-		expect(await screen.findByText(/匯入完成：新增 1 門課程/)).toBeInTheDocument();
+		expect(mocks.toastSuccess).toHaveBeenCalledWith('匯入完成：新增 1 門課程，涵蓋 1 個學期。');
 	});
 
 	it('supports the legacy paste flow without writing before confirmation', async () => {
@@ -103,9 +124,11 @@ describe('SettingsPage my course backup', () => {
 
 		await user.upload(input, new File(['not json'], 'broken.json', { type: 'application/json' }));
 		await waitFor(() =>
-			expect(screen.queryByRole('button', { name: '確認匯入' })).not.toBeInTheDocument(),
+			expect(mocks.toastError).toHaveBeenCalledWith('備份操作失敗', {
+				description: '匯入資料不是有效的 JSON',
+			}),
 		);
-		expect(await screen.findByText('備份操作失敗')).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: '確認匯入' })).not.toBeInTheDocument();
 
 		await user.upload(
 			input,
@@ -116,6 +139,49 @@ describe('SettingsPage my course backup', () => {
 		await waitFor(() =>
 			expect(screen.queryByRole('button', { name: '確認匯入' })).not.toBeInTheDocument(),
 		);
-		expect(screen.getByText('備份檔過大，請選擇 5 MB 以下的 JSON 檔案')).toBeInTheDocument();
+		expect(mocks.toastError).toHaveBeenLastCalledWith('備份操作失敗', {
+			description: '備份檔過大，請選擇 5 MB 以下的 JSON 檔案',
+		});
+	});
+
+	it('shows a toast when a backup file cannot be read', async () => {
+		vi.spyOn(FileReader.prototype, 'readAsText').mockImplementation(() => {
+			throw new Error('無法讀取備份檔');
+		});
+		const user = userEvent.setup();
+		const { container } = render(<SettingsPage />);
+		const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+
+		await user.upload(input, new File(['{}'], 'unreadable.json', { type: 'application/json' }));
+
+		await waitFor(() =>
+			expect(mocks.toastError).toHaveBeenCalledWith('備份操作失敗', {
+				description: '無法讀取備份檔',
+			}),
+		);
+	});
+
+	it('shows a success toast when clearing the website cache succeeds', async () => {
+		const user = userEvent.setup();
+		render(<SettingsPage />);
+
+		await user.click(screen.getByRole('button', { name: '清空網站快取' }));
+
+		await waitFor(() => expect(mocks.cleanStore).toHaveBeenCalledOnce());
+		expect(mocks.toastSuccess).toHaveBeenCalledWith('已清空網站快取。');
+	});
+
+	it('shows an error toast when clearing the website cache fails', async () => {
+		mocks.cleanStore.mockRejectedValueOnce(new Error('快取服務失敗'));
+		const user = userEvent.setup();
+		render(<SettingsPage />);
+
+		await user.click(screen.getByRole('button', { name: '清空網站快取' }));
+
+		await waitFor(() =>
+			expect(mocks.toastError).toHaveBeenCalledWith('清空網站快取失敗', {
+				description: '快取服務失敗',
+			}),
+		);
 	});
 });
