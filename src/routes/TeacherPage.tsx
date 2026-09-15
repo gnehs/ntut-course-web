@@ -120,7 +120,7 @@ export function TeacherPage() {
 			<div className='mt-2 grid gap-3 md:grid-cols-2'>
 				{courses.map((course: TeacherWithdrawalCourse) => (
 					<Link
-						className='grid cursor-pointer grid-cols-[auto_1fr_auto_auto] items-center gap-x-2 gap-y-0 rounded-lg bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
+						className='rounded-surface grid cursor-pointer grid-cols-[auto_1fr_auto_auto] items-center gap-x-2 gap-y-0 bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
 						to={`/course/${course.year}/${course.sem}/${course.id}`}
 						key={`${course.year}-${course.sem}-${course.id}`}
 					>

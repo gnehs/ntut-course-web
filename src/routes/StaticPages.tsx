@@ -329,7 +329,7 @@ export function DocPage() {
 				<li>資料擷取自國立臺北科技大學課程系統，資料僅供參考。</li>
 			</ul>
 			<h2>API Endpoint</h2>
-			<div className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'>
+			<div className='rounded-panel border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'>
 				<code>https://gnehs.github.io/ntut-course-crawler-node/</code>
 			</div>
 			<h2>API 清單</h2>
@@ -347,7 +347,7 @@ export function DocPage() {
 			].map((item) => (
 				<div
 					key={item}
-					className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'
+					className='rounded-panel border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'
 				>
 					<h3 className='m-0'>{item}</h3>
 				</div>
@@ -480,7 +480,7 @@ export function ChangelogPage() {
 							{entries.map((entry) => (
 								<li
 									key={entry.date}
-									className='grid overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.04))] sm:grid-cols-[10rem_minmax(0,1fr)]'
+									className='rounded-surface grid overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.04))] sm:grid-cols-[10rem_minmax(0,1fr)]'
 								>
 									<div className='flex items-center gap-2 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.025)] px-4 py-3 text-sm text-[rgba(var(--vs-text),0.65)] sm:border-r sm:border-b-0'>
 										<CalendarDays className='size-4 shrink-0' />
@@ -494,7 +494,7 @@ export function ChangelogPage() {
 												<li key={change.title} className='py-2 first:pt-0 last:pb-0'>
 													<p className='m-0 leading-relaxed'>{change.title}</p>
 													{change.details ? (
-														<div className='mt-2 space-y-1 rounded-lg bg-[rgba(var(--vs-text),0.035)] px-3 py-2 text-sm text-[rgba(var(--vs-text),0.76)]'>
+														<div className='rounded-panel mt-2 space-y-1 bg-[rgba(var(--vs-text),0.035)] px-3 py-2 text-sm text-[rgba(var(--vs-text),0.76)]'>
 															{change.details.map((detail) => (
 																<p key={detail} className='m-0 leading-relaxed'>
 																	{detail}
@@ -831,7 +831,7 @@ export function StatusPage() {
 						href={run.html_url}
 						target='_blank'
 						rel='noreferrer'
-						className='flex items-center gap-2 rounded-lg bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
+						className='rounded-surface flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
 					>
 						<div
 							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}

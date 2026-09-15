@@ -67,7 +67,7 @@ export function Layout() {
 		<div className='bg-page text-foreground flex min-h-svh flex-col font-sans'>
 			<a
 				href='#main-content'
-				className='sr-only fixed top-2 left-2 z-50 rounded-lg bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] shadow-lg focus:not-sr-only'
+				className='rounded-control sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] shadow-lg focus:not-sr-only'
 			>
 				跳至主要內容
 			</a>

@@ -89,7 +89,7 @@ export function WidgetPage() {
 				</Alert>
 			) : null}
 			<Card
-				className={`overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm ${!hasCourses ? 'opacity-70' : ''}`}
+				className={`rounded-surface overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm ${!hasCourses ? 'opacity-70' : ''}`}
 			>
 				<CardHeader className='gap-3 border-b border-[rgba(var(--vs-text),0.08)] p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='min-w-0'>
@@ -136,7 +136,7 @@ export function WidgetPage() {
 					</pre>
 				</CardContent>
 			</Card>
-			<Card className='rounded-lg border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+			<Card className='rounded-surface border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>2. 貼到 Scriptable 並加入小工具</CardTitle>
 					<CardDescription>
@@ -160,7 +160,7 @@ export function WidgetPage() {
 						<PlaySquare className='size-4' />
 						教學影片
 					</div>
-					<video loop controls className='mx-auto block max-h-[640px] max-w-full rounded-lg'>
+					<video loop controls className='rounded-panel mx-auto block max-h-[640px] max-w-full'>
 						<source src='/video/how_to_add_iOS_widget.mp4' type='video/mp4' />
 					</video>
 				</CardContent>

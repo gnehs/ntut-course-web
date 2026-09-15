@@ -256,7 +256,7 @@ export function EmptyRoomPage() {
 				}
 			>
 				{emptyroomDetailData ? (
-					<div className='overflow-hidden rounded-lg border border-[rgba(var(--vs-text),0.1)]'>
+					<div className='rounded-panel overflow-hidden border border-[rgba(var(--vs-text),0.1)]'>
 						{timetableSlots.map((slot, index) => (
 							<div
 								key={slot}

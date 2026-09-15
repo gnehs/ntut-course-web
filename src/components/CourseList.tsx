@@ -510,7 +510,7 @@ function TimetableCourses({
 							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
 							to={`/course/${year}/${sem}/${item.id}`}
 							className={cn(
-								'relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 rounded-lg border px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
+								'rounded-control relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 border px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
 								item.isConflict
 									? 'border-[rgba(var(--vs-danger),0.35)] bg-[rgba(var(--vs-danger),0.16)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.22)]'
 									: 'border-transparent bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',

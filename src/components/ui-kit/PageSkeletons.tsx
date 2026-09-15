@@ -1,7 +1,9 @@
 import type React from 'react';
 
 function SkeletonBlock({ className = '' }: { className?: string }) {
-	return <div className={`animate-pulse rounded-lg bg-[rgba(var(--vs-text),0.1)] ${className}`} />;
+	return (
+		<div className={`rounded-control animate-pulse bg-[rgba(var(--vs-text),0.1)] ${className}`} />
+	);
 }
 
 function SkeletonCard({
@@ -336,7 +338,7 @@ function EmptyRoomCardSkeleton() {
 
 function CalendarDateSkeleton() {
 	return (
-		<div className='flex size-12 shrink-0 flex-col overflow-hidden rounded-lg bg-[rgba(var(--vs-text),0.08)] shadow-md'>
+		<div className='rounded-control flex size-12 shrink-0 flex-col overflow-hidden bg-[rgba(var(--vs-text),0.08)] shadow-md'>
 			<SkeletonBlock className='h-5 w-full rounded-none bg-[rgba(var(--vs-danger),0.22)]' />
 			<div className='flex flex-1 items-center justify-center'>
 				<SkeletonBlock className='h-5 w-5' />

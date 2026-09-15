@@ -301,7 +301,7 @@ export function StandardPage() {
 															key={`${item.type}-${item.name}`}
 														>
 															<span className='flex min-w-0 items-center gap-2 text-sm'>
-																<span className='shrink-0 rounded bg-[rgba(var(--vs-primary),0.08)] px-1 py-0.5 text-xs font-medium'>
+																<span className='shrink-0 rounded-sm bg-[rgba(var(--vs-primary),0.08)] px-1 py-0.5 text-xs font-medium'>
 																	{item.type}
 																</span>
 																<span className='truncate'>{item.name}</span>

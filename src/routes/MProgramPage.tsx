@@ -56,12 +56,7 @@ export function MProgramIndexPage() {
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div>
-				<h1>微學程</h1>
-				<p className='m-0 text-sm opacity-70'>
-					{dataset.year} 年第 {dataset.sem === '1' ? '一' : '二'} 學期
-				</p>
-			</div>
+			<h1>微學程</h1>
 
 			<div className='relative'>
 				<Search className='pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 opacity-50' />
@@ -107,10 +102,7 @@ export function MProgramIndexPage() {
 function MProgramIndexSkeleton() {
 	return (
 		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入微學程'>
-			<div className='flex flex-col gap-2'>
-				<Skeleton className='h-8 w-32' />
-				<Skeleton className='h-4 w-48' />
-			</div>
+			<Skeleton className='h-8 w-32' />
 			<Skeleton className='h-11 w-full' />
 			<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
 				{Array.from({ length: 6 }, (_, index) => (
