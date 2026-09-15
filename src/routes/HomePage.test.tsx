@@ -17,6 +17,12 @@ vi.mock('../lib/courseApi', () => ({
 	fetchCalendar: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock('../components/AdsByGoogle', () => ({
+	AdsByGoogle: ({ placement }: { placement?: string }) => (
+		<div data-testid={`ad-${placement || 'inline'}`} />
+	),
+}));
+
 vi.mock('@tanstack/react-router', () => ({
 	Link: ({ to, children, ...props }) => (
 		<a href={to} {...props}>
@@ -93,6 +99,14 @@ describe('HomePage', () => {
 			expect(link).not.toHaveAttribute('type');
 			expect(link).toHaveClass('rounded-surface', 'min-h-11');
 		}
+	});
+
+	it('does not show the ad between the primary actions and planning links', () => {
+		render(<HomePage />);
+
+		expect(screen.queryByTestId('ad-section')).not.toBeInTheDocument();
+		expect(screen.getByTestId('ad-footer')).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: '探索與規劃' })).toBeInTheDocument();
 	});
 
 	it('falls back to valid routes while the semester is loading', () => {

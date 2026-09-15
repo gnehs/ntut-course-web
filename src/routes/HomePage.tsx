@@ -198,7 +198,6 @@ export function HomePage() {
 			</section>
 
 			<UpcomingCourse />
-			<AdsByGoogle placement='section' />
 
 			<div className='grid items-start gap-6 md:grid-cols-2'>
 				<PageSection title='探索與規劃'>
