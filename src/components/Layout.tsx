@@ -64,122 +64,125 @@ export function Layout() {
 	}
 
 	return (
-		<div className='bg-page text-foreground flex min-h-svh flex-col font-sans'>
-			<a
-				href='#main-content'
-				className='rounded-control sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] shadow-lg focus:not-sr-only'
-			>
-				跳至主要內容
-			</a>
-			{!isIframe ? (
-				<nav
-					className={cn(
-						'sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]',
-						isAdvancedSearch && 'lg:hidden',
-					)}
-					style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
+		// Grid track sizing survives AdSense's inline height/min-height resets on ad ancestors.
+		<div className='grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(100svh,auto)]'>
+			<div className='bg-page text-foreground flex flex-col font-sans'>
+				<a
+					href='#main-content'
+					className='rounded-control sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] shadow-lg focus:not-sr-only'
 				>
-					<Link
-						to='/'
-						className='block min-w-0 truncate font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
+					跳至主要內容
+				</a>
+				{!isIframe ? (
+					<nav
+						className={cn(
+							'sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]',
+							isAdvancedSearch && 'lg:hidden',
+						)}
+						style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
 					>
-						🍤 北科課程好朋友
-					</Link>
-					<div className='hidden md:block'>
-						{!isAdvancedSearch ? <UniversalSearch navbar /> : null}
-					</div>
-					<div className='flex justify-end'>
-						<Button className='whitespace-nowrap' onClick={() => setDatasetDialogOpen(true)}>
-							{yearSemLabel}
-						</Button>
-					</div>
-				</nav>
-			) : null}
-			<ContentSurface
-				as='main'
-				id='main-content'
-				tabIndex={-1}
-				className={cn(
-					'flex-1 scroll-mt-20',
-					isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 py-8',
-					isIframe ? 'pt-0' : '',
-				)}
-			>
-				{error ? (
-					<Alert danger className='mb-4 flex items-center justify-between gap-3'>
-						<div>
-							<p className='font-medium'>
-								{hasDataset ? '學期資料暫時無法更新。' : '目前無法載入學期資料。'}
-							</p>
-							<p className='mt-1 text-sm'>
-								{hasDataset
-									? '目前仍保留已選的學期，請稍後重試。'
-									: '請確認網路連線後重試，載入成功後才能瀏覽課程。'}
-							</p>
+						<Link
+							to='/'
+							className='block min-w-0 truncate font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
+						>
+							🍤 北科課程好朋友
+						</Link>
+						<div className='hidden md:block'>
+							{!isAdvancedSearch ? <UniversalSearch navbar /> : null}
 						</div>
-						<Button onClick={() => void retryDataset()} disabled={loadingDataset}>
-							重試
-						</Button>
-					</Alert>
-				) : loadingDataset && !hasDataset ? (
-					<Alert className='mb-4'>正在載入學期資料…</Alert>
+						<div className='flex justify-end'>
+							<Button className='whitespace-nowrap' onClick={() => setDatasetDialogOpen(true)}>
+								{yearSemLabel}
+							</Button>
+						</div>
+					</nav>
 				) : null}
-				<Outlet />
-			</ContentSurface>
-			{isIframe && !isAdvancedSearch ? (
-				<div className='my-4 text-center text-[0.75em] opacity-75'>
-					本資料由{' '}
-					<a href='https://ntut-course.gnehs.net/' target='_blank' rel='noreferrer'>
-						北科課程好朋友
-					</a>{' '}
-					提供
-				</div>
-			) : null}
-			{!isIframe && !isAdvancedSearch ? (
-				<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))]'>
-					<div className='mx-auto max-w-[1024px] space-y-2 text-[rgb(var(--vs-text))] opacity-75'>
-						<div className='flex items-center justify-between gap-2'>
+				<ContentSurface
+					as='main'
+					id='main-content'
+					tabIndex={-1}
+					className={cn(
+						'flex-1 scroll-mt-20',
+						isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 py-8',
+						isIframe ? 'pt-0' : '',
+					)}
+				>
+					{error ? (
+						<Alert danger className='mb-4 flex items-center justify-between gap-3'>
 							<div>
-								Developed by{' '}
-								<a
-									href='https://gnehs.net'
-									target='_blank'
-									rel='noreferrer'
-									className='text-[rgb(var(--vs-primary))] underline hover:opacity-80'
-								>
-									勝勝
-								</a>
+								<p className='font-medium'>
+									{hasDataset ? '學期資料暫時無法更新。' : '目前無法載入學期資料。'}
+								</p>
+								<p className='mt-1 text-sm'>
+									{hasDataset
+										? '目前仍保留已選的學期，請稍後重試。'
+										: '請確認網路連線後重試，載入成功後才能瀏覽課程。'}
+								</p>
 							</div>
-							<div className='flex justify-end'>
-								<Button
-									as='a'
-									icon
-									href='https://github.com/gnehs/ntut-course-web'
-									aria-label='查看 GitHub 原始碼'
-									target='_blank'
-									rel='noreferrer'
-								>
-									<GitBranch className='size-4' />
-								</Button>
+							<Button onClick={() => void retryDataset()} disabled={loadingDataset}>
+								重試
+							</Button>
+						</Alert>
+					) : loadingDataset && !hasDataset ? (
+						<Alert className='mb-4'>正在載入學期資料…</Alert>
+					) : null}
+					<Outlet />
+				</ContentSurface>
+				{isIframe && !isAdvancedSearch ? (
+					<div className='my-4 text-center text-[0.75em] opacity-75'>
+						本資料由{' '}
+						<a href='https://ntut-course.gnehs.net/' target='_blank' rel='noreferrer'>
+							北科課程好朋友
+						</a>{' '}
+						提供
+					</div>
+				) : null}
+				{!isIframe && !isAdvancedSearch ? (
+					<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))]'>
+						<div className='mx-auto max-w-[1024px] space-y-2 text-[rgb(var(--vs-text))] opacity-75'>
+							<div className='flex items-center justify-between gap-2'>
+								<div>
+									Developed by{' '}
+									<a
+										href='https://gnehs.net'
+										target='_blank'
+										rel='noreferrer'
+										className='text-[rgb(var(--vs-primary))] underline hover:opacity-80'
+									>
+										勝勝
+									</a>
+								</div>
+								<div className='flex justify-end'>
+									<Button
+										as='a'
+										icon
+										href='https://github.com/gnehs/ntut-course-web'
+										aria-label='查看 GitHub 原始碼'
+										target='_blank'
+										rel='noreferrer'
+									>
+										<GitBranch className='size-4' />
+									</Button>
+								</div>
 							</div>
 						</div>
-					</div>
-				</footer>
-			) : null}
-			<Dialog
-				open={datasetDialogOpen}
-				title='選擇學期與學制'
-				onClose={() => setDatasetDialogOpen(false)}
-			>
-				<DatasetForm
-					year={viewYear}
-					sem={viewSem}
-					department={viewDepartment}
-					yearSemItems={yearSemItems}
-					departmentItems={departmentItems}
-					onSubmit={applyDataset}
-				/>
-			</Dialog>
+					</footer>
+				) : null}
+				<Dialog
+					open={datasetDialogOpen}
+					title='選擇學期與學制'
+					onClose={() => setDatasetDialogOpen(false)}
+				>
+					<DatasetForm
+						year={viewYear}
+						sem={viewSem}
+						department={viewDepartment}
+						yearSemItems={yearSemItems}
+						departmentItems={departmentItems}
+						onSubmit={applyDataset}
+					/>
+				</Dialog>
+			</div>
 		</div>
 	);
 }
