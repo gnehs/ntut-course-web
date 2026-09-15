@@ -2,7 +2,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Search } from 'lucide-react';
 import { toast } from 'sonner';
-import { CourseList } from '../components/CourseList';
+import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -305,7 +305,8 @@ export function ProgramDetailPage() {
 			),
 		);
 
-	if (program === undefined && !error && !unavailable) return <ProgramDetailSkeleton />;
+	if (program === undefined && !error && !unavailable)
+		return <CourseCollectionSkeleton label='載入一般學程' />;
 	if (unavailable)
 		return (
 			<div className='flex flex-col gap-4'>
@@ -336,98 +337,67 @@ export function ProgramDetailPage() {
 
 	const sourceHref = safeProgramHref(program.href);
 	return (
-		<div className='flex flex-col gap-4'>
-			<div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-				<div>
-					<p className='m-0 font-mono text-sm opacity-65'>{program.id}</p>
-					<h1>{program.name}</h1>
-					{program.description ? <p className='m-0 opacity-75'>{program.description}</p> : null}
-				</div>
-			</div>
-
-			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<p className='m-0 text-sm opacity-70'>找到 {matchedCourses.length} 門課程</p>
-				{matchedCourses.length ? (
-					<Button
-						primary={!allSaved}
-						danger={allSaved}
-						onClick={allSaved ? removeProgramCourses : addProgramCourses}
-					>
-						{allSaved ? '從我的課程移除全部' : '全部加入我的課程'}
-					</Button>
-				) : null}
-			</div>
-
-			{courseErrors.length ? (
-				<Alert danger>
-					<strong>部分學制的課程資料無法載入</strong>
-					<ul className='mt-2 mb-0 list-disc pl-5 text-sm'>
-						{courseErrors.map(({ department, reason }) => (
-							<li key={department}>
-								{department}：{errorMessage(reason)}
-							</li>
-						))}
-					</ul>
-				</Alert>
-			) : null}
-
-			{matchedCourses.length ? (
-				<div className='flex flex-col gap-5'>
-					{matchedGroups
-						.filter((group) => group.courses.length)
-						.map((group) => (
-							<section key={group.department} className='flex flex-col gap-2'>
-								<h2 className='text-lg font-semibold'>{group.department}</h2>
-								<CourseList
-									courses={group.courses}
-									showTimetable
-									year={year}
-									sem={sem}
-									department={group.storageDepartment}
-									savedVersion={savedVersion}
-									onSavedChange={() => setSavedVersion((value) => value + 1)}
-								/>
-							</section>
-						))}
-				</div>
-			) : courseErrors.length ? (
-				<Alert>
-					<strong>目前無法確認此學程的課程清單</strong>
-					<p className='mt-1 mb-0 text-sm opacity-75'>部分學制資料載入失敗，請稍後再試。</p>
-				</Alert>
-			) : (
-				<Alert>此學程在目前三個學制的課程清單中沒有找到對應課程。</Alert>
-			)}
-			{sourceHref ? (
-				<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
-					<a
-						href={sourceHref}
-						target='_blank'
-						rel='noreferrer'
-						className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
-					>
-						學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
-					</a>
-				</div>
-			) : null}
-		</div>
-	);
-}
-
-function ProgramDetailSkeleton() {
-	return (
-		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入一般學程'>
-			<div className='flex flex-col gap-2'>
-				<Skeleton className='h-4 w-24' />
-				<Skeleton className='h-8 w-64 max-w-full' />
-			</div>
-			<Skeleton className='h-20 w-full' />
-			<Skeleton className='h-11 w-32' />
-			<div className='grid gap-3 sm:grid-cols-2'>
-				{Array.from({ length: 4 }, (_, index) => (
-					<Skeleton key={index} className='h-48 w-full' />
-				))}
-			</div>
-		</div>
+		<CourseCollectionPage
+			title={program.name}
+			code={program.id}
+			description={program.description}
+			year={year}
+			sem={sem}
+			groups={matchedGroups.map((group) => ({
+				key: group.storageDepartment,
+				label: group.department,
+				department: group.storageDepartment,
+				courses: group.courses,
+			}))}
+			actions={
+				<Button
+					primary={!allSaved}
+					danger={allSaved}
+					onClick={allSaved ? removeProgramCourses : addProgramCourses}
+				>
+					{allSaved ? '從我的課程移除全部' : '全部加入我的課程'}
+				</Button>
+			}
+			notice={
+				courseErrors.length ? (
+					<Alert danger>
+						<strong>部分學制的課程資料無法載入</strong>
+						<ul className='mt-2 mb-0 list-disc pl-5 text-sm'>
+							{courseErrors.map(({ department, reason }) => (
+								<li key={department}>
+									{department}：{errorMessage(reason)}
+								</li>
+							))}
+						</ul>
+					</Alert>
+				) : undefined
+			}
+			emptyState={
+				courseErrors.length ? (
+					<Alert>
+						<strong>目前無法確認此學程的課程清單</strong>
+						<p className='mt-1 mb-0 text-sm opacity-75'>部分學制資料載入失敗，請稍後再試。</p>
+					</Alert>
+				) : (
+					<Alert>此學程在目前三個學制的課程清單中沒有找到對應課程。</Alert>
+				)
+			}
+			savedVersion={savedVersion}
+			onSavedChange={() => setSavedVersion((value) => value + 1)}
+			footer={
+				sourceHref ? (
+					<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+						<a
+							href={sourceHref}
+							target='_blank'
+							rel='noreferrer'
+							className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
+						>
+							學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
+						</a>
+					</div>
+				) : undefined
+			}
+		/>
 	);
 }

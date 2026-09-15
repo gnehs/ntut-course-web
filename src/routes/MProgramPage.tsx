@@ -1,8 +1,8 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { CourseList } from '../components/CourseList';
-import { Check, Minus, Plus, Search, X } from 'lucide-react';
+import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
+import { Minus, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -127,7 +127,6 @@ export function MProgramDetailPage() {
 	const [program, setProgram] = useState<MicroProgram | null>(null);
 	const [courses, setCourses] = useState<Course[] | null>(null);
 	const [error, setError] = useState<unknown>(null);
-	const [showConflictCourse, setShowConflictCourse] = useState(true);
 	const [version, setVersion] = useState(0);
 	const storageKey = `my-couse-mprogram-${year}-${sem}`;
 	const programName = program?.name || '微學程';
@@ -191,105 +190,63 @@ export function MProgramDetailPage() {
 		setVersion((value) => value + 1);
 	}
 
-	if (!courses) return <MProgramDetailSkeleton />;
-	return (
-		<div className='flex flex-col gap-4'>
-			<div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-				<div>
-					<p className='m-0 font-mono text-sm opacity-65'>{id}</p>
-					<h1>{programName}</h1>
-				</div>
-			</div>
-
-			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<p className='m-0 text-sm opacity-70'>找到 {courses.length} 門課程</p>
-				<div className='flex flex-wrap items-center gap-2 sm:justify-end'>
-					<Button
-						active={showConflictCourse}
-						aria-pressed={showConflictCourse}
-						onClick={() => setShowConflictCourse((value) => !value)}
+	if (!courses) return <CourseCollectionSkeleton label='載入微學程' />;
+	const emptyState = error ? (
+		<></>
+	) : program ? (
+		<Alert>
+			<strong>查無資料</strong>
+			{program.href ? (
+				<>
+					<br />
+					<a
+						href={`https://aps.ntut.edu.tw/course/tw/${program.href}`}
+						target='_blank'
+						rel='noreferrer'
 					>
-						{showConflictCourse ? <Check className='size-4' /> : <X className='size-4' />}
-						衝堂課程
-					</Button>
-					{!isInMyCourse ? (
-						<Button primary onClick={addProgramCourses}>
-							<Plus className='size-4' />
-							加入我的課程
-						</Button>
-					) : (
-						<Button danger onClick={removeProgramCourses}>
-							<Minus className='size-4' />
-							從我的課程移除
-						</Button>
-					)}
-				</div>
-			</div>
-			{error ? (
-				<Alert danger>
-					<strong>微學程資料載入失敗</strong>
-					<p className='mt-1 mb-0 text-sm'>{errorMessage(error)}</p>
-				</Alert>
+						前往原始網頁
+					</a>
+					看看原本的資料
+				</>
 			) : null}
-			{courses.length ? (
-				<CourseList
-					courses={courses}
-					showTimetable
-					showConflictCourse={showConflictCourse}
-					year={year}
-					sem={sem}
-				/>
-			) : null}
-			{!courses.length && program ? (
-				<Alert>
-					<strong>查無資料</strong>
-					{program.href ? (
-						<>
-							<br />
-							<a
-								href={`https://aps.ntut.edu.tw/course/tw/${program.href}`}
-								target='_blank'
-								rel='noreferrer'
-							>
-								前往原始網頁
-							</a>
-							看看原本的資料
-						</>
-					) : null}
-				</Alert>
-			) : null}
-			<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
-				<h3 className='m-0'>贊助商廣告</h3>
-				<AdsByGoogle />
-			</section>
-		</div>
-	);
-}
-
-function MProgramDetailSkeleton() {
+		</Alert>
+	) : undefined;
 	return (
-		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入微學程'>
-			<div className='flex flex-col gap-2'>
-				<Skeleton className='h-4 w-24' />
-				<Skeleton className='h-8 w-64 max-w-full' />
-			</div>
-			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<Skeleton className='h-4 w-28' />
-				<div className='flex gap-2'>
-					<Skeleton className='h-11 w-24' />
-					<Skeleton className='h-11 w-32' />
-				</div>
-			</div>
-			<div className='flex justify-center gap-1 py-4'>
-				<Skeleton className='h-9 w-20' />
-				<Skeleton className='h-9 w-20' />
-				<Skeleton className='h-9 w-20' />
-			</div>
-			<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
-				{Array.from({ length: 6 }, (_, index) => (
-					<Skeleton key={index} className='h-48 w-full' />
-				))}
-			</div>
-		</div>
+		<CourseCollectionPage
+			title={programName}
+			code={id}
+			year={year}
+			sem={sem}
+			groups={[{ key: 'micro', courses }]}
+			actions={
+				!isInMyCourse ? (
+					<Button primary onClick={addProgramCourses}>
+						<Plus className='size-4' />
+						加入我的課程
+					</Button>
+				) : (
+					<Button danger onClick={removeProgramCourses}>
+						<Minus className='size-4' />
+						從我的課程移除
+					</Button>
+				)
+			}
+			notice={
+				error ? (
+					<Alert danger>
+						<strong>微學程資料載入失敗</strong>
+						<p className='mt-1 mb-0 text-sm'>{errorMessage(error)}</p>
+					</Alert>
+				) : undefined
+			}
+			emptyState={emptyState}
+			savedVersion={version}
+			footer={
+				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+					<h3 className='m-0'>贊助商廣告</h3>
+					<AdsByGoogle />
+				</section>
+			}
+		/>
 	);
 }

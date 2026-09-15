@@ -1,7 +1,8 @@
+import { CourseListToolbar } from './CourseListToolbar';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
-import { CircleAlert, Clock, Minus, PanelTop, Plus, Table } from 'lucide-react';
+import { CircleAlert, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import {
@@ -30,6 +31,9 @@ const PAGE_SIZE = 54;
 type CourseListProps = {
 	courses: Course[] | null;
 	emptyState?: React.ReactNode;
+	showToolbar?: boolean;
+	toolbarStart?: React.ReactNode;
+	toolbarEnd?: React.ReactNode;
 	layout?: CourseListLayout;
 	onLayoutChange?: (layout: CourseListLayout) => void;
 	onPageChange?: (page: number) => void;
@@ -60,6 +64,9 @@ type TimetableCourseItem = Course & {
 export function CourseList({
 	courses,
 	emptyState,
+	showToolbar = true,
+	toolbarStart,
+	toolbarEnd,
 	layout: controlledLayout,
 	onLayoutChange,
 	onPageChange,
@@ -133,7 +140,7 @@ export function CourseList({
 			return;
 		}
 		setInternalPage(1);
-	}, [controlledPage, courses, showConflictCourse]);
+	}, [controlledPage, courses, showConflictCourse, layout]);
 
 	useEffect(() => {
 		if (page > pageCount) updatePage(1);
@@ -179,56 +186,37 @@ export function CourseList({
 
 	return (
 		<div>
-			<div className='flex flex-wrap items-center justify-center gap-1 py-4'>
-				<Button
-					active={layout === 'table'}
-					aria-pressed={layout === 'table'}
-					className='m-0'
-					onClick={() => changeLayout('table')}
-				>
-					<Table className='size-4' />
-					表格
-				</Button>
-				<Button
-					active={layout === 'card'}
-					aria-pressed={layout === 'card'}
-					className='m-0'
-					onClick={() => changeLayout('card')}
-				>
-					<PanelTop className='size-4' />
-					卡片
-				</Button>
-				{showTimetable ? (
-					<Button
-						active={layout === 'timetable'}
-						aria-pressed={layout === 'timetable'}
-						onClick={() => changeLayout('timetable')}
-					>
-						<Clock className='size-4' />
-						課表
-					</Button>
-				) : null}
-			</div>
+			{showToolbar ? (
+				<CourseListToolbar
+					layout={layout}
+					onLayoutChange={changeLayout}
+					showTimetable={showTimetable}
+					toolbarStart={toolbarStart}
+					toolbarEnd={toolbarEnd}
+				/>
+			) : null}
 			{layout === 'card' ? (
 				<>
-					<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
+					<div className='grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'>
 						{pageItems.map((course) => {
 							const saved = savedCourseIds.includes(course.id);
 							const timeItems = parseCourseTime(course.time);
 							return (
 								<Card
 									key={course.id}
-									className='hoverable px-4 py-3 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
+									className='hoverable px-4 py-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'
 								>
 									<Link
 										to={`/course/${viewYear}/${viewSem}/${course.id}`}
 										aria-label={`查看 ${courseTitle(course)} 課程詳情`}
 										className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 									/>
-									<div className='pointer-events-none relative z-[1] flex h-full min-h-[10.25rem] flex-col'>
-										<div className='relative pr-14'>
-											<CardTitle className='flex-wrap gap-1 leading-snug [overflow-wrap:anywhere]'>
-												<CourseDisplayHeading course={course} />
+									<div className='pointer-events-none relative z-[1] flex flex-col'>
+										<div className='relative pr-11'>
+											<div className='flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1'>
+												<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
+													<CourseDisplayHeading course={course} />
+												</CardTitle>
 												{conflictCourseData.includes(course.id) ? (
 													<Tag
 														color='rgba(var(--vs-danger),0.15)'
@@ -238,10 +226,14 @@ export function CourseList({
 														衝堂
 													</Tag>
 												) : null}
-											</CardTitle>
+											</div>
 											<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
+											{getGeneralCourseTags(course).length ? (
+												<div className='mt-2'>
+													<CourseTags course={course} />
+												</div>
+											) : null}
 										</div>
-										<CourseTags course={course} />
 										<div className='mt-3 grid grid-cols-[repeat(auto-fit,minmax(4.25rem,1fr))] gap-x-3 gap-y-2'>
 											<CourseMetric title='課號' value={course.id} />
 											<CourseMetric title='學分' value={formatCredit(course.credit)} />
@@ -374,7 +366,7 @@ function CourseTags({ course }: { course: Course }) {
 	const tags = getGeneralCourseTags(course);
 	if (!tags.length) return null;
 	return (
-		<div className='mt-2 flex flex-wrap gap-1'>
+		<div className='flex flex-wrap gap-1'>
 			{tags.map((tag) => (
 				<Tag key={tag.name} color={tag.color} textColor={tag.textColor}>
 					{tag.name}

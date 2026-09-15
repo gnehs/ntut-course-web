@@ -1,7 +1,7 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { CourseList } from '../components/CourseList';
+import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { Minus, Plus, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
@@ -9,7 +9,7 @@ import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
-import { ClassDetailSkeleton, ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons';
+import { ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCourse, fetchDepartment } from '../lib/courseApi';
 import { departmentItems, storageDepartment } from '../lib/courseUtils';
 import { usePageTitle } from '../lib/pageTitle';
@@ -228,35 +228,35 @@ export function ClassDetailPage() {
 		setVersion((value) => value + 1);
 	}
 
-	if (!courses) return <ClassDetailSkeleton />;
+	if (!courses) return <CourseCollectionSkeleton label='載入班級課程' />;
 
 	return (
-		<div className='space-y-4'>
-			<div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-				<div className='flex flex-col gap-1'>
-					<h1>{id}</h1>
-					<p className='m-0 text-sm opacity-75'>{courses.length} 門課程</p>
-				</div>
-				<div className='flex flex-wrap items-center gap-2 sm:justify-end'>
-					{!isInMyCourse ? (
-						<Button primary onClick={addClassCourses}>
-							<Plus className='size-4' />
-							加入到我的課程
-						</Button>
-					) : (
-						<Button danger onClick={removeClassCourses}>
-							<Minus className='size-4' />
-							從我的課程中移除
-						</Button>
-					)}
-				</div>
-			</div>
-			{!courses.length && classData ? <Alert>此班級目前沒有課程。</Alert> : null}
-			{courses.length ? (
-				<CourseList courses={courses} showTimetable year={year} sem={sem} department={department} />
-			) : null}
-			<h3 className='mb-4'>贊助商廣告</h3>
-			<AdsByGoogle />
-		</div>
+		<CourseCollectionPage
+			title={id}
+			year={year}
+			sem={sem}
+			groups={[{ key: 'class', department, courses }]}
+			actions={
+				!isInMyCourse ? (
+					<Button primary onClick={addClassCourses}>
+						<Plus className='size-4' />
+						加入到我的課程
+					</Button>
+				) : (
+					<Button danger onClick={removeClassCourses}>
+						<Minus className='size-4' />
+						從我的課程中移除
+					</Button>
+				)
+			}
+			emptyState={classData ? <Alert>此班級目前沒有課程。</Alert> : undefined}
+			savedVersion={version}
+			footer={
+				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
+					<h3 className='m-0'>贊助商廣告</h3>
+					<AdsByGoogle />
+				</section>
+			}
+		/>
 	);
 }
