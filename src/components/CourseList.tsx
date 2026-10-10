@@ -275,7 +275,7 @@ export function CourseList({
 					<div className='overflow-x-auto'>
 						<table className='w-full min-w-[860px] border-collapse text-left'>
 							<thead>
-								<tr className='text-shadow-emboss bg-linear-to-b from-[rgba(var(--vs-text),0.015)] to-[rgba(var(--vs-text),0.05)] text-sm'>
+								<tr className='text-shadow-emboss bg-[rgba(var(--vs-text),0.035)] text-sm'>
 									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>課號</th>
 									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 										課程名稱

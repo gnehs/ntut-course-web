@@ -195,7 +195,7 @@ export function CourseDetailPage() {
 					{isInMyCourse ? '從我的課程移除' : '加入我的課程'}
 				</Button>
 				<div className={panelClassName}>
-					<div className='rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)] bg-linear-to-b from-[rgba(var(--vs-text),0.04)] to-transparent'>
+					<div className='rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)]'>
 						<CourseStat label='課號' value={currentCourse.id} />
 						<CourseStat label='學分' value={formatCredit(course.credit)} />
 						<WithdrawalRateStat

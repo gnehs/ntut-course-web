@@ -328,7 +328,7 @@ export function StandardPage() {
 												key={`${courseYear}-${sem}`}
 												className='rounded-surface shadow-rest overflow-hidden bg-[rgb(var(--vs-background))]'
 											>
-												<div className='flex items-baseline justify-between gap-3 border-b border-[rgba(var(--vs-text),0.08)] bg-linear-to-b from-[rgba(var(--vs-text),0.015)] to-[rgba(var(--vs-text),0.045)] px-4 py-2.5'>
+												<div className='flex items-baseline justify-between gap-3 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.035)] px-4 py-2.5'>
 													<h3 className='m-0 text-sm font-semibold'>
 														{gradeLabel(courseYear, sem)}
 													</h3>
