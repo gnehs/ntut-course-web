@@ -22,13 +22,45 @@ async function fetchJson<T>(url: string): Promise<T> {
 	return response.json();
 }
 
-export async function fetchYearData(): Promise<YearSemData> {
+const pendingRequests = new Map<string, Promise<unknown>>();
+
+/**
+ * Callers asking for the same dataset before it settles share one request. Pages and the
+ * navbar search mount together, so each would otherwise download and compress its own copy.
+ */
+function shared<T>(key: string, load: () => Promise<T>): Promise<T> {
+	const pending = pendingRequests.get(key);
+	if (pending) return pending as Promise<T>;
+	const request = load().finally(() => pendingRequests.delete(key));
+	pendingRequests.set(key, request);
+	return request;
+}
+
+/** Persisting is best effort: a full or blocked IndexedDB must not fail data that already arrived. */
+function remember(key: string, data: unknown, expiration?: number) {
+	const saved = expiration === undefined ? setStore(key, data) : setStore(key, data, expiration);
+	void Promise.resolve(saved).catch(() => {});
+}
+
+function fetchCached<T>(key: string, path: string, expiration?: number): Promise<T> {
+	return shared(key, async () => {
+		const cached = await getStore(key);
+		if (cached) return cached as T;
+		const data = await fetchJson<T>(`${API_BASE}/${path}`);
+		remember(key, data, expiration);
+		return data;
+	});
+}
+
+export function fetchYearData(): Promise<YearSemData> {
 	const key = 'main_year';
-	const cached = sessionStorage.getItem(key);
-	if (cached) return JSON.parse(cached) as YearSemData;
-	const data = await fetchJson<YearSemData>(`${API_BASE}/main.json`);
-	sessionStorage.setItem(key, JSON.stringify(data));
-	return data;
+	return shared(key, async () => {
+		const cached = sessionStorage.getItem(key);
+		if (cached) return JSON.parse(cached) as YearSemData;
+		const data = await fetchJson<YearSemData>(`${API_BASE}/main.json`);
+		sessionStorage.setItem(key, JSON.stringify(data));
+		return data;
+	});
 }
 
 export async function fetchCourse(
@@ -37,12 +69,7 @@ export async function fetchCourse(
 	department = 'main',
 ): Promise<Course[]> {
 	if (!year || !sem) return [];
-	const dataKey = `course_${year}_${sem}_${department}`;
-	const cached = await getStore(dataKey);
-	if (cached) return cached as Course[];
-	const data = await fetchJson<Course[]>(`${API_BASE}/${year}/${sem}/${department}.json`);
-	await setStore(dataKey, data);
-	return data;
+	return fetchCached(`course_${year}_${sem}_${department}`, `${year}/${sem}/${department}.json`);
 }
 
 export async function fetchCourseDetail(
@@ -51,58 +78,34 @@ export async function fetchCourseDetail(
 	id: string,
 ): Promise<SyllabusItem[]> {
 	if (!year || !sem) return [];
-	const key = `course_detail_${year}_${sem}_${id}`;
-	const cached = await getStore(key);
-	if (cached) return cached as SyllabusItem[];
-	const data = await fetchJson<SyllabusItem[]>(`${API_BASE}/${year}/${sem}/course/${id}.json`);
-	await setStore(key, data);
-	return data;
+	return fetchCached(`course_detail_${year}_${sem}_${id}`, `${year}/${sem}/course/${id}.json`);
 }
 
 export async function fetchDepartment(year: string, sem: string): Promise<DepartmentGroup[]> {
 	if (!year || !sem) return [];
-	const key = `department_${year}_${sem}`;
-	const cached = await getStore(key);
-	if (cached) return cached as DepartmentGroup[];
-	const data = await fetchJson<DepartmentGroup[]>(`${API_BASE}/${year}/${sem}/department.json`);
-	await setStore(key, data);
-	return data;
+	return fetchCached(`department_${year}_${sem}`, `${year}/${sem}/department.json`);
 }
 
-export async function fetchWithdrawalRate(period = ''): Promise<WithdrawalRateMap> {
-	const key = `withdrawalRate${period}`;
-	const cached = await getStore(key);
-	if (cached) return cached as WithdrawalRateMap;
-	const data = await fetchJson<WithdrawalRateMap>(
-		`${API_BASE}/analytics/withdrawal-rate${period}.json`,
-	);
-	await setStore(key, data, 30);
-	return data;
+export function fetchWithdrawalRate(period = ''): Promise<WithdrawalRateMap> {
+	return fetchCached(`withdrawalRate${period}`, `analytics/withdrawal-rate${period}.json`, 30);
 }
 
-export async function fetchWithdrawal(period = ''): Promise<WithdrawalResponse> {
-	return fetchJson<WithdrawalResponse>(`${API_BASE}/analytics/withdrawal${period}.json`);
+export function fetchWithdrawal(period = ''): Promise<WithdrawalResponse> {
+	const url = `${API_BASE}/analytics/withdrawal${period}.json`;
+	return shared(url, () => fetchJson<WithdrawalResponse>(url));
 }
 
-export async function fetchCalendar(): Promise<CalendarEvent[]> {
-	return fetchJson<CalendarEvent[]>(`${API_BASE}/calendar.json`);
+export function fetchCalendar(): Promise<CalendarEvent[]> {
+	const url = `${API_BASE}/calendar.json`;
+	return shared(url, () => fetchJson<CalendarEvent[]>(url));
 }
 
-export async function fetchStandards(): Promise<string[]> {
-	const cached = await getStore('standards');
-	if (cached) return cached as string[];
-	const data = await fetchJson<string[]>(`${API_BASE}/standards.json`);
-	await setStore('standards', data, 30);
-	return data;
+export function fetchStandards(): Promise<string[]> {
+	return fetchCached('standards', 'standards.json', 30);
 }
 
-export async function fetchStandardYear(year: string): Promise<StandardYearData> {
-	const key = `standard_${year}`;
-	const cached = await getStore(key);
-	if (cached) return cached as StandardYearData;
-	const data = await fetchJson<StandardYearData>(`${API_BASE}/${year}/standard.json`);
-	await setStore(key, data, 30);
-	return data;
+export function fetchStandardYear(year: string): Promise<StandardYearData> {
+	return fetchCached(`standard_${year}`, `${year}/standard.json`, 30);
 }
 
 /** Only the admission year is sent; student identifiers stay in the input. */
@@ -119,34 +122,33 @@ export async function fetchStandardDepartments(year: string): Promise<StandardDe
 					(field) => typeof entry[field] === 'string' && entry[field].length > 0,
 				),
 		);
-	const cached = await getStore(key);
-	if (valid(cached)) return cached;
-	const data = await fetchJson<unknown>(`${API_BASE}/${year}/standard-departments.json`);
-	if (!valid(data)) throw new Error('系所索引格式不正確');
-	await setStore(key, data, 1);
-	return data;
+	return shared(key, async () => {
+		const cached = await getStore(key);
+		if (valid(cached)) return cached;
+		const data = await fetchJson<unknown>(`${API_BASE}/${year}/standard-departments.json`);
+		if (!valid(data)) throw new Error('系所索引格式不正確');
+		remember(key, data, 1);
+		return data;
+	});
 }
 
 export async function fetchMicroPrograms(year: string, sem: string): Promise<MicroProgram[]> {
 	if (!year || !sem) return [];
-	const key = `mprogram_${year}_${sem}`;
-	const cached = await getStore(key);
-	if (cached) return cached as MicroProgram[];
-	const data = await fetchJson<MicroProgram[]>(`${API_BASE}/${year}/${sem}/mprogram.json`);
-	await setStore(key, data, 30);
-	return data;
+	return fetchCached(`mprogram_${year}_${sem}`, `${year}/${sem}/mprogram.json`, 30);
 }
 
-async function fetchOptionalDataset<T>(path: string): Promise<T | null> {
+function fetchOptionalDataset<T>(path: string): Promise<T | null> {
 	const key = `optional_${path}`;
-	const cached = await getStore(key);
-	if (cached) return cached as T;
-	const response = await fetch(`${API_BASE}/${path}`);
-	if (response.status === 404) return null;
-	if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-	const data = (await response.json()) as T;
-	await setStore(key, data);
-	return data;
+	return shared(key, async () => {
+		const cached = await getStore(key);
+		if (cached) return cached as T;
+		const response = await fetch(`${API_BASE}/${path}`);
+		if (response.status === 404) return null;
+		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+		const data = (await response.json()) as T;
+		remember(key, data);
+		return data;
+	});
 }
 
 export function fetchPrograms(year: string, sem: string): Promise<Program[] | null> {

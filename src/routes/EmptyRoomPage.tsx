@@ -32,6 +32,7 @@ export function EmptyRoomPage() {
 	const [emptyroomDetailRoomName, setEmptyroomDetailRoomName] = useState<string | null>(null);
 
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
 		setCourses(null);
 		setOnError(null);

@@ -63,6 +63,7 @@ export function ProgramIndexPage() {
 	usePageTitle('一般學程');
 
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
 		setPrograms(null);
 		setUnavailable(false);

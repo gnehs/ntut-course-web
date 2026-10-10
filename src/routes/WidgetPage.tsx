@@ -23,6 +23,7 @@ export function WidgetPage() {
 	const { dataset, getCourses, getMyCourseIds } = useApp();
 	const [courses, setCourses] = useState<WidgetCourse[] | null>(null);
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
 		async function load() {
 			const ids = getMyCourseIds();
@@ -43,7 +44,9 @@ export function WidgetPage() {
 				);
 			}
 		}
-		load().catch(() => setCourses([]));
+		load().catch(() => {
+			if (!cancelled) setCourses([]);
+		});
 		return () => {
 			cancelled = true;
 		};

@@ -24,6 +24,7 @@ export function MProgramIndexPage() {
 	usePageTitle('微學程');
 
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
 		setPrograms(null);
 		setError(null);

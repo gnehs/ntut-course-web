@@ -175,3 +175,38 @@ describe('student prefix department index', () => {
 		expect(mocks.fetch).not.toHaveBeenCalled();
 	});
 });
+
+describe('concurrent requests for one dataset', () => {
+	const courses = [{ id: 'course-001' }];
+
+	it('shares a single download between callers that overlap', async () => {
+		let resolveFetch: (value: unknown) => void = () => {};
+		mocks.fetch.mockReturnValue(new Promise((resolve) => (resolveFetch = resolve)));
+
+		const first = fetchCourse('115', '1', 'main');
+		const second = fetchCourse('115', '1', 'main');
+		const other = fetchCourse('115', '1', '進修部');
+		await vi.waitFor(() => expect(mocks.fetch).toHaveBeenCalledTimes(2));
+		resolveFetch(response(courses));
+
+		await expect(first).resolves.toEqual(courses);
+		await expect(second).resolves.toEqual(courses);
+		await expect(other).resolves.toEqual(courses);
+		expect(mocks.fetch).toHaveBeenCalledTimes(2);
+		expect(mocks.setStore).toHaveBeenCalledTimes(2);
+	});
+
+	it('retries after a failed request instead of reusing the rejection', async () => {
+		mocks.fetch.mockResolvedValueOnce(response(null, 500)).mockResolvedValue(response(courses));
+
+		await expect(fetchCourse('115', '1', 'main')).rejects.toThrow('500 Server Error');
+		await expect(fetchCourse('115', '1', 'main')).resolves.toEqual(courses);
+	});
+
+	it('returns downloaded data even when it cannot be persisted', async () => {
+		mocks.fetch.mockResolvedValue(response(courses));
+		mocks.setStore.mockRejectedValue(new Error('QuotaExceededError'));
+
+		await expect(fetchCourse('115', '1', 'main')).resolves.toEqual(courses);
+	});
+});

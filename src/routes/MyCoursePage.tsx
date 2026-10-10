@@ -20,6 +20,7 @@ export function MyCoursePage() {
 	const [version, setVersion] = useState(0);
 
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
 		async function load() {
 			setCourses(null);

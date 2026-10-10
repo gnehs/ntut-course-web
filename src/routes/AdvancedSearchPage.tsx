@@ -299,6 +299,7 @@ export function AdvancedSearchPage() {
 	}, [allCourses, courseStandardOptions]);
 
 	useEffect(() => {
+		if (!year || !sem) return undefined;
 		let cancelled = false;
 		async function load() {
 			setIsLoading(true);

@@ -14,7 +14,13 @@ export async function getStore(key) {
 	if (memoryCache.has(key)) return memoryCache.get(key);
 	const raw = await localforage.getItem(key);
 	if (!raw) return null;
-	const data = JSON.parse(new TextDecoder('utf-8').decode(inflate(raw)));
+	let data;
+	try {
+		data = JSON.parse(new TextDecoder('utf-8').decode(inflate(raw)));
+	} catch {
+		// A truncated or corrupt entry is a cache miss, so the caller fetches a fresh copy.
+		return null;
+	}
 	if (data.expiration < Date.now()) return null;
 	memoryCache.set(key, data.data);
 	return data.data;

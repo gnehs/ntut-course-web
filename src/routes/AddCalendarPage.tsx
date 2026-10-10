@@ -22,6 +22,7 @@ export function AddCalendarPage() {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
 		async function load() {
 			const calendar = await fetchCalendar().catch(() => []);

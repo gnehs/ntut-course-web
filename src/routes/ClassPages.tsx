@@ -36,7 +36,11 @@ export function ClassIndexPage() {
 	const [error, setError] = useState<unknown>(null);
 
 	useEffect(() => {
+		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
+		setDepartments(null);
+		setRecommendClass([]);
+		setError(null);
 		async function load() {
 			try {
 				const data = await fetchDepartment(dataset.year, dataset.sem);
@@ -67,7 +71,7 @@ export function ClassIndexPage() {
 						if (found) recommendations.push({ ...found, description: '博雅課程' });
 					}
 				}
-				setRecommendClass(recommendations);
+				if (!cancelled) setRecommendClass(recommendations);
 			} catch (e) {
 				if (!cancelled) {
 					setError(e);
@@ -184,6 +188,8 @@ export function ClassDetailPage() {
 
 	useEffect(() => {
 		let cancelled = false;
+		setCourses(null);
+		setClassData(null);
 		async function load() {
 			const [departments, allCourses] = await Promise.all([
 				fetchDepartment(year, sem),
@@ -200,7 +206,9 @@ export function ClassDetailPage() {
 				setCourses(result);
 			}
 		}
-		load().catch(() => setCourses([]));
+		load().catch(() => {
+			if (!cancelled) setCourses([]);
+		});
 		return () => {
 			cancelled = true;
 		};

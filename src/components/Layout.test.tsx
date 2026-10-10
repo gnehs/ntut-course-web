@@ -9,6 +9,7 @@ const fixtures = vi.hoisted(() => ({
 	retryDataset: vi.fn(),
 	error: null as unknown,
 	loadingDataset: false,
+	yearSemItems: ['115-1', '114-2'],
 	dataset: { year: '115', sem: '1', department: 'main' },
 	location: {
 		pathname: '/advanced-search',
@@ -38,7 +39,7 @@ vi.mock('../state/AppContext', async () => {
 				retryDataset: fixtures.retryDataset,
 				error: fixtures.error,
 				loadingDataset: fixtures.loadingDataset,
-				yearSemItems: ['115-1', '114-2'],
+				yearSemItems: fixtures.yearSemItems,
 				departmentItems: ['日間部'],
 				datasetDialogOpen,
 				setDatasetDialogOpen,
@@ -52,6 +53,7 @@ describe('dataset dialog', () => {
 		vi.clearAllMocks();
 		fixtures.error = null;
 		fixtures.loadingDataset = false;
+		fixtures.yearSemItems = ['115-1', '114-2'];
 		fixtures.dataset = { year: '115', sem: '1', department: 'main' };
 		fixtures.location.pathname = '/advanced-search';
 		fixtures.location.search.year = '114';
@@ -123,5 +125,26 @@ describe('dataset dialog', () => {
 			page: undefined,
 			q: { k: '測試' },
 		});
+	});
+
+	it('applies the latest semester when the dialog was opened before the index loaded', async () => {
+		const user = userEvent.setup();
+		fixtures.location.pathname = '/';
+		fixtures.loadingDataset = true;
+		fixtures.yearSemItems = [];
+		fixtures.dataset = { year: '', sem: '', department: 'main' };
+		const { rerender } = render(<Layout />);
+
+		await user.click(screen.getByRole('button', { name: '正在載入學期' }));
+		expect(screen.getByRole('button', { name: '正在載入學期…' })).toBeDisabled();
+
+		fixtures.loadingDataset = false;
+		fixtures.yearSemItems = ['115-1', '114-2'];
+		rerender(<Layout />);
+		await waitFor(() =>
+			expect(screen.getByRole('combobox', { name: '學期' })).toHaveTextContent('115 年上學期'),
+		);
+		await user.click(screen.getByRole('button', { name: '套用學期與學制' }));
+		expect(fixtures.setDataset).toHaveBeenCalledWith({ year: '115', sem: '1', department: 'main' });
 	});
 });

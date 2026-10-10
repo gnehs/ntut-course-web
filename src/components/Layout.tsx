@@ -164,7 +164,7 @@ export function Layout() {
 				) : null}
 				{!isIframe && !isAdvancedSearch ? (
 					<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_-1px_0_var(--hairline)]'>
-						<div className='mx-auto max-w-[1024px] text-foreground-soft space-y-2'>
+						<div className='text-foreground-soft mx-auto max-w-[1024px] space-y-2'>
 							<div className='flex items-center justify-between gap-2'>
 								<div>
 									Developed by{' '}
@@ -199,6 +199,8 @@ export function Layout() {
 					onClose={() => setDatasetDialogOpen(false)}
 				>
 					<DatasetForm
+						// Radix Select keeps a blank trigger when its value arrives after mount.
+						key={yearSemItems.length ? 'ready' : 'loading'}
 						year={viewYear}
 						sem={viewSem}
 						department={viewDepartment}
@@ -213,13 +215,17 @@ export function Layout() {
 }
 
 function DatasetForm({ year, sem, department, yearSemItems, departmentItems, onSubmit }) {
-	const [yearSemValue, setYearSemValue] = useState(`${year}-${sem}`);
+	// The dialog can open before the semester index arrives, so the default is derived per render.
+	const [selectedYearSem, setYearSemValue] = useState<string | null>(null);
+	const yearSemValue = selectedYearSem ?? (year && sem ? `${year}-${sem}` : yearSemItems[0] || '');
 	const [departmentValue, setDepartmentValue] = useState(displayDepartment(department));
+	const ready = yearSemItems.length > 0 && Boolean(yearSemValue);
 	return (
 		<form
 			className='grid gap-4'
 			onSubmit={(event) => {
 				event.preventDefault();
+				if (!ready) return;
 				const [nextYear, nextSem] = yearSemValue.split('-');
 				onSubmit({ year: nextYear, sem: nextSem, department: storageDepartment(departmentValue) });
 			}}
@@ -242,8 +248,8 @@ function DatasetForm({ year, sem, department, yearSemItems, departmentItems, onS
 					))}
 				</Select>
 			</Field>
-			<Button primary type='submit' className='w-full'>
-				套用學期與學制
+			<Button primary type='submit' className='w-full' disabled={!ready}>
+				{ready ? '套用學期與學制' : '正在載入學期…'}
 			</Button>
 		</form>
 	);

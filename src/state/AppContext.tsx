@@ -58,8 +58,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 	const setDataset = useCallback((next: Partial<Dataset>) => {
 		setDatasetState((current) => {
 			const normalized = {
-				year: next.year ?? current.year,
-				sem: next.sem ?? current.sem,
+				// An empty value would blank the semester and leave every page without data.
+				year: next.year || current.year,
+				sem: next.sem || current.sem,
 				department: storageDepartment(next.department ?? current.department),
 			};
 			localStorage.setItem('data-year', normalized.year);
