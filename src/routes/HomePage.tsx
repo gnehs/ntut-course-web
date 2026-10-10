@@ -306,7 +306,7 @@ function SiteNavigation() {
 			<h2 id='site-heading' className='text-muted-foreground m-0 px-1 text-sm font-medium'>
 				網站與資料
 			</h2>
-			<nav aria-label='網站與資料連結' className='-mx-2 flex flex-wrap gap-x-1'>
+			<nav aria-label='網站與資料連結' className='-mx-1 flex flex-wrap gap-x-1'>
 				{links.map(({ to, title, icon: Icon }) => (
 					<Link
 						key={to}
