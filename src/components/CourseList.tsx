@@ -403,7 +403,7 @@ function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => v
 			aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 			className={cn(
 				'rounded-control pointer-events-auto absolute -top-1 -right-1 grid size-11 place-items-center border-0 bg-transparent p-0 transition-colors',
-				'before:rounded-control before:bg-sheen-soft before:shadow-soft hover:before:shadow-soft-hover text-[rgb(var(--tone))] outline-none before:absolute before:inset-1.5 before:transition-[background-color,box-shadow]',
+				'before:rounded-control before:shadow-soft hover:before:shadow-soft-hover text-[rgb(var(--tone))] outline-none before:absolute before:inset-1.5 before:transition-[background-color,box-shadow]',
 				'focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)]',
 				saved
 					? 'tone-danger before:bg-[rgba(var(--vs-danger),0.15)] hover:before:bg-[rgba(var(--vs-danger),0.2)]'
@@ -521,7 +521,7 @@ function TimetableCourses({
 							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
 							to={`/course/${year}/${sem}/${item.id}`}
 							className={cn(
-								'rounded-control bg-sheen-soft shadow-soft hover:shadow-soft-hover relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-[background-color,box-shadow]',
+								'rounded-control shadow-soft hover:shadow-soft-hover relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-[background-color,box-shadow]',
 								item.isConflict
 									? 'tone-danger bg-[rgba(var(--vs-danger),0.16)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.22)]'
 									: 'tone-primary bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
