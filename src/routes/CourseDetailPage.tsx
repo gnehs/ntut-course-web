@@ -293,10 +293,13 @@ export function CourseDetailPage() {
 				<div className={panelClassName}>
 					<section className={docSectionClassName}>
 						<h3 className={docHeadingClassName}>課程概述</h3>
-						<div className='flex min-w-0 flex-col gap-2'>
-							<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
-							<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
-						</div>
+						{/* The English description repeats the Chinese one, so it only stands in when that is missing. */}
+						<HtmlText
+							text={
+								course.description?.zh?.trim() || course.description?.en?.trim() || '尚無課程概述'
+							}
+							as='p'
+						/>
 					</section>
 				</div>
 				{selectedSyllabus &&
