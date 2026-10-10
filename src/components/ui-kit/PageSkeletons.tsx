@@ -127,7 +127,7 @@ function CourseCardsSkeleton({
 	return (
 		<div>
 			{showToolbar ? <CourseResultToolbarSkeleton showTimetable={showTimetable} /> : null}
-			<div className='grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3'>
+			<div className='grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'>
 				{Array.from({ length: count }, (_, index) => (
 					<CourseCardSkeleton key={index} />
 				))}

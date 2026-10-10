@@ -5,6 +5,7 @@ import type React from 'react';
 import { CircleAlert, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdsByGoogle } from './AdsByGoogle';
+import { CourseTimeChips } from './CourseTimeChips';
 import { cn } from '../lib/utils';
 import {
 	courseStandard,
@@ -15,7 +16,6 @@ import {
 	getGeneralCourseTags,
 	getSportsCourseTitle,
 	isSportsCourse,
-	parseCourseTime,
 	timetable,
 	trimEllip,
 } from '../lib/courseUtils';
@@ -205,7 +205,6 @@ export function CourseList({
 					<div className='grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'>
 						{pageItems.map((course, index) => {
 							const saved = savedCourseIds.includes(course.id);
-							const timeItems = parseCourseTime(course.time);
 							const conflicted = conflictCourseData.includes(course.id);
 							return (
 								<Fragment key={course.id}>
@@ -230,36 +229,22 @@ export function CourseList({
 												</div>
 												<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
 											</div>
-											{conflicted || getGeneralCourseTags(course).length ? (
+											{getGeneralCourseTags(course).length ? (
 												<div className='flex flex-wrap gap-1'>
-													{conflicted ? (
-														<Tag
-															color='rgba(var(--vs-danger),0.15)'
-															textColor={`rgb(var(--vs-danger))`}
-														>
-															<CircleAlert className='size-3.5' />
-															衝堂
-														</Tag>
-													) : null}
 													<CourseTags course={course} />
 												</div>
 											) : null}
 											<dl className='m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm leading-5'>
 												<CourseMetaLine label='時間'>
-													{timeItems.length ? (
-														<span className='flex flex-wrap gap-1'>
-															{timeItems.map((item) => (
-																<span
-																	key={item.title}
-																	className='rounded-sm bg-[rgba(var(--vs-text),0.07)] px-1.5 font-medium whitespace-nowrap tabular-nums'
-																>
-																	{item.title} {item.content}
-																</span>
-															))}
-														</span>
-													) : (
-														<span className='opacity-60'>無資料</span>
-													)}
+													<CourseTimeChips time={course.time}>
+														{/* A conflict is a property of the time slot, so it sits beside it instead of taking its own row. */}
+														{conflicted ? (
+															<span className='inline-flex items-center gap-1 rounded-sm bg-[rgba(var(--vs-danger),0.12)] px-1.5 font-medium whitespace-nowrap text-[rgb(var(--vs-danger))]'>
+																<CircleAlert className='size-3.5' />
+																衝堂
+															</span>
+														) : null}
+													</CourseTimeChips>
 												</CourseMetaLine>
 												<CourseMetaLine label='教師' truncate>
 													{(course.teacher || []).map((item) => item.name).join('、') || '無資料'}
@@ -325,9 +310,7 @@ export function CourseList({
 												{formatCredit(course.credit)}
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap tabular-nums'>
-												{parseCourseTime(course.time)
-													.map((item) => `${item.title} ${item.content}`)
-													.join('、')}
+												<CourseTimeChips time={course.time} fallback='' wrap={false} />
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 9)}

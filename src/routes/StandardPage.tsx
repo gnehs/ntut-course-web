@@ -16,7 +16,7 @@ import type {
 } from '../types/course';
 import { errorMessage } from '../lib/error';
 import { courseStandard, formatCredit, isZeroCreditValue } from '../lib/courseUtils';
-import { Building2, Calendar, Search } from 'lucide-react';
+import { Building2, Calendar, GraduationCap, Search } from 'lucide-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
 
@@ -223,6 +223,24 @@ export function StandardPage() {
 						</div>
 					</TabsContent>
 				</Tabs>
+			) : null}
+
+			{years && !year ? (
+				<div className='rounded-surface shadow-rest flex flex-col items-center gap-3 bg-[rgb(var(--vs-background))] px-4 py-10 text-center'>
+					<div
+						aria-hidden='true'
+						className='text-muted-foreground grid size-14 place-items-center rounded-full bg-[rgba(var(--vs-text),0.06)]'
+					>
+						<GraduationCap className='size-6' />
+					</div>
+					<div className='flex max-w-[30rem] flex-col gap-2'>
+						<strong className='text-lg leading-snug'>還沒選擇課程標準</strong>
+						<p className='text-muted-foreground m-0 text-sm leading-relaxed'>
+							輸入學號前五碼就能直接找到自己的系所，例如 114 學年度入學就是 114
+							開頭。選好之後會列出畢業學分門檻，以及各年級上下學期的必選修課程。
+						</p>
+					</div>
+				</div>
 			) : null}
 
 			{year && system && department ? (

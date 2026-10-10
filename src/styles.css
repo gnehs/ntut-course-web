@@ -153,7 +153,6 @@
 	--vs-gray-1: 244, 247, 248;
 	--vs-gray-2: 228, 233, 236;
 	--vs-danger: 234, 84, 85;
-	--vs-success: 21, 128, 61;
 	--vs-shadow: 24, 39, 75;
 	--vs-shadow-strength: 1;
 	--tone: var(--vs-primary);
@@ -234,12 +233,12 @@
 		color-scheme: dark;
 		--vs-primary: 92, 170, 255;
 		--vs-primary-foreground: 8, 14, 24;
-		--vs-success: 74, 222, 128;
 		--vs-text: 255, 255, 255;
-		--vs-background: 16, 16, 16;
-		--vs-page-background: 29, 29, 29;
-		--vs-gray-1: 32, 32, 32;
-		--vs-gray-2: 48, 48, 48;
+		/* Surfaces sit above the page, so they are the lighter of the two. */
+		--vs-background: 30, 30, 30;
+		--vs-page-background: 18, 18, 18;
+		--vs-gray-1: 18, 18, 18;
+		--vs-gray-2: 46, 46, 46;
 		--vs-shadow: 0, 0, 0;
 		--vs-shadow-strength: 4;
 		--hairline: rgba(255, 255, 255, 0.09);
@@ -249,11 +248,6 @@
 		--text-on-solid: 0 1px 0 rgba(255, 255, 255, 0.3);
 		--sheen-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 65%);
 		--sheen-well: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0) 55%);
-		--backdrop: linear-gradient(
-			180deg,
-			rgb(var(--vs-gray-1)),
-			rgb(var(--vs-page-background)) 22rem
-		);
 	}
 }
 

@@ -759,7 +759,7 @@ export function AdvancedSearchPage() {
 			<aside className='shadow-raised hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 lg:sticky lg:top-0 lg:block lg:w-auto'>
 				<AdvancedSearchSidebarContent {...searchControlsProps} />
 			</aside>
-			<section className='min-w-0 px-3 pt-4 pb-10 lg:pt-0 lg:pr-4 lg:pb-10 lg:pl-0'>
+			<section className='min-w-0 px-3 pt-4 pb-10 lg:pr-4 lg:pl-0'>
 				<h1 className='sr-only'>搜尋課程</h1>
 				<AdvancedSearchMobileControls {...searchControlsProps} />
 				{onError ? (

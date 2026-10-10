@@ -34,7 +34,7 @@ export function Select({
 				id={id}
 				aria-label={ariaLabel}
 				className={cn(
-					'rounded-control bg-sheen-well shadow-well min-h-11 w-full min-w-0 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 text-base text-[rgb(var(--vs-text))] transition-[background-color,border-color,box-shadow] outline-none md:text-sm',
+					'rounded-control min-h-11 w-full min-w-0 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 text-base text-[rgb(var(--vs-text))] transition-[background-color,border-color,box-shadow] outline-none md:text-sm',
 					'focus:border-[rgba(var(--vs-primary),0.7)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.24)]',
 					className,
 				)}

@@ -1,4 +1,5 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { CourseTimeChips } from '../components/CourseTimeChips';
 import { Link, useParams } from '@tanstack/react-router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import type React from 'react';
@@ -139,6 +140,13 @@ export function CourseDetailPage() {
 	}, [course, relatedCourses, courseDepartment, version]);
 	const conflicted = conflictCourses.length > 0;
 	const selectedSyllabus = syllabus[Number(selectedSyllabusIndex)] || null;
+	// The sidebar only sits beside the content on wide screens; on phones this slot would push the description down.
+	const [showSidebarAd] = useState(
+		() =>
+			typeof window !== 'undefined' &&
+			typeof window.matchMedia === 'function' &&
+			window.matchMedia('(min-width: 1024px)').matches,
+	);
 	const isEarlyEight = parseCourseTime(course?.time).some((item) =>
 		item.content.split('、').includes('1'),
 	);
@@ -250,13 +258,16 @@ export function CourseDetailPage() {
 										? course.classroom.map((item) => item.name).join('、')
 										: '無資料',
 								),
-								...(parseCourseTime(course.time).length
-									? parseCourseTime(course.time).map((item) => infoItem(item.title, item.content))
-									: [infoItem('上課時間', '尚無資訊')]),
+								infoItem('時間', <CourseTimeChips time={course.time} />),
 							]}
 						/>
 					</div>
 				</div>
+				{showSidebarAd ? (
+					<div className='has-[[data-ad-collapsed]]:hidden'>
+						<AdsByGoogle />
+					</div>
+				) : null}
 			</aside>
 			<div className='flex min-w-0 flex-col gap-4 lg:col-start-1'>
 				{conflicted ? (
@@ -292,7 +303,9 @@ export function CourseDetailPage() {
 				[selectedSyllabus.objective, selectedSyllabus.schedule, selectedSyllabus.materials]
 					.join('')
 					.trim().length >= 400 ? (
-					<AdsByGoogle placement='section' />
+					<div className='has-[[data-ad-collapsed]]:hidden'>
+						<AdsByGoogle placement='section' />
+					</div>
 				) : null}
 				{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
 				{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
@@ -318,8 +331,11 @@ export function CourseDetailPage() {
 					</Alert>
 				) : null}
 				{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
+				{/* An unfilled slot is removed from the column so it leaves no gap between the panels. */}
+				<div className='has-[[data-ad-collapsed]]:hidden'>
+					<AdsByGoogle placement='section' />
+				</div>
 				<CourseSourceLinks course={course} />
-				<AdsByGoogle placement='footer' />
 			</div>
 		</div>
 	);
@@ -602,7 +618,7 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 				</div>
 			</section>
 			{Object.entries(syllabusTextFields).map(([key, label]) => (
-				<TextSection key={key} label={label} value={item[key]} />
+				<TextSection key={key} label={label} value={item[key]} weekly={key === 'schedule'} />
 			))}
 			{additionalFields.map(([key, value]) => (
 				<TextSection key={key} label={key} value={value} />
@@ -625,7 +641,15 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 
 const emptySyllabusText = new Set(['無', '● 無 (None)', '無（None）', '● 無（None）']);
 
-function TextSection({ label, value }: { label: string; value: unknown }) {
+function TextSection({
+	label,
+	value,
+	weekly = false,
+}: {
+	label: string;
+	value: unknown;
+	weekly?: boolean;
+}) {
 	const text =
 		typeof value === 'string'
 			? value.trim()
@@ -637,16 +661,82 @@ function TextSection({ label, value }: { label: string; value: unknown }) {
 					? String(value)
 					: '';
 	if (!text || emptySyllabusText.has(text)) return null;
+	const schedule = weekly ? parseWeeklySchedule(text) : null;
 	return (
 		<section className={docSectionClassName}>
 			<h3 className={docHeadingClassName}>{label}</h3>
-			<HtmlText as='p' text={formatSyllabusText(text)} />
+			{schedule ? (
+				<div className='flex min-w-0 flex-col gap-3'>
+					{schedule.intro ? <HtmlText as='p' text={schedule.intro} /> : null}
+					<ol className='m-0 grid list-none grid-cols-[auto_minmax(0,1fr)] gap-x-4 p-0'>
+						{schedule.weeks.map((week, index) => (
+							<li
+								key={`${week.label}-${index}`}
+								className='col-span-full grid grid-cols-subgrid border-t border-[rgba(var(--vs-text),0.08)] py-2 first:border-t-0 first:pt-0 last:pb-0'
+							>
+								<span className='text-muted-foreground font-medium whitespace-nowrap tabular-nums'>
+									{week.label}
+								</span>
+								<HtmlText as='div' text={week.content} />
+							</li>
+						))}
+					</ol>
+				</div>
+			) : (
+				<HtmlText as='p' text={formatSyllabusText(text)} />
+			)}
 		</section>
 	);
 }
 
 function formatSyllabusText(text: string) {
-	return text.replace(/([^\n])●/g, '$1\n●').replace(/([)）])[ \t]*(?=SDG\d+[:：])/g, '$1\n');
+	return separateLanguages(
+		text.replace(/([^\n])●/g, '$1\n●').replace(/([)）])[ \t]*(?=SDG\d+[:：])/g, '$1\n'),
+	);
+}
+
+const cjkPattern = /[\u3400-\u9fff]/;
+
+// Teachers often paste the English translation right under the Chinese text; a blank line keeps
+// the two from reading as one paragraph.
+function separateLanguages(text: string) {
+	const isEnglishParagraph = (line: string) =>
+		line.length >= 40 && !cjkPattern.test(line) && /[A-Za-z]{3}/.test(line);
+	const lines = text.split('\n');
+	return lines
+		.flatMap((line, index) => {
+			const previous = lines[index - 1];
+			if (!previous?.trim() || !line.trim()) return [line];
+			const switched =
+				(cjkPattern.test(previous) && isEnglishParagraph(line)) ||
+				(isEnglishParagraph(previous) && cjkPattern.test(line));
+			return switched ? ['', line] : [line];
+		})
+		.join('\n');
+}
+
+const weekLinePattern = /^\s*(Week\s*\d+|第\s*[\d一二三四五六七八九十]+\s*[週周])\s*[:：.、-]?\s*/i;
+
+// Schedules are free text, so they only become a list when enough lines clearly start with a week.
+function parseWeeklySchedule(text: string) {
+	const intro: string[] = [];
+	const weeks: { label: string; content: string }[] = [];
+	for (const line of normaliseDisplayText(text).split('\n')) {
+		const match = line.match(weekLinePattern);
+		if (match) {
+			weeks.push({
+				label: match[1].replace(/\s+/g, ' ').trim(),
+				content: line.slice(match[0].length).trim(),
+			});
+		} else if (!weeks.length) {
+			intro.push(line);
+		} else if (line.trim()) {
+			const week = weeks[weeks.length - 1];
+			week.content = week.content ? `${week.content}\n${line.trim()}` : line.trim();
+		}
+	}
+	if (weeks.length < 3) return null;
+	return { intro: intro.join('\n').trim(), weeks };
 }
 
 function normaliseDisplayText(text: string) {

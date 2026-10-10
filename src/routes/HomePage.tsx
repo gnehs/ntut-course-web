@@ -251,7 +251,7 @@ function PrimaryActionCard({ item }: { item: HomeLink }) {
 		<Card className='flex items-center gap-3 p-4' to={item.to}>
 			<span
 				aria-hidden='true'
-				className='tone-primary bg-sheen-gloss rounded-control shadow-solid flex size-10 shrink-0 items-center justify-center bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
+				className='rounded-control flex size-10 shrink-0 items-center justify-center bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
 			>
 				<Icon className='size-5' />
 			</span>

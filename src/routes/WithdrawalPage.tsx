@@ -7,6 +7,7 @@ import { Input } from '../components/ui-kit/Input';
 import { WithdrawalSkeleton } from '../components/ui-kit/PageSkeletons';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchWithdrawal } from '../lib/courseApi';
+import { cn } from '../lib/utils';
 import {
 	classifyWithdrawalRate,
 	createWithdrawalRateDistribution,
@@ -197,23 +198,32 @@ export function WithdrawalPage() {
 						<div className='grid gap-5'>
 							{visibleGroupedRows
 								.filter((group) => group.rows.length)
-								.map((group) => (
-									<section key={group.title} className='relative grid'>
-										<div className='sticky top-14.5 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
-											<h2 className='text-lg font-semibold'>{group.title}</h2>
-											<div className='text-sm opacity-70'>
-												{group.rows.length === group.totalRows
-													? `${group.totalRows} 位教師`
-													: `${group.rows.length} / ${group.totalRows} 位教師`}
+								.map((group) => {
+									// Rates are heavily skewed, so each group scales its bars to its own maximum.
+									const maxRate = Math.max(...group.rows.map(rateValue));
+									return (
+										<section key={group.title} className='relative grid'>
+											<div className='sticky top-14.5 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
+												<h2 className='text-lg font-semibold'>{group.title}</h2>
+												<div className='text-sm opacity-70'>
+													{group.rows.length === group.totalRows
+														? `${group.totalRows} 位教師`
+														: `${group.rows.length} / ${group.totalRows} 位教師`}
+												</div>
 											</div>
-										</div>
-										<div className='grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2'>
-											{group.rows.map((item) => (
-												<WithdrawalTeacherCard item={item} key={item.name} />
-											))}
-										</div>
-									</section>
-								))}
+											<div className='grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2'>
+												{group.rows.map((item) => (
+													<WithdrawalTeacherCard
+														item={item}
+														key={item.name}
+														maxRate={maxRate}
+														level={classifyWithdrawalRate(rateValue(item), distribution).level}
+													/>
+												))}
+											</div>
+										</section>
+									);
+								})}
 							{hiddenCount ? (
 								<div className='rounded-panel flex flex-col items-center gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 text-center sm:flex-row sm:justify-between sm:text-left'>
 									<div className='text-sm opacity-75'>
@@ -274,7 +284,23 @@ function getWithdrawalBatchSize() {
 		: MOBILE_WITHDRAWAL_BATCH_SIZE;
 }
 
-function WithdrawalTeacherCard({ item }: { item: WithdrawalStat }) {
+const RATE_BAR_COLORS = {
+	high: 'bg-[rgb(var(--vs-danger))]',
+	normal: 'bg-[rgb(var(--vs-primary))]',
+	low: 'bg-[rgba(var(--vs-text),0.35)]',
+};
+
+function WithdrawalTeacherCard({
+	item,
+	maxRate,
+	level,
+}: {
+	item: WithdrawalStat;
+	/** Highest rate in the card's group; the bar is linear against it. */
+	maxRate: number;
+	level: keyof typeof RATE_BAR_COLORS;
+}) {
+	const rate = rateValue(item);
 	const courseSummary = (item.course || [])
 		.map((course) => course.name?.zh)
 		.filter(Boolean)
@@ -284,7 +310,23 @@ function WithdrawalTeacherCard({ item }: { item: WithdrawalStat }) {
 	return (
 		<Card to={`/teacher/${item.name}`} className='padding hoverable'>
 			<CardTitle>{item.name}</CardTitle>
-			<div className='text-lg font-semibold'>{formatWithdrawalRate(rateValue(item))}%</div>
+			<div
+				className={cn(
+					'text-lg font-semibold tabular-nums',
+					level === 'high' && 'text-[rgb(var(--vs-danger))]',
+				)}
+			>
+				{formatWithdrawalRate(rate)}%
+			</div>
+			<div
+				aria-hidden='true'
+				className='my-1.5 h-1 overflow-hidden rounded-full bg-[rgba(var(--vs-text),0.08)]'
+			>
+				<div
+					className={cn('h-full min-w-0.5 rounded-full', RATE_BAR_COLORS[level])}
+					style={{ width: `${maxRate > 0 ? (rate / maxRate) * 100 : 0}%` }}
+				/>
+			</div>
 			<p>
 				{item.withdraw ?? 0} 人退選 / {item.people ?? 0} 人選課
 			</p>

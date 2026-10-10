@@ -1,5 +1,5 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
-import { useParams, useRouterState } from '@tanstack/react-router';
+import { Link, useParams, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { Minus, Plus, Star } from 'lucide-react';
@@ -150,13 +150,14 @@ export function ClassIndexPage() {
 					</div>
 					<div className='grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-2'>
 						{(department.class || []).map(({ name }) => (
-							<Card
-								className='flex min-h-11 items-center px-3 py-2 text-[0.95rem] leading-snug font-medium [overflow-wrap:anywhere]'
+							// A long index reads as a menu, so entries stay flat instead of each casting a card shadow.
+							<Link
+								className='rounded-control !text-foreground flex min-h-11 items-center border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-3 py-2 text-[0.95rem] leading-snug font-medium [overflow-wrap:anywhere] !no-underline transition-colors duration-150 hover:border-[rgba(var(--vs-primary),0.5)] hover:bg-[rgba(var(--vs-primary),0.06)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 								key={name}
 								to={`/class/${dataset.year}/${dataset.sem}/${name}?d=${dataset.department}`}
 							>
 								{name}
-							</Card>
+							</Link>
 						))}
 					</div>
 				</section>

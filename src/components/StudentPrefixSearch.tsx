@@ -219,7 +219,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 					'rounded-surface flex border transition-[background-color,border-color,box-shadow] duration-200',
 					focused
 						? 'shadow-raised border-[rgba(var(--vs-primary),0.55)] bg-[rgb(var(--vs-background))] ring-[3px] ring-[rgba(var(--vs-primary),0.16)]'
-						: 'bg-sheen-well shadow-well border-[rgba(var(--vs-text),0.06)] bg-[rgba(var(--vs-text),0.07)] hover:bg-[rgba(var(--vs-text),0.045)] dark:bg-[rgba(var(--vs-text),0.05)] dark:hover:bg-[rgba(var(--vs-text),0.075)]',
+						: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] hover:border-[rgba(var(--vs-text),0.24)]',
 				)}
 			>
 				<Input

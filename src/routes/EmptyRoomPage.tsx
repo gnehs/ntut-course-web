@@ -176,15 +176,12 @@ export function EmptyRoomPage() {
 				<div className='flex items-center gap-2'>
 					<span
 						aria-hidden='true'
-						className='size-3.5 rounded-full bg-[rgba(var(--vs-success),0.16)] shadow-[inset_0_0_0_1px_rgba(var(--vs-success),0.45)]'
+						className='size-3.5 rounded-full bg-[rgba(var(--vs-text),0.08)]'
 					/>
 					<span>空堂</span>
 				</div>
 				<div className='flex items-center gap-2'>
-					<span
-						aria-hidden='true'
-						className='size-3.5 rounded-full bg-[rgba(var(--vs-text),0.08)]'
-					/>
+					<span aria-hidden='true' className='size-3.5 rounded-full bg-[rgb(var(--vs-danger))]' />
 					<span>有課程</span>
 				</div>
 				{currentSlot ? (
@@ -234,8 +231,8 @@ export function EmptyRoomPage() {
 														slot === currentSlot &&
 															'ring-2 ring-[rgb(var(--vs-primary))] ring-offset-1 ring-offset-[rgb(var(--vs-background))]',
 														room.timetable.includes(slot)
-															? 'bg-[rgba(var(--vs-success),0.16)] font-semibold text-[rgb(var(--vs-success))]'
-															: 'text-icon-subtle bg-[rgba(var(--vs-text),0.05)]',
+															? 'bg-[rgba(var(--vs-text),0.08)] text-[rgba(var(--vs-text),0.55)]'
+															: 'bg-[rgb(var(--vs-danger))] font-semibold text-white',
 													)}
 												>
 													<span aria-hidden='true'>{slot}</span>
