@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 
-type AdPlacement = 'inline' | 'footer' | 'section';
+type AdPlacement = 'inline' | 'footer' | 'section' | 'sidebar';
 
 export function AdsByGoogle({
 	placement = 'inline',
@@ -20,6 +20,14 @@ export function AdsByGoogle({
 		return null;
 	return <AdUnit placement={placement} title={title} />;
 }
+
+const adFormat: Record<AdPlacement, string> = {
+	inline: 'auto',
+	footer: 'horizontal',
+	section: 'horizontal',
+	// A narrow column has no horizontal fallback, so it asks for the medium rectangle directly.
+	sidebar: 'rectangle',
+};
 
 function AdUnit({ placement, title }: { placement: AdPlacement; title?: string }) {
 	const region = useMemo(() => `page-${Math.random()}`, []);
@@ -88,7 +96,7 @@ function AdUnit({ placement, title }: { placement: AdPlacement; title?: string }
 					backgroundColor: 'transparent',
 				}}
 				data-ad-client='ca-pub-6834090314855499'
-				data-ad-format={placement !== 'inline' ? 'horizontal' : 'auto'}
+				data-ad-format={adFormat[placement]}
 				data-full-width-responsive={placement !== 'inline' ? 'false' : 'true'}
 				data-ad-region={region}
 			/>

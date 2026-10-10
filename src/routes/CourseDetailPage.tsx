@@ -265,7 +265,7 @@ export function CourseDetailPage() {
 				</div>
 				{showSidebarAd ? (
 					<div className='has-[[data-ad-collapsed]]:hidden'>
-						<AdsByGoogle />
+						<AdsByGoogle placement='sidebar' />
 					</div>
 				) : null}
 			</aside>

@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('footer ads', () => {
-	it.each(['footer', 'section'] as const)(
+	it.each(['footer', 'section', 'sidebar'] as const)(
 		'does not request %s ads in embedded pages',
 		(placement) => {
 			window.history.replaceState({}, '', '/program?mode=iframe');
@@ -27,6 +27,14 @@ describe('footer ads', () => {
 		expect(ad).toHaveAttribute('data-ad-format', 'horizontal');
 		expect(ad).toHaveAttribute('data-full-width-responsive', 'false');
 		expect(window.adsbygoogle).toHaveLength(1);
+	});
+
+	it('requests a labeled rectangle for the sidebar', () => {
+		const { container } = render(<AdsByGoogle placement='sidebar' />);
+		const ad = container.querySelector('ins')!;
+		expect(screen.getByText('廣告')).toBeInTheDocument();
+		expect(ad).toHaveAttribute('data-ad-format', 'rectangle');
+		expect(ad).toHaveAttribute('data-full-width-responsive', 'false');
 	});
 
 	it('collapses empty space and restores an ad that fills after the timeout', async () => {
