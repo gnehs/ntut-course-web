@@ -34,15 +34,20 @@ export function Select({
 				id={id}
 				aria-label={ariaLabel}
 				className={cn(
-					'rounded-control min-h-11 w-full min-w-0 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 text-[rgb(var(--vs-text))] transition-colors outline-none',
+					'rounded-control bg-sheen-well shadow-well min-h-11 w-full min-w-0 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 text-base text-[rgb(var(--vs-text))] transition-[background-color,border-color,box-shadow] outline-none md:text-sm',
 					'focus:border-[rgba(var(--vs-primary),0.7)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.24)]',
 					className,
 				)}
 			>
 				<SelectValue placeholder={placeholder} />
 			</SelectTrigger>
-			<SelectContent className='rounded-popover border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] p-1 text-[rgb(var(--vs-text))]'>
-				<SelectGroup>{children}</SelectGroup>
+			<SelectContent
+				position='popper'
+				align='start'
+				sideOffset={6}
+				className='rounded-popover bg-sheen-surface shadow-overlay max-h-[min(20rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] border-0 bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
+			>
+				<SelectGroup className='flex flex-col gap-0.5'>{children}</SelectGroup>
 			</SelectContent>
 		</ShadcnSelect>
 	);
@@ -52,7 +57,7 @@ export function SelectOption({ value, children }: { value: string; children: Rea
 	return (
 		<SelectItem
 			value={value}
-			className='cursor-pointer hover:bg-[rgba(var(--vs-primary),0.08)] focus:bg-[rgba(var(--vs-primary),0.08)]'
+			className='tone-neutral focus:bg-sheen-soft focus:shadow-soft min-h-9 cursor-pointer py-2 pr-9 pl-3 transition-[background-color,box-shadow,color] duration-100 focus:bg-[rgba(var(--vs-text),0.07)] focus:text-[rgb(var(--vs-text))] data-[state=checked]:font-semibold [&_svg]:!text-[rgb(var(--vs-primary))]'
 		>
 			{children}
 		</SelectItem>

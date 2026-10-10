@@ -126,7 +126,7 @@ export function AddCalendarPage() {
 					</AlertDescription>
 				</Alert>
 			) : null}
-			<Card className='rounded-surface border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+			<Card className='rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))]'>
 				<CardHeader className='p-4 sm:px-5'>
 					<div className='flex flex-wrap items-start justify-between gap-3'>
 						<div className='flex min-w-0 flex-col gap-2'>
@@ -147,7 +147,7 @@ export function AddCalendarPage() {
 									<label
 										key={course.id}
 										htmlFor={`calendar-course-${course.id}`}
-										className='rounded-control flex min-w-0 cursor-pointer items-center gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3 transition-colors hover:bg-[rgba(var(--vs-primary),0.06)]'
+										className='rounded-control flex min-w-0 cursor-pointer items-center gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3 transition-colors hover:bg-[rgba(var(--vs-text),0.07)]'
 									>
 										<Checkbox
 											id={`calendar-course-${course.id}`}
@@ -181,7 +181,7 @@ export function AddCalendarPage() {
 				</CardContent>
 			</Card>
 			<Card
-				className={`rounded-surface border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm ${!hasCourses ? 'opacity-70' : ''}`}
+				className={`rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))] ${!hasCourses ? 'opacity-70' : ''}`}
 			>
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>2. 確認日期並下載</CardTitle>

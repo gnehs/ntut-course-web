@@ -33,6 +33,76 @@
 	--radius-panel: calc(var(--radius) * 2);
 	--radius-surface: calc(var(--radius) * 2);
 	--radius-overlay: calc(var(--radius) * 3);
+
+	/* Elevation scale. Surfaces are flat hairline outlines; only hover and overlays cast a real shadow. */
+	--shadow-rest: var(--elevation-rest);
+	--shadow-raised: var(--elevation-raised);
+	--shadow-lifted: var(--elevation-lifted);
+	--shadow-pressed: var(--elevation-pressed);
+	--shadow-overlay: var(--elevation-overlay);
+	--shadow-bar: var(--elevation-bar);
+	--shadow-well: var(--elevation-well);
+	--shadow-thumb: var(--elevation-thumb);
+	/* Control shadows read --tone on the element itself, so they are inlined instead of living on :root. */
+	--shadow-soft:
+		inset 0 1px 0 var(--edge-highlight-soft), inset 0 0 0 1px rgba(var(--tone), 0.16),
+		0 1px 2px rgba(var(--tone), 0.16);
+	--shadow-soft-hover:
+		inset 0 1px 0 var(--edge-highlight-soft), inset 0 0 0 1px rgba(var(--tone), 0.24),
+		0 2px 6px -1px rgba(var(--tone), 0.26);
+	--shadow-solid:
+		inset 0 0 0 1px color-mix(in oklab, rgb(var(--tone)) 84%, black),
+		inset 0 2px 0 rgba(255, 255, 255, 0.32), inset 0 -2px 0 rgba(0, 0, 0, 0.16),
+		0 1px 1px rgba(var(--vs-shadow), 0.2), 0 2px 3px -1px rgba(var(--tone), 0.3);
+	--shadow-solid-hover:
+		inset 0 0 0 1px color-mix(in oklab, rgb(var(--tone)) 84%, black),
+		inset 0 2px 0 rgba(255, 255, 255, 0.4), inset 0 -2px 0 rgba(0, 0, 0, 0.16),
+		0 1px 2px rgba(var(--vs-shadow), 0.22), 0 3px 6px -2px rgba(var(--tone), 0.38);
+
+	--text-shadow-emboss: var(--text-emboss);
+	--text-shadow-solid: var(--text-on-solid);
+	--text-shadow-ink: 0 1px 1px rgba(0, 0, 0, 0.28);
+}
+
+/* Sheens are translucent overlays, so they keep working when a caller swaps the background colour.
+   Surfaces stay flat (--sheen-surface is none); gloss is reserved for solid controls. */
+@utility bg-sheen-surface {
+	background-image: var(--sheen-surface);
+}
+
+/* Interactive cards share the neutral surface sheen; colour is reserved for emphasis. */
+@utility bg-sheen-glow {
+	background-image: var(--sheen-surface);
+}
+
+@utility bg-sheen-gloss {
+	background-image: var(--sheen-gloss);
+}
+
+@utility bg-sheen-soft {
+	background-image: var(--sheen-soft);
+}
+
+@utility bg-sheen-well {
+	background-image: var(--sheen-well);
+}
+
+@utility bg-backdrop {
+	background-color: var(--page);
+	background-image: var(--backdrop);
+	background-repeat: no-repeat;
+}
+
+@utility tone-primary {
+	--tone: var(--vs-primary);
+}
+
+@utility tone-neutral {
+	--tone: var(--vs-text);
+}
+
+@utility tone-danger {
+	--tone: var(--vs-danger);
 }
 
 /* Defaults stay below utilities so each page can set its own type scale and spacing. */
@@ -41,6 +111,7 @@
 		font-weight: 600;
 		line-height: 1.4;
 		overflow-wrap: anywhere;
+		text-shadow: var(--text-emboss);
 	}
 
 	.content-surface :where(h1) {
@@ -85,7 +156,55 @@
 	--vs-gray-1: 244, 247, 248;
 	--vs-gray-2: 228, 233, 236;
 	--vs-danger: 234, 84, 85;
-	--vs-shadow-opacity: 0.05;
+	--vs-shadow: 24, 39, 75;
+	--vs-shadow-strength: 1;
+	--tone: var(--vs-primary);
+	--hairline: rgba(var(--vs-shadow), 0.08);
+	--hairline-strong: rgba(var(--vs-shadow), 0.18);
+	--edge-highlight: rgba(255, 255, 255, 0.9);
+	--edge-highlight-soft: rgba(255, 255, 255, 0.55);
+	--text-emboss: none;
+	--text-on-solid: 0 1px 1px rgba(0, 0, 0, 0.28);
+	--sheen-surface: none;
+	--sheen-gloss: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.2),
+		rgba(255, 255, 255, 0) 45%,
+		rgba(0, 0, 0, 0.1)
+	);
+	--sheen-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 65%);
+	--sheen-well: linear-gradient(
+		180deg,
+		rgba(var(--vs-shadow), 0.035),
+		rgba(var(--vs-shadow), 0) 45%
+	);
+	--backdrop: linear-gradient(
+		180deg,
+		rgb(var(--vs-background)),
+		rgb(var(--vs-page-background)) 22rem
+	);
+	--elevation-rest: 0 0 0 1px var(--hairline);
+	--elevation-raised:
+		0 0 0 1px var(--hairline),
+		0 1px 2px rgba(var(--vs-shadow), calc(0.05 * var(--vs-shadow-strength)));
+	--elevation-lifted:
+		0 0 0 1px var(--hairline-strong),
+		0 2px 4px -1px rgba(var(--vs-shadow), calc(0.06 * var(--vs-shadow-strength))),
+		0 10px 20px -8px rgba(var(--vs-shadow), calc(0.12 * var(--vs-shadow-strength)));
+	--elevation-pressed: 0 0 0 1px var(--hairline-strong);
+	--elevation-overlay:
+		inset 0 1px 0 var(--edge-highlight), 0 0 0 1px var(--hairline),
+		0 4px 8px -2px rgba(var(--vs-shadow), calc(0.08 * var(--vs-shadow-strength))),
+		0 16px 32px -8px rgba(var(--vs-shadow), calc(0.16 * var(--vs-shadow-strength))),
+		0 40px 80px -20px rgba(var(--vs-shadow), calc(0.24 * var(--vs-shadow-strength)));
+	--elevation-bar: 0 1px 0 var(--hairline);
+	--elevation-well:
+		inset 0 1px 2px rgba(var(--vs-shadow), calc(0.08 * var(--vs-shadow-strength))),
+		0 1px 0 var(--edge-highlight-soft);
+	--elevation-thumb:
+		inset 0 1px 0 var(--edge-highlight), 0 0 0 1px var(--hairline),
+		0 1px 2px rgba(var(--vs-shadow), calc(0.1 * var(--vs-shadow-strength))),
+		0 3px 6px -2px rgba(var(--vs-shadow), calc(0.12 * var(--vs-shadow-strength)));
 	--background: rgb(var(--vs-background));
 	--foreground: rgb(var(--vs-text));
 	--card: rgb(var(--vs-background));
@@ -118,7 +237,20 @@
 		--vs-page-background: 29, 29, 29;
 		--vs-gray-1: 32, 32, 32;
 		--vs-gray-2: 48, 48, 48;
-		--vs-shadow-opacity: 0.18;
+		--vs-shadow: 0, 0, 0;
+		--vs-shadow-strength: 4;
+		--hairline: rgba(255, 255, 255, 0.09);
+		--hairline-strong: rgba(255, 255, 255, 0.2);
+		--edge-highlight: rgba(255, 255, 255, 0.08);
+		--edge-highlight-soft: rgba(255, 255, 255, 0.06);
+		--text-on-solid: 0 1px 0 rgba(255, 255, 255, 0.3);
+		--sheen-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 65%);
+		--sheen-well: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0) 55%);
+		--backdrop: linear-gradient(
+			180deg,
+			rgb(var(--vs-gray-1)),
+			rgb(var(--vs-page-background)) 22rem
+		);
 	}
 }
 
@@ -138,9 +270,8 @@
 [data-slot='tabs-trigger'][data-state='active'] {
 	background-color: rgb(var(--vs-background));
 	color: rgb(var(--vs-text));
-	box-shadow:
-		0 1px 3px rgba(var(--vs-text), 0.12),
-		0 0 0 1px rgba(var(--vs-text), 0.04);
+	background-image: var(--sheen-surface);
+	box-shadow: var(--elevation-thumb);
 }
 
 [data-slot='dialog-overlay'][data-state='open'] {

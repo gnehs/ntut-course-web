@@ -26,7 +26,7 @@ export function CourseListToolbar({
 				<div
 					role='group'
 					aria-label='課程顯示方式'
-					className='rounded-control bg-muted col-span-2 flex justify-self-center p-1 md:col-span-1 md:col-start-2 md:row-start-1'
+					className='rounded-control bg-sheen-well shadow-well col-span-2 flex gap-1 justify-self-center bg-[rgba(var(--vs-text),0.06)] p-1 md:col-span-1 md:col-start-2 md:row-start-1'
 				>
 					{(
 						[
@@ -41,8 +41,8 @@ export function CourseListToolbar({
 							className={cn(
 								'm-0 px-2.5',
 								layout === value
-									? 'bg-background text-foreground hover:bg-background shadow-sm'
-									: 'text-muted-foreground hover:bg-background/60 bg-transparent',
+									? 'bg-background bg-sheen-surface text-foreground hover:bg-background shadow-thumb hover:shadow-thumb'
+									: 'text-muted-foreground hover:text-foreground bg-transparent bg-none shadow-none hover:bg-[rgba(var(--vs-text),0.06)] hover:shadow-none',
 							)}
 							onClick={() => onLayoutChange(value as CourseListLayout)}
 						>

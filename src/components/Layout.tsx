@@ -4,7 +4,7 @@ import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/co
 import { pageTitleForPath, usePageTitle } from '../lib/pageTitle';
 import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
-import { GitBranch } from 'lucide-react';
+import { ChevronsUpDown, GitBranch, Search } from 'lucide-react';
 import { Button } from './ui-kit/Button';
 import { Alert } from './ui-kit/Alert';
 import { ContentSurface } from './ui-kit/ContentSurface';
@@ -63,37 +63,62 @@ export function Layout() {
 		setDatasetDialogOpen(false);
 	}
 
+	const semesterButton = (
+		<Button
+			className='whitespace-nowrap'
+			aria-haspopup='dialog'
+			title='切換學期與學制'
+			onClick={() => setDatasetDialogOpen(true)}
+		>
+			{yearSemLabel}
+			<ChevronsUpDown className='size-3.5 opacity-55' aria-hidden='true' />
+		</Button>
+	);
+
 	return (
 		// Grid track sizing survives AdSense's inline height/min-height resets on ad ancestors.
 		<div className='grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(100svh,auto)]'>
-			<div className='bg-page text-foreground flex flex-col font-sans'>
+			<div className='bg-backdrop text-foreground flex flex-col font-sans'>
 				<a
 					href='#main-content'
-					className='rounded-control sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] shadow-lg focus:not-sr-only'
+					className='rounded-control shadow-overlay sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] focus:not-sr-only'
 				>
 					跳至主要內容
 				</a>
 				{!isIframe ? (
 					<nav
 						className={cn(
-							'sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.9)] px-4 py-2 shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))] backdrop-blur-[16px] md:grid-cols-[1fr_minmax(250px,430px)_1fr]',
+							'bg-sheen-surface shadow-bar sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.78)] px-4 py-2 backdrop-blur-[20px] backdrop-saturate-150 md:grid-cols-[1fr_minmax(250px,430px)_1fr]',
 							isAdvancedSearch && 'lg:hidden',
 						)}
 						style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
 					>
 						<Link
 							to='/'
-							className='block min-w-0 truncate font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
+							className='text-shadow-emboss flex min-w-0 items-center gap-1.5 font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
 						>
-							🍤 北科課程好朋友
+							<span aria-hidden='true' className='shrink-0'>
+								🍤
+							</span>
+							<span className='truncate'>北科課程好朋友</span>
 						</Link>
 						<div className='hidden md:block'>
 							{!isAdvancedSearch ? <UniversalSearch navbar /> : null}
 						</div>
-						<div className='flex justify-end'>
-							<Button className='whitespace-nowrap' onClick={() => setDatasetDialogOpen(true)}>
-								{yearSemLabel}
-							</Button>
+						<div className='flex justify-end gap-2'>
+							{/* The navbar search box is desktop-only, so small screens get a shortcut instead. */}
+							{location.pathname !== '/' && !isAdvancedSearch ? (
+								<Button
+									as={Link}
+									icon
+									to='/advanced-search'
+									aria-label='搜尋課程'
+									className='md:hidden'
+								>
+									<Search className='size-4' aria-hidden='true' />
+								</Button>
+							) : null}
+							{semesterButton}
 						</div>
 					</nav>
 				) : null}
@@ -138,7 +163,7 @@ export function Layout() {
 					</div>
 				) : null}
 				{!isIframe && !isAdvancedSearch ? (
-					<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_5px_25px_0_rgba(0,0,0,var(--vs-shadow-opacity))]'>
+					<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_-1px_0_var(--hairline)]'>
 						<div className='mx-auto max-w-[1024px] space-y-2 text-[rgb(var(--vs-text))] opacity-75'>
 							<div className='flex items-center justify-between gap-2'>
 								<div>

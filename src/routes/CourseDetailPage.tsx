@@ -1,13 +1,11 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Link, useParams } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import type React from 'react';
-import { Info, MapPin, Minus, Plus, User } from 'lucide-react';
+import { ExternalLink, Info, MapPin, Minus, Plus, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
 import { CourseDetailSkeleton } from '../components/ui-kit/PageSkeletons';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
@@ -166,196 +164,215 @@ export function CourseDetailPage() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
-			<div className='flex flex-wrap items-center justify-between gap-3'>
-				<div className='flex flex-col gap-1'>
-					<h1 className='text-xl leading-snug font-semibold'>
-						<CourseDetailTitle course={currentCourse} />
-					</h1>
-					<div className='text-base font-normal opacity-80'>{currentCourse.name?.en}</div>
-				</div>
-				<div>
-					<Button primary={!isInMyCourse} danger={isInMyCourse} onClick={toggleCourse}>
-						{isInMyCourse ? <Minus className='size-4' /> : <Plus className='size-4' />}
-						{isInMyCourse ? '從我的課程移除' : '加入我的課程'}
-					</Button>
-				</div>
-			</div>
-			{conflicted ? (
-				<Alert danger>
-					<strong>課程衝堂</strong>
-					<br />
-					本課程與{' '}
-					{conflictCourses.map((item, index) => (
-						<span key={item.id}>
-							{index > 0 ? '、' : ''}
-							<Link
-								to={`/course/${year}/${sem}/${item.id}`}
-								className='underline underline-offset-2'
-							>
-								{item.name?.zh}
-							</Link>
-						</span>
-					))}{' '}
-					衝堂！
-				</Alert>
-			) : null}
-			{isEarlyEight ? <Alert>該課程為早八，選課前請先三思！</Alert> : null}
-			<div>
-				<div className='mt-4 grid gap-3 sm:grid-cols-3'>
-					<Card>
-						<CardTitle>{currentCourse.id}</CardTitle>
-						<p>課號</p>
-					</Card>
-					<Card>
-						<CardTitle>{formatCredit(course.credit)}</CardTitle>
-						<p>學分</p>
-					</Card>
-					<WithdrawalRateCard
-						withdrawalRate={withdrawalRate}
-						distribution={withdrawalDistribution}
-					/>
-				</div>
-				<div
-					className='-mx-4 mt-3 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 [-webkit-overflow-scrolling:touch] lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0'
-					aria-label='課程詳細資訊'
+		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-x-6'>
+			<header className='flex min-w-0 flex-col gap-1 lg:col-start-1'>
+				<h1 className='m-0 text-2xl leading-snug font-semibold'>
+					<CourseDetailTitle course={currentCourse} />
+				</h1>
+				{currentCourse.name?.en ? (
+					<div className='text-base font-normal opacity-70'>{currentCourse.name.en}</div>
+				) : null}
+			</header>
+			<aside
+				aria-label='課程詳細資訊'
+				className='flex min-w-0 flex-col gap-3 lg:sticky lg:top-[74px] lg:col-start-2 lg:row-span-2 lg:row-start-1'
+			>
+				<Button
+					primary={!isInMyCourse}
+					danger={isInMyCourse}
+					className='w-full'
+					onClick={toggleCourse}
 				>
-					<InfoCard
-						className='min-w-[82vw] snap-start sm:min-w-[22rem] lg:min-w-0 lg:snap-none'
-						icon={<Info />}
-						title='課程資訊'
-						items={[
-							infoItem(
-								'課程標準',
-								`${course.courseType || ''} ${course.courseType ? courseStandard[course.courseType] || '' : ''}`,
-							),
-							...optionalInfoItem('課程代碼', course.code),
-							infoItem('人數', formatQuantity(course.people, '人')),
-							...optionalInfoItem('退選', course.peopleWithdraw, '人'),
-							infoItem('時數', formatQuantity(course.hours, '小時')),
-							...optionalInfoItem('階段', course.stage),
-							...courseAttributeItems(course),
-						]}
-					/>
-					<InfoCard
-						className='min-w-[82vw] snap-start sm:min-w-[22rem] lg:min-w-0 lg:snap-none'
-						icon={<User />}
-						title='授課資訊'
-						items={[
-							infoItem(
-								'教師',
-								<InlineLinks
-									items={(course.teacher || []).map((item) => ({
-										label: item.name,
-										to: `/teacher/${item.name}`,
-									}))}
-									fallback='無資料'
-								/>,
-							),
-							infoItem(
-								'班級',
-								<InlineLinks
-									items={(course.class || []).map((item) => ({
-										label: item.name,
-										to: `/class/${year}/${sem}/${item.name}`,
-									}))}
-								/>,
-							),
-							...optionalInfoItem('助教', course.ta?.map((item) => item.name).join('、')),
-							...optionalInfoItem('授課語言', course.language),
-							infoItem('備註', <HtmlText text={course.notes || '無'} />),
-						]}
-					/>
-					<InfoCard
-						className='min-w-[82vw] snap-start sm:min-w-[22rem] lg:min-w-0 lg:snap-none'
-						icon={<MapPin />}
-						title='上課資訊'
-						items={[
-							infoItem(
-								'教室',
-								course.classroom?.length
-									? course.classroom.map((item) => item.name).join('、')
-									: '無資料',
-							),
-							...(parseCourseTime(course.time).length
-								? parseCourseTime(course.time).map((item) => infoItem(item.title, item.content))
-								: [infoItem('上課時間', '尚無資訊')]),
-						]}
-					/>
+					{isInMyCourse ? <Minus className='size-4' /> : <Plus className='size-4' />}
+					{isInMyCourse ? '從我的課程移除' : '加入我的課程'}
+				</Button>
+				<div className={panelClassName}>
+					<div className='rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)] bg-linear-to-b from-[rgba(var(--vs-text),0.04)] to-transparent'>
+						<CourseStat label='課號' value={currentCourse.id} />
+						<CourseStat label='學分' value={formatCredit(course.credit)} />
+						<WithdrawalRateStat
+							withdrawalRate={withdrawalRate}
+							distribution={withdrawalDistribution}
+						/>
+					</div>
+					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] md:grid-cols-3 md:divide-x md:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y'>
+						<InfoSection
+							icon={<Info />}
+							title='課程資訊'
+							items={[
+								infoItem(
+									'課程標準',
+									`${course.courseType || ''} ${course.courseType ? courseStandard[course.courseType] || '' : ''}`,
+								),
+								...optionalInfoItem('課程代碼', course.code),
+								infoItem('人數', formatQuantity(course.people, '人')),
+								...optionalInfoItem('退選', course.peopleWithdraw, '人'),
+								infoItem('時數', formatQuantity(course.hours, '小時')),
+								...optionalInfoItem('階段', course.stage),
+								...courseAttributeItems(course),
+							]}
+						/>
+						<InfoSection
+							icon={<User />}
+							title='授課資訊'
+							items={[
+								infoItem(
+									'教師',
+									<InlineLinks
+										items={(course.teacher || []).map((item) => ({
+											label: item.name,
+											to: `/teacher/${item.name}`,
+										}))}
+										fallback='無資料'
+									/>,
+								),
+								infoItem(
+									'班級',
+									<InlineLinks
+										items={(course.class || []).map((item) => ({
+											label: item.name,
+											to: `/class/${year}/${sem}/${item.name}`,
+										}))}
+									/>,
+								),
+								...optionalInfoItem('助教', course.ta?.map((item) => item.name).join('、')),
+								...optionalInfoItem('授課語言', course.language),
+								infoItem('備註', <HtmlText text={course.notes || '無'} />),
+							]}
+						/>
+						<InfoSection
+							icon={<MapPin />}
+							title='上課資訊'
+							items={[
+								infoItem(
+									'教室',
+									course.classroom?.length
+										? course.classroom.map((item) => item.name).join('、')
+										: '無資料',
+								),
+								...(parseCourseTime(course.time).length
+									? parseCourseTime(course.time).map((item) => infoItem(item.title, item.content))
+									: [infoItem('上課時間', '尚無資訊')]),
+							]}
+						/>
+					</div>
 				</div>
+			</aside>
+			<div className='flex min-w-0 flex-col gap-4 lg:col-start-1'>
+				{conflicted ? (
+					<Alert danger>
+						<strong>課程衝堂</strong>
+						<br />
+						本課程與{' '}
+						{conflictCourses.map((item, index) => (
+							<span key={item.id}>
+								{index > 0 ? '、' : ''}
+								<Link
+									to={`/course/${year}/${sem}/${item.id}`}
+									className='underline underline-offset-2'
+								>
+									{item.name?.zh}
+								</Link>
+							</span>
+						))}{' '}
+						衝堂！
+					</Alert>
+				) : null}
+				{isEarlyEight ? <Alert>該課程為早八，選課前請先三思！</Alert> : null}
+				<div className={panelClassName}>
+					<section className={docSectionClassName}>
+						<h3 className={docHeadingClassName}>課程概述</h3>
+						<div className='flex min-w-0 flex-col gap-2'>
+							<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
+							<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
+						</div>
+					</section>
+				</div>
+				{selectedSyllabus &&
+				[selectedSyllabus.objective, selectedSyllabus.schedule, selectedSyllabus.materials]
+					.join('')
+					.trim().length >= 400 ? (
+					<AdsByGoogle placement='section' />
+				) : null}
+				{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
+				{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
+				{syllabus.length > 1 ? (
+					<Alert className='flex flex-col gap-3'>
+						<div>
+							<strong>含有多項資料</strong>
+							<div className='text-sm opacity-80'>
+								本課程含有多項資料可供查詢，請使用下拉式選單選取教師來查看資料。
+							</div>
+						</div>
+						<Select
+							aria-label='選擇課綱教師'
+							value={selectedSyllabusIndex}
+							onChange={(value) => setSelectedSyllabusIndex(value)}
+						>
+							{syllabus.map((item, index) => (
+								<SelectOption key={`${item.name}-${index}`} value={String(index)}>
+									{item.name || `課綱 ${index + 1}`}
+								</SelectOption>
+							))}
+						</Select>
+					</Alert>
+				) : null}
+				{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
+				<CourseSourceLinks course={course} />
+				<AdsByGoogle placement='footer' />
 			</div>
-			<section className='flex flex-col gap-2'>
-				<h3>課程概述</h3>
-				<HtmlText text={course.description?.zh || '尚無中文課程概述'} as='p' />
-				<HtmlText text={course.description?.en || '尚無英文課程概述'} as='p' />
-			</section>
-			{selectedSyllabus &&
-			[selectedSyllabus.objective, selectedSyllabus.schedule, selectedSyllabus.materials]
-				.join('')
-				.trim().length >= 400 ? (
-				<AdsByGoogle placement='section' />
-			) : null}
-			{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
-			{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
-			{syllabus.length > 1 ? (
-				<Alert>
-					<strong>含有多項資料</strong>
-					<br />
-					本課程含有多項資料可供查詢，請使用下拉式選單選取教師來查看資料。
-					<br />
-					<br />
-					<Select
-						aria-label='選擇課綱教師'
-						value={selectedSyllabusIndex}
-						onChange={(value) => setSelectedSyllabusIndex(value)}
-					>
-						{syllabus.map((item, index) => (
-							<SelectOption key={`${item.name}-${index}`} value={String(index)}>
-								{item.name || `課綱 ${index + 1}`}
-							</SelectOption>
-						))}
-					</Select>
-				</Alert>
-			) : null}
-			{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
-			<CourseSourceLinks course={course} />
-			<AdsByGoogle placement='footer' />
 		</div>
 	);
 }
 
-function InfoCard({
-	className = '',
+const panelClassName = 'rounded-surface min-w-0 bg-[rgb(var(--vs-background))] shadow-rest';
+const dividerClassName = 'divide-y divide-[rgba(var(--vs-text),0.08)]';
+// Label column beside the text keeps long syllabus fields scannable and the line length readable.
+const docSectionClassName =
+	'flex min-w-0 flex-col gap-2 px-4 py-4 text-[0.95rem] sm:px-5 md:grid md:grid-cols-[9rem_minmax(0,1fr)] md:gap-6';
+const docHeadingClassName = 'm-0 text-[0.95rem] leading-relaxed font-semibold';
+
+function InfoSection({
 	icon,
 	title,
 	items,
 }: {
-	className?: string;
 	icon: React.ReactNode;
 	title: string;
 	items: InfoCardItem[];
 }) {
 	return (
-		<section
-			className={`rounded-panel border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 leading-[1.5] ${className}`}
-		>
-			<div>{icon}</div>
-			<div className='my-2 text-base font-semibold'>{title}</div>
-			<div className='grid gap-2 md:grid-cols-2'>
-				{items.map(([itemTitle, content]) => (
-					<div className='grid min-w-0 gap-0 md:gap-1' key={itemTitle}>
-						<div className='text-sm font-semibold whitespace-nowrap'>{itemTitle}</div>
-						<div className='min-w-0 text-sm [overflow-wrap:anywhere] break-words whitespace-pre-wrap opacity-75'>
-							{content}
-						</div>
-					</div>
-				))}
+		<section className='min-w-0 px-4 py-3 leading-[1.5]'>
+			<div className='mb-2 flex items-center gap-1.5 text-sm font-semibold'>
+				<span aria-hidden='true' className='text-[rgba(var(--vs-text),0.55)] [&>svg]:size-4'>
+					{icon}
+				</span>
+				<span>{title}</span>
 			</div>
+			<dl className='m-0 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm'>
+				{items.map(([itemTitle, content]) => (
+					<Fragment key={itemTitle}>
+						<dt className='text-[rgba(var(--vs-text),0.6)]'>{itemTitle}</dt>
+						<dd className='m-0 min-w-0 [overflow-wrap:anywhere] break-words whitespace-pre-wrap'>
+							{content}
+						</dd>
+					</Fragment>
+				))}
+			</dl>
 		</section>
 	);
 }
 
-function WithdrawalRateCard({
+function CourseStat({ label, value }: { label: string; value: React.ReactNode }) {
+	return (
+		<div className='min-w-0 px-4 py-3'>
+			<div className='truncate text-lg leading-tight font-semibold tabular-nums'>{value}</div>
+			<div className='mt-1 text-xs leading-tight opacity-70'>{label}</div>
+		</div>
+	);
+}
+
+function WithdrawalRateStat({
 	withdrawalRate,
 	distribution,
 }: {
@@ -380,31 +397,33 @@ function WithdrawalRateCard({
 	return (
 		<TooltipProvider>
 			<Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
-				<Card className='cursor-help'>
+				<div className='relative min-w-0 cursor-help px-4 py-3'>
 					<TooltipTrigger asChild>
 						<button
 							type='button'
 							aria-label={`退選率 ${withdrawalRateLabel}${withdrawalRate !== null ? `，${classification.label}` : ''}，查看退選率說明`}
-							className='absolute inset-0 z-10 cursor-help rounded-[inherit] border-0 bg-transparent p-0 focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
+							className='rounded-tr-surface absolute inset-0 z-10 cursor-help border-0 bg-transparent p-0 focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none focus-visible:ring-inset'
 							onClick={handleTooltipClick}
 						/>
 					</TooltipTrigger>
-					<CardTitle className='flex flex-wrap items-start justify-between gap-2'>
+					<div className='truncate text-lg leading-tight font-semibold tabular-nums'>
 						{withdrawalRateLabel}
+					</div>
+					<div className='mt-1 flex flex-wrap items-center gap-x-1 text-xs leading-tight'>
+						<span className='inline-flex items-center gap-0.5 opacity-70'>
+							退選率
+							<Info aria-hidden='true' className='size-[1em]' />
+						</span>
 						{withdrawalRate !== null ? (
 							<WithdrawalRateBadge level={classification.level} label={classification.label} />
 						) : null}
-					</CardTitle>
-					<p className='inline-flex items-center gap-1'>
-						退選率
-						<Info aria-hidden='true' className='inline size-[1em] align-[-0.125em] opacity-70' />
-					</p>
-				</Card>
+					</div>
+				</div>
 				<TooltipContent
 					side='bottom'
 					align='center'
 					sideOffset={8}
-					className='rounded-panel max-w-[min(20rem,calc(100vw-2rem))] border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] p-3 text-left text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(15,23,42,0.18)]'
+					className='rounded-panel max-w-[min(20rem,calc(100vw-2rem))] p-4 text-left'
 				>
 					<div className='flex flex-col gap-1'>
 						<h4 className='text-sm font-semibold'>什麼是退選率？</h4>
@@ -564,21 +583,23 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 		([key]) => !syllabusMetadata.has(key) && !Object.hasOwn(syllabusTextFields, key),
 	);
 	return (
-		<div className='flex flex-col gap-4'>
+		<div className={`${panelClassName} ${dividerClassName}`}>
 			{item.covid19 ? <CovidInfo covid19={item.covid19} /> : null}
-			<section className='flex flex-col gap-2'>
-				<h3>教師</h3>
-				<HtmlText as='p' text={[item.name, item.email].filter(Boolean).join(' ') || '無資料'} />
-				{officeHoursUrl ? (
-					<a
-						href={officeHoursUrl}
-						className={courseTextLinkClassName}
-						target='_blank'
-						rel='noreferrer'
-					>
-						教師諮商時間
-					</a>
-				) : null}
+			<section className={docSectionClassName}>
+				<h3 className={docHeadingClassName}>教師</h3>
+				<div className='flex min-w-0 flex-col items-start gap-1'>
+					<HtmlText as='p' text={[item.name, item.email].filter(Boolean).join(' ') || '無資料'} />
+					{officeHoursUrl ? (
+						<a
+							href={officeHoursUrl}
+							className={courseTextLinkClassName}
+							target='_blank'
+							rel='noreferrer'
+						>
+							教師諮商時間
+						</a>
+					) : null}
+				</div>
 			</section>
 			{Object.entries(syllabusTextFields).map(([key, label]) => (
 				<TextSection key={key} label={label} value={item[key]} />
@@ -587,11 +608,15 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 				<TextSection key={key} label={key} value={value} />
 			))}
 			{/* The crawler also emits false when the school's answer is blank. */}
-			{item.foreignLanguageTextbooks === true ? <h3>使用外文原文書籍：是</h3> : null}
+			{item.foreignLanguageTextbooks === true ? (
+				<section className={docSectionClassName}>
+					<h3 className={`${docHeadingClassName} col-span-full`}>使用外文原文書籍：是</h3>
+				</section>
+			) : null}
 			{item.latestUpdate?.trim() ? (
-				<section className='flex flex-col gap-2'>
-					<h3>最後更新</h3>
-					<p className='my-0'>{formatLatestUpdate(item.latestUpdate)}</p>
+				<section className={docSectionClassName}>
+					<h3 className={docHeadingClassName}>最後更新</h3>
+					<p className='my-0 opacity-75'>{formatLatestUpdate(item.latestUpdate)}</p>
 				</section>
 			) : null}
 		</div>
@@ -613,8 +638,8 @@ function TextSection({ label, value }: { label: string; value: unknown }) {
 					: '';
 	if (!text || emptySyllabusText.has(text)) return null;
 	return (
-		<section className='flex min-w-0 flex-col gap-2'>
-			<h3>{label}</h3>
+		<section className={docSectionClassName}>
+			<h3 className={docHeadingClassName}>{label}</h3>
 			<HtmlText as='p' text={formatSyllabusText(text)} />
 		</section>
 	);
@@ -647,9 +672,11 @@ function CovidInfo({ covid19 }: { covid19: CovidCourseInfo }) {
 	)
 		return null;
 	return (
-		<section className='flex min-w-0 flex-col gap-4'>
-			<h2>因應疫情所致之上課方式</h2>
-			<p className='my-0'>實際實施日期與上課方式，依學校公布之訊息為主</p>
+		<section className={`min-w-0 ${dividerClassName}`}>
+			<div className='px-4 py-4 sm:px-5'>
+				<h2 className='m-0 text-base font-semibold'>因應疫情所致之上課方式</h2>
+				<p className='my-0 mt-1 text-sm opacity-70'>實際實施日期與上課方式，依學校公布之訊息為主</p>
+			</div>
 			{Object.entries(covid19).map(([key, value]) => (
 				<TextSection key={key} label={covidFields[key] || key} value={value} />
 			))}
@@ -722,18 +749,19 @@ function CourseSourceLinks({ course }: { course: Course }) {
 	].filter((link) => link.url !== null);
 	if (!links.length) return null;
 	return (
-		<section className='mt-2 flex min-w-0 flex-col gap-2 border-t border-[rgba(var(--vs-text),0.1)] pt-4 text-sm text-[rgba(var(--vs-text),0.72)]'>
-			<h3 className='text-base font-medium'>學校原始資料</h3>
-			<ul className='flex flex-wrap gap-x-4 gap-y-2'>
+		<section className={`${panelClassName} ${docSectionClassName}`}>
+			<h3 className={docHeadingClassName}>學校原始資料</h3>
+			<ul className='m-0 flex min-w-0 list-none flex-wrap gap-2 p-0'>
 				{links.map((link, index) => (
-					<li key={`${link.url}-${index}`}>
+					<li key={`${link.url}-${index}`} className='min-w-0'>
 						<a
-							className={courseTextLinkClassName}
+							className='rounded-control inline-flex min-h-8 max-w-full items-center gap-1.5 bg-[rgba(var(--vs-text),0.05)] px-2.5 py-1 text-sm text-[rgb(var(--vs-text))] no-underline transition-colors hover:bg-[rgba(var(--vs-text),0.1)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 							href={link.url!}
 							target='_blank'
 							rel='noreferrer'
 						>
-							{link.label}
+							<span className='min-w-0 [overflow-wrap:anywhere]'>{link.label}</span>
+							<ExternalLink aria-hidden='true' className='size-3.5 shrink-0 opacity-55' />
 						</a>
 					</li>
 				))}

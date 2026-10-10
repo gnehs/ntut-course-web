@@ -125,7 +125,7 @@ export function ClassIndexPage() {
 				<>
 					<h3>建議</h3>
 					<p>根據你先前儲存的班級所提供的建議</p>
-					<div className='grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-3 lg:grid-cols-5'>
+					<div className='grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-3'>
 						{recommendClass.map((item, index) => (
 							<Card
 								className='px-4 py-3'
@@ -141,21 +141,25 @@ export function ClassIndexPage() {
 				</>
 			) : null}
 			{(filteredDepartmentData || []).map((department) => (
-				<div key={department.name} className='space-y-2'>
-					<h3>{department.name}</h3>
-					<div className='grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-3 lg:grid-cols-5'>
+				<section key={department.name} className='space-y-2'>
+					<div className='flex items-baseline justify-between gap-3'>
+						<h3 className='m-0'>{department.name}</h3>
+						<span className='shrink-0 text-xs tabular-nums opacity-60'>
+							{(department.class || []).length} 個班級
+						</span>
+					</div>
+					<div className='grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-2'>
 						{(department.class || []).map(({ name }) => (
 							<Card
-								className='px-4 py-3'
+								className='flex min-h-11 items-center px-3 py-2 text-[0.95rem] leading-snug font-medium [overflow-wrap:anywhere]'
 								key={name}
 								to={`/class/${dataset.year}/${dataset.sem}/${name}?d=${dataset.department}`}
 							>
-								<CardTitle>{name}</CardTitle>
-								<p>{department.name}</p>
+								{name}
 							</Card>
 						))}
 					</div>
-				</div>
+				</section>
 			))}
 		</div>
 	);

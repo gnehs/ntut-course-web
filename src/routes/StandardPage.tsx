@@ -3,8 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
 import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons';
 import { StudentPrefixSearch } from '../components/StudentPrefixSearch';
 import { Select, SelectOption } from '../components/ui-kit/Select';
@@ -126,9 +124,9 @@ export function StandardPage() {
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
+		<div className='flex flex-col gap-6'>
 			<div className='flex flex-col gap-1'>
-				<h1>課程標準</h1>
+				<h1 className='m-0'>課程標準</h1>
 				<p className='m-0 text-sm opacity-70'>輸入入學年度或學號前綴，查看課程規劃與畢業學分要求</p>
 			</div>
 
@@ -142,7 +140,7 @@ export function StandardPage() {
 			{!years ? <StandardPickerSkeleton /> : null}
 
 			{years ? (
-				<Tabs defaultValue='search' className='gap-4'>
+				<Tabs defaultValue='search' className='gap-3'>
 					<TabsList aria-label='課程標準查詢方式'>
 						<TabsTrigger value='search'>快速搜尋</TabsTrigger>
 						<TabsTrigger value='manual'>條件選擇</TabsTrigger>
@@ -228,9 +226,12 @@ export function StandardPage() {
 			) : null}
 
 			{year && system && department ? (
-				<p className='m-0 text-sm' aria-live='polite'>
-					<span className='opacity-70'>目前查看：</span>
-					<strong>
+				<p
+					className='m-0 flex flex-col gap-0.5 border-t border-[rgba(var(--vs-text),0.1)] pt-5'
+					aria-live='polite'
+				>
+					<span className='text-sm opacity-65'>目前查看</span>
+					<strong className='text-shadow-emboss text-xl leading-snug font-semibold'>
 						{formatRocYear(year)}入學 · {system} · {department}
 					</strong>
 				</p>
@@ -240,85 +241,106 @@ export function StandardPage() {
 
 			{department && current ? (
 				<>
-					<div>
-						<h2 className='text-lg font-semibold'>畢業學分要求</h2>
-						<div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5'>
+					<section className='flex flex-col gap-3'>
+						<h2 className='m-0 text-lg font-semibold'>畢業學分要求</h2>
+						<dl className='rounded-surface shadow-rest m-0 grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-px overflow-hidden bg-[rgba(var(--vs-text),0.08)]'>
 							{creditItems.map(([key, value]) => (
-								<Card key={key}>
-									<CardTitle className='tabular-nums'>{formatCredit(value)}</CardTitle>
-									<p>{key}</p>
-								</Card>
+								<div
+									key={key}
+									className='flex min-w-0 flex-col-reverse gap-1 bg-[rgb(var(--vs-background))] px-4 py-3'
+								>
+									<dt className='text-xs leading-snug opacity-70'>{key}</dt>
+									<dd className='m-0 text-2xl leading-tight font-semibold tabular-nums'>
+										{formatCredit(value)}
+									</dd>
+								</div>
 							))}
-						</div>
-					</div>
+						</dl>
+					</section>
 
-					<div>
-						<h2 className='text-lg font-semibold'>相關規定事項</h2>
+					<section className='flex flex-col gap-3'>
+						<h2 className='m-0 text-lg font-semibold'>相關規定事項</h2>
 						{current.rules?.length ? (
-							<ul className='rounded-surface space-y-2 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-4'>
-								{current.rules.map((item) => (
-									<li key={item} className='flex items-start gap-2 text-sm leading-relaxed'>
-										<span className='mt-1.5 block size-1.5 shrink-0 rounded-full bg-[rgb(var(--vs-primary))]' />
-										{item}
+							<ol className='rounded-surface shadow-rest m-0 list-none divide-y divide-[rgba(var(--vs-text),0.08)] bg-[rgb(var(--vs-background))] p-0'>
+								{current.rules.map((item, index) => (
+									<li
+										key={item}
+										className='grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 px-4 py-3 text-[0.95rem] leading-relaxed sm:px-5'
+									>
+										<span
+											aria-hidden='true'
+											className='text-sm leading-[1.7] font-medium text-[rgba(var(--vs-text),0.5)] tabular-nums'
+										>
+											{index + 1}
+										</span>
+										<span className='max-w-[44rem]'>{item}</span>
 									</li>
 								))}
-							</ul>
+							</ol>
 						) : (
 							<Alert>無相關規定事項</Alert>
 						)}
-					</div>
+					</section>
 
-					<div>
-						<h2 className='text-lg font-semibold'>課程列表</h2>
-						{legendEntries.length > 0 ? (
-							<dl
-								aria-label='課程類型圖例'
-								className='mt-2 mb-5 grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:gap-x-5'
-							>
-								{legendEntries.map(([symbol, label]) => (
-									<div key={symbol} className='flex items-center gap-2'>
-										<dt className='flex size-5 shrink-0 items-center justify-center text-base leading-none'>
-											{symbol}
-										</dt>
-										<dd className='m-0 text-[rgba(var(--vs-text),0.8)]'>{label}</dd>
-									</div>
-								))}
-							</dl>
-						) : null}
-						<div className='grid gap-4 lg:grid-cols-2'>
+					<section className='flex flex-col gap-3'>
+						<div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2'>
+							<h2 className='m-0 text-lg font-semibold'>課程列表</h2>
+							{legendEntries.length > 0 ? (
+								<dl
+									aria-label='課程類型圖例'
+									className='m-0 flex flex-wrap gap-x-4 gap-y-1 text-xs'
+								>
+									{legendEntries.map(([symbol, label]) => (
+										<div key={symbol} className='flex items-center gap-1.5'>
+											<dt className='flex size-5 shrink-0 items-center justify-center text-sm leading-none'>
+												{symbol}
+											</dt>
+											<dd className='m-0 text-[rgba(var(--vs-text),0.75)]'>{label}</dd>
+										</div>
+									))}
+								</dl>
+							) : null}
+						</div>
+						<div className='flex flex-col gap-5'>
 							{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
-								<div key={courseYear} className='space-y-3'>
+								<div key={courseYear} className='grid items-start gap-4 md:grid-cols-2'>
 									{(Object.entries(yearData) as [string, StandardCourse[]][]).map(
 										([sem, items]) => (
-											<div key={`${courseYear}-${sem}`} className='space-y-2'>
-												<h3 className='text-sm font-semibold opacity-70'>
-													{gradeLabel(courseYear, sem)}
-												</h3>
-												<div className='rounded-surface overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))]'>
-													{items.map((item, index) => (
-														<div
-															className={`flex items-center justify-between gap-2 px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
-															key={`${item.type}-${item.name}`}
-														>
-															<span className='flex min-w-0 items-center gap-2 text-sm'>
-																<span className='shrink-0 rounded-sm bg-[rgba(var(--vs-primary),0.08)] px-1 py-0.5 text-xs font-medium'>
-																	{item.type}
-																</span>
-																<span className='truncate'>{item.name}</span>
-															</span>
-															<span className='shrink-0 text-sm tabular-nums opacity-60'>
-																{formatCredit(item.credit)} 學分
-															</span>
-														</div>
-													))}
+											<div
+												key={`${courseYear}-${sem}`}
+												className='rounded-surface shadow-rest overflow-hidden bg-[rgb(var(--vs-background))]'
+											>
+												<div className='flex items-baseline justify-between gap-3 border-b border-[rgba(var(--vs-text),0.08)] bg-linear-to-b from-[rgba(var(--vs-text),0.015)] to-[rgba(var(--vs-text),0.045)] px-4 py-2.5'>
+													<h3 className='m-0 text-sm font-semibold'>
+														{gradeLabel(courseYear, sem)}
+													</h3>
+													<span className='shrink-0 text-xs tabular-nums opacity-65'>
+														{items.length} 門 · {formatCredit(sumCredits(items))} 學分
+													</span>
 												</div>
+												{items.map((item, index) => (
+													<div
+														className={`flex items-center justify-between gap-3 px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
+														key={`${item.type}-${item.name}`}
+													>
+														<span className='flex min-w-0 items-center gap-2.5 text-sm'>
+															<span className='grid size-5 shrink-0 place-items-center text-sm leading-none text-[rgba(var(--vs-text),0.7)]'>
+																{item.type}
+															</span>
+															<span className='truncate'>{item.name}</span>
+														</span>
+														<span className='shrink-0 text-sm tabular-nums opacity-60'>
+															{formatCredit(item.credit)} 學分
+														</span>
+													</div>
+												))}
 											</div>
 										),
 									)}
 								</div>
 							))}
 						</div>
-					</div>
+					</section>
 				</>
 			) : null}
 			{!error && current && Object.keys(current.courses || {}).length > 0 ? (
@@ -326,6 +348,13 @@ export function StandardPage() {
 			) : null}
 		</div>
 	);
+}
+
+function sumCredits(items: StandardCourse[]) {
+	return items.reduce((sum, item) => {
+		const credit = Number(formatCredit(item.credit));
+		return Number.isFinite(credit) ? sum + credit : sum;
+	}, 0);
 }
 
 function formatRocYear(value: string) {

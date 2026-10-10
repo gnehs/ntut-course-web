@@ -89,7 +89,7 @@ export function WidgetPage() {
 				</Alert>
 			) : null}
 			<Card
-				className={`rounded-surface overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm ${!hasCourses ? 'opacity-70' : ''}`}
+				className={`rounded-surface bg-sheen-surface shadow-rest overflow-hidden bg-[rgb(var(--vs-background))] ${!hasCourses ? 'opacity-70' : ''}`}
 			>
 				<CardHeader className='gap-3 border-b border-[rgba(var(--vs-text),0.08)] p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='min-w-0'>
@@ -136,7 +136,7 @@ export function WidgetPage() {
 					</pre>
 				</CardContent>
 			</Card>
-			<Card className='rounded-surface border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-sm'>
+			<Card className='rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))]'>
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>2. 貼到 Scriptable 並加入小工具</CardTitle>
 					<CardDescription>

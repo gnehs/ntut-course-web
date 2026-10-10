@@ -205,10 +205,29 @@ const changelogEntries: ChangelogEntry[] = [
 	},
 ];
 
+function ProsePage({
+	title,
+	children,
+	after,
+}: {
+	title: string;
+	children: React.ReactNode;
+	after?: React.ReactNode;
+}) {
+	return (
+		<div className='mx-auto flex max-w-[46rem] flex-col gap-4'>
+			<h1 className='m-0'>{title}</h1>
+			<article className='rounded-surface shadow-rest space-y-4 bg-[rgb(var(--vs-background))] px-5 py-5 leading-relaxed sm:px-8 sm:py-7 [&_h2]:!mt-8 [&_h2]:text-lg [&_h3]:!mt-6 [&_h3]:text-base [&>:first-child]:!mt-0'>
+				{children}
+			</article>
+			{after}
+		</div>
+	);
+}
+
 export function AboutPage() {
 	return (
-		<div className='space-y-4'>
-			<h1>關於</h1>
+		<ProsePage title='關於' after={<AdsByGoogle placement='footer' />}>
 			<p>
 				本網站與爬蟲由{' '}
 				<a
@@ -305,15 +324,14 @@ export function AboutPage() {
 					</a>
 				</li>
 			</ul>
-			<AdsByGoogle placement='footer' />
-		</div>
+		</ProsePage>
 	);
 }
 
 export function DocPage() {
 	return (
-		<div className='space-y-4'>
-			<h1>嵌入功能</h1>
+		<ProsePage title='文件'>
+			<h2>嵌入功能</h2>
 			<ul className='list-disc space-y-1 pl-6'>
 				<li>你可以透過嵌入功能，將課程資訊嵌入到你的網站中。</li>
 				<li>啟用嵌入功能後，導航欄與頁尾將會被隱藏。</li>
@@ -321,45 +339,46 @@ export function DocPage() {
 					在任一網址後方加入 <code>?mode=iframe</code> 即可使用嵌入功能。
 				</li>
 			</ul>
-			<h1>API 文件</h1>
-			<h2>注意</h2>
+			<h2>API 文件</h2>
 			<ul className='list-disc space-y-1 pl-6'>
 				<li>這不是學校官方提供的 API</li>
 				<li>這份文件非即時更新，可能會有 API 失效</li>
 				<li>資料擷取自國立臺北科技大學課程系統，資料僅供參考。</li>
 			</ul>
-			<h2>API Endpoint</h2>
-			<div className='rounded-panel border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'>
-				<code>https://gnehs.github.io/ntut-course-crawler-node/</code>
+			<h3>API Endpoint</h3>
+			<div className='rounded-panel bg-sheen-well shadow-well border border-[rgba(var(--vs-text),0.1)] px-4 py-3'>
+				<code className='break-all'>https://gnehs.github.io/ntut-course-crawler-node/</code>
 			</div>
-			<h2>API 清單</h2>
-			{[
-				'/main.json 取得所有可用之年份與學期',
-				'/{year}/{sem}/{system}.json 取得某學期某學制課程資料',
-				'/{year}/{sem}/course/{id}.json 取得教師課綱陣列',
-				'/{year}/{sem}/syllabus-index.json 取得 AI、SDGs 與教學資源搜尋索引',
-				'/{year}/{sem}/programs.json 取得一般學程與開課課號',
-				'/{year}/{sem}/mprogram.json 取得微學程',
-				'/competencies.json 取得系所課程核心能力對照',
-				'/{year}/{sem}/department.json 取得系所班級清單',
-				'/standards.json 取得課程標準可用年份',
-				'/calendar.json 取得行事曆',
-			].map((item) => (
-				<div
-					key={item}
-					className='rounded-panel border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-4 py-3'
-				>
-					<h3 className='m-0'>{item}</h3>
-				</div>
-			))}
-		</div>
+			<h3>API 清單</h3>
+			<div className='rounded-panel divide-y divide-[rgba(var(--vs-text),0.08)] border border-[rgba(var(--vs-text),0.1)]'>
+				{[
+					['/main.json', '取得所有可用之年份與學期'],
+					['/{year}/{sem}/{system}.json', '取得某學期某學制課程資料'],
+					['/{year}/{sem}/course/{id}.json', '取得教師課綱陣列'],
+					['/{year}/{sem}/syllabus-index.json', '取得 AI、SDGs 與教學資源搜尋索引'],
+					['/{year}/{sem}/programs.json', '取得一般學程與開課課號'],
+					['/{year}/{sem}/mprogram.json', '取得微學程'],
+					['/competencies.json', '取得系所課程核心能力對照'],
+					['/{year}/{sem}/department.json', '取得系所班級清單'],
+					['/standards.json', '取得課程標準可用年份'],
+					['/calendar.json', '取得行事曆'],
+				].map(([path, description]) => (
+					<div
+						key={path}
+						className='flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4'
+					>
+						<code className='break-all'>{path}</code>
+						<span className='text-sm opacity-75 sm:shrink-0'>{description}</span>
+					</div>
+				))}
+			</div>
+		</ProsePage>
 	);
 }
 
 export function PrivacyPage() {
 	return (
-		<div className='space-y-4'>
-			<h1>隱私權政策</h1>
+		<ProsePage title='隱私權政策'>
 			<p>上次更新：2022/6/15</p>
 			<p>
 				非常歡迎您光臨「北科課程好朋友」（以下簡稱本網站），為了讓您能夠安心使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：
@@ -433,7 +452,7 @@ export function PrivacyPage() {
 				對於本站之隱私權政策有任何疑問，或者想提出變更、移除個人資料之請求，請聯繫
 				ntut-course-web[at]gnehs.net（請將 [at] 替換為 @）。
 			</p>
-		</div>
+		</ProsePage>
 	);
 }
 
@@ -461,7 +480,7 @@ export function ChangelogPage() {
 					<a
 						key={year}
 						href={`#changelog-${year}`}
-						className='inline-flex items-center gap-2 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-1.5 text-sm text-[rgb(var(--vs-text))] no-underline transition-colors hover:border-[rgba(var(--vs-primary),0.45)] hover:bg-[rgba(var(--vs-primary),0.08)]'
+						className='inline-flex items-center gap-2 rounded-full border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-1.5 text-sm text-[rgb(var(--vs-text))] no-underline transition-colors hover:border-[rgba(var(--vs-text),0.25)] hover:bg-[rgba(var(--vs-text),0.05)]'
 					>
 						<span>{year}</span>
 						<span className='text-[rgba(var(--vs-text),0.58)]'>{entries.length}</span>
@@ -480,7 +499,7 @@ export function ChangelogPage() {
 							{entries.map((entry) => (
 								<li
 									key={entry.date}
-									className='rounded-surface grid overflow-hidden border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.04))] sm:grid-cols-[10rem_minmax(0,1fr)]'
+									className='rounded-surface bg-sheen-surface shadow-raised grid overflow-hidden bg-[rgb(var(--vs-background))] sm:grid-cols-[10rem_minmax(0,1fr)]'
 								>
 									<div className='flex items-center gap-2 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.025)] px-4 py-3 text-sm text-[rgba(var(--vs-text),0.65)] sm:border-r sm:border-b-0'>
 										<CalendarDays className='size-4 shrink-0' />
@@ -519,10 +538,16 @@ export function ChangelogPage() {
 
 export function NotFoundPage() {
 	return (
-		<div className='space-y-4'>
-			<h1>找不到頁面</h1>
-			<p>你要找的頁面不存在。</p>
-			<Button as={Link} to='/'>
+		<div className='mx-auto flex max-w-[28rem] flex-col items-center gap-3 py-16 text-center'>
+			<div
+				aria-hidden='true'
+				className='text-shadow-emboss text-7xl leading-none font-semibold tracking-tight text-[rgba(var(--vs-text),0.18)] tabular-nums'
+			>
+				404
+			</div>
+			<h1 className='m-0'>找不到頁面</h1>
+			<p className='m-0 opacity-70'>你要找的頁面不存在。</p>
+			<Button primary as={Link} to='/'>
 				回首頁
 			</Button>
 		</div>
@@ -831,7 +856,7 @@ export function StatusPage() {
 						href={run.html_url}
 						target='_blank'
 						rel='noreferrer'
-						className='rounded-surface flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
+						className='rounded-surface bg-sheen-glow shadow-raised hover:shadow-lifted active:shadow-pressed flex items-center gap-3 bg-[rgb(var(--vs-background))] px-4 py-2.5 transition-[box-shadow,translate] duration-200 hover:-translate-y-0.5 active:translate-y-px'
 					>
 						<div
 							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}

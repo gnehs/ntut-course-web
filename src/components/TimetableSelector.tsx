@@ -70,7 +70,7 @@ function TimetableRow({ slot, dayKeys, selected, onToggle }) {
 								'flex h-full min-h-[52px] w-full items-center justify-center px-2 py-2 text-2xl transition-colors',
 								active
 									? 'bg-[rgba(var(--vs-danger),0.18)] text-[rgb(var(--vs-danger))]'
-									: 'bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
+									: 'bg-[rgba(var(--vs-text),0.06)] text-[rgba(var(--vs-text),0.6)] hover:bg-[rgba(var(--vs-text),0.11)]',
 							)}
 						>
 							{active ? <X className='size-4' /> : <Check className='size-4' />}

@@ -15,7 +15,7 @@ function SkeletonCard({
 }) {
 	return (
 		<div
-			className={`rounded-surface bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] ${className}`}
+			className={`rounded-surface bg-sheen-surface shadow-raised bg-[rgb(var(--vs-background))] p-4 ${className}`}
 		>
 			{children}
 		</div>
@@ -211,7 +211,7 @@ export function CalendarSkeleton() {
 				{Array.from({ length: 8 }, (_, index) => (
 					<div
 						key={index}
-						className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
+						className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
 					>
 						<CalendarDateSkeleton />
 						<div className='grid flex-1 gap-2'>
@@ -261,7 +261,7 @@ export function TeacherSkeleton() {
 				{Array.from({ length: 6 }, (_, index) => (
 					<SkeletonCard
 						key={index}
-						className='grid grid-cols-[auto_1fr_auto_auto] items-center gap-2 p-2'
+						className='grid grid-cols-[auto_1fr_auto_auto] items-center gap-2 px-4 py-2.5'
 					>
 						<div className='grid gap-2'>
 							<SkeletonBlock className='h-5 w-16' />
@@ -329,7 +329,7 @@ function EmptyRoomCardSkeleton() {
 			<SkeletonBlock className='h-5 w-24' />
 			<div className='mt-3 flex flex-wrap gap-1'>
 				{Array.from({ length: 14 }, (_, dotIndex) => (
-					<SkeletonBlock key={dotIndex} className='h-5 w-5 rounded-full' />
+					<SkeletonBlock key={dotIndex} className='h-6 w-6 rounded-full' />
 				))}
 			</div>
 		</SkeletonCard>
@@ -375,27 +375,40 @@ export function EmptyRoomSkeleton() {
 
 export function CourseDetailSkeleton() {
 	return (
-		<div>
-			<SkeletonHeading withActions />
-			<div className='mt-4'>
-				<StatCardsSkeleton count={3} className='sm:grid-cols-3' />
+		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-x-6'>
+			<div className='grid gap-2 lg:col-start-1'>
+				<SkeletonBlock className='h-8 w-48 max-w-full' />
+				<SkeletonBlock className='h-4 w-72 max-w-full' />
 			</div>
-			<div className='mt-3 grid gap-3 lg:grid-cols-3'>
-				{Array.from({ length: 3 }, (_, index) => (
-					<SkeletonCard key={index}>
-						<SkeletonBlock className='h-6 w-8' />
-						<SkeletonBlock className='mt-2 h-5 w-24' />
-						<div className='mt-3 grid grid-cols-2 gap-2'>
-							<SkeletonBlock className='h-10' />
-							<SkeletonBlock className='h-10' />
-							<SkeletonBlock className='h-10' />
-							<SkeletonBlock className='h-10' />
-						</div>
-					</SkeletonCard>
-				))}
+			<div className='flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1'>
+				<SkeletonBlock className='h-11 w-full sm:h-9' />
+				<SkeletonCard>
+					<div className='grid grid-cols-3 gap-3'>
+						{Array.from({ length: 3 }, (_, index) => (
+							<div key={index}>
+								<SkeletonBlock className='h-6 w-14' />
+								<SkeletonBlock className='mt-2 h-3 w-10' />
+							</div>
+						))}
+					</div>
+					<div className='mt-5 grid gap-5 md:grid-cols-3 lg:grid-cols-1'>
+						{Array.from({ length: 3 }, (_, index) => (
+							<div key={index} className='grid gap-2'>
+								<SkeletonBlock className='h-5 w-24' />
+								<SkeletonBlock className='h-4 w-4/5' />
+								<SkeletonBlock className='h-4 w-3/5' />
+								<SkeletonBlock className='h-4 w-2/3' />
+							</div>
+						))}
+					</div>
+				</SkeletonCard>
 			</div>
-			<SkeletonBlock className='mt-6 h-6 w-28' />
-			<SkeletonBlock className='mt-3 h-24 w-full' />
+			<SkeletonCard className='lg:col-start-1'>
+				<SkeletonBlock className='h-5 w-28' />
+				<SkeletonBlock className='mt-3 h-24 w-full' />
+				<SkeletonBlock className='mt-6 h-5 w-28' />
+				<SkeletonBlock className='mt-3 h-40 w-full' />
+			</SkeletonCard>
 		</div>
 	);
 }
@@ -406,7 +419,7 @@ export function StatusSkeleton() {
 			<SkeletonHeading />
 			<div className='mt-4 space-y-2'>
 				{Array.from({ length: 8 }, (_, index) => (
-					<SkeletonCard key={index} className='flex items-center gap-2 p-2'>
+					<SkeletonCard key={index} className='flex items-center gap-2 px-4 py-2.5'>
 						<SkeletonBlock className='h-8 w-8 rounded-full' />
 						<div className='grid flex-1 gap-2'>
 							<SkeletonBlock className='h-4 w-52 max-w-full' />

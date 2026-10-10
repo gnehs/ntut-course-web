@@ -6,6 +6,7 @@ import {
 	Calendar,
 	CalendarPlus,
 	ChartNoAxesColumnIncreasing,
+	ChevronRight,
 	CircleHelp,
 	Clock3,
 	FileText,
@@ -21,6 +22,7 @@ import {
 	UserRound,
 	UsersRound,
 } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { UniversalSearch } from '../components/UniversalSearch';
 import { Card } from '../components/ui-kit/Card';
@@ -93,7 +95,7 @@ function UpcomingCourse() {
 						key={course.id}
 						to={`/course/${dataset.year}/${dataset.sem}/${course.id}`}
 					>
-						<div className='relative z-10 min-w-0 pr-6'>
+						<div className='min-w-0'>
 							<CardTitle>{course.name?.zh || '未命名課程'}</CardTitle>
 							<p>{(course.teacher || []).map((item) => item.name).join('、')}</p>
 						</div>
@@ -192,7 +194,7 @@ export function HomePage() {
 				<h2 className='sr-only'>常用功能</h2>
 				<div className='grid gap-3 sm:grid-cols-3'>
 					{primaryActions.map((item) => (
-						<HomeLinkCard item={item} key={item.to} />
+						<PrimaryActionCard item={item} key={item.to} />
 					))}
 				</div>
 			</section>
@@ -231,7 +233,10 @@ function PageSection({ title, children }: { title: string; children: React.React
 	const headingId = `home-${title.replaceAll(/\s/g, '-')}`;
 	return (
 		<section aria-labelledby={headingId} className='flex min-w-0 flex-col gap-3'>
-			<h2 id={headingId} className='m-0 scroll-mt-20'>
+			<h2
+				id={headingId}
+				className='text-muted-foreground m-0 scroll-mt-20 px-1 text-sm font-medium'
+			>
 				{title}
 			</h2>
 			{children}
@@ -239,25 +244,49 @@ function PageSection({ title, children }: { title: string; children: React.React
 	);
 }
 
-function HomeLinkList({ items }: { items: HomeLink[] }) {
-	return (
-		<div className='grid gap-3'>
-			{items.map((item) => (
-				<HomeLinkCard item={item} key={item.to} />
-			))}
-		</div>
-	);
-}
-
-function HomeLinkCard({ item }: { item: HomeLink }) {
+// Primary actions carry the brand colour; everything else on the page stays neutral.
+function PrimaryActionCard({ item }: { item: HomeLink }) {
 	const Icon = item.icon;
 	return (
-		<Card className='px-4 py-3' to={item.to}>
-			<div className='relative z-10 min-w-0 pr-6'>
+		<Card className='flex items-center gap-3 p-4' to={item.to}>
+			<span
+				aria-hidden='true'
+				className='tone-primary bg-sheen-gloss rounded-control shadow-solid flex size-10 shrink-0 items-center justify-center bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
+			>
+				<Icon className='size-5' />
+			</span>
+			<div className='min-w-0'>
 				<CardTitle>{item.title}</CardTitle>
 				<p>{item.text}</p>
 			</div>
-			<Icon data-card-icon aria-hidden='true' />
+		</Card>
+	);
+}
+
+// Secondary destinations share one surface so they read as a list, not as competing cards.
+function HomeLinkList({ items }: { items: HomeLink[] }) {
+	return (
+		<Card className='!p-0'>
+			{items.map((item) => {
+				const Icon = item.icon;
+				return (
+					<Link
+						key={item.to}
+						to={item.to}
+						className='group flex min-h-14 items-center gap-3 border-t px-4 py-2.5 !text-[rgb(var(--vs-text))] !no-underline transition-colors duration-200 first:border-t-0 hover:bg-[rgba(var(--vs-text),0.04)] focus-visible:bg-[rgba(var(--vs-text),0.06)] focus-visible:outline-none'
+					>
+						<Icon className='text-muted-foreground size-5 shrink-0' aria-hidden='true' />
+						<div className='min-w-0 flex-1'>
+							<div className='font-medium'>{item.title}</div>
+							<p>{item.text}</p>
+						</div>
+						<ChevronRight
+							className='size-4 shrink-0 opacity-30 transition-[opacity,translate] duration-200 group-hover:translate-x-0.5 group-hover:opacity-70'
+							aria-hidden='true'
+						/>
+					</Link>
+				);
+			})}
 		</Card>
 	);
 }
@@ -273,23 +302,20 @@ function SiteNavigation() {
 	];
 
 	return (
-		<section aria-labelledby='site-heading' className='flex flex-col gap-3 border-t pt-3'>
-			<h2 id='site-heading' className='text-muted-foreground m-0 text-sm font-medium'>
+		<section aria-labelledby='site-heading' className='flex flex-col gap-1 border-t pt-3'>
+			<h2 id='site-heading' className='text-muted-foreground m-0 px-1 text-sm font-medium'>
 				網站與資料
 			</h2>
-			<nav
-				aria-label='網站與資料連結'
-				className='grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6'
-			>
+			<nav aria-label='網站與資料連結' className='-mx-2 flex flex-wrap gap-x-1'>
 				{links.map(({ to, title, icon: Icon }) => (
-					<Card
+					<Link
 						key={to}
 						to={to}
-						className='flex min-h-11 min-w-0 items-center gap-1.5 text-sm sm:min-h-9'
+						className='rounded-surface !text-muted-foreground hover:!text-foreground flex min-h-11 items-center gap-1.5 px-2 text-sm !no-underline transition-colors duration-200 hover:bg-[rgba(var(--vs-text),0.05)] sm:min-h-9'
 					>
-						<Icon className='text-muted-foreground size-4 shrink-0' aria-hidden='true' />
+						<Icon className='size-4 shrink-0' aria-hidden='true' />
 						<span>{title}</span>
-					</Card>
+					</Link>
 				))}
 			</nav>
 		</section>

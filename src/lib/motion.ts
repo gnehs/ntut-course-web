@@ -14,32 +14,23 @@ export function bindInteractiveCard(element) {
 		window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 	const icon = element.querySelector(':scope > [data-card-icon]');
-	const shadowOpacity =
-		Number.parseFloat(
-			getComputedStyle(document.documentElement).getPropertyValue('--vs-shadow-opacity'),
-		) || 0.05;
-	const baseShadow = `0 5px 20px 0 rgba(0,0,0,${shadowOpacity})`;
-	const liftShadow = `0 10px 24px 0 rgba(0,0,0,${Math.min(shadowOpacity * 1.5, 0.18)})`;
 	let hovered = false;
 
 	gsap.set(element, { transformOrigin: '50% 50%', willChange: 'transform' });
-	if (icon) gsap.set(icon, { transformOrigin: '100% 100%' });
 
 	function enter() {
 		hovered = true;
 		gsap.to(element, {
 			y: -3,
 			scale: 1.002,
-			boxShadow: liftShadow,
 			duration: 0.2,
 			ease: 'power3.out',
 			overwrite: 'auto',
 		});
 		if (icon) {
 			gsap.to(icon, {
-				autoAlpha: 0.34,
-				y: -10,
-				scale: 1.025,
+				autoAlpha: 0.75,
+				x: 2,
 				duration: 0.24,
 				ease: 'power3.out',
 				overwrite: 'auto',
@@ -52,16 +43,14 @@ export function bindInteractiveCard(element) {
 		gsap.to(element, {
 			y: 0,
 			scale: 1,
-			boxShadow: baseShadow,
 			duration: 0.22,
 			ease: 'power3.out',
 			overwrite: 'auto',
 		});
 		if (icon) {
 			gsap.to(icon, {
-				autoAlpha: 0.2,
-				y: 10,
-				scale: 1,
+				autoAlpha: 0.4,
+				x: 0,
 				duration: 0.24,
 				ease: 'power2.out',
 				overwrite: 'auto',
@@ -73,7 +62,6 @@ export function bindInteractiveCard(element) {
 		gsap.to(element, {
 			y: 1,
 			scale: 0.998,
-			boxShadow: `0 3px 10px 0 rgba(0,0,0,${Math.max(shadowOpacity * 0.7, 0.03)})`,
 			duration: 0.08,
 			ease: 'power2.out',
 			overwrite: 'auto',

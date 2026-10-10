@@ -164,7 +164,10 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 		}
 		if (loadingYear === year) {
 			return (
-				<div className='flex items-center gap-2 px-4 py-3 text-sm opacity-75' role='status'>
+				<div
+					className='flex items-center gap-2 px-4 py-3 text-sm opacity-75'
+					role='status'
+				>
 					<Loader aria-hidden='true' className='size-4 animate-spin' />
 					載入 {year} 年的系所建議…
 				</div>
@@ -215,9 +218,8 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 				className={cn(
 					'rounded-surface flex border transition-[background-color,border-color,box-shadow] duration-200',
 					focused
-						? 'border-[rgba(var(--vs-gray-2),1)] bg-[rgb(var(--vs-gray-1))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
-						: 'border-transparent bg-[rgba(var(--vs-text),0.1)] hover:bg-[rgba(var(--vs-text),0.05)]',
-					'dark:border-[rgba(var(--vs-text),0.05)] dark:bg-[rgba(var(--vs-text),0.05)] dark:hover:bg-[rgba(var(--vs-text),0.075)]',
+						? 'shadow-raised border-[rgba(var(--vs-primary),0.55)] bg-[rgb(var(--vs-background))] ring-[3px] ring-[rgba(var(--vs-primary),0.16)]'
+						: 'bg-sheen-well shadow-well border-[rgba(var(--vs-text),0.06)] bg-[rgba(var(--vs-text),0.07)] hover:bg-[rgba(var(--vs-text),0.045)] dark:bg-[rgba(var(--vs-text),0.05)] dark:hover:bg-[rgba(var(--vs-text),0.075)]',
 				)}
 			>
 				<Input
@@ -275,7 +277,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 				aria-label='入學年度或學號前綴搜尋結果'
 				aria-busy={loadingYear === year}
 				className={cn(
-					'rounded-surface absolute top-full right-0 left-0 z-[999] mt-1 max-h-[360px] overflow-y-auto border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] shadow-[0_16px_40px_rgba(var(--vs-text),0.16)] transition-[opacity,transform] duration-200',
+					'rounded-surface bg-sheen-surface shadow-overlay absolute top-full right-0 left-0 z-[999] mt-1 max-h-[360px] overflow-y-auto bg-[rgb(var(--vs-background))] transition-[opacity,transform] duration-200',
 					focused
 						? 'pointer-events-auto opacity-100'
 						: 'pointer-events-none -translate-y-2 opacity-0',

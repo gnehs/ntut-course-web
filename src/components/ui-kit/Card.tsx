@@ -13,19 +13,19 @@ type CardProps = {
 export function Card({ to, className = '', children, ...props }: CardProps) {
 	const cardRef = useRef<HTMLElement | null>(null);
 	const isHoverable = /\bhoverable\b/.test(className);
-	const isPadding = /\bpadding\b/.test(className);
 	const isBorderless = /\bborderless\b/.test(className);
 	const isInteractive = isHoverable || Boolean(to);
 	const normalizedClassName = normalizeCardClassName(className, isInteractive);
 	const classes = cn(
-		'relative w-full overflow-hidden rounded-surface !text-foreground !no-underline transition-colors duration-200',
+		'relative w-full overflow-hidden rounded-surface !text-foreground !no-underline transition-[background-color,border-color,color,box-shadow] duration-200',
 		'[&_p]:!m-0 [&_p]:!text-[0.85rem] [&_p]:!opacity-80 [&_p+p]:!mt-2',
-		'[&>[data-card-icon]]:absolute [&>[data-card-icon]]:right-2 [&>[data-card-icon]]:bottom-0 [&>[data-card-icon]]:m-auto [&>[data-card-icon]]:size-12 [&>[data-card-icon]]:origin-bottom-right [&>[data-card-icon]]:opacity-20 [&>[data-card-icon]]:translate-y-2.5',
+		'has-[>[data-card-icon]]:!pr-12 [&>[data-card-icon]]:absolute [&>[data-card-icon]]:inset-y-0 [&>[data-card-icon]]:right-4 [&>[data-card-icon]]:my-auto [&>[data-card-icon]]:size-5 [&>[data-card-icon]]:opacity-40',
 		isBorderless ? 'border-0 bg-transparent shadow-none' : 'bg-[rgb(var(--vs-background))]',
-		!isBorderless && isInteractive
-			? 'shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
-			: !isBorderless && 'border border-[rgba(var(--vs-text),0.1)] shadow-none',
-		isBorderless ? 'px-0 py-1' : isPadding ? 'px-4 py-3' : 'px-3 py-2',
+		!isBorderless &&
+			(isInteractive
+				? 'bg-sheen-glow shadow-raised hover:shadow-lifted active:shadow-pressed'
+				: 'bg-sheen-surface shadow-rest'),
+		isBorderless ? 'px-0 py-1' : 'px-4 py-3',
 		isInteractive &&
 			'cursor-pointer will-change-transform focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none hover:!text-foreground',
 		normalizedClassName,

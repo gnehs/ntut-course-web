@@ -36,7 +36,7 @@ function TooltipContent({
 				data-slot='tooltip-content'
 				sideOffset={sideOffset}
 				className={cn(
-					'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 z-50 max-h-[min(24rem,var(--radix-tooltip-content-available-height))] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-panel border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-1.5 text-sm leading-5 text-[rgb(var(--vs-text))] shadow-[0_12px_32px_rgba(15,23,42,0.18)] origin-(--radix-tooltip-content-transform-origin)',
+					'animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 rounded-panel bg-sheen-surface shadow-overlay z-50 max-h-[min(24rem,var(--radix-tooltip-content-available-height))] max-w-[calc(100vw-2rem)] origin-(--radix-tooltip-content-transform-origin) overflow-y-auto bg-[rgb(var(--vs-background))] px-3 py-1.5 text-sm leading-5 text-[rgb(var(--vs-text))]',
 					className,
 				)}
 				{...props}

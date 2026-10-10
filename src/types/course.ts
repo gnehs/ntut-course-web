@@ -227,5 +227,6 @@ export type SearchHistoryItem = {
 	text?: string;
 	description?: string;
 	history?: boolean;
+	transient?: boolean;
 	course?: Course;
 };

@@ -100,7 +100,7 @@ export function WithdrawalPage() {
 		<div className='space-y-4'>
 			<h1>退選率</h1>
 			<p>這是期間中所有教師的退選率統計頁面</p>
-			<div className='rounded-panel grid gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-3 md:grid-cols-[minmax(180px,1fr)_160px_180px_160px]'>
+			<div className='rounded-panel grid gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] p-4 md:grid-cols-[minmax(180px,1fr)_160px_180px_160px]'>
 				<label className='grid gap-1 text-sm font-medium'>
 					<span>搜尋教師或課程</span>
 					<Input

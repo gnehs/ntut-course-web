@@ -756,7 +756,7 @@ export function AdvancedSearchPage() {
 
 	return (
 		<div className='grid min-w-0 gap-[18px] lg:grid-cols-[340px_minmax(0,1fr)]'>
-			<aside className='hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 shadow-[0_5px_20px_rgba(0,0,0,var(--vs-shadow-opacity))] lg:sticky lg:top-0 lg:block lg:w-auto'>
+			<aside className='shadow-raised hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 lg:sticky lg:top-0 lg:block lg:w-auto'>
 				<AdvancedSearchSidebarContent {...searchControlsProps} />
 			</aside>
 			<section className='min-w-0 px-3 pt-4 pb-10 lg:pt-0 lg:pr-4 lg:pb-10 lg:pl-0'>
@@ -939,7 +939,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 					{hasActiveCondition ? (
 						<button
 							type='button'
-							className='rounded-control inline-flex min-h-11 shrink-0 items-center gap-1.5 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-colors'
+							className='rounded-control bg-sheen-surface shadow-rest inline-flex min-h-11 shrink-0 items-center gap-1.5 bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-[background-color,color,box-shadow]'
 							onClick={props.onReset}
 						>
 							<X className='size-4 shrink-0' />
@@ -961,12 +961,12 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 									<button
 										type='button'
 										aria-pressed={active}
-										className={`rounded-control inline-flex min-h-11 shrink-0 items-center gap-1.5 border px-3 text-sm transition-colors ${
+										className={`rounded-control inline-flex min-h-11 shrink-0 items-center gap-1.5 px-3 text-sm transition-[background-color,color,box-shadow] ${
 											active
-												? 'border-[rgb(var(--vs-primary))] bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
+												? 'bg-sheen-gloss shadow-solid text-shadow-solid bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
 												: count
-													? 'border-[rgba(var(--vs-primary),0.35)] bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
-													: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
+													? 'bg-sheen-soft shadow-soft bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
+													: 'bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
 										}`}
 									>
 										<TriggerIcon className='size-4 shrink-0' />
@@ -975,7 +975,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 								</PopoverTrigger>
 								<PopoverContent>
 									<div className='mb-3 flex items-center gap-2 font-semibold'>
-										<Icon className='size-4 text-[rgb(var(--vs-primary))]' />
+										<Icon className='size-4 text-[rgba(var(--vs-text),0.55)]' />
 										<span>{section.label}</span>
 									</div>
 									<FilterSectionContent id={section.id} {...props} />
@@ -1302,7 +1302,7 @@ function SearchSection({
 				}}
 			>
 				<span className='flex min-w-0 items-center gap-2'>
-					<Icon className='size-4 shrink-0 text-[rgb(var(--vs-primary))]' />
+					<Icon className='size-4 shrink-0 text-[rgba(var(--vs-text),0.55)]' />
 					<span>{section.title}</span>
 				</span>
 				<ChevronDown ref={iconRef} className='size-4 shrink-0' />

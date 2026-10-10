@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { AdsByGoogle } from './AdsByGoogle';
 import { cn } from '../lib/utils';
 import {
+	courseStandard,
 	courseTitle,
 	dateEng2zh,
 	formatCredit,
@@ -205,6 +206,7 @@ export function CourseList({
 						{pageItems.map((course, index) => {
 							const saved = savedCourseIds.includes(course.id);
 							const timeItems = parseCourseTime(course.time);
+							const conflicted = conflictCourseData.includes(course.id);
 							return (
 								<Fragment key={course.id}>
 									{showSectionAd && index === 6 ? (
@@ -212,59 +214,62 @@ export function CourseList({
 											<AdsByGoogle placement='section' />
 										</div>
 									) : null}
-									<Card className='hoverable px-4 py-4 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_10px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))] active:translate-y-[5px] active:shadow-none'>
+									<Card className='hoverable px-4 py-4'>
 										<Link
 											to={`/course/${viewYear}/${viewSem}/${course.id}`}
 											aria-label={`查看 ${courseTitle(course)} 課程詳情`}
 											className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 										/>
-										<div className='pointer-events-none relative z-[1] flex flex-col'>
-											<div className='relative pr-11'>
-												<div className='flex min-h-6 flex-wrap items-center gap-x-2 gap-y-1'>
-													<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
-														<CourseDisplayHeading course={course} />
-													</CardTitle>
-													{conflictCourseData.includes(course.id) ? (
+										<div className='pointer-events-none relative z-[1] flex flex-col gap-3'>
+											<div className='relative flex flex-col gap-1 pr-11'>
+												<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
+													<CourseDisplayHeading course={course} />
+												</CardTitle>
+												<div className='text-xs leading-5 tabular-nums opacity-70'>
+													{courseSummary(course)}
+												</div>
+												<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
+											</div>
+											{conflicted || getGeneralCourseTags(course).length ? (
+												<div className='flex flex-wrap gap-1'>
+													{conflicted ? (
 														<Tag
 															color='rgba(var(--vs-danger),0.15)'
 															textColor={`rgb(var(--vs-danger))`}
 														>
-															<CircleAlert className='size-4' />
+															<CircleAlert className='size-3.5' />
 															衝堂
 														</Tag>
 													) : null}
+													<CourseTags course={course} />
 												</div>
-												<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
-												{getGeneralCourseTags(course).length ? (
-													<div className='mt-2'>
-														<CourseTags course={course} />
-													</div>
+											) : null}
+											<dl className='m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm leading-5'>
+												<CourseMetaLine label='時間'>
+													{timeItems.length ? (
+														<span className='flex flex-wrap gap-1'>
+															{timeItems.map((item) => (
+																<span
+																	key={item.title}
+																	className='rounded-sm bg-[rgba(var(--vs-text),0.07)] px-1.5 font-medium whitespace-nowrap tabular-nums'
+																>
+																	{item.title} {item.content}
+																</span>
+															))}
+														</span>
+													) : (
+														<span className='opacity-60'>無資料</span>
+													)}
+												</CourseMetaLine>
+												<CourseMetaLine label='教師' truncate>
+													{(course.teacher || []).map((item) => item.name).join('、') || '無資料'}
+												</CourseMetaLine>
+												<CourseMetaLine label='班級' truncate>
+													{(course.class || []).map((item) => item.name).join('、') || '無資料'}
+												</CourseMetaLine>
+												{hasCourseNotes(course) ? (
+													<CourseMetaLine label='備註'>{course.notes}</CourseMetaLine>
 												) : null}
-											</div>
-											<div className='mt-3 grid grid-cols-[repeat(auto-fit,minmax(4.25rem,1fr))] gap-x-3 gap-y-2'>
-												<CourseMetric title='課號' value={course.id} />
-												<CourseMetric title='學分' value={formatCredit(course.credit)} />
-												{timeItems.map((item) => (
-													<CourseMetric key={item.title} title={item.title} value={item.content} />
-												))}
-												{!timeItems.length ? (
-													<CourseMetric title='上課時間' value='無資料' />
-												) : null}
-											</div>
-											<dl className='mt-3 grid gap-1 text-sm leading-5'>
-												<CourseMetaLine label='班級'>
-													{trimEllip((course.class || []).map((item) => item.name).join('、'), 9) ||
-														'無資料'}
-												</CourseMetaLine>
-												<CourseMetaLine label='教師'>
-													{trimEllip(
-														(course.teacher || []).map((item) => item.name).join('、'),
-														13,
-													) || '無資料'}
-												</CourseMetaLine>
-												<CourseMetaLine label='備註' truncate={false}>
-													{course.notes || '無'}
-												</CourseMetaLine>
 											</dl>
 										</div>
 									</Card>
@@ -283,17 +288,19 @@ export function CourseList({
 			{layout === 'table' ? (
 				<Card className='overflow-hidden p-0'>
 					<div className='overflow-x-auto'>
-						<table className='w-full min-w-[720px] border-collapse text-left'>
+						<table className='w-full min-w-[860px] border-collapse text-left'>
 							<thead>
-								<tr>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>課號</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+								<tr className='text-shadow-emboss bg-linear-to-b from-[rgba(var(--vs-text),0.015)] to-[rgba(var(--vs-text),0.05)] text-sm'>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>課號</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 										課程名稱
 									</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>教師</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>班級</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>備註</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>學分</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>時間</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>教師</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>班級</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>備註</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 										我的課程
 									</th>
 								</tr>
@@ -306,28 +313,36 @@ export function CourseList({
 											key={course.id}
 											className='transition-colors hover:bg-[rgba(var(--vs-text),0.04)]'
 										>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap tabular-nums'>
 												{course.id}
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												<Link to={`/course/${viewYear}/${viewSem}/${course.id}`}>
 													{courseTitle(course)}
 												</Link>
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 tabular-nums'>
+												{formatCredit(course.credit)}
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap tabular-nums'>
+												{parseCourseTime(course.time)
+													.map((item) => `${item.title} ${item.content}`)
+													.join('、')}
+											</td>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 9)}
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												{conflictCourseData.includes(course.id) ? (
 													<span className='text-[rgb(var(--vs-danger))]'>衝堂</span>
 												) : (
 													course.notes
 												)}
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-3 py-2'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												<Button
 													icon
 													danger={saved}
@@ -373,17 +388,11 @@ function CourseDisplayHeading({ course }: { course: Course }) {
 }
 
 function CourseTags({ course }: { course: Course }) {
-	const tags = getGeneralCourseTags(course);
-	if (!tags.length) return null;
-	return (
-		<div className='flex flex-wrap gap-1'>
-			{tags.map((tag) => (
-				<Tag key={tag.name} color={tag.color} textColor={tag.textColor}>
-					{tag.name}
-				</Tag>
-			))}
-		</div>
-	);
+	return getGeneralCourseTags(course).map((tag) => (
+		<Tag key={tag.name} color={tag.color} textColor={tag.textColor}>
+			{tag.name}
+		</Tag>
+	));
 }
 
 function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => void }) {
@@ -394,11 +403,11 @@ function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => v
 			aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 			className={cn(
 				'rounded-control pointer-events-auto absolute -top-1 -right-1 grid size-11 place-items-center border-0 bg-transparent p-0 transition-colors',
-				'before:rounded-control text-[rgb(var(--vs-primary))] outline-none before:absolute before:inset-1.5 before:transition-colors',
+				'before:rounded-control before:bg-sheen-soft before:shadow-soft hover:before:shadow-soft-hover text-[rgb(var(--tone))] outline-none before:absolute before:inset-1.5 before:transition-[background-color,box-shadow]',
 				'focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)]',
 				saved
-					? 'text-[rgb(var(--vs-danger))] before:bg-[rgba(var(--vs-danger),0.15)] hover:before:bg-[rgba(var(--vs-danger),0.2)]'
-					: 'before:bg-[rgba(var(--vs-primary),0.15)] hover:before:bg-[rgba(var(--vs-primary),0.22)]',
+					? 'tone-danger before:bg-[rgba(var(--vs-danger),0.15)] hover:before:bg-[rgba(var(--vs-danger),0.2)]'
+					: 'tone-neutral before:bg-[rgba(var(--vs-text),0.06)] hover:before:bg-[rgba(var(--vs-text),0.1)]',
 			)}
 			onClick={onClick}
 		>
@@ -407,36 +416,38 @@ function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => v
 	);
 }
 
-function CourseMetric({ title, value }: { title: string; value: React.ReactNode }) {
-	return (
-		<div className='min-w-0'>
-			<div className='truncate text-lg leading-tight font-semibold tabular-nums'>{value}</div>
-			<div className='mt-0.5 text-xs leading-tight opacity-75'>{title}</div>
-		</div>
-	);
+function courseSummary(course: Course) {
+	const credit = formatCredit(course.credit);
+	return [
+		course.id,
+		Number.isFinite(Number(credit || NaN)) ? `${credit} 學分` : '',
+		course.courseType ? courseStandard[course.courseType] : '',
+	]
+		.filter(Boolean)
+		.join(' · ');
+}
+
+function hasCourseNotes(course: Course) {
+	const notes = course.notes?.trim();
+	return Boolean(notes) && notes !== '無';
 }
 
 function CourseMetaLine({
 	label,
 	children,
-	truncate = true,
+	truncate = false,
 }: {
 	label: string;
 	children: React.ReactNode;
 	truncate?: boolean;
 }) {
 	return (
-		<div className='flex min-w-0 gap-1'>
-			<dt className='shrink-0 font-medium'>{label}：</dt>
-			<dd
-				className={cn(
-					'm-0 min-w-0 opacity-75',
-					truncate ? 'truncate' : 'break-words whitespace-pre-wrap',
-				)}
-			>
+		<>
+			<dt className='text-[rgba(var(--vs-text),0.6)]'>{label}</dt>
+			<dd className={cn('m-0 min-w-0', truncate ? 'truncate' : 'break-words whitespace-pre-wrap')}>
 				{children}
 			</dd>
-		</div>
+		</>
 	);
 }
 
@@ -482,7 +493,7 @@ function TimetableCourses({
 				}}
 			>
 				<div
-					className='bg-[rgba(var(--vs-text),0.05)]'
+					className='rounded-control bg-sheen-well shadow-well bg-[rgba(var(--vs-text),0.05)]'
 					style={{ gridColumn: 'time / end', gridRow: 'weekday' }}
 				/>
 				{timetable.map((time) => (
@@ -510,10 +521,10 @@ function TimetableCourses({
 							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
 							to={`/course/${year}/${sem}/${item.id}`}
 							className={cn(
-								'rounded-control relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 border px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-colors',
+								'rounded-control bg-sheen-soft shadow-soft hover:shadow-soft-hover relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-[background-color,box-shadow]',
 								item.isConflict
-									? 'border-[rgba(var(--vs-danger),0.35)] bg-[rgba(var(--vs-danger),0.16)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.22)]'
-									: 'border-transparent bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
+									? 'tone-danger bg-[rgba(var(--vs-danger),0.16)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.22)]'
+									: 'tone-primary bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
 							)}
 							style={{
 								gridColumn: dateEng2zh[item.date].slice(1),

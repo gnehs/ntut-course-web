@@ -130,6 +130,8 @@ export function EmptyRoomPage() {
 		[emptyroomDetailRoomName, roomList],
 	);
 	const emptyroomDetailDialog = Boolean(emptyroomDetailData);
+	const currentSlot =
+		todayDayOfWeek === Object.keys(dateEng2zh)[new Date().getDay()] ? slotAt(new Date()) : null;
 
 	if (!courses) return <EmptyRoomSkeleton />;
 
@@ -142,10 +144,14 @@ export function EmptyRoomPage() {
 					<pre>{errorMessage(onError)}</pre>
 				</Alert>
 			) : null}
-			<Alert>請注意，此功能僅能列出表定無課程進行的教室，教室可能因其他因素，致無法使用。</Alert>
-			<h1>尋找空教室</h1>
+			<header>
+				<h1 className='m-0'>尋找空教室</h1>
+				<p className='m-0 text-sm opacity-70'>
+					僅列出表定沒有課程的教室，實際仍可能因其他因素無法使用。
+				</p>
+			</header>
 			<div
-				className='flex flex-wrap items-center justify-center gap-1 py-3'
+				className='flex flex-wrap items-center justify-center gap-1 py-1'
 				role='group'
 				aria-label='選擇星期'
 			>
@@ -170,19 +176,31 @@ export function EmptyRoomPage() {
 				<div className='flex items-center gap-2'>
 					<span
 						aria-hidden='true'
-						className='size-3 rounded-full border border-dashed border-slate-500 bg-white'
+						className='bg-sheen-well shadow-well size-3.5 rounded-full bg-[rgba(var(--vs-text),0.06)]'
 					/>
 					<span>空堂</span>
 				</div>
 				<div className='flex items-center gap-2'>
-					<span aria-hidden='true' className='size-3 rounded-full bg-[rgb(var(--vs-danger))]' />
+					<span
+						aria-hidden='true'
+						className='bg-sheen-gloss size-3.5 rounded-full bg-[rgb(var(--vs-danger))] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12),inset_0_2px_0_rgba(255,255,255,0.3),0_1px_2px_rgba(var(--vs-danger),0.45)]'
+					/>
 					<span>有課程</span>
 				</div>
+				{currentSlot ? (
+					<div className='flex items-center gap-2'>
+						<span
+							aria-hidden='true'
+							className='size-3.5 rounded-full ring-2 ring-[rgb(var(--vs-primary))]'
+						/>
+						<span>目前節次</span>
+					</div>
+				) : null}
 			</div>
 			<div className='space-y-4'>
 				{categoryList.map((category) => (
 					<section key={category}>
-						<h2>{category}</h2>
+						<h2 className='mb-2'>{category}</h2>
 						<div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
 							{roomList
 								.filter((room) => room.category === category)
@@ -210,12 +228,14 @@ export function EmptyRoomPage() {
 												<div
 													key={slot}
 													role='img'
-													aria-label={`${slot}，${room.timetable.includes(slot) ? '空堂' : '有課程'}`}
+													aria-label={`${slot}，${room.timetable.includes(slot) ? '空堂' : '有課程'}${slot === currentSlot ? '，目前節次' : ''}`}
 													className={cn(
-														'flex size-5 items-center justify-center rounded-full border text-xs',
+														'flex size-6 items-center justify-center rounded-full text-xs leading-none tabular-nums',
+														slot === currentSlot &&
+															'ring-2 ring-[rgb(var(--vs-primary))] ring-offset-1 ring-offset-[rgb(var(--vs-background))]',
 														room.timetable.includes(slot)
-															? 'border-dashed border-slate-500 bg-white text-slate-700'
-															: 'border-transparent bg-[rgb(var(--vs-danger))] text-[rgb(var(--vs-primary-foreground))]',
+															? 'bg-sheen-well shadow-well bg-[rgba(var(--vs-text),0.06)] text-[rgba(var(--vs-text),0.55)]'
+															: 'bg-sheen-gloss text-shadow-ink bg-[rgb(var(--vs-danger))] font-semibold text-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12),inset_0_2px_0_rgba(255,255,255,0.3),0_1px_2px_rgba(var(--vs-danger),0.45)]',
 													)}
 												>
 													<span aria-hidden='true'>{slot}</span>
@@ -260,7 +280,7 @@ export function EmptyRoomPage() {
 						{timetableSlots.map((slot, index) => (
 							<div
 								key={slot}
-								className={`flex items-center justify-between gap-4 bg-[rgb(var(--vs-background))] px-3 py-2 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
+								className={`flex items-center justify-between gap-4 bg-[rgb(var(--vs-background))] px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
 							>
 								<div>
 									{slot} - {slotToTime(slot)}
@@ -301,24 +321,37 @@ export function resolveRoomSourceUrl(link?: string) {
 	}
 }
 
+const slotStartTimes = {
+	'1': '8:10',
+	'2': '9:10',
+	'3': '10:10',
+	'4': '11:10',
+	N: '12:10',
+	'5': '13:10',
+	'6': '14:10',
+	'7': '15:10',
+	'8': '16:10',
+	'9': '17:10',
+	A: '18:30',
+	B: '19:20',
+	C: '20:20',
+	D: '21:10',
+};
+
 function slotToTime(slot) {
-	const timetable = {
-		'1': '8:10',
-		'2': '9:10',
-		'3': '10:10',
-		'4': '11:10',
-		N: '12:10',
-		'5': '13:10',
-		'6': '14:10',
-		'7': '15:10',
-		'8': '16:10',
-		'9': '17:10',
-		A: '18:30',
-		B: '19:20',
-		C: '20:20',
-		D: '21:10',
-	};
-	return timetable[slot];
+	return slotStartTimes[slot];
+}
+
+// The slot in session at `date`; breaks count towards the slot that just ended.
+function slotAt(date: Date) {
+	const minutes = date.getHours() * 60 + date.getMinutes();
+	if (minutes >= 22 * 60) return null;
+	let current: string | null = null;
+	for (const slot of timetableSlots) {
+		const [hour, minute] = slotStartTimes[slot].split(':').map(Number);
+		if (hour * 60 + minute <= minutes) current = slot;
+	}
+	return current;
 }
 type EmptyRoom = {
 	name: string;

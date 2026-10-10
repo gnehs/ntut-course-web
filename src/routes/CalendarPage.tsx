@@ -90,7 +90,7 @@ export function CalendarPage() {
 					rows.map((item, index) => (
 						<div
 							key={item.uid || `${item.summary}-${index}`}
-							className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] p-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
+							className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
 						>
 							<div
 								className='rounded-control from-background flex size-12 shrink-0 flex-col overflow-hidden bg-gradient-to-b to-[rgba(var(--vs-text),0.04)] text-center shadow-md'

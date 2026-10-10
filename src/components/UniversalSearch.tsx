@@ -43,7 +43,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 		if (!input) return JSON.parse(localStorage.getItem('search-history') || '[]').reverse();
 		if (!courseData) return [];
 		const courses = searchCourseList(courseData, input).slice(0, 20);
-		return courses.map((course) => ({
+		const results: SearchHistoryItem[] = courses.map((course) => ({
 			id: course.id,
 			key: `${course.id}`,
 			to: `/course/${dataset.year}/${dataset.sem}/${course.id}`,
@@ -52,7 +52,27 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 			description: (course.teacher || []).map((item) => item.name).join('、'),
 			course,
 		}));
-	}, [courseData, input, dataset.year, dataset.sem]);
+		const keyword = input.trim();
+		if (!keyword) return results;
+		// Always offer a way forward, so an empty result list never looks like a broken search.
+		const query = new URLSearchParams({
+			year: dataset.year,
+			sem: dataset.sem,
+			d: dataset.department,
+			q: JSON.stringify({ k: keyword }),
+		});
+		return [
+			...results,
+			{
+				id: 'advanced-search',
+				key: 'advanced-search',
+				to: `/advanced-search?${query}`,
+				category: results.length ? '想找更多？' : '找不到直接符合的課程',
+				text: `用進階搜尋尋找「${keyword}」`,
+				transient: true,
+			},
+		];
+	}, [courseData, input, dataset.year, dataset.sem, dataset.department]);
 
 	useEffect(() => {
 		setCurrentSelectionIndex(-1);
@@ -69,6 +89,10 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 	}, [focused, items.length]);
 
 	function remember(item) {
+		setInput('');
+		setFocused(false);
+		setCurrentSelectionIndex(-1);
+		if (item.transient) return;
 		const historyItem = { ...item, id: item.id || item.key || item.to, history: true };
 		const history = JSON.parse(localStorage.getItem('search-history') || '[]').filter(
 			(entry) => entry.to !== item.to,
@@ -83,9 +107,6 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					.reverse(),
 			),
 		);
-		setInput('');
-		setFocused(false);
-		setCurrentSelectionIndex(-1);
 	}
 
 	function selectItem(item: SearchHistoryItem) {
@@ -102,9 +123,14 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 			event.preventDefault();
 			setCurrentSelectionIndex((value) => Math.max(value - 1, 0));
 		} else if (event.key === 'Enter') {
-			if (currentSelectionIndex >= 0) {
+			// Without an explicit selection, Enter takes the keyword to the full search page.
+			const item =
+				currentSelectionIndex >= 0
+					? items[currentSelectionIndex]
+					: items.find((entry) => entry.transient);
+			if (item) {
 				event.preventDefault();
-				selectItem(items[currentSelectionIndex]);
+				selectItem(item);
 			}
 		} else if (event.key === 'Escape') {
 			event.preventDefault();
@@ -124,9 +150,8 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				className={cn(
 					'rounded-control flex border transition-[background-color,border-color,box-shadow] duration-200',
 					focused
-						? 'border-[rgba(var(--vs-gray-2),1)] bg-[rgb(var(--vs-gray-1))] shadow-[0_5px_20px_0_rgba(0,0,0,var(--vs-shadow-opacity,0.05))]'
-						: 'border-transparent bg-[rgba(var(--vs-text),0.1)] hover:bg-[rgba(var(--vs-text),0.05)]',
-					'dark:border-[rgba(var(--vs-text),0.05)] dark:bg-[rgba(var(--vs-text),0.05)] dark:hover:bg-[rgba(var(--vs-text),0.075)]',
+						? 'shadow-raised border-[rgba(var(--vs-primary),0.55)] bg-[rgb(var(--vs-background))] ring-[3px] ring-[rgba(var(--vs-primary),0.16)]'
+						: 'bg-sheen-well shadow-well border-[rgba(var(--vs-text),0.06)] bg-[rgba(var(--vs-text),0.07)] hover:bg-[rgba(var(--vs-text),0.045)] dark:bg-[rgba(var(--vs-text),0.05)] dark:hover:bg-[rgba(var(--vs-text),0.075)]',
 				)}
 			>
 				<input
@@ -168,8 +193,8 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 						if (input) {
 							setInput('');
 							setCurrentSelectionIndex(-1);
-							inputRef.current?.focus?.();
 						}
+						inputRef.current?.focus?.();
 					}}
 				>
 					{input ? (
@@ -188,7 +213,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				role='listbox'
 				aria-label='搜尋建議'
 				className={cn(
-					'rounded-surface absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] shadow-[0_16px_40px_rgba(var(--vs-text),0.16)] transition-[opacity,transform] duration-200',
+					'rounded-surface bg-sheen-surface shadow-overlay absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto bg-[rgb(var(--vs-background))] transition-[opacity,transform] duration-200',
 					focused
 						? 'pointer-events-auto opacity-100'
 						: 'pointer-events-none -translate-y-2 opacity-0',
