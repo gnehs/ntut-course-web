@@ -256,9 +256,8 @@ export function ClassDetailPage() {
 			emptyState={classData ? <Alert>此班級目前沒有課程。</Alert> : undefined}
 			savedVersion={version}
 			footer={
-				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
-					<h3 className='m-0'>贊助商廣告</h3>
-					<AdsByGoogle />
+				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4 has-[[data-ad-collapsed]]:hidden'>
+					<AdsByGoogle title='贊助商廣告' />
 				</section>
 			}
 		/>

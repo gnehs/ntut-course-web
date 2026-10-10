@@ -153,6 +153,7 @@
 	--vs-gray-1: 244, 247, 248;
 	--vs-gray-2: 228, 233, 236;
 	--vs-danger: 234, 84, 85;
+	--vs-success: 21, 128, 61;
 	--vs-shadow: 24, 39, 75;
 	--vs-shadow-strength: 1;
 	--tone: var(--vs-primary);
@@ -233,6 +234,7 @@
 		color-scheme: dark;
 		--vs-primary: 92, 170, 255;
 		--vs-primary-foreground: 8, 14, 24;
+		--vs-success: 74, 222, 128;
 		--vs-text: 255, 255, 255;
 		--vs-background: 16, 16, 16;
 		--vs-page-background: 29, 29, 29;

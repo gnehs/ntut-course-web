@@ -3,7 +3,14 @@ import { cn } from '../lib/utils';
 
 type AdPlacement = 'inline' | 'footer' | 'section';
 
-export function AdsByGoogle({ placement = 'inline' }: { placement?: AdPlacement }) {
+export function AdsByGoogle({
+	placement = 'inline',
+	title,
+}: {
+	placement?: AdPlacement;
+	/** Heading shown above the ad; it collapses together with an unfilled slot. */
+	title?: string;
+}) {
 	// Embedded pages keep their compact layout without these additional placements.
 	if (
 		placement !== 'inline' &&
@@ -11,10 +18,10 @@ export function AdsByGoogle({ placement = 'inline' }: { placement?: AdPlacement 
 		new URLSearchParams(window.location.search).get('mode') === 'iframe'
 	)
 		return null;
-	return <AdUnit placement={placement} />;
+	return <AdUnit placement={placement} title={title} />;
 }
 
-function AdUnit({ placement }: { placement: AdPlacement }) {
+function AdUnit({ placement, title }: { placement: AdPlacement; title?: string }) {
 	const region = useMemo(() => `page-${Math.random()}`, []);
 	const rootRef = useRef<HTMLDivElement | null>(null);
 	const [collapsed, setCollapsed] = useState(false);
@@ -64,7 +71,9 @@ function AdUnit({ placement }: { placement: AdPlacement }) {
 				collapsed && 'h-0 overflow-hidden opacity-0',
 			)}
 			aria-hidden={collapsed}
+			data-ad-collapsed={collapsed ? '' : undefined}
 		>
+			{title ? <h3 className='m-0 mb-3'>{title}</h3> : null}
 			{placement !== 'inline' ? (
 				<p className='text-muted-foreground m-0 mb-3 text-center text-xs'>廣告</p>
 			) : null}

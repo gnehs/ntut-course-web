@@ -66,8 +66,7 @@ export function MyCoursePage() {
 						</Button>
 					</div>
 				</Alert>
-				<h3 className='mb-4'>贊助商廣告</h3>
-				<AdsByGoogle />
+				<AdsByGoogle title='贊助商廣告' />
 			</div>
 		);
 	}
@@ -159,9 +158,8 @@ export function MyCoursePage() {
 					</section>
 				</>
 			)}
-			<section className='flex flex-col gap-3'>
-				<h3 className='m-0'>贊助商廣告</h3>
-				<AdsByGoogle />
+			<section className='has-[[data-ad-collapsed]]:hidden'>
+				<AdsByGoogle title='贊助商廣告' />
 			</section>
 		</div>
 	);

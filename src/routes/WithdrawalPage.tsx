@@ -169,7 +169,7 @@ export function WithdrawalPage() {
 							{Array.isArray(stat)
 								? stat.map((item, index) => (
 										<Card key={`${item.title}-${index}`}>
-											<CardTitle>{item.value}</CardTitle>
+											<StatValue title={item.title} value={item.value} />
 											<p>{item.title}</p>
 										</Card>
 									))
@@ -354,4 +354,23 @@ function groupWithdrawalRows(
 
 function rateValue(item: WithdrawalStat) {
 	return numberValue(item.rate_percent ?? item.rate);
+}
+
+const QUANTILE_LABELS = ['第 25 百分位', '中位數', '第 75 百分位'];
+
+// The API packs the quartiles into one "a - b - c" string, which reads as a range without labels.
+function StatValue({ title, value }: { title?: string; value?: string | number }) {
+	const parts = typeof value === 'string' ? value.split(' - ') : [];
+	if (!title?.includes('分位數') || parts.length !== QUANTILE_LABELS.length)
+		return <CardTitle>{value}</CardTitle>;
+	return (
+		<dl className='m-0 flex flex-wrap gap-x-6 gap-y-2'>
+			{parts.map((part, index) => (
+				<div key={QUANTILE_LABELS[index]} className='flex flex-col-reverse'>
+					<dt className='text-muted-foreground text-xs'>{QUANTILE_LABELS[index]}</dt>
+					<dd className='m-0 text-[1.17em] font-semibold'>{part}</dd>
+				</div>
+			))}
+		</dl>
+	);
 }

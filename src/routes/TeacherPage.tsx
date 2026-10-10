@@ -144,8 +144,7 @@ export function TeacherPage() {
 				))}
 			</div>
 			{courses.length ? null : <p>尚無課程，請選擇其他分類</p>}
-			<h3 className='mb-4'>贊助商廣告</h3>
-			<AdsByGoogle />
+			<AdsByGoogle title='贊助商廣告' />
 		</div>
 	);
 }
