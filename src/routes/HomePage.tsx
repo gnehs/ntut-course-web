@@ -281,7 +281,7 @@ function HomeLinkList({ items }: { items: HomeLink[] }) {
 							<p>{item.text}</p>
 						</div>
 						<ChevronRight
-							className='size-4 shrink-0 opacity-30 transition-[opacity,translate] duration-200 group-hover:translate-x-0.5 group-hover:opacity-70'
+							className='text-icon-subtle group-hover:text-icon-muted size-4 shrink-0 transition-[color,translate] duration-200 group-hover:translate-x-0.5'
 							aria-hidden='true'
 						/>
 					</Link>

@@ -19,7 +19,7 @@ export function Card({ to, className = '', children, ...props }: CardProps) {
 	const classes = cn(
 		'relative w-full overflow-hidden rounded-surface !text-foreground !no-underline transition-[background-color,border-color,color,box-shadow] duration-200',
 		'[&_p]:!m-0 [&_p]:!text-[0.85rem] [&_p]:!opacity-80 [&_p+p]:!mt-2',
-		'has-[>[data-card-icon]]:!pr-12 [&>[data-card-icon]]:absolute [&>[data-card-icon]]:inset-y-0 [&>[data-card-icon]]:right-4 [&>[data-card-icon]]:my-auto [&>[data-card-icon]]:size-5 [&>[data-card-icon]]:opacity-40',
+		'has-[>[data-card-icon]]:!pr-12 [&>[data-card-icon]]:absolute [&>[data-card-icon]]:inset-y-0 [&>[data-card-icon]]:right-4 [&>[data-card-icon]]:my-auto [&>[data-card-icon]]:size-5 [&>[data-card-icon]]:text-icon-subtle',
 		isBorderless ? 'border-0 bg-transparent shadow-none' : 'bg-[rgb(var(--vs-background))]',
 		!isBorderless &&
 			(isInteractive

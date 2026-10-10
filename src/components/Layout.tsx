@@ -71,7 +71,7 @@ export function Layout() {
 			onClick={() => setDatasetDialogOpen(true)}
 		>
 			{yearSemLabel}
-			<ChevronsUpDown className='size-3.5 opacity-55' aria-hidden='true' />
+			<ChevronsUpDown className='text-icon-muted size-3.5' aria-hidden='true' />
 		</Button>
 	);
 
@@ -164,7 +164,7 @@ export function Layout() {
 				) : null}
 				{!isIframe && !isAdvancedSearch ? (
 					<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_-1px_0_var(--hairline)]'>
-						<div className='mx-auto max-w-[1024px] space-y-2 text-[rgb(var(--vs-text))] opacity-75'>
+						<div className='mx-auto max-w-[1024px] text-foreground-soft space-y-2'>
 							<div className='flex items-center justify-between gap-2'>
 								<div>
 									Developed by{' '}

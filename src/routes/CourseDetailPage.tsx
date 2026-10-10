@@ -344,7 +344,7 @@ function InfoSection({
 	return (
 		<section className='min-w-0 px-4 py-3 leading-[1.5]'>
 			<div className='mb-2 flex items-center gap-1.5 text-sm font-semibold'>
-				<span aria-hidden='true' className='text-[rgba(var(--vs-text),0.55)] [&>svg]:size-4'>
+				<span aria-hidden='true' className='text-icon-muted [&>svg]:size-4'>
 					{icon}
 				</span>
 				<span>{title}</span>
@@ -410,7 +410,7 @@ function WithdrawalRateStat({
 						{withdrawalRateLabel}
 					</div>
 					<div className='mt-1 flex flex-wrap items-center gap-x-1 text-xs leading-tight'>
-						<span className='inline-flex items-center gap-0.5 opacity-70'>
+						<span className='text-muted-foreground inline-flex items-center gap-0.5'>
 							退選率
 							<Info aria-hidden='true' className='size-[1em]' />
 						</span>
@@ -761,7 +761,7 @@ function CourseSourceLinks({ course }: { course: Course }) {
 							rel='noreferrer'
 						>
 							<span className='min-w-0 [overflow-wrap:anywhere]'>{link.label}</span>
-							<ExternalLink aria-hidden='true' className='size-3.5 shrink-0 opacity-55' />
+							<ExternalLink aria-hidden='true' className='text-icon-muted size-3.5 shrink-0' />
 						</a>
 					</li>
 				))}

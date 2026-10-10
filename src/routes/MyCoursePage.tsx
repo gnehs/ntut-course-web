@@ -96,7 +96,7 @@ export function MyCoursePage() {
 				<section className='rounded-surface shadow-rest flex flex-col items-center gap-4 bg-[rgb(var(--vs-background))] px-6 py-12 text-center'>
 					<div
 						aria-hidden='true'
-						className='tone-neutral shadow-soft bg-sheen-soft grid size-14 place-items-center rounded-full bg-[rgba(var(--vs-text),0.06)] text-[rgba(var(--vs-text),0.6)]'
+						className='tone-neutral shadow-soft bg-sheen-soft text-muted-foreground grid size-14 place-items-center rounded-full bg-[rgba(var(--vs-text),0.06)]'
 					>
 						<BookOpen className='size-6' />
 					</div>

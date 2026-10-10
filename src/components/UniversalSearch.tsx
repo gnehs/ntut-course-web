@@ -186,7 +186,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					type='button'
 					aria-label={input ? '清除搜尋' : '搜尋'}
 					className={cn(
-						'flex shrink-0 items-center justify-center text-[rgba(var(--vs-text),0.8)] transition-colors duration-200 hover:text-[rgb(var(--vs-text))]',
+						'text-foreground-soft flex shrink-0 items-center justify-center transition-colors duration-200 hover:text-[rgb(var(--vs-text))]',
 						navbar ? 'px-3 py-2' : 'px-4 py-3',
 					)}
 					onClick={() => {

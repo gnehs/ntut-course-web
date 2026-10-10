@@ -501,7 +501,7 @@ export function ChangelogPage() {
 									key={entry.date}
 									className='rounded-surface bg-sheen-surface shadow-raised grid overflow-hidden bg-[rgb(var(--vs-background))] sm:grid-cols-[10rem_minmax(0,1fr)]'
 								>
-									<div className='flex items-center gap-2 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.025)] px-4 py-3 text-sm text-[rgba(var(--vs-text),0.65)] sm:border-r sm:border-b-0'>
+									<div className='text-muted-foreground flex items-center gap-2 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.025)] px-4 py-3 text-sm sm:border-r sm:border-b-0'>
 										<CalendarDays className='size-4 shrink-0' />
 										<time dateTime={entry.date} className='tabular-nums'>
 											{entry.date}
@@ -871,7 +871,7 @@ export function StatusPage() {
 						</div>
 						<div className='min-w-0 flex-1'>
 							<div className='font-semibold'>{parseName(run.name)}</div>
-							<div className='text-sm opacity-75'>
+							<div className='text-muted-foreground text-sm'>
 								{run.event === 'schedule' ? (
 									<Calendar className='inline-block size-4 align-[-0.125em]' />
 								) : run.event === 'push' ? (

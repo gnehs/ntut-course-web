@@ -904,7 +904,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 			<div className='flex min-w-0 items-center'>
 				<label className='relative min-w-0 flex-1'>
 					<span className='sr-only'>搜尋關鍵字</span>
-					<Search className='pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[rgba(var(--vs-text),0.5)]' />
+					<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2' />
 					<Input
 						value={props.searchCourseKeyword}
 						onChange={(event) => props.onKeywordChange(event.target.value)}
@@ -975,7 +975,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 								</PopoverTrigger>
 								<PopoverContent>
 									<div className='mb-3 flex items-center gap-2 font-semibold'>
-										<Icon className='size-4 text-[rgba(var(--vs-text),0.55)]' />
+										<Icon className='text-icon-muted size-4' />
 										<span>{section.label}</span>
 									</div>
 									<FilterSectionContent id={section.id} {...props} />
@@ -1302,7 +1302,7 @@ function SearchSection({
 				}}
 			>
 				<span className='flex min-w-0 items-center gap-2'>
-					<Icon className='size-4 shrink-0 text-[rgba(var(--vs-text),0.55)]' />
+					<Icon className='text-icon-muted size-4 shrink-0' />
 					<span>{section.title}</span>
 				</span>
 				<ChevronDown ref={iconRef} className='size-4 shrink-0' />

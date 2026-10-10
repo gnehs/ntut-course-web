@@ -153,7 +153,7 @@ export function StandardPage() {
 							<div className='flex flex-col gap-1'>
 								<label
 									htmlFor='standard-year'
-									className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
 								>
 									<Calendar className='size-3.5' />
 									入學年度
@@ -176,7 +176,7 @@ export function StandardPage() {
 							<div className='flex flex-col gap-1'>
 								<label
 									htmlFor='standard-system'
-									className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
 								>
 									<Building2 className='size-3.5' />
 									學制
@@ -200,7 +200,7 @@ export function StandardPage() {
 							<div className='flex flex-col gap-1'>
 								<label
 									htmlFor='standard-department'
-									className='flex items-center gap-1.5 text-sm font-medium opacity-75'
+									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
 								>
 									<Search className='size-3.5' />
 									系所

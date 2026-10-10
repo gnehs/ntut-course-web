@@ -14,6 +14,9 @@
 	--color-secondary-foreground: var(--secondary-foreground);
 	--color-muted: var(--muted);
 	--color-muted-foreground: var(--muted-foreground);
+	--color-foreground-soft: var(--foreground-soft);
+	--color-icon-muted: var(--icon-muted);
+	--color-icon-subtle: var(--icon-subtle);
 	--color-accent: var(--accent);
 	--color-accent-foreground: var(--accent-foreground);
 	--color-destructive: var(--destructive);
@@ -216,7 +219,11 @@
 	--secondary: rgb(var(--vs-gray-1));
 	--secondary-foreground: rgb(var(--vs-text));
 	--muted: rgb(var(--vs-gray-1));
-	--muted-foreground: rgba(var(--vs-text), 0.65);
+	/* Muted text and icon colors stay opaque: alpha strokes darken where icon paths overlap. */
+	--muted-foreground: color-mix(in srgb, rgb(var(--vs-text)) 65%, rgb(var(--vs-background)));
+	--foreground-soft: color-mix(in srgb, rgb(var(--vs-text)) 80%, rgb(var(--vs-background)));
+	--icon-muted: color-mix(in srgb, rgb(var(--vs-text)) 55%, rgb(var(--vs-background)));
+	--icon-subtle: color-mix(in srgb, rgb(var(--vs-text)) 35%, rgb(var(--vs-background)));
 	--accent: rgb(var(--vs-gray-1));
 	--accent-foreground: rgb(var(--vs-text));
 	--destructive: rgb(var(--vs-danger));

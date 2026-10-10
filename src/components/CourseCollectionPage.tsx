@@ -69,7 +69,7 @@ export function CourseCollectionPage({
 								className={
 									showConflictCourse
 										? 'bg-[rgba(var(--vs-primary),0.08)] text-[rgb(var(--vs-primary))] hover:bg-[rgba(var(--vs-primary),0.14)]'
-										: 'bg-transparent text-[rgba(var(--vs-text),0.7)] hover:bg-[rgba(var(--vs-text),0.06)]'
+										: 'text-muted-foreground bg-transparent hover:bg-[rgba(var(--vs-text),0.06)]'
 								}
 							>
 								{showConflictCourse ? <Check className='size-4' /> : <X className='size-4' />}

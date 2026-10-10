@@ -59,7 +59,7 @@ export function MProgramIndexPage() {
 			<h1>微學程</h1>
 
 			<div className='relative'>
-				<Search className='pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 opacity-50' />
+				<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
 				<Input
 					value={filter}
 					onChange={(event) => setFilter(event.target.value)}

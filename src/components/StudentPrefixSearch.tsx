@@ -165,7 +165,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 		if (loadingYear === year) {
 			return (
 				<div
-					className='flex items-center gap-2 px-4 py-3 text-sm opacity-75'
+					className='text-muted-foreground flex items-center gap-2 px-4 py-3 text-sm'
 					role='status'
 				>
 					<Loader aria-hidden='true' className='size-4 animate-spin' />
@@ -253,7 +253,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 				<button
 					type='button'
 					aria-label={input ? '清除入學年度或學號前綴' : '搜尋入學年度或學號前綴'}
-					className='flex shrink-0 items-center justify-center px-3 text-[rgba(var(--vs-text),0.8)] transition-colors duration-200 hover:text-[rgb(var(--vs-text))]'
+					className='text-foreground-soft flex shrink-0 items-center justify-center px-3 transition-colors duration-200 hover:text-[rgb(var(--vs-text))]'
 					onClick={() => {
 						if (!input) {
 							inputRef.current?.focus?.();

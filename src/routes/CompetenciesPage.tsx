@@ -167,7 +167,7 @@ export function CompetenciesPage() {
 								搜尋能力或課程
 							</label>
 							<div className='relative'>
-								<Search className='pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 opacity-50' />
+								<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
 								<Input
 									id='competency-search'
 									value={filter}
@@ -269,7 +269,7 @@ export function CompetenciesPage() {
 										href={safeCompetencyHref(selectedDepartment.href)!}
 										target='_blank'
 										rel='noreferrer'
-										className='inline-flex items-center gap-1 text-sm underline underline-offset-2 opacity-65 hover:opacity-100'
+										className='text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm underline underline-offset-2'
 									>
 										學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
 									</a>
