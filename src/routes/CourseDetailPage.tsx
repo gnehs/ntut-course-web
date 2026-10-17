@@ -903,16 +903,21 @@ function SimilarCourseSection({
 		<section className='flex flex-col gap-2'>
 			<h2 className='m-0 text-lg font-semibold'>{title}</h2>
 			<CourseList
-				courses={expanded ? courses : courses.slice(0, similarCoursePreviewCount)}
+				courses={courses}
 				year={year}
 				sem={sem}
 				department={department}
 				showToolbar={false}
 				markConflicts={false}
+				scrollOnMobile
+				desktopLimit={expanded ? undefined : similarCoursePreviewCount}
 				onSavedChange={onSavedChange}
 			/>
 			{courses.length > similarCoursePreviewCount ? (
-				<Button className='self-center' onClick={() => setExpanded((value) => !value)}>
+				<Button
+					className='self-center max-sm:hidden'
+					onClick={() => setExpanded((value) => !value)}
+				>
 					{expanded ? '收合' : `顯示全部 ${courses.length} 門`}
 				</Button>
 			) : null}

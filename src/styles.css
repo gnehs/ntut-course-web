@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'shadcn/tailwind.css';
 
 /* A compact shared radius scale for controls and their surrounding surfaces. */
 @theme inline {

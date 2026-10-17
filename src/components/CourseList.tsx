@@ -44,6 +44,10 @@ type CourseListProps = {
 	showMidListAd?: boolean;
 	showConflictCourse?: boolean;
 	markConflicts?: boolean;
+	/** Phones get a single swipeable row instead of a stack of cards. */
+	scrollOnMobile?: boolean;
+	/** Cards past this count are hidden on wider screens; a mobile swipe row still shows them all. */
+	desktopLimit?: number;
 	year?: string;
 	sem?: string;
 	department?: string;
@@ -79,6 +83,8 @@ export function CourseList({
 	showMidListAd = false,
 	showConflictCourse = true,
 	markConflicts = true,
+	scrollOnMobile = false,
+	desktopLimit,
 	year,
 	sem,
 	department,
@@ -91,6 +97,7 @@ export function CourseList({
 	const layout = controlledLayout ?? internalLayout;
 	const page = controlledPage ?? internalPage;
 	const hasMountedRef = useRef(false);
+	const cardRowRef = useRef<HTMLDivElement>(null);
 	const [savedVersion, setSavedVersion] = useState(0);
 	const [conflictCourseData, setConflictCourseData] = useState<string[]>([]);
 	const viewYear = year || dataset.year;
@@ -216,7 +223,14 @@ export function CourseList({
 			) : null}
 			{layout === 'card' ? (
 				<>
-					<div className='grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'>
+					<div
+						ref={cardRowRef}
+						className={cn(
+							'grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3',
+							scrollOnMobile &&
+								'max-sm:no-scrollbar max-sm:scroll-fade-x max-sm:-mx-4 max-sm:-mt-2 max-sm:-mb-6 max-sm:flex max-sm:snap-x max-sm:snap-mandatory max-sm:scroll-px-4 max-sm:overflow-x-auto max-sm:px-4 max-sm:pt-2 max-sm:pb-6 max-sm:*:w-[85%] max-sm:*:shrink-0 max-sm:*:snap-start',
+						)}
+					>
 						{pageItems.map((course, index) => {
 							const saved = savedCourseIds.includes(course.id);
 							const conflicted = conflictCourseData.includes(course.id);
@@ -227,7 +241,12 @@ export function CourseList({
 											<AdsByGoogle placement='section' />
 										</div>
 									) : null}
-									<Card className='hoverable px-4 py-4'>
+									<Card
+										className={cn(
+											'hoverable px-4 py-4',
+											desktopLimit !== undefined && index >= desktopLimit && 'sm:hidden',
+										)}
+									>
 										<Link
 											to={`/course/${viewYear}/${viewSem}/${course.id}`}
 											aria-label={`查看 ${courseTitle(course)} 課程詳情`}
@@ -276,6 +295,7 @@ export function CourseList({
 							);
 						})}
 					</div>
+					{scrollOnMobile ? <ScrollIndicator targetRef={cardRowRef} /> : null}
 					{!filteredCourse.length ? (
 						<div className='flex items-center justify-center p-5'>
 							{emptyState || <p>查無資料</p>}
@@ -390,6 +410,42 @@ function CourseTags({ course }: { course: Course }) {
 			{tag.name}
 		</Tag>
 	));
+}
+
+// iOS only shows its overlay scrollbar mid-swipe, so the row keeps its own track to show how much is left.
+function ScrollIndicator({ targetRef }: { targetRef: React.RefObject<HTMLDivElement | null> }) {
+	const [thumb, setThumb] = useState<{ size: number; offset: number } | null>(null);
+	useEffect(() => {
+		const target = targetRef.current;
+		if (!target) return;
+		function measure() {
+			if (!target) return;
+			const { scrollWidth, clientWidth, scrollLeft } = target;
+			if (scrollWidth <= clientWidth + 1) return setThumb(null);
+			const size = Math.max(clientWidth / scrollWidth, 0.2);
+			setThumb({ size, offset: (scrollLeft / (scrollWidth - clientWidth)) * (1 - size) });
+		}
+		measure();
+		target.addEventListener('scroll', measure, { passive: true });
+		const observer = new ResizeObserver(measure);
+		observer.observe(target);
+		return () => {
+			target.removeEventListener('scroll', measure);
+			observer.disconnect();
+		};
+	}, [targetRef]);
+	if (!thumb) return null;
+	return (
+		<div
+			aria-hidden='true'
+			className='relative mx-auto mt-3 h-1 w-24 overflow-hidden rounded-full bg-[rgba(var(--vs-text),0.1)] sm:hidden'
+		>
+			<div
+				className='absolute inset-y-0 rounded-full bg-[rgba(var(--vs-text),0.45)]'
+				style={{ width: `${thumb.size * 100}%`, left: `${thumb.offset * 100}%` }}
+			/>
+		</div>
+	);
 }
 
 function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => void }) {
