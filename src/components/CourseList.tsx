@@ -43,6 +43,7 @@ type CourseListProps = {
 	showTimetable?: boolean;
 	showMidListAd?: boolean;
 	showConflictCourse?: boolean;
+	markConflicts?: boolean;
 	year?: string;
 	sem?: string;
 	department?: string;
@@ -77,6 +78,7 @@ export function CourseList({
 	showTimetable = false,
 	showMidListAd = false,
 	showConflictCourse = true,
+	markConflicts = true,
 	year,
 	sem,
 	department,
@@ -100,6 +102,10 @@ export function CourseList({
 	);
 
 	useEffect(() => {
+		if (!markConflicts) {
+			setConflictCourseData([]);
+			return;
+		}
 		let cancelled = false;
 		async function checkConflict() {
 			const ids = getMyCourseIds(viewYear, viewSem, viewDepartment);
@@ -125,7 +131,15 @@ export function CourseList({
 		return () => {
 			cancelled = true;
 		};
-	}, [courses, viewYear, viewSem, viewDepartment, savedVersion, externalSavedVersion]);
+	}, [
+		courses,
+		markConflicts,
+		viewYear,
+		viewSem,
+		viewDepartment,
+		savedVersion,
+		externalSavedVersion,
+	]);
 
 	const filteredCourse = useMemo(() => {
 		if (!courses) return [];

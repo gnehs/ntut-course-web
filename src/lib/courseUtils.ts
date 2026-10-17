@@ -6,6 +6,7 @@ import type {
 	NamedCourseItem,
 	WeekdayKey,
 } from '../types/course';
+import { isCourseHidden } from './contentVisibility';
 
 type CourseTitleLike = {
 	courseType?: string;
@@ -188,6 +189,25 @@ export function hasTimeConflict(a: Course, b: Course) {
 		}
 	}
 	return false;
+}
+
+// Sports sections all share the name 體育, so the sport itself identifies the course.
+function similarCourseKey(course: Course) {
+	return isSportsCourse(course) ? getSportsCourseTitle(course) : (course.name?.zh || '').trim();
+}
+
+export function findSimilarCourses(course: Course, courses: Course[]) {
+	const key = similarCourseKey(course);
+	const teachers = new Set((course.teacher || []).map((item) => item.name));
+	const candidates = filterPlaceholderCourses(courses).filter(
+		(item) => item.id !== course.id && !isCourseHidden(item),
+	);
+	const sameName = key ? candidates.filter((item) => similarCourseKey(item) === key) : [];
+	const sameTeacher = candidates.filter(
+		(item) =>
+			!sameName.includes(item) && (item.teacher || []).some((teacher) => teachers.has(teacher.name)),
+	);
+	return { sameName, sameTeacher };
 }
 
 export function searchCourseList<T extends SearchableCourse>(courses: T[], keyword: string) {

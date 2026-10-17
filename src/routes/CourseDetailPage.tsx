@@ -1,4 +1,5 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { CourseList } from '../components/CourseList';
 import { CourseTimeChips } from '../components/CourseTimeChips';
 import { Link, useParams } from '@tanstack/react-router';
 import { Fragment, useEffect, useMemo, useState } from 'react';
@@ -17,6 +18,7 @@ import { hasMeaningfulValue } from '../lib/courseFilters';
 import {
 	courseStandard,
 	departmentItems,
+	findSimilarCourses,
 	storageDepartment,
 	formatCredit,
 	getSportsCourseTitle,
@@ -339,6 +341,15 @@ export function CourseDetailPage() {
 					<AdsByGoogle placement='section' />
 				</div>
 				<CourseSourceLinks course={course} />
+				<SimilarCourses
+					key={course.id}
+					course={course}
+					courses={relatedCourses}
+					year={year}
+					sem={sem}
+					department={courseDepartment}
+					onSavedChange={() => setVersion((value) => value + 1)}
+				/>
 			</div>
 		</div>
 	);
@@ -824,6 +835,89 @@ function officialCourseUrl(value: string | undefined, section: 'tw' | 'mobile') 
 	} catch {
 		return null;
 	}
+}
+
+const similarCoursePreviewCount = 6;
+
+function SimilarCourses({
+	course,
+	courses,
+	year,
+	sem,
+	department,
+	onSavedChange,
+}: {
+	course: Course;
+	courses: Course[];
+	year: string;
+	sem: string;
+	department: string;
+	onSavedChange: () => void;
+}) {
+	const { sameName, sameTeacher } = useMemo(
+		() => findSimilarCourses(course, courses),
+		[course, courses],
+	);
+	if (!sameName.length && !sameTeacher.length) return null;
+	return (
+		<>
+			<div className='has-[[data-ad-collapsed]]:hidden'>
+				<AdsByGoogle placement='section' />
+			</div>
+			{[
+				{ title: '同名課程', items: sameName },
+				{ title: '同教師的其他課程', items: sameTeacher },
+			].map((group) => (
+				<SimilarCourseSection
+					key={group.title}
+					title={group.title}
+					courses={group.items}
+					year={year}
+					sem={sem}
+					department={department}
+					onSavedChange={onSavedChange}
+				/>
+			))}
+		</>
+	);
+}
+
+function SimilarCourseSection({
+	title,
+	courses,
+	year,
+	sem,
+	department,
+	onSavedChange,
+}: {
+	title: string;
+	courses: Course[];
+	year: string;
+	sem: string;
+	department: string;
+	onSavedChange: () => void;
+}) {
+	const [expanded, setExpanded] = useState(false);
+	if (!courses.length) return null;
+	return (
+		<section className='flex flex-col gap-2'>
+			<h2 className='m-0 text-lg font-semibold'>{title}</h2>
+			<CourseList
+				courses={expanded ? courses : courses.slice(0, similarCoursePreviewCount)}
+				year={year}
+				sem={sem}
+				department={department}
+				showToolbar={false}
+				markConflicts={false}
+				onSavedChange={onSavedChange}
+			/>
+			{courses.length > similarCoursePreviewCount ? (
+				<Button className='self-center' onClick={() => setExpanded((value) => !value)}>
+					{expanded ? '收合' : `顯示全部 ${courses.length} 門`}
+				</Button>
+			) : null}
+		</section>
+	);
 }
 
 function CourseSourceLinks({ course }: { course: Course }) {
