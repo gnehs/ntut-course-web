@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'shadcn/tailwind.css';
 
 /* A compact shared radius scale for controls and their surrounding surfaces. */
 @theme inline {
@@ -101,6 +100,66 @@
 
 @utility tone-danger {
 	--tone: var(--vs-danger);
+}
+
+@utility no-scrollbar {
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+/* Adapted from shadcn's scroll-fade-x: each edge fades in only while there is content past it. */
+@property --scroll-fade-s {
+	syntax: '<length-percentage>';
+	inherits: false;
+	initial-value: 0px;
+}
+@property --scroll-fade-e {
+	syntax: '<length-percentage>';
+	inherits: false;
+	initial-value: 0px;
+}
+@keyframes scroll-fade-reveal-s {
+	from {
+		--scroll-fade-s: 0px;
+	}
+	to {
+		--scroll-fade-s: min(12%, calc(var(--spacing) * 10));
+	}
+}
+@keyframes scroll-fade-reveal-e {
+	from {
+		--scroll-fade-e: min(12%, calc(var(--spacing) * 10));
+	}
+	to {
+		--scroll-fade-e: 0px;
+	}
+}
+@utility scroll-fade-x {
+	mask-image: linear-gradient(
+		to right,
+		transparent 0,
+		#000 var(--scroll-fade-s),
+		#000 calc(100% - var(--scroll-fade-e)),
+		transparent 100%
+	);
+	mask-repeat: no-repeat;
+
+	@supports (animation-timeline: scroll()) {
+		animation:
+			scroll-fade-reveal-s 1ms ease-in-out both,
+			scroll-fade-reveal-e 1ms ease-in-out both;
+		animation-timeline: scroll(self inline), scroll(self inline);
+		animation-range:
+			0 calc(var(--spacing) * 24),
+			calc(100% - calc(var(--spacing) * 24)) 100%;
+	}
+
+	@supports not (animation-timeline: scroll()) {
+		--scroll-fade-e: min(12%, calc(var(--spacing) * 10));
+	}
 }
 
 /* Defaults stay below utilities so each page can set its own type scale and spacing. */
