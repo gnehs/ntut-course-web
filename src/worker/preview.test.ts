@@ -5,6 +5,7 @@ import {
 	createTeacherPreview,
 	parsePreviewRoute,
 	previewTags,
+	resolvePreviewMeta,
 } from './preview';
 import type { Course, DepartmentClass, WithdrawalStat } from '../types/course';
 
@@ -121,5 +122,33 @@ describe('preview metadata', () => {
 			'twitter:description',
 			'twitter:image',
 		]);
+	});
+
+	it('creates micro program and program metadata from their own datasets', async () => {
+		const datasets: Record<string, unknown> = {
+			'/115/1/mprogram.json': [{ id: 'AV2', name: '面板微學程', course: ['1', '2', '3'] }],
+			'/115/1/programs.json': [
+				{ id: '620', name: '教育學程', href: '', courses: ['1', '2'], description: '師資培育' },
+			],
+		};
+		const fetchJson = async <T,>(path: string) => datasets[path] as T;
+
+		const mprogramRoute = parsePreviewRoute(new URL('https://example.com/mprogram/115/1/AV2'));
+		expect(await resolvePreviewMeta(mprogramRoute!, config, fetchJson)).toEqual({
+			title: '面板微學程',
+			description: '在北科好朋友上查看微學程「面板微學程」的資訊，包含 3 門課程',
+			image: 'https://ntut-course.gnehs.net/mprogram/115/1/AV2/og.png',
+			url: 'https://ntut-course.gnehs.net/mprogram/115/1/AV2',
+		});
+
+		const programRoute = parsePreviewRoute(new URL('https://example.com/program/115/1/620'));
+		expect(await resolvePreviewMeta(programRoute!, config, fetchJson)).toMatchObject({
+			title: '教育學程',
+			description: '師資培育',
+			image: 'https://ntut-course.gnehs.net/program/115/1/620/og.png',
+		});
+
+		const missingRoute = parsePreviewRoute(new URL('https://example.com/program/115/1/999'));
+		expect(await resolvePreviewMeta(missingRoute!, config, fetchJson)).toBeNull();
 	});
 });

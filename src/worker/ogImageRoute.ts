@@ -1,7 +1,10 @@
+import { isProgramKind, type ProgramKind } from './programs';
+
 export type OgImageRoute =
 	| { type: 'course'; year: string; sem: string; id: string; department: string }
 	| { type: 'class'; year: string; sem: string; id: string }
-	| { type: 'teacher'; name: string };
+	| { type: 'teacher'; name: string }
+	| { type: 'program'; kind: ProgramKind; year: string; sem: string; id: string };
 
 export function parseOgImageRoute(url: URL): OgImageRoute | null {
 	const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
@@ -29,6 +32,9 @@ export function parseOgImageRoute(url: URL): OgImageRoute | null {
 			type: 'teacher',
 			name: parts[1],
 		};
+	}
+	if (isProgramKind(parts[0]) && parts.length === 5) {
+		return { type: 'program', kind: parts[0], year: parts[1], sem: parts[2], id: parts[3] };
 	}
 	return null;
 }

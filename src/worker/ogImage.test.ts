@@ -22,6 +22,20 @@ describe('og image routes', () => {
 			type: 'teacher',
 			name: '高子漢',
 		});
+		expect(parseOgImageRoute(new URL('https://example.com/mprogram/115/1/AV2/og.png'))).toEqual({
+			type: 'program',
+			kind: 'mprogram',
+			year: '115',
+			sem: '1',
+			id: 'AV2',
+		});
+		expect(parseOgImageRoute(new URL('https://example.com/program/115/1/620/og.png'))).toEqual({
+			type: 'program',
+			kind: 'program',
+			year: '115',
+			sem: '1',
+			id: '620',
+		});
 	});
 
 	it('rejects incomplete image endpoint parameters', () => {

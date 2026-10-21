@@ -6,7 +6,7 @@
 	"assets": {
 		"directory": "./dist/",
 		"binding": "ASSETS",
-		"run_worker_first": ["/sitemap.xml", "/sitemap-*", "/course/*", "/class/*", "/teacher/*"],
+		"run_worker_first": ["/sitemap.xml", "/sitemap-*", "/course/*", "/class/*", "/teacher/*", "/mprogram/*", "/program/*"],
 		"not_found_handling": "single-page-application",
 	},
 	"observability": {

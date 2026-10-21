@@ -5,6 +5,7 @@ import type {
 	WithdrawalResponse,
 	WithdrawalStat,
 } from '../types/course';
+import { PROGRAM_KINDS, findProgram, isProgramKind, type ProgramKind, type ProgramSummary } from './programs';
 
 const DEFAULT_API_BASE = 'https://gnehs.github.io/ntut-course-crawler-node';
 const COURSE_DIGITS = ['𝟬', '𝟭', '𝟮', '𝟯', '𝟰', '𝟱', '𝟲', '𝟳', '𝟴', '𝟵'];
@@ -25,7 +26,8 @@ export type PreviewMeta = {
 export type PreviewRoute =
 	| { type: 'course'; year: string; sem: string; id: string; department: string }
 	| { type: 'class'; year: string; sem: string; id: string; department: string }
-	| { type: 'teacher'; id: string };
+	| { type: 'teacher'; id: string }
+	| { type: 'program'; kind: ProgramKind; year: string; sem: string; id: string };
 
 type FetchJson = <T>(path: string) => Promise<T>;
 
@@ -52,6 +54,9 @@ export function parsePreviewRoute(url: URL): PreviewRoute | null {
 	if (parts[0] === 'teacher' && parts.length === 2) {
 		return { type: 'teacher', id: parts[1] };
 	}
+	if (isProgramKind(parts[0]) && parts.length === 4) {
+		return { type: 'program', kind: parts[0], year: parts[1], sem: parts[2], id: parts[3] };
+	}
 	return null;
 }
 
@@ -62,6 +67,10 @@ export async function resolvePreviewMeta(
 ): Promise<PreviewMeta | null> {
 	if (route.type === 'course') return resolveCoursePreview(route, config, fetchJson);
 	if (route.type === 'class') return resolveClassPreview(route, config, fetchJson);
+	if (route.type === 'program') {
+		const program = await findProgram(route.kind, route.year, route.sem, route.id, fetchJson);
+		return program ? createProgramPreview(program, route, config) : null;
+	}
 	return resolveTeacherPreview(route, config, fetchJson);
 }
 
@@ -134,6 +143,23 @@ export function createTeacherPreview(
 		description: `在北科好朋友上查看教師「${teacher.name}」的資訊，包含${courseNames.slice(0, 3).join('、')}等課程與選課人數等相關資訊`,
 		image: imageUrl(config, `/teacher/${encodeURIComponent(route.id)}/og.png`).toString(),
 		url: canonicalUrl(config, `/teacher/${encodeURIComponent(route.id)}`),
+	};
+}
+
+export function createProgramPreview(
+	program: ProgramSummary,
+	route: Extract<PreviewRoute, { type: 'program' }>,
+	config: PreviewConfig,
+): PreviewMeta {
+	const label = PROGRAM_KINDS[route.kind].label;
+	const path = `/${route.kind}/${route.year}/${route.sem}/${encodeURIComponent(route.id)}`;
+	return {
+		title: program.name,
+		description:
+			program.description ||
+			`在北科好朋友上查看${label}「${program.name}」的資訊，包含 ${program.courseCount} 門課程`,
+		image: imageUrl(config, `${path}/og.png`).toString(),
+		url: canonicalUrl(config, path),
 	};
 }
 

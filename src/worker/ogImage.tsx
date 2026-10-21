@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { Course, DepartmentGroup, WithdrawalResponse, WithdrawalStat } from '../types/course';
 import { WORKER_PREVIEW_CACHE_CONTROL } from './cache';
 import { parseOgImageRoute, type OgImageRoute } from './ogImageRoute';
+import { PROGRAM_KINDS, findProgram, type ProgramKind, type ProgramSummary } from './programs';
 
 const DEFAULT_API_BASE = 'https://gnehs.github.io/ntut-course-crawler-node';
 const OG_IMAGE_DEFAULT_FONT = new GoogleFont('Inter Tight', { weight: 400 });
@@ -90,6 +91,10 @@ export async function resolveOgImageElement(route: OgImageRoute, fetchJson: Fetc
 		}
 		return null;
 	}
+	if (route.type === 'program') {
+		const program = await findProgram(route.kind, route.year, route.sem, route.id, fetchJson);
+		return program ? renderProgramImage(route.year, route.sem, route.kind, program) : null;
+	}
 
 	const withdrawal = await fetchJson<WithdrawalResponse>('/analytics/withdrawal.json');
 	const teacher = withdrawal.data?.find((item) => item.name === route.name);
@@ -152,6 +157,26 @@ function renderClassImage(
 			<Footer>
 				<FooterItem title='學院' value={categoryName} />
 			</Footer>
+		</Container>
+	);
+}
+
+function renderProgramImage(year: string, sem: string, kind: ProgramKind, program: ProgramSummary) {
+	return (
+		<Container>
+			<Header>
+				<div>{`${year} 年${sem === '1' ? '上' : '下'}學期`}</div>
+			</Header>
+			<Spacer />
+			<Content>
+				<Eyebrow>{program.id}</Eyebrow>
+				<Title>{program.name}</Title>
+				<SubTitle>{PROGRAM_KINDS[kind].label}</SubTitle>
+				<Tags>
+					<Tag>{`📚 ${program.courseCount} 門課程`}</Tag>
+				</Tags>
+			</Content>
+			<Spacer />
 		</Container>
 	);
 }
