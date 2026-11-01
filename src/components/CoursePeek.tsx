@@ -285,8 +285,8 @@ export function CoursePeek() {
 type PeekViewProps = { peek: CoursePeekState; onClose: () => void; onExpand: () => void };
 
 /**
- * A drawer over the right of the page. It does not lock the page: the list stays scrollable, and
- * choosing another course swaps the drawer's content instead of closing it.
+ * A drawer over the right of the page. The dimmed page behind it takes no hover or clicks; a press
+ * there closes the drawer.
  */
 function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 	const opened = useOpenedSignal();
@@ -314,7 +314,7 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 				<motion.div
 					aria-hidden='true'
 					data-peek-overlay
-					className='pointer-events-none fixed inset-0 z-40 bg-black/20'
+					className='fixed inset-0 z-40 bg-black/20'
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
@@ -324,11 +324,6 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 					asChild
 					forceMount
 					aria-describedby={undefined}
-					// A press on another course opens it here; only a press elsewhere closes the drawer.
-					onPointerDownOutside={(event) => {
-						if ((event.target as Element | null)?.closest?.('[data-peek-origin]'))
-							event.preventDefault();
-					}}
 					onFocusOutside={(event) => event.preventDefault()}
 				>
 					<motion.div
@@ -403,9 +398,9 @@ function releasePagePush() {
 let pageScrollLocks = 0;
 
 /**
- * Holds the page still behind the drawer while leaving it clickable, so another course can still be
- * chosen. The scrollbar's width is padded back so the page does not shift sideways. Counted, so a
- * drawer opening while the last one is still sliding out does not restore a locked state.
+ * Holds the page still behind the drawer. The scrollbar's width is padded back so the page does not
+ * shift sideways. Counted, so a drawer opening while the last one is still sliding out does not
+ * restore a locked state.
  */
 function lockPageScroll() {
 	const root = document.documentElement;
