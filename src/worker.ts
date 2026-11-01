@@ -60,7 +60,10 @@ export default {
 		);
 		if (sitemapResponse) return sitemapResponse;
 
-		const imageResponse = await handleOgImageRequest(request, { apiBase: env.API_BASE });
+		const imageResponse = await handleOgImageRequest(request, {
+			apiBase: env.API_BASE,
+			assets: env.ASSETS,
+		});
 		if (imageResponse) return imageResponse;
 
 		const route = parsePreviewRoute(url);

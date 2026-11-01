@@ -9,3 +9,4 @@ dist
 .DS_Store
 .pnpm-store
 .wrangler
+scripts/og-background/out-*

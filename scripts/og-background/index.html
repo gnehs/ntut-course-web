@@ -1,0 +1,258 @@
+<!doctype html>
+<!--
+  Renders the sea glass book behind the worker's og images.
+  1. python3 scripts/og-background/server.py scripts/og-background
+  2. open http://127.0.0.1:8765/index.html?save in a browser
+  3. for f in scripts/og-background/out-*.png; do n=${f##*/out-}; sips -z 600 1200 -s format jpeg -s formatOptions 88 "$f" --out "static/og/book-${n%.png}.jpg"; done
+  If the book moves, copy out-label.json's corners into COVER in src/worker/ogImage.tsx.
+-->
+<html>
+<head>
+<meta charset="utf-8" />
+<style>html,body{margin:0;background:#222}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const params = new URLSearchParams(location.search);
+const SAVE = params.has('save');
+const W = 1200, H = 600, SCALE = 2;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(SCALE);
+renderer.setSize(W, H);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.OrthographicCamera(-6, 6, 3, -3, 0.1, 100);
+camera.position.set(0, 0, 30);
+camera.lookAt(0, 0, 0);
+
+// seeded random
+let seed = 7;
+const rand = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+// frosted grain texture used as a bump map
+function noiseTexture(size = 512) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const ctx = c.getContext('2d'); const img = ctx.createImageData(size, size);
+  for (let i = 0; i < size * size; i++) {
+    const v = 128 + (rand() - 0.5) * 255 * (rand() < 0.04 ? 1 : 0.45);
+    img.data[i*4] = img.data[i*4+1] = img.data[i*4+2] = v; img.data[i*4+3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3);
+  return t;
+}
+const grain = noiseTexture();
+
+function seaGlass(color, opts = {}) {
+  return new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color(color).lerp(new THREE.Color('#ffffff'), 0.12),
+    attenuationColor: new THREE.Color(color),
+    attenuationDistance: opts.attenuation ?? 0.9,
+    transmission: 0.72,
+    clearcoat: 0.35,
+    clearcoatRoughness: 0.55,
+    sheen: 0.25,
+    sheenRoughness: 0.5,
+    sheenColor: new THREE.Color('#ffffff'),
+    thickness: opts.thickness ?? 1.2,
+    roughness: opts.roughness ?? 0.42,
+    ior: 1.5,
+    specularIntensity: 0.9,
+    bumpMap: grain,
+    bumpScale: opts.bump ?? 2.5,
+    ...opts.extra,
+  });
+}
+
+// backdrop
+const backdrop = new THREE.Mesh(
+  new THREE.PlaneGeometry(40, 20),
+  new THREE.MeshStandardMaterial({ color: params.get('bg') || '#cfe6e1', roughness: 1 })
+);
+backdrop.position.z = -4;
+backdrop.receiveShadow = true;
+scene.add(backdrop);
+
+const key = new THREE.DirectionalLight(0xffffff, 3.2);
+key.position.set(-6, 9, 14);
+key.castShadow = true;
+key.shadow.mapSize.set(4096, 4096);
+key.shadow.camera.left = -10; key.shadow.camera.right = 10;
+key.shadow.camera.top = 8; key.shadow.camera.bottom = -8;
+key.shadow.camera.near = 1; key.shadow.camera.far = 50;
+key.shadow.radius = 9; key.shadow.blurSamples = 20;
+key.shadow.bias = -0.0005;
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xe8fff8, 0.6);
+fill.position.set(8, -3, 10);
+scene.add(fill);
+const glow = new THREE.PointLight(0xffffff, 60, 0, 2);
+glow.position.set(1.2, 3.2, 4.5);
+scene.add(glow);
+
+// ---------- book ----------
+const BOOK = { x: 2.95, y: 0.02, w: 3.25, h: 4.25, rx: 0.1, ry: -0.42, rz: -0.13 };
+const book = new THREE.Group();
+book.position.set(BOOK.x, BOOK.y, 0);
+book.rotation.set(BOOK.rx, BOOK.ry, BOOK.rz);
+scene.add(book);
+
+// one render per college; the worker picks the file by name
+const COVERS = {
+  seafoam: '#3fb79d',
+  cobalt: '#3b6fd4',
+  amber: '#d0892f',
+  aqua: '#33aecb',
+  kelly: '#45ad5a',
+  rose: '#de7f95',
+  lavender: '#8f78d2',
+  citrine: '#cdb32e',
+};
+const coverMat = seaGlass(COVERS.seafoam, { attenuation: 1.4, thickness: 0.8, extra: { transmission: 0.82 } });
+const coverT = 0.16, pagesT = 0.62;
+const front = new THREE.Mesh(new RoundedBoxGeometry(BOOK.w, BOOK.h, coverT, 6, 0.07), coverMat);
+front.position.z = pagesT / 2 + coverT / 2;
+const back = front.clone(); back.position.z = -front.position.z;
+const spine = new THREE.Mesh(new RoundedBoxGeometry(0.22, BOOK.h, pagesT + coverT * 2, 6, 0.08), coverMat);
+spine.position.x = -BOOK.w / 2 + 0.06;
+
+function pageTexture() {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 256;
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#f7f5ee'; ctx.fillRect(0, 0, 64, 256);
+  for (let i = 0; i < 256; i += 3) { ctx.fillStyle = `rgba(150,140,120,${0.08 + rand() * 0.1})`; ctx.fillRect(0, i, 64, 1); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.rotation = Math.PI / 2; t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const pages = new THREE.Mesh(
+  new RoundedBoxGeometry(BOOK.w - 0.2, BOOK.h - 0.22, pagesT, 4, 0.04),
+  new THREE.MeshStandardMaterial({ color: '#ffffff', map: pageTexture(), roughness: 0.85 })
+);
+pages.position.x = 0.07;
+
+// the cover's front face, where the worker lays out the cover design
+const LABEL = { w: 3.15, h: 4.15, x: 0, y: 0 };
+const labelZ = front.position.z + coverT / 2 + 0.012;
+
+
+[front, back, spine, pages].forEach((m) => { m.castShadow = true; m.receiveShadow = true; book.add(m); });
+
+// ---------- pebbles ----------
+// Each cover gets its own pebbles: shades of the cover's glass, a couple of
+// frosted whites and one accent from across the colour wheel.
+function pebblePalette(coverColor, count) {
+  const base = { h: 0, s: 0, l: 0 };
+  new THREE.Color(coverColor).getHSL(base);
+  let state = Math.round(base.h * 1000) + 1;
+  const next = () => { state = (state * 16807) % 2147483647; return (state - 1) / 2147483646; };
+  const shade = () => new THREE.Color().setHSL(
+    (base.h + (next() - 0.5) * 0.12 + 1) % 1,
+    Math.min(1, base.s * (0.55 + next() * 0.6)),
+    0.38 + next() * 0.4,
+  );
+  const colors = Array.from({ length: count }, shade);
+  const slots = colors.map((_, index) => index).sort(() => next() - 0.5);
+  colors[slots[0]] = new THREE.Color('#e6efec');
+  colors[slots[1]] = new THREE.Color('#f2f5f3');
+  colors[slots[2]] = new THREE.Color().setHSL((base.h + 0.45 + next() * 0.1) % 1, 0.55, 0.55);
+  return colors;
+}
+function pebbleGeometry(sx, sy, sz) {
+  const g = mergeVertices(new THREE.IcosahedronGeometry(1, 7));
+  const p = g.attributes.position; const v = new THREE.Vector3();
+  const f = [rand() * 6, rand() * 6, rand() * 6, rand() * 6];
+  for (let i = 0; i < p.count; i++) {
+    v.fromBufferAttribute(p, i);
+    const n = 1 + 0.12 * Math.sin(v.x * 2.1 + f[0]) * Math.cos(v.y * 1.7 + f[1]) + 0.07 * Math.sin(v.y * 3.3 + v.x * 1.3 + f[2]) + 0.05 * Math.cos(v.x * 4.1 - v.y * 2.7 + f[3]);
+    v.multiplyScalar(n);
+    // flatten like tumbled shards: squash z harder and round the top
+    p.setXYZ(i, v.x * sx, v.y * sy, Math.sign(v.z) * Math.pow(Math.abs(v.z), 0.8) * sz);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+// [x, y, z, size, rotation]
+const PEBBLES = [
+  [ 0.35, 2.75, -1.2, 0.62, 0.6],
+  [ 1.05, -2.55, 0.8, 0.7, -0.4],
+  [ 0.15, -1.95, -0.6, 0.34, 1.2],
+  [ 4.95, -2.55, 0.9, 0.62, 0.8],
+  [ 5.55, 2.4, -0.3, 0.75, -0.7],
+  [ 5.65, 0.35, -1.5, 0.45, 0.3],
+  [ 4.75, 2.85, 0.6, 0.38, 1.9],
+  [ 0.95, 1.55, -2.2, 0.36, -1.2],
+  [ 1.25, -0.6, -2.4, 0.3, 0.4],
+  [ 3.15, -2.95, 1.6, 0.48, -0.2],
+  [-5.6, -2.85, -0.5, 0.55, 0.7],
+  [-4.8, -3.05, -1.0, 0.32, -0.9],
+  [ 5.9, -1.15, 0.4, 0.4, 2.2],
+  [ 2.1, 2.95, 1.2, 0.34, -0.6],
+];
+const pebbleMats = [];
+for (const [x, y, z, s, r] of PEBBLES) {
+  const mat = seaGlass('#ffffff', { attenuation: 0.45 + rand() * 0.5, thickness: s * 1.6, roughness: 0.38 + rand() * 0.12 });
+  pebbleMats.push(mat);
+  const m = new THREE.Mesh(
+    pebbleGeometry(s * (1.1 + rand() * 0.5), s * (0.75 + rand() * 0.35), s * 0.42),
+    mat
+  );
+  m.position.set(x, y, z);
+  m.rotation.set((rand() - 0.5) * 0.9, (rand() - 0.5) * 0.9, r);
+  m.castShadow = true; m.receiveShadow = true;
+  scene.add(m);
+}
+
+// project the label's front face corners into image pixels
+scene.updateMatrixWorld(true);
+const corner = (cx, cy) => {
+  const v = new THREE.Vector3(LABEL.x + cx * LABEL.w / 2, LABEL.y + cy * LABEL.h / 2, labelZ + 0.015).applyMatrix4(book.matrixWorld).project(camera);
+  return [ (v.x + 1) / 2 * W, (1 - v.y) / 2 * H ];
+};
+const labelCorners = { tl: corner(-1, 1), tr: corner(1, 1), bl: corner(-1, -1), br: corner(1, -1), size: [LABEL.w * 100, LABEL.h * 100] };
+window.labelCorners = labelCorners;
+document.title = 'rendered';
+
+function paintCover(color) {
+  coverMat.color.set(color).lerp(new THREE.Color('#ffffff'), 0.12);
+  coverMat.attenuationColor.set(color);
+  pebblePalette(color, pebbleMats.length).forEach((tone, index) => {
+    pebbleMats[index].color.copy(tone).lerp(new THREE.Color('#ffffff'), 0.12);
+    pebbleMats[index].attenuationColor.copy(tone);
+  });
+  renderer.render(scene, camera);
+}
+const save = (name, body) => fetch(`/save/${name}`, { method: 'POST', body });
+const snapshot = () => new Promise((resolve) => renderer.domElement.toBlob(resolve, 'image/png'));
+
+paintCover(COVERS[params.get('cover')] || COVERS.seafoam);
+if (SAVE) {
+  for (const [name, color] of Object.entries(COVERS)) {
+    paintCover(color);
+    await save(`${name}.png`, await snapshot());
+  }
+  await save('label.json', JSON.stringify(labelCorners));
+  document.title = 'saved';
+}
+</script>
+</body>
+</html>
