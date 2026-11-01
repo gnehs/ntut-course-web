@@ -238,8 +238,6 @@ export function CoursePeek() {
 			return;
 		}
 		await growPeekIntoPage();
-		// The backdrop now covers everything, so the pushed page can snap home unseen.
-		releasePagePush();
 		const top = contentTop();
 		const transition = document.startViewTransition(async () => {
 			const arrived = new Promise<void>((resolve) => {
@@ -301,12 +299,7 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 	const [width] = useState(drawerWidth);
 	useEffect(() => {
 		if (!present) return;
-		const unlock = lockPageScroll();
-		const unpush = pushPage(width);
-		return () => {
-			unlock();
-			unpush();
-		};
+		return lockPageScroll();
 	}, [present]);
 	return (
 		<DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
@@ -314,7 +307,7 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 				<motion.div
 					aria-hidden='true'
 					data-peek-overlay
-					className='fixed inset-0 z-40 bg-black/20'
+					className='bg-sea-glass fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]'
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
@@ -365,34 +358,6 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 /** Wide enough for the course's two-column layout, leaving at least 22rem of the page in view. */
 function drawerWidth() {
 	return Math.min(896, window.innerWidth - 352);
-}
-
-/**
- * Nudges the whole page a little to the left as the drawer slides in, so the drawer reads as
- * pushing the page aside rather than covering it. The returned function slides it back.
- */
-function pushPage(width: number) {
-	const shift = Math.min(120, Math.round(width * 0.15));
-	const page = document.getElementById('root');
-	if (!page) return () => {};
-	const timing: KeyframeAnimationOptions = {
-		duration: reducedMotion() ? 0 : 320,
-		easing: panelEasing,
-	};
-	page.animate([{ transform: 'none' }, { transform: `translateX(${-shift}px)` }], {
-		...timing,
-		fill: 'forwards',
-	});
-	return () => {
-		const from = getComputedStyle(page).transform;
-		releasePagePush();
-		if (from !== 'none') page.animate([{ transform: from }, { transform: 'none' }], timing);
-	};
-}
-
-function releasePagePush() {
-	for (const animation of document.getElementById('root')?.getAnimations() ?? [])
-		animation.cancel();
 }
 
 let pageScrollLocks = 0;
