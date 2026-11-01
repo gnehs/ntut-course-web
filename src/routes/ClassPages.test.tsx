@@ -29,7 +29,8 @@ vi.mock('../state/AppContext', () => ({
 
 vi.mock('@tanstack/react-router', () => ({
 	useParams: () => ({ year: '115', sem: '1', id: '資工一' }),
-	useRouterState: () => ({ location: { search: mocks.locationSearch } }),
+	useRouterState: ({ select = (state) => state } = {}) =>
+		select({ location: { search: mocks.locationSearch } }),
 }));
 
 vi.mock('../components/CourseList', () => ({

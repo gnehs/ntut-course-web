@@ -1,5 +1,5 @@
 import { CourseListToolbar } from './CourseListToolbar';
-import { Link } from '@tanstack/react-router';
+import { CourseLink } from './CoursePeek';
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { CircleAlert, Minus, Plus } from 'lucide-react';
@@ -242,13 +242,18 @@ export function CourseList({
 										</div>
 									) : null}
 									<Card
+										data-peek-card
 										className={cn(
-											'hoverable px-4 py-4',
+											'hoverable px-4 py-4 has-[[data-peek-source]]:invisible',
 											desktopLimit !== undefined && index >= desktopLimit && 'sm:hidden',
 										)}
 									>
-										<Link
-											to={`/course/${viewYear}/${viewSem}/${course.id}`}
+										<CourseLink
+											year={viewYear}
+											sem={viewSem}
+											id={course.id}
+											course={course}
+											department={viewDepartment}
 											aria-label={`查看 ${courseTitle(course)} 課程詳情`}
 											className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 										/>
@@ -336,9 +341,15 @@ export function CourseList({
 												{course.id}
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
-												<Link to={`/course/${viewYear}/${viewSem}/${course.id}`}>
+												<CourseLink
+													year={viewYear}
+													sem={viewSem}
+													id={course.id}
+													course={course}
+													department={viewDepartment}
+												>
 													{courseTitle(course)}
-												</Link>
+												</CourseLink>
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 tabular-nums'>
 												{formatCredit(course.credit)}
@@ -570,9 +581,12 @@ function TimetableCourses({
 				{items.map((item) => {
 					const laneWidth = `${100 / item.laneCount}%`;
 					return (
-						<Link
+						<CourseLink
 							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
-							to={`/course/${year}/${sem}/${item.id}`}
+							year={year}
+							sem={sem}
+							id={item.id}
+							course={item}
 							className={cn(
 								'rounded-control shadow-soft hover:shadow-soft-hover relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-[background-color,box-shadow]',
 								item.isConflict
@@ -595,7 +609,7 @@ function TimetableCourses({
 							>
 								{(item.teacher || []).map((x) => x.name).join('、') || item.id}
 							</div>
-						</Link>
+						</CourseLink>
 					);
 				})}
 			</div>

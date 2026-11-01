@@ -1,14 +1,19 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
+import { CourseLink, CoursePeekOpenedContext, courseSeed } from '../components/CoursePeek';
 import { CourseTimeChips } from '../components/CourseTimeChips';
 import { Link, useParams } from '@tanstack/react-router';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, startTransition, use, useEffect, useMemo, useState } from 'react';
 import type React from 'react';
 import { ExternalLink, Info, MapPin, Minus, Plus, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { CourseDetailSkeleton } from '../components/ui-kit/PageSkeletons';
+import {
+	CourseDetailSkeleton,
+	SkeletonBlock,
+	SkeletonCard,
+} from '../components/ui-kit/PageSkeletons';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
@@ -43,9 +48,20 @@ type InfoCardItem = [string, React.ReactNode];
 
 export function CourseDetailPage() {
 	const { year, sem, id } = useParams({ from: '/course/$year/$sem/$id' });
+	return <CourseDetail year={year} sem={sem} id={id} />;
+}
+
+export function CourseDetail({ year, sem, id }: { year: string; sem: string; id: string }) {
 	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
-	const [courseDepartment, setCourseDepartment] = useState(dataset.department);
-	const [course, setCourse] = useState<Course | null>(null);
+	// A course opened from a list is already in hand, so its summary renders before the fetches settle.
+	const [courseDepartment, setCourseDepartment] = useState(
+		() => courseSeed(year, sem, id)?.department || dataset.department,
+	);
+	const [course, setCourse] = useState<Course | null>(
+		() => courseSeed(year, sem, id)?.course ?? null,
+	);
+	const [loaded, setLoaded] = useState(false);
+	const opened = use(CoursePeekOpenedContext);
 	const [syllabus, setSyllabus] = useState<SyllabusItem[]>([]);
 	const [relatedCourses, setRelatedCourses] = useState<Course[]>([]);
 	const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
@@ -59,8 +75,11 @@ export function CourseDetailPage() {
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
+			const seed = courseSeed(year, sem, id);
 			setError(null);
-			setCourse(null);
+			setLoaded(false);
+			setCourse(seed?.course ?? null);
+			if (seed?.department) setCourseDepartment(seed.department);
 			setSyllabusError(false);
 			setSelectedSyllabusIndex('0');
 			try {
@@ -102,7 +121,6 @@ export function CourseDetailPage() {
 					}
 				}
 				if (!found) throw new Error('找不到課程');
-				setCourseDepartment(foundDepartment);
 				if (isCourseHidden(found)) {
 					globalThis.location.href = '/not-found';
 					return;
@@ -111,17 +129,24 @@ export function CourseDetailPage() {
 					detailResult.status === 'fulfilled' && Array.isArray(detailResult.value)
 						? detailResult.value
 						: [];
-				setSyllabusError(detailResult.status === 'rejected');
 				const teacherRates = (found.teacher || [])
 					.map((item) => rate[item.name])
 					.filter((value) => value !== null && value !== undefined && String(value).trim() !== '')
 					.map(Number)
 					.filter((value) => Number.isFinite(value) && value >= 0);
-				setCourse(found);
-				setSyllabus(detailItems);
-				setRelatedCourses(courses);
-				setWithdrawalRate(teacherRates.length ? Math.max(...teacherRates) : null);
-				setWithdrawalDistribution(createWithdrawalRateDistribution(Object.values(rate)));
+				await opened;
+				if (cancelled) return;
+				// The syllabus and similar course lists are a large render; yielding keeps the page responsive.
+				startTransition(() => {
+					setCourseDepartment(foundDepartment);
+					setSyllabusError(detailResult.status === 'rejected');
+					setCourse(found);
+					setSyllabus(detailItems);
+					setRelatedCourses(courses);
+					setWithdrawalRate(teacherRates.length ? Math.max(...teacherRates) : null);
+					setWithdrawalDistribution(createWithdrawalRateDistribution(Object.values(rate)));
+					setLoaded(true);
+				});
 			} catch (e) {
 				if (!cancelled) setError(e);
 			}
@@ -185,7 +210,7 @@ export function CourseDetailPage() {
 			</header>
 			<aside
 				aria-label='課程詳細資訊'
-				className='flex min-w-0 flex-col gap-3 lg:sticky lg:top-[74px] lg:col-start-2 lg:row-span-2 lg:row-start-1'
+				className='flex min-w-0 flex-col gap-3 lg:sticky lg:top-[var(--course-sticky-top,74px)] lg:col-start-2 lg:row-span-2 lg:row-start-1'
 			>
 				<Button
 					primary={!isInMyCourse}
@@ -200,10 +225,17 @@ export function CourseDetailPage() {
 					<div className='rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)]'>
 						<CourseStat label='課號' value={currentCourse.id} />
 						<CourseStat label='學分' value={formatCredit(course.credit)} />
-						<WithdrawalRateStat
-							withdrawalRate={withdrawalRate}
-							distribution={withdrawalDistribution}
-						/>
+						{loaded ? (
+							<WithdrawalRateStat
+								withdrawalRate={withdrawalRate}
+								distribution={withdrawalDistribution}
+							/>
+						) : (
+							<div className='px-4 py-3'>
+								<SkeletonBlock className='h-6 w-14' />
+								<SkeletonBlock className='mt-2 h-3 w-10' />
+							</div>
+						)}
 					</div>
 					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] md:grid-cols-3 md:divide-x md:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y'>
 						<InfoSection
@@ -280,12 +312,16 @@ export function CourseDetailPage() {
 						{conflictCourses.map((item, index) => (
 							<span key={item.id}>
 								{index > 0 ? '、' : ''}
-								<Link
-									to={`/course/${year}/${sem}/${item.id}`}
+								<CourseLink
+									year={year}
+									sem={sem}
+									id={item.id}
+									course={item}
+									department={courseDepartment}
 									className='underline underline-offset-2'
 								>
 									{item.name?.zh}
-								</Link>
+								</CourseLink>
 							</span>
 						))}{' '}
 						衝堂！
@@ -312,8 +348,14 @@ export function CourseDetailPage() {
 						<AdsByGoogle placement='section' />
 					</div>
 				) : null}
+				{!loaded ? (
+					<SkeletonCard>
+						<SkeletonBlock className='h-5 w-28' />
+						<SkeletonBlock className='mt-3 h-40 w-full' />
+					</SkeletonCard>
+				) : null}
 				{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
-				{!syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
+				{loaded && !syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
 				{syllabus.length > 1 ? (
 					<Alert className='flex flex-col gap-3'>
 						<div>

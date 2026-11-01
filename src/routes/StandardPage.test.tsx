@@ -14,7 +14,8 @@ vi.mock('../lib/courseApi', () => ({
 }));
 vi.mock('@tanstack/react-router', () => ({
 	useNavigate: () => mocks.navigate,
-	useRouterState: () => ({ location: { pathname: '/standard', search: {} } }),
+	useRouterState: ({ select = (state) => state } = {}) =>
+		select({ location: { pathname: '/standard', search: {} } }),
 }));
 vi.mock('../components/StudentPrefixSearch', () => ({
 	StudentPrefixSearch: ({ onSelect }) => (

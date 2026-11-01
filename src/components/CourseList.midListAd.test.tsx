@@ -23,6 +23,13 @@ vi.mock('../state/AppContext', () => ({
 	}),
 }));
 
+vi.mock('./CoursePeek', () => ({
+	CourseLink: ({ year, sem, id, children, ...props }) => (
+		<a href={`/course/${year}/${sem}/${id}`} {...props}>
+			{children}
+		</a>
+	),
+}));
 vi.mock('@tanstack/react-router', () => ({
 	Link: ({ to, children, ...props }) => (
 		<a href={to} {...props}>

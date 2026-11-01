@@ -1,12 +1,12 @@
 import type React from 'react';
 
-function SkeletonBlock({ className = '' }: { className?: string }) {
+export function SkeletonBlock({ className = '' }: { className?: string }) {
 	return (
 		<div className={`rounded-control animate-pulse bg-[rgba(var(--vs-text),0.1)] ${className}`} />
 	);
 }
 
-function SkeletonCard({
+export function SkeletonCard({
 	children,
 	className = '',
 }: {

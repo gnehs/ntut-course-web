@@ -1,4 +1,5 @@
-import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
+import { useRouteLocation } from '../lib/routeLocation';
 import { useEffect, useMemo, useState } from 'react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
@@ -21,7 +22,7 @@ import { Building2, Calendar, GraduationCap, Search } from 'lucide-react';
 const courseStandardEntries = Object.entries(courseStandard);
 
 export function StandardPage() {
-	const { location } = useRouterState();
+	const location = useRouteLocation();
 	const navigate = useNavigate();
 	const params = useMemo(() => createSearchParams(location.search), [location.search]);
 	const [years, setYears] = useState<string[] | null>(null);

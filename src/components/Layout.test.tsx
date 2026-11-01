@@ -14,6 +14,7 @@ const fixtures = vi.hoisted(() => ({
 	location: {
 		pathname: '/advanced-search',
 		search: { year: '114', sem: '2', d: 'main', page: 3, q: { k: '測試' } },
+		state: {},
 	},
 }));
 
@@ -24,10 +25,11 @@ vi.mock('@tanstack/react-router', () => ({
 		</a>
 	),
 	Outlet: () => <div>頁面內容</div>,
-	useRouterState: () => ({ location: fixtures.location }),
+	useRouterState: ({ select = (state) => state } = {}) => select({ location: fixtures.location }),
 	useNavigate: () => fixtures.navigate,
 }));
 vi.mock('./UniversalSearch', () => ({ UniversalSearch: () => null }));
+vi.mock('./CoursePeek', () => ({ CoursePeek: () => null }));
 vi.mock('../state/AppContext', async () => {
 	const { useState } = await import('react');
 	return {

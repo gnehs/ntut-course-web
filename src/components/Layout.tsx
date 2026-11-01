@@ -4,9 +4,11 @@ import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/co
 import { SITE_TITLE, pageTitleForPath, usePageTitle } from '../lib/pageTitle';
 import { DESKTOP_MEDIA_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { createSearchParams } from '../lib/urlState';
+import { useRouteLocation } from '../lib/routeLocation';
 import { useApp } from '../state/AppContext';
 import { ChevronsUpDown, GitBranch, Search } from 'lucide-react';
 import { Button } from './ui-kit/Button';
+import { CoursePeek } from './CoursePeek';
 import { Alert } from './ui-kit/Alert';
 import { ContentSurface } from './ui-kit/ContentSurface';
 import { cn } from '@/lib/utils';
@@ -16,7 +18,8 @@ import { Select, SelectOption } from './ui-kit/Select';
 import { UniversalSearch } from './UniversalSearch';
 
 export function Layout() {
-	const { location } = useRouterState();
+	const location = useRouteLocation();
+	const peekOpen = useRouterState({ select: (state) => Boolean(state.location.state.coursePeek) });
 	const navigate = useNavigate();
 	const searchParams = createSearchParams(location.search);
 	const isIframe = searchParams.get('mode') === 'iframe';
@@ -44,7 +47,8 @@ export function Layout() {
 			? '正在載入學期'
 			: '選擇學期';
 
-	usePageTitle(pageTitleForPath(location.pathname));
+	// A course peek titles the tab itself; the page title comes back when the peek closes.
+	usePageTitle(peekOpen ? null : pageTitleForPath(location.pathname));
 
 	function applyDataset(nextDataset: { year: string; sem: string; department: string }) {
 		setDataset(nextDataset);
@@ -205,6 +209,7 @@ export function Layout() {
 					onSubmit={applyDataset}
 				/>
 			</Dialog>
+			<CoursePeek />
 		</div>
 	);
 }

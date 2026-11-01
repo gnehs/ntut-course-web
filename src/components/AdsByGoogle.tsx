@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, use, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 
 type AdPlacement = 'inline' | 'footer' | 'section' | 'sidebar';
+
+/** Surfaces that are not a page of their own, such as the course peek, turn placements off. */
+export const AdsEnabledContext = createContext(true);
 
 export function AdsByGoogle({
 	placement = 'inline',
@@ -11,6 +14,8 @@ export function AdsByGoogle({
 	/** Heading shown above the ad; it collapses together with an unfilled slot. */
 	title?: string;
 }) {
+	const enabled = use(AdsEnabledContext);
+	if (!enabled) return null;
 	// Embedded pages keep their compact layout without these additional placements.
 	if (
 		placement !== 'inline' &&

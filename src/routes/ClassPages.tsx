@@ -1,5 +1,6 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
-import { Link, useParams, useRouterState } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
+import { useRouteLocation } from '../lib/routeLocation';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { Minus, Plus, Star } from 'lucide-react';
@@ -172,7 +173,7 @@ export function ClassIndexPage() {
 
 export function ClassDetailPage() {
 	const { year, sem, id } = useParams({ from: '/class/$year/$sem/$id' });
-	const { location } = useRouterState();
+	const location = useRouteLocation();
 	const { dataset, addCourse, removeCourse, myCourseClassKey } = useApp();
 	const searchParams = useMemo(() => createSearchParams(location.search), [location.search]);
 	const requestedDepartment = searchParams.get('d');

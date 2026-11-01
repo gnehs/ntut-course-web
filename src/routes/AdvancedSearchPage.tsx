@@ -1,4 +1,5 @@
-import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
+import { useRouteLocation } from '../lib/routeLocation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
@@ -156,7 +157,7 @@ const filterSections: {
 ];
 
 export function AdvancedSearchPage() {
-	const { location } = useRouterState();
+	const location = useRouteLocation();
 	const navigate = useNavigate();
 	const { dataset, getCourses, setDatasetDialogOpen } = useApp();
 	const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);

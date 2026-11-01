@@ -12,6 +12,13 @@ const mocks = vi.hoisted(() => ({
 vi.mock('../state/AppContext', () => ({
 	useApp: () => ({ dataset: { year: '115', sem: '1', department: 'main' }, ...mocks }),
 }));
+vi.mock('./CoursePeek', () => ({
+	CourseLink: ({ year, sem, id, children, ...props }) => (
+		<a href={`/course/${year}/${sem}/${id}`} {...props}>
+			{children}
+		</a>
+	),
+}));
 vi.mock('@tanstack/react-router', () => ({
 	Link: ({ to, children, ...props }) => (
 		<a href={to} {...props}>

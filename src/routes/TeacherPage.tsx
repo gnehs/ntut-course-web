@@ -1,5 +1,6 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
+import { CourseLink } from '../components/CoursePeek';
 import { useEffect, useState } from 'react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -115,9 +116,11 @@ export function TeacherPage() {
 			</div>
 			<div className='mt-2 grid gap-3 md:grid-cols-2'>
 				{courses.map((course: TeacherWithdrawalCourse) => (
-					<Link
+					<CourseLink
 						className='rounded-surface bg-sheen-glow shadow-raised hover:shadow-lifted active:shadow-pressed grid cursor-pointer grid-cols-[4.75rem_minmax(0,1fr)_auto_auto] items-center gap-x-2 gap-y-0 bg-[rgb(var(--vs-background))] px-4 py-2.5 transition-[box-shadow,translate] duration-200 hover:-translate-y-0.5 active:translate-y-px'
-						to={`/course/${course.year}/${course.sem}/${course.id}`}
+						year={course.year}
+						sem={course.sem}
+						id={course.id}
 						key={`${course.year}-${course.sem}-${course.id}`}
 					>
 						<div>
@@ -140,7 +143,7 @@ export function TeacherPage() {
 							<div className='text-base font-semibold'>{course.people}</div>
 							<div className='text-xs opacity-80'>選課</div>
 						</div>
-					</Link>
+					</CourseLink>
 				))}
 			</div>
 			{courses.length ? null : <p>尚無課程，請選擇其他分類</p>}
