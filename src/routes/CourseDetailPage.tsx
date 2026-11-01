@@ -339,7 +339,8 @@ export function CourseDetail({
 								infoItem('人數', formatQuantity(course.people, '人')),
 								...optionalInfoItem('退選', course.peopleWithdraw, '人'),
 								infoItem('時數', formatQuantity(course.hours, '小時')),
-								...optionalInfoItem('階段', course.stage),
+								// Stage 1 is the default every course has, so only a later stage is worth a row.
+								...optionalInfoItem('階段', course.stage?.trim() === '1' ? undefined : course.stage),
 								...courseAttributeItems(course),
 							]}
 						/>
@@ -368,7 +369,9 @@ export function CourseDetail({
 								),
 								...optionalInfoItem('助教', course.ta?.map((item) => item.name).join('、')),
 								...optionalInfoItem('授課語言', course.language),
-								infoItem('備註', <HtmlText text={course.notes || '無'} />),
+								...(course.notes?.trim() && course.notes.trim() !== '無'
+									? [infoItem('備註', <HtmlText text={course.notes} />)]
+									: []),
 							]}
 						/>
 						<InfoSection

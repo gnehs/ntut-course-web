@@ -107,7 +107,7 @@ function getInfoCard(title: string) {
 }
 
 describe('CourseDetailPage course and syllabus fields', () => {
-	it('renders course code, TA, language, zero withdrawals, stage one, and source links', async () => {
+	it('renders course code, TA, language, zero withdrawals, and source links', async () => {
 		await renderCourseDetail();
 
 		const courseInfo = getInfoCard('課程資訊');
@@ -115,8 +115,7 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		expect(courseInfo.getByText('CODE-001', { exact: true })).toBeInTheDocument();
 		expect(courseInfo.getByText('退選')).toBeInTheDocument();
 		expect(courseInfo.getByText('0 人', { exact: true })).toBeInTheDocument();
-		expect(courseInfo.getByText('階段')).toBeInTheDocument();
-		expect(courseInfo.getByText('1', { exact: true })).toBeInTheDocument();
+		expect(courseInfo.queryByText('階段')).not.toBeInTheDocument();
 
 		const teachingInfo = getInfoCard('授課資訊');
 		expect(teachingInfo.getByText('助教')).toBeInTheDocument();
