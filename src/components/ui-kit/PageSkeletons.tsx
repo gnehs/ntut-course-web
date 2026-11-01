@@ -375,12 +375,12 @@ export function EmptyRoomSkeleton() {
 
 export function CourseDetailSkeleton() {
 	return (
-		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-6'>
-			<div className='grid gap-2 lg:col-start-1'>
+		<div className='grid min-w-0 gap-4 @3xl:grid-cols-[minmax(0,1fr)_20rem] @3xl:grid-rows-[auto_1fr] @3xl:items-start @3xl:gap-x-6'>
+			<div className='grid gap-2 @3xl:col-start-1'>
 				<SkeletonBlock className='h-8 w-48 max-w-full' />
 				<SkeletonBlock className='h-4 w-72 max-w-full' />
 			</div>
-			<div className='flex flex-col gap-3 lg:col-start-2 lg:row-span-2 lg:row-start-1'>
+			<div className='flex flex-col gap-3 @3xl:col-start-2 @3xl:row-span-2 @3xl:row-start-1'>
 				<SkeletonBlock className='h-11 w-full sm:h-9' />
 				<SkeletonCard>
 					<div className='grid grid-cols-3 gap-3'>
@@ -391,7 +391,7 @@ export function CourseDetailSkeleton() {
 							</div>
 						))}
 					</div>
-					<div className='mt-5 grid gap-5 md:grid-cols-3 lg:grid-cols-1'>
+					<div className='mt-5 grid gap-5 @xl:grid-cols-3 @3xl:grid-cols-1'>
 						{Array.from({ length: 3 }, (_, index) => (
 							<div key={index} className='grid gap-2'>
 								<SkeletonBlock className='h-5 w-24' />
@@ -403,7 +403,7 @@ export function CourseDetailSkeleton() {
 					</div>
 				</SkeletonCard>
 			</div>
-			<SkeletonCard className='lg:col-start-1'>
+			<SkeletonCard className='@3xl:col-start-1'>
 				<SkeletonBlock className='h-5 w-28' />
 				<SkeletonBlock className='mt-3 h-24 w-full' />
 				<SkeletonBlock className='mt-6 h-5 w-28' />

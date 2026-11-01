@@ -392,6 +392,12 @@
 	animation: dialog-content-out 140ms ease-in;
 }
 
+/* The course a peek drawer is showing stays marked in the list beside it. */
+[data-peek-source] {
+	outline: 2px solid rgb(var(--vs-primary));
+	outline-offset: 2px;
+}
+
 /* Expanding a course peek: by the time this runs the peek fills the window with its content on the
    page's column, so the page only crossfades in and the sidebar slides to where it sticks. */
 ::view-transition-old(root),

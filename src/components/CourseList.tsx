@@ -242,9 +242,8 @@ export function CourseList({
 										</div>
 									) : null}
 									<Card
-										data-peek-card
 										className={cn(
-											'hoverable px-4 py-4 has-[[data-peek-source]]:invisible',
+											'hoverable px-4 py-4',
 											desktopLimit !== undefined && index >= desktopLimit && 'sm:hidden',
 										)}
 									>

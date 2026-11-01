@@ -77,7 +77,7 @@ export function CourseDetailPage() {
 	}, [loaded]);
 
 	return (
-		<div ref={rootRef}>
+		<div ref={rootRef} className='@container'>
 			<CourseDetail
 				year={year}
 				sem={sem}
@@ -294,8 +294,8 @@ export function CourseDetail({
 	}
 
 	return (
-		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-6'>
-			<header className='flex min-w-0 flex-col gap-1 lg:col-start-1'>
+		<div className='grid min-w-0 gap-4 @3xl:grid-cols-[minmax(0,1fr)_20rem] @3xl:grid-rows-[auto_1fr] @3xl:items-start @3xl:gap-x-6'>
+			<header className='flex min-w-0 flex-col gap-1 @3xl:col-start-1'>
 				<h1 className='m-0 text-2xl leading-snug font-semibold'>
 					<CourseDetailTitle course={currentCourse} />
 				</h1>
@@ -306,7 +306,7 @@ export function CourseDetail({
 			<aside
 				aria-label='課程詳細資訊'
 				style={{ viewTransitionName: asideTransition ? COURSE_ASIDE_TRANSITION : undefined }}
-				className='flex min-w-0 flex-col gap-3 lg:sticky lg:top-[var(--course-sticky-top,74px)] lg:col-start-2 lg:row-span-2 lg:row-start-1'
+				className='flex min-w-0 flex-col gap-3 @3xl:sticky @3xl:top-[var(--course-sticky-top,74px)] @3xl:col-start-2 @3xl:row-span-2 @3xl:row-start-1'
 			>
 				<Button
 					primary={!isInMyCourse}
@@ -327,7 +327,7 @@ export function CourseDetail({
 							distribution={withdrawalDistribution}
 						/>
 					</div>
-					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] md:grid-cols-3 md:divide-x md:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y'>
+					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] @xl:grid-cols-3 @xl:divide-x @xl:divide-y-0 @3xl:grid-cols-1 @3xl:divide-x-0 @3xl:divide-y'>
 						<InfoSection
 							icon={<Info />}
 							title='課程資訊'
@@ -393,7 +393,7 @@ export function CourseDetail({
 					</div>
 				) : null}
 			</aside>
-			<div className='flex min-w-0 flex-col gap-4 lg:col-start-1'>
+			<div className='flex min-w-0 flex-col gap-4 @3xl:col-start-1'>
 				{conflicted ? (
 					<Alert danger>
 						<strong>課程衝堂</strong>
