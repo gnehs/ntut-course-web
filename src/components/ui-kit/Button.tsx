@@ -25,7 +25,7 @@ export function Button({
 	const isSolid = (active || primary) && !danger;
 	const classes = cn(
 		'inline-flex min-h-11 shrink-0 touch-manipulation items-center justify-center gap-1.5 rounded-control px-3 py-2 text-sm font-medium leading-5 transition-[background-color,border-color,color,box-shadow,opacity,transform] duration-200 motion-safe:active:scale-[0.97] motion-safe:active:duration-[120ms] sm:min-h-9',
-		'border-0 no-underline focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+		'border-0 bg-sea-glass no-underline focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
 		icon && 'size-11 p-0 sm:size-9',
 		danger ? 'tone-danger' : isSolid ? 'tone-primary' : 'tone-neutral',
 		isSolid

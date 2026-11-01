@@ -22,7 +22,10 @@ const twMerge = extendTailwindMerge({
 			'text-shadow': ['emboss', 'solid', 'ink'],
 		},
 		classGroups: {
-			'bg-image': [{ 'bg-sheen': ['surface', 'glow', 'gloss', 'soft', 'well'] }],
+			'bg-image': [
+				{ 'bg-sheen': ['surface', 'glow', 'gloss', 'soft', 'well'] },
+				'bg-sea-glass',
+			],
 		},
 	},
 });
