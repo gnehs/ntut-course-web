@@ -6,15 +6,16 @@ import { cn } from '@/lib/utils';
 
 type CardProps = {
 	to?: string;
+	href?: string;
 	className?: string;
 	children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLElement>;
 
-export function Card({ to, className = '', children, ...props }: CardProps) {
+export function Card({ to, href, className = '', children, ...props }: CardProps) {
 	const cardRef = useRef<HTMLElement | null>(null);
 	const isHoverable = /\bhoverable\b/.test(className);
 	const isBorderless = /\bborderless\b/.test(className);
-	const isInteractive = isHoverable || Boolean(to);
+	const isInteractive = isHoverable || Boolean(to || href);
 	const normalizedClassName = normalizeCardClassName(className, isInteractive);
 	const classes = cn(
 		'relative w-full overflow-hidden rounded-surface !text-foreground !no-underline transition-[background-color,border-color,color,box-shadow] duration-200',
@@ -41,6 +42,20 @@ export function Card({ to, className = '', children, ...props }: CardProps) {
 			<Link ref={cardRef as React.Ref<HTMLAnchorElement>} to={to} className={classes} {...props}>
 				{children}
 			</Link>
+		);
+	}
+	if (href) {
+		return (
+			<a
+				ref={cardRef as React.Ref<HTMLAnchorElement>}
+				href={href}
+				target='_blank'
+				rel='noreferrer'
+				className={classes}
+				{...props}
+			>
+				{children}
+			</a>
 		);
 	}
 	return (

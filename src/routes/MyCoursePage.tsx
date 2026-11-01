@@ -2,12 +2,13 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
-import { BookOpen, Calendar, Clock, Puzzle, Search } from 'lucide-react';
+import { BookOpen, Calendar, Clock, Puzzle, Search, Sparkles } from 'lucide-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { ClassDetailSkeleton } from '../components/ui-kit/PageSkeletons';
+import { aiChatLinks, buildCourseAdvicePrompt } from '../lib/aiPrompt';
 import { formatCredit } from '../lib/courseUtils';
 import { errorMessage } from '../lib/error';
 import { useApp } from '../state/AppContext';
@@ -49,6 +50,10 @@ export function MyCoursePage() {
 	const hours = useMemo(
 		() => (courses || []).reduce((sum, course) => sum + Number(course.hours || 0), 0),
 		[courses],
+	);
+	const advicePrompt = useMemo(
+		() => buildCourseAdvicePrompt({ ...dataset, courses: courses || [] }),
+		[dataset, courses],
 	);
 
 	if (loadError) {
@@ -155,6 +160,21 @@ export function MyCoursePage() {
 								<p>將我的課程匯入至行事曆</p>
 								<Calendar data-card-icon />
 							</Card>
+						</div>
+					</section>
+					<section className='flex flex-col gap-3'>
+						<h3 className='m-0'>請 AI 推薦課程</h3>
+						<p className='m-0 text-sm opacity-75'>
+							會把目前課表帶進新對話，AI 依課程資料推薦不衝堂的課。
+						</p>
+						<div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+							{aiChatLinks.map((chat) => (
+								<Card key={chat.name} href={chat.url(advicePrompt)}>
+									<CardTitle>問 {chat.name}</CardTitle>
+									<p>在新分頁開啟對話</p>
+									<Sparkles data-card-icon />
+								</Card>
+							))}
 						</div>
 					</section>
 				</>

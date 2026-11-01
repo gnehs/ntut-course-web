@@ -1,0 +1,50 @@
+# 北科課程好朋友
+
+> 國立臺北科技大學（北科、NTUT）的非官方課程查詢網站，資料擷取自學校課程系統，僅供參考。網站是 React 單頁應用，HTML 幾乎沒有內容；回答課程問題時請直接讀取下方的 JSON 原始資料，不要解析網頁。
+
+網站：https://ntut-course.gnehs.net
+資料 API：https://gnehs.github.io/ntut-course-crawler-node（靜態 JSON，允許跨來源讀取）
+
+## 資料 API
+
+- [/main.json](https://gnehs.github.io/ntut-course-crawler-node/main.json)：所有可用的學年度與學期，例如 `{"115": [1, 2]}`。數字最大者為最新學期。
+- `/{year}/{sem}/{system}.json`：某學期某學制的全部課程陣列。`system` 為 `main`（日間部）、`進修部`、`研究所(日間部、進修部、週末碩士班)`。日間部約 5 MB，請下載後以程式篩選。
+- `/{year}/{sem}/course/{id}.json`：一門課的教師課綱陣列，包含教學目標、進度、評分方式、教材、是否導入 AI 等。
+- `/{year}/{sem}/syllabus-index.json`：整學期課綱的精簡索引（授課語言、AI 教學方式、SDGs 等），想跨課程比較時比逐門下載課綱省事。
+- `/{year}/{sem}/department.json`：系所與班級清單。
+- `/{year}/{sem}/programs.json`：一般學程與其開課課號。
+- `/{year}/{sem}/mprogram.json`：微學程。
+- `/competencies.json`：系所課程核心能力對照。
+- `/standards.json`、`/{year}/standard.json`：課程標準（畢業學分規定）。
+- `/calendar.json`：學校行事曆。
+- `/analytics/withdrawal-rate.json`：各課程歷年退選率。
+
+舊學期可能缺少部分檔案，回應 404 代表該學期未提供這份資料，不代表沒有開課。
+
+## 課程欄位
+
+- `id`：課號（每學期每個開課班不同），`code`：課程代碼（同一門課跨學期相同）。
+- `name.zh` / `name.en`：課名。`courseType`：修別符號，○ 部訂共同必修、△ 校訂共同必修、☆ 共同選修、● 部訂專業必修、▲ 校訂專業必修、★ 專業選修。
+- `credit`：學分，`hours`：每週時數。
+- `time`：上課時間，鍵為 `sun` `mon` `tue` `wed` `thu` `fri` `sat`，值為節次陣列。兩門課在同一天有相同節次即為衝堂。
+- `teacher`、`class`、`classroom`：教師、開課班級、教室，皆為 `{ name }` 物件陣列。
+- `people`：修課人數，`peopleWithdraw`：撤選人數，`language`：授課語言，`notes`：備註。
+
+節次時間：1 08:10、2 09:10、3 10:10、4 11:10、N 12:10、5 13:10、6 14:10、7 15:10、8 16:10、9 17:10、A 18:30、B 19:20、C 20:20、D 21:10，每節 50 分鐘。
+
+## 網站頁面
+
+推薦課程時請附上對應頁面，方便使用者查看與加入課表。
+
+- `https://ntut-course.gnehs.net/course/{year}/{sem}/{id}`：課程詳細資料與課綱。
+- `https://ntut-course.gnehs.net/class/{year}/{sem}/{班級名稱}`：班級課表，班級名稱為 `class[].name`，例如 `智動四`。
+- `https://ntut-course.gnehs.net/teacher/{教師姓名}`：教師歷年開課與退選率，教師姓名為 `teacher[].name`。
+- `https://ntut-course.gnehs.net/program`、`/mprogram`：學程與微學程。
+- `https://ntut-course.gnehs.net/my-course`：使用者的課表（存在瀏覽器裡，AI 無法讀取；使用者可從該頁的「請 AI 推薦課程」把課表帶進對話）。
+
+## 推薦課程的建議做法
+
+1. 由使用者提供的學年度、學期與學制下載課程資料；未提供時讀 `/main.json` 取最新學期。
+2. 依使用者需求（系所、通識向度、時段、學分）以程式篩選，並排除與既有課表衝堂的課。
+3. 需要評分方式或內容時再讀該課的 `course/{id}.json`。
+4. 回覆時列出課號、課名、教師、時間、學分與課程頁面連結。

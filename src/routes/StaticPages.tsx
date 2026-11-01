@@ -381,6 +381,13 @@ export function DocPage() {
 					在任一網址後方加入 <code>?mode=iframe</code> 即可使用嵌入功能。
 				</li>
 			</ul>
+			<h2>AI 助理</h2>
+			<ul className='list-disc space-y-1 pl-6'>
+				<li>
+					<a href='/llms.txt'>/llms.txt</a> 以 AI 易讀的格式說明資料來源、欄位與網址規則。
+				</li>
+				<li>把這個網址貼給 ChatGPT、Claude 等 AI 助理，即可請它直接讀取原始資料回答課程問題。</li>
+			</ul>
 			<h2>API 文件</h2>
 			<ul className='list-disc space-y-1 pl-6'>
 				<li>這不是學校官方提供的 API</li>

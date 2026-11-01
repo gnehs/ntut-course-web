@@ -1,6 +1,9 @@
 /manifest.webmanifest
   Content-Type: application/manifest+json
 
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
 /*
   Cache-Control: public, max-age=0, must-revalidate
 
