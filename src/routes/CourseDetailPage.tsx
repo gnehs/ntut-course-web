@@ -6,7 +6,6 @@ import {
 	CoursePeekOpenedContext,
 	type PendingExpand,
 	courseSeed,
-	setExpandReveal,
 	takePendingExpand,
 } from '../components/CoursePeek';
 import { CourseTimeChips } from '../components/CourseTimeChips';
@@ -70,12 +69,9 @@ export function CourseDetailPage() {
 		const root = rootRef.current;
 		if (!loaded || !pending) return;
 		pendingRef.current = undefined;
-		if (pending.content && root) {
-			const top = root.getBoundingClientRect().top + window.scrollY - pending.content.top;
+		if (pending.contentTop !== undefined && root) {
+			const top = root.getBoundingClientRect().top + window.scrollY - pending.contentTop;
 			window.scrollTo(0, Math.max(0, top));
-			if (pending.frame) {
-				setExpandReveal(pending.frame, pending.content.left - root.getBoundingClientRect().left);
-			}
 		}
 		pending.arrived();
 	}, [loaded]);
@@ -93,45 +89,86 @@ export function CourseDetailPage() {
 	);
 }
 
+type LoadedCourseDetail = {
+	department: string;
+	course: Course;
+	syllabus: SyllabusItem[];
+	syllabusError: boolean;
+	relatedCourses: Course[];
+	withdrawalRate: number | null;
+	withdrawalDistribution: WithdrawalRateDistribution | null;
+};
+
+// What a peek finished loading, kept for the page it may expand into. The page takes it once, so it
+// opens complete instead of with a skeleton, a refetch and a second large render; anything else loads fresh.
+const handedOffDetails = new Map<string, LoadedCourseDetail>();
+
 export function CourseDetail({
 	year,
 	sem,
 	id,
 	asideTransition = false,
+	handOff = false,
 	onLoaded,
 }: {
 	year: string;
 	sem: string;
 	id: string;
 	asideTransition?: boolean;
+	/** Keeps the loaded detail for the full page, which a peek can expand into. */
+	handOff?: boolean;
 	onLoaded?: () => void;
 }) {
 	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
+	const detailKey = `${year}/${sem}/${id}`;
+	const [handedOff] = useState(() => ({ key: detailKey, detail: handedOffDetails.get(detailKey) }));
+	const cached = handedOff.detail;
+	useEffect(() => {
+		handedOffDetails.delete(handedOff.key);
+	}, []);
 	// A course opened from a list is already in hand, so its summary renders before the fetches settle.
 	const [courseDepartment, setCourseDepartment] = useState(
-		() => courseSeed(year, sem, id)?.department || dataset.department,
+		() => cached?.department || courseSeed(year, sem, id)?.department || dataset.department,
 	);
 	const [course, setCourse] = useState<Course | null>(
-		() => courseSeed(year, sem, id)?.course ?? null,
+		() => cached?.course ?? courseSeed(year, sem, id)?.course ?? null,
 	);
-	const [loaded, setLoaded] = useState(false);
+	const [loaded, setLoaded] = useState(Boolean(cached));
 	const opened = use(CoursePeekOpenedContext);
 	useEffect(() => {
 		if (loaded) onLoaded?.();
 	}, [loaded]);
-	const [syllabus, setSyllabus] = useState<SyllabusItem[]>([]);
-	const [relatedCourses, setRelatedCourses] = useState<Course[]>([]);
-	const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
+	const [syllabus, setSyllabus] = useState<SyllabusItem[]>(cached?.syllabus ?? []);
+	const [relatedCourses, setRelatedCourses] = useState<Course[]>(cached?.relatedCourses ?? []);
+	const [withdrawalRate, setWithdrawalRate] = useState<number | null>(
+		cached?.withdrawalRate ?? null,
+	);
 	const [withdrawalDistribution, setWithdrawalDistribution] =
-		useState<WithdrawalRateDistribution | null>(null);
+		useState<WithdrawalRateDistribution | null>(cached?.withdrawalDistribution ?? null);
 	const [selectedSyllabusIndex, setSelectedSyllabusIndex] = useState('0');
 	const [error, setError] = useState<unknown>(null);
-	const [syllabusError, setSyllabusError] = useState(false);
+	const [syllabusError, setSyllabusError] = useState(cached?.syllabusError ?? false);
 	const [version, setVersion] = useState(0);
+
+	function showDetail(detail: LoadedCourseDetail) {
+		setCourseDepartment(detail.department);
+		setSyllabusError(detail.syllabusError);
+		setCourse(detail.course);
+		setSyllabus(detail.syllabus);
+		setRelatedCourses(detail.relatedCourses);
+		setWithdrawalRate(detail.withdrawalRate);
+		setWithdrawalDistribution(detail.withdrawalDistribution);
+		setLoaded(true);
+	}
 
 	useEffect(() => {
 		let cancelled = false;
 		async function load() {
+			if (handedOff.detail && handedOff.key === `${year}/${sem}/${id}`) {
+				setError(null);
+				showDetail(handedOff.detail);
+				return;
+			}
 			const seed = courseSeed(year, sem, id);
 			setError(null);
 			setLoaded(false);
@@ -191,19 +228,20 @@ export function CourseDetail({
 					.filter((value) => value !== null && value !== undefined && String(value).trim() !== '')
 					.map(Number)
 					.filter((value) => Number.isFinite(value) && value >= 0);
+				const detail: LoadedCourseDetail = {
+					department: foundDepartment,
+					course: found,
+					syllabus: detailItems,
+					syllabusError: detailResult.status === 'rejected',
+					relatedCourses: courses,
+					withdrawalRate: teacherRates.length ? Math.max(...teacherRates) : null,
+					withdrawalDistribution: createWithdrawalRateDistribution(Object.values(rate)),
+				};
+				if (handOff && !detail.syllabusError) handedOffDetails.set(`${year}/${sem}/${id}`, detail);
 				await opened;
 				if (cancelled) return;
 				// The syllabus and similar course lists are a large render; yielding keeps the page responsive.
-				startTransition(() => {
-					setCourseDepartment(foundDepartment);
-					setSyllabusError(detailResult.status === 'rejected');
-					setCourse(found);
-					setSyllabus(detailItems);
-					setRelatedCourses(courses);
-					setWithdrawalRate(teacherRates.length ? Math.max(...teacherRates) : null);
-					setWithdrawalDistribution(createWithdrawalRateDistribution(Object.values(rate)));
-					setLoaded(true);
-				});
+				startTransition(() => showDetail(detail));
 			} catch (e) {
 				if (!cancelled) setError(e);
 			}

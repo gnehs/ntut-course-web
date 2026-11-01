@@ -382,31 +382,15 @@
 	animation: dialog-content-out 140ms ease-in;
 }
 
-/* Expanding a course peek: the page is revealed out of the peek's frame while the old screen stays
-   put under it. The content was scrolled and shifted onto the peek's, so it barely moves; the edges
-   open out and the sidebar slides to where it sticks on the page. */
-:root.peek-expanding::view-transition-old(root) {
-	animation: none;
-}
-
-:root.peek-expanding::view-transition-new(root) {
-	animation: peek-expand 340ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-@keyframes peek-expand {
-	from {
-		clip-path: var(--peek-expand-from);
-		translate: var(--peek-expand-dx, 0px) 0;
-	}
-
-	to {
-		clip-path: inset(0px 0px 0px 0px round 0px);
-		translate: 0 0;
-	}
+/* Expanding a course peek: by the time this runs the peek fills the window with its content on the
+   page's column, so the page only crossfades in and the sidebar slides to where it sticks. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 180ms;
 }
 
 ::view-transition-group(course-detail-aside) {
-	animation-duration: 340ms;
+	animation-duration: 260ms;
 	animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 

@@ -131,41 +131,66 @@ export function CourseLink({
 
 /**
  * The course sidebar sticks under the panel's top in a peek and under the navbar on the page, so it
- * moves on its own while the page is revealed around it.
+ * slides on its own while the rest of the page crossfades in.
  */
 export const COURSE_ASIDE_TRANSITION = 'course-detail-aside';
 
 /**
- * A peek being expanded: where its content and frame sat on screen, so the page can line itself up
- * with them, and a callback the page calls once it is ready, which ends the view transition's update.
+ * A peek being expanded: where its content sat on screen, so the page can scroll to match, and a
+ * callback the page calls once it is ready, which ends the view transition's update.
  */
-export type PendingExpand = {
-	content: DOMRect | undefined;
-	frame: DOMRect | undefined;
-	arrived: () => void;
-};
+export type PendingExpand = { contentTop: number | undefined; arrived: () => void };
 let pendingExpand: PendingExpand | undefined;
-
-/**
- * Starts the revealed page shifted by `dx` so its content sits over the peek's, with its clip moved
- * the other way so the visible window still matches the peek's frame; both settle to zero.
- */
-export function setExpandReveal(frame: DOMRect, dx: number) {
-	const root = document.documentElement;
-	const inset = [
-		frame.top,
-		root.clientWidth - frame.right + dx,
-		window.innerHeight - frame.bottom,
-		frame.left - dx,
-	].map((value) => `${Math.max(0, value)}px`);
-	root.style.setProperty('--peek-expand-from', `inset(${inset.join(' ')} round 18px)`);
-	root.style.setProperty('--peek-expand-dx', `${dx}px`);
-}
 
 export function takePendingExpand() {
 	const pending = pendingExpand;
 	pendingExpand = undefined;
 	return pending;
+}
+
+/** Left edge of the page's content column, from the padding `Layout` gives its main element. */
+function pageContentLeft() {
+	const width = document.documentElement.clientWidth;
+	return Math.max(width >= 1024 ? 24 : 16, (width - 1024) / 2);
+}
+
+/**
+ * Grows the peek's backdrop out to the whole window and slides its content onto the page's column.
+ * Only the compositor works here; the page's render comes after, while the screen is still.
+ */
+function growPeekIntoPage() {
+	const frame = document.querySelector<HTMLElement>('[data-peek-frame]');
+	const content = document.querySelector('[data-peek-body] > *');
+	if (!frame || !content) return Promise.resolve();
+	const from = frame.getBoundingClientRect();
+	const root = document.documentElement;
+	const backdrop = document.createElement('div');
+	backdrop.className = 'bg-backdrop fixed inset-0';
+	frame.before(backdrop);
+	const timing: KeyframeAnimationOptions = { duration: 300, easing: panelEasing, fill: 'forwards' };
+	const inset = [
+		from.top,
+		root.clientWidth - from.right,
+		window.innerHeight - from.bottom,
+		from.left,
+	];
+	backdrop.animate(
+		[
+			{ clipPath: `inset(${inset.map((value) => `${value}px`).join(' ')} round 18px)` },
+			{ clipPath: 'inset(0px 0px 0px 0px round 0px)' },
+		],
+		timing,
+	);
+	document
+		.querySelector('[data-peek-actions]')
+		?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: 'forwards' });
+	const dx = pageContentLeft() - content.getBoundingClientRect().left;
+	return frame
+		.animate([{ transform: 'none' }, { transform: `translateX(${dx}px)` }], timing)
+		.finished.then(
+			() => {},
+			() => {},
+		);
 }
 
 /** Starts the requests the detail view makes; requests already in flight are shared. */
@@ -191,37 +216,30 @@ export function CoursePeek() {
 		if (current) router.history.go(-current.depth);
 	}
 
-	// The router updates its location before its own view transition captures the old state, which
-	// would drop the peek from that snapshot, so the transition is started here instead.
-	function expand({ year, sem, id }: CoursePeekState) {
-		const content = document.querySelector('[data-peek-body] > *')?.getBoundingClientRect();
-		const frame = document.querySelector('[data-peek-frame]')?.getBoundingClientRect();
+	// The page's render is too heavy to start during an animation, so the peek first grows to fill
+	// the window on its own, then the page is swapped in under a short crossfade while nothing moves.
+	// The transition is started here rather than by the router, which updates its location before
+	// capturing the old state and would drop the peek from that snapshot.
+	async function expand({ year, sem, id }: CoursePeekState) {
 		const go = () =>
 			navigate({ to: `/course/${year}/${sem}/${id}`, replace: true, resetScroll: false });
+		const contentTop = () =>
+			document.querySelector('[data-peek-body] > *')?.getBoundingClientRect().top;
 		if (reducedMotion() || typeof document.startViewTransition !== 'function') {
-			pendingExpand = { content, frame: undefined, arrived: () => {} };
+			pendingExpand = { contentTop: contentTop(), arrived: () => {} };
 			void go();
 			return;
 		}
-		// The page opens out of the peek's frame, the same way the peek opened out of its card.
-		const root = document.documentElement;
-		if (frame) {
-			setExpandReveal(frame, 0);
-			root.classList.add('peek-expanding');
-		}
-		const transition = document.startViewTransition(async () => {
+		await growPeekIntoPage();
+		const top = contentTop();
+		document.startViewTransition(async () => {
 			const arrived = new Promise<void>((resolve) => {
-				pendingExpand = { content, frame, arrived: resolve };
-				// The page normally has the prefetched data within a few frames; never hold the screen long.
+				pendingExpand = { contentTop: top, arrived: resolve };
+				// The page normally has the peek's data at once; never hold the screen long.
 				window.setTimeout(resolve, 500);
 			});
 			await go();
 			await arrived;
-		});
-		void transition.finished.finally(() => {
-			root.classList.remove('peek-expanding');
-			root.style.removeProperty('--peek-expand-from');
-			root.style.removeProperty('--peek-expand-dx');
 		});
 	}
 
@@ -315,6 +333,7 @@ function PeekDialog({ peek, onClose, onExpand }: PeekViewProps) {
 			<DialogPrimitive.Portal forceMount>
 				<DialogPrimitive.Overlay asChild forceMount>
 					<motion.div
+						data-peek-overlay
 						className='fixed inset-0 z-50 bg-black/45 backdrop-blur-[3px]'
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
@@ -360,6 +379,7 @@ function PeekDialog({ peek, onClose, onExpand }: PeekViewProps) {
 						</div>
 					</div>
 					<motion.div
+						data-peek-actions
 						className='flex flex-col gap-2 self-start'
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1, transition: { delay: 0.1, duration: 0.15 } }}
@@ -495,6 +515,7 @@ const PeekDetail = memo(function PeekDetail({
 					sem={peek.sem}
 					id={peek.id}
 					asideTransition
+					handOff
 				/>
 			</CoursePeekOpenedContext>
 		</AdsEnabledContext>
