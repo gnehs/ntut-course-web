@@ -9,11 +9,7 @@ import { ExternalLink, Info, MapPin, Minus, Plus, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import {
-	CourseDetailSkeleton,
-	SkeletonBlock,
-	SkeletonCard,
-} from '../components/ui-kit/PageSkeletons';
+import { CourseDetailSkeleton, SkeletonBlock } from '../components/ui-kit/PageSkeletons';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
@@ -225,17 +221,11 @@ export function CourseDetail({ year, sem, id }: { year: string; sem: string; id:
 					<div className='rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)]'>
 						<CourseStat label='課號' value={currentCourse.id} />
 						<CourseStat label='學分' value={formatCredit(course.credit)} />
-						{loaded ? (
-							<WithdrawalRateStat
-								withdrawalRate={withdrawalRate}
-								distribution={withdrawalDistribution}
-							/>
-						) : (
-							<div className='px-4 py-3'>
-								<SkeletonBlock className='h-6 w-14' />
-								<SkeletonBlock className='mt-2 h-3 w-10' />
-							</div>
-						)}
+						<WithdrawalRateStat
+							loading={!loaded}
+							withdrawalRate={withdrawalRate}
+							distribution={withdrawalDistribution}
+						/>
 					</div>
 					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] md:grid-cols-3 md:divide-x md:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y'>
 						<InfoSection
@@ -298,7 +288,7 @@ export function CourseDetail({ year, sem, id }: { year: string; sem: string; id:
 					</div>
 				</div>
 				{showSidebarAd ? (
-					<div className='has-[[data-ad-collapsed]]:hidden'>
+					<div className='empty:hidden has-[[data-ad-collapsed]]:hidden'>
 						<AdsByGoogle placement='sidebar' />
 					</div>
 				) : null}
@@ -344,15 +334,24 @@ export function CourseDetail({ year, sem, id }: { year: string; sem: string; id:
 				[selectedSyllabus.objective, selectedSyllabus.schedule, selectedSyllabus.materials]
 					.join('')
 					.trim().length >= 400 ? (
-					<div className='has-[[data-ad-collapsed]]:hidden'>
+					<div className='empty:hidden has-[[data-ad-collapsed]]:hidden'>
 						<AdsByGoogle placement='section' />
 					</div>
 				) : null}
 				{!loaded ? (
-					<SkeletonCard>
-						<SkeletonBlock className='h-5 w-28' />
-						<SkeletonBlock className='mt-3 h-40 w-full' />
-					</SkeletonCard>
+					<div className={panelClassName}>
+						<section className={docSectionClassName}>
+							<div className={docHeadingClassName}>
+								<SkeletonBlock className='h-[1lh] w-16' />
+							</div>
+							<div className='flex flex-col gap-2 leading-relaxed'>
+								<SkeletonBlock className='h-[1lh] w-full' />
+								<SkeletonBlock className='h-[1lh] w-full' />
+								<SkeletonBlock className='h-[1lh] w-4/5' />
+								<SkeletonBlock className='h-[1lh] w-3/5' />
+							</div>
+						</section>
+					</div>
 				) : null}
 				{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
 				{loaded && !syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
@@ -379,7 +378,7 @@ export function CourseDetail({ year, sem, id }: { year: string; sem: string; id:
 				) : null}
 				{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
 				{/* An unfilled slot is removed from the column so it leaves no gap between the panels. */}
-				<div className='has-[[data-ad-collapsed]]:hidden'>
+				<div className='empty:hidden has-[[data-ad-collapsed]]:hidden'>
 					<AdsByGoogle placement='section' />
 				</div>
 				<CourseSourceLinks course={course} />
@@ -445,9 +444,12 @@ function CourseStat({ label, value }: { label: string; value: React.ReactNode })
 }
 
 function WithdrawalRateStat({
+	loading,
 	withdrawalRate,
 	distribution,
 }: {
+	/** Placeholders take the value's and the badge's line boxes, so the row keeps its height once loaded. */
+	loading: boolean;
 	withdrawalRate: number | null;
 	distribution: WithdrawalRateDistribution | null;
 }) {
@@ -479,14 +481,16 @@ function WithdrawalRateStat({
 						/>
 					</TooltipTrigger>
 					<div className='truncate text-lg leading-tight font-semibold tabular-nums'>
-						{withdrawalRateLabel}
+						{loading ? <SkeletonBlock className='h-[1lh] w-14' /> : withdrawalRateLabel}
 					</div>
 					<div className='mt-1 flex flex-wrap items-center gap-x-1 text-xs leading-tight'>
 						<span className='text-muted-foreground inline-flex items-center gap-0.5'>
 							退選率
 							<Info aria-hidden='true' className='size-[1em]' />
 						</span>
-						{withdrawalRate !== null ? (
+						{loading ? (
+							<SkeletonBlock className='h-[1lh] w-16 text-xs' />
+						) : withdrawalRate !== null ? (
 							<WithdrawalRateBadge level={classification.level} label={classification.label} />
 						) : null}
 					</div>
@@ -903,7 +907,7 @@ function SimilarCourses({
 	if (!sameName.length && !sameTeacher.length) return null;
 	return (
 		<>
-			<div className='has-[[data-ad-collapsed]]:hidden'>
+			<div className='empty:hidden has-[[data-ad-collapsed]]:hidden'>
 				<AdsByGoogle placement='section' />
 			</div>
 			{[

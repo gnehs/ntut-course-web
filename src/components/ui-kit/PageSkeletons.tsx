@@ -6,7 +6,7 @@ export function SkeletonBlock({ className = '' }: { className?: string }) {
 	);
 }
 
-export function SkeletonCard({
+function SkeletonCard({
 	children,
 	className = '',
 }: {
