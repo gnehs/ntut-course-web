@@ -1,17 +1,7 @@
 import { Link, useNavigate, useRouter, useRouterState } from '@tanstack/react-router';
-import {
-	createContext,
-	memo,
-	useEffect,
-	useId,
-	useRef,
-	useState,
-	useSyncExternalStore,
-} from 'react';
+import { createContext, memo, useEffect, useId, useRef, useState } from 'react';
 import type React from 'react';
 import { Maximize2, X } from 'lucide-react';
-import { AnimatePresence, MotionConfig, motion, useIsPresent } from 'motion/react';
-import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Drawer } from 'vaul';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import { CourseDetail } from '../routes/CourseDetailPage';
@@ -210,7 +200,6 @@ export function CoursePeek() {
 	const peek = useRouterState({ select: (state) => state.location.state.coursePeek });
 	const router = useRouter();
 	const navigate = useNavigate();
-	const compact = useMediaQuery('(max-width: 767px)');
 	const pathname = useRouterState({ select: (state) => state.location.pathname });
 	// The sheet keeps the last peek rendered after its history entry is gone, so it can slide out.
 	const [shown, setShown] = useState(peek);
@@ -258,35 +247,22 @@ export function CoursePeek() {
 	const expanded = !peek && shown && pathname === `/course/${shown.year}/${shown.sem}/${shown.id}`;
 	if (expanded) return null;
 
-	return (
-		<MotionConfig reducedMotion='user'>
-			{compact ? (
-				shown ? (
-					<PeekSheet
-						open={Boolean(peek)}
-						peek={shown}
-						onClose={close}
-						onExpand={() => expand(shown)}
-					/>
-				) : null
-			) : (
-				<AnimatePresence>
-					{peek ? (
-						<PeekDrawer key='drawer' peek={peek} onClose={close} onExpand={() => expand(peek)} />
-					) : null}
-				</AnimatePresence>
-			)}
-		</MotionConfig>
-	);
+	return shown ? (
+		<PeekSheet open={Boolean(peek)} peek={shown} onClose={close} onExpand={() => expand(shown)} />
+	) : null;
 }
 
 type PeekViewProps = { peek: CoursePeekState; onClose: () => void; onExpand: () => void };
 
-/**
- * A drawer over the right of the page. The dimmed page behind it takes no hover or clicks; a press
- * there closes the drawer.
- */
-function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
+// Even enough that the motion reads as movement rather than a jump in the first few frames.
+const panelEasing = 'cubic-bezier(0.2, 0, 0, 1)';
+
+function reducedMotion() {
+	return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+}
+
+/** A sheet from the bottom of the screen, on phones and desktops alike; centred and capped when wide. */
+function PeekSheet({ open, peek, onClose, onExpand }: PeekViewProps & { open: boolean }) {
 	const opened = useOpenedSignal();
 	const seed = courseSeed(peek.year, peek.sem, peek.id);
 	// The slide runs on animation frames, which a background tab never gets; the data must not wait on it.
@@ -294,103 +270,6 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 		const timeout = window.setTimeout(opened.resolve, 500);
 		return () => window.clearTimeout(timeout);
 	}, []);
-	// Released as soon as the drawer starts to close, not once it has slid away.
-	const present = useIsPresent();
-	const [width] = useState(drawerWidth);
-	useEffect(() => {
-		if (!present) return;
-		return lockPageScroll();
-	}, [present]);
-	return (
-		<DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
-			<DialogPrimitive.Portal forceMount>
-				<motion.div
-					aria-hidden='true'
-					data-peek-overlay
-					className='bg-sea-glass fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]'
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					transition={{ duration: 0.2 }}
-				/>
-				<DialogPrimitive.Content
-					asChild
-					forceMount
-					aria-describedby={undefined}
-					onFocusOutside={(event) => event.preventDefault()}
-				>
-					<motion.div
-						data-peek-frame
-						style={{ width }}
-						className='bg-backdrop text-foreground shadow-overlay fixed inset-y-0 right-0 z-50 flex flex-col outline-none'
-						initial={{ x: '100%' }}
-						animate={{ x: 0 }}
-						exit={{ x: '100%' }}
-						transition={drawerTransition}
-						onAnimationComplete={(target: { x?: number | string }) => {
-							if (target.x === 0) opened.resolve();
-						}}
-					>
-						<div
-							data-peek-actions
-							className='flex h-14 shrink-0 items-center gap-1 border-b border-[rgba(var(--vs-text),0.08)] pr-3 pl-6'
-						>
-							<DialogPrimitive.Title className='min-w-0 flex-1 truncate text-sm font-medium tabular-nums'>
-								{seed ? `${peek.id} ${seed.course.name?.zh || ''}` : peek.id}
-							</DialogPrimitive.Title>
-							<PeekActions onClose={onClose} onExpand={onExpand} />
-						</div>
-						<div
-							data-peek-body
-							className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6 [--course-sticky-top:0px]'
-						>
-							<div className='@container'>
-								<PeekDetail peek={peek} opened={opened.promise} />
-							</div>
-						</div>
-					</motion.div>
-				</DialogPrimitive.Content>
-			</DialogPrimitive.Portal>
-		</DialogPrimitive.Root>
-	);
-}
-
-/** Wide enough for the course's two-column layout, leaving at least 22rem of the page in view. */
-function drawerWidth() {
-	return Math.min(896, window.innerWidth - 352);
-}
-
-let pageScrollLocks = 0;
-
-/**
- * Holds the page still behind the drawer. The scrollbar's width is padded back so the page does not
- * shift sideways. Counted, so a drawer opening while the last one is still sliding out does not
- * restore a locked state.
- */
-function lockPageScroll() {
-	const root = document.documentElement;
-	if (pageScrollLocks++ === 0) {
-		const scrollbar = window.innerWidth - root.clientWidth;
-		root.style.overflow = 'hidden';
-		if (scrollbar > 0) root.style.paddingRight = `${scrollbar}px`;
-	}
-	return () => {
-		if (--pageScrollLocks > 0) return;
-		root.style.overflow = '';
-		root.style.paddingRight = '';
-	};
-}
-
-// Even enough that the motion reads as movement rather than a jump in the first few frames.
-const panelEasing = 'cubic-bezier(0.2, 0, 0, 1)';
-const drawerTransition = { duration: 0.32, ease: [0.2, 0, 0, 1] } as const;
-
-function reducedMotion() {
-	return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-}
-
-function PeekSheet({ open, peek, onClose, onExpand }: PeekViewProps & { open: boolean }) {
-	const opened = useOpenedSignal();
 	return (
 		<Drawer.Root
 			open={open}
@@ -398,20 +277,25 @@ function PeekSheet({ open, peek, onClose, onExpand }: PeekViewProps & { open: bo
 			onAnimationEnd={(value) => value && opened.resolve()}
 		>
 			<Drawer.Portal>
-				<Drawer.Overlay className='fixed inset-0 z-50 bg-black/45' />
+				<Drawer.Overlay className='bg-sea-glass fixed inset-0 z-50 bg-black/20 backdrop-blur-[2px]' />
 				<Drawer.Content
 					aria-describedby={undefined}
 					data-peek-frame
-					className='rounded-t-overlay shadow-overlay bg-backdrop text-foreground fixed inset-x-0 bottom-0 z-50 flex h-[calc(100dvh-2.5rem)] flex-col outline-none'
+					className='rounded-t-overlay shadow-overlay bg-backdrop text-foreground fixed inset-x-0 bottom-0 z-50 mx-auto flex h-[calc(100dvh-2.5rem)] w-full max-w-[1072px] flex-col outline-none'
 				>
-					<Drawer.Title className='sr-only'>課程預覽</Drawer.Title>
-					<div className='relative flex h-14 shrink-0 items-center justify-end gap-2 px-3'>
+					<div
+						data-peek-actions
+						className='relative flex h-14 shrink-0 items-center gap-1 pr-3 pl-4 sm:pl-6'
+					>
 						<Drawer.Handle className='absolute! top-2 left-1/2 -translate-x-1/2' />
+						<Drawer.Title className='min-w-0 flex-1 truncate text-sm font-medium tabular-nums'>
+							{seed ? `${peek.id} ${seed.course.name?.zh || ''}` : peek.id}
+						</Drawer.Title>
 						<PeekActions onClose={onClose} onExpand={onExpand} />
 					</div>
 					<div
 						data-peek-body
-						className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]'
+						className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] [--course-sticky-top:0px] sm:px-6'
 					>
 						<div className='@container'>
 							<PeekDetail peek={peek} opened={opened.promise} />
@@ -462,19 +346,6 @@ function PeekActions({ onClose, onExpand }: { onClose: () => void; onExpand: () 
 
 function peekKey(peek: CoursePeekState | undefined) {
 	return peek ? `${peek.year}/${peek.sem}/${peek.id}/${peek.depth}` : '';
-}
-
-function useMediaQuery(query: string) {
-	return useSyncExternalStore(
-		(onChange) => {
-			if (typeof window.matchMedia !== 'function') return () => {};
-			const media = window.matchMedia(query);
-			media.addEventListener('change', onChange);
-			return () => media.removeEventListener('change', onChange);
-		},
-		() => typeof window.matchMedia === 'function' && window.matchMedia(query).matches,
-		() => false,
-	);
 }
 
 function PeekButton({
