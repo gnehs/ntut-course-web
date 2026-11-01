@@ -960,16 +960,18 @@ export function StatusPage() {
 	);
 }
 
+const workflowNames: Record<string, string> = {
+	'fetch current courses': '取得本學期課程',
+	'fetch current departments': '取得本學期科系',
+	'fetch current programs': '取得本學期一般學程與微學程',
+	'fetch standards': '取得課程標準',
+	'rerun failed fetches': '重新擷取失敗的資料',
+	'pages build and deployment': 'API 資料建置與部署',
+	'Run Analytics & Fatch calendar': '分析課程資料與取得行事曆',
+};
+
 function parseName(name: string) {
-	if (name === 'fetch current courses') return '取得本學期課程';
-	if (name === 'fetch current departments') return '取得本學期科系';
-	if (name === 'fetch current mprograms') return '取得本學期微學程';
-	if (name === 'fetch current programs') return '取得本學期一般學程與微學程';
-	if (name === 'fetch standards') return '取得課程標準';
-	if (name === 'pages build and deployment') return 'API 資料建置與部署';
-	if (name === 'Run Analytics & Fatch calendar') return '分析課程資料與取得行事曆';
-	if (name === 'Run Analytics') return '分析課程資料';
-	return name;
+	return workflowNames[name] ?? name;
 }
 
 function timeSince(date: Date) {

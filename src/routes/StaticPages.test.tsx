@@ -29,7 +29,7 @@ describe('StatusPage', () => {
 						},
 						{
 							id: 2,
-							name: 'fetch current mprograms',
+							name: 'rerun failed fetches',
 							status: 'completed',
 							event: 'schedule',
 							created_at: '2026-06-03T11:50:00.000Z',
@@ -43,7 +43,7 @@ describe('StatusPage', () => {
 		render(<StatusPage />);
 
 		expect(await screen.findByText('取得本學期課程')).toBeInTheDocument();
-		expect(screen.getByText('取得本學期微學程')).toBeInTheDocument();
+		expect(screen.getByText('重新擷取失敗的資料')).toBeInTheDocument();
 		expect(screen.getByText('5 分鐘', { exact: false })).toBeInTheDocument();
 	});
 
