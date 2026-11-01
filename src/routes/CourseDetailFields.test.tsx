@@ -35,6 +35,8 @@ vi.mock('@tanstack/react-router', () => ({
 		</a>
 	),
 	useParams: () => ({ year: '115', sem: '1', id: 'COURSE-001' }),
+	useRouterState: ({ select = (state) => state } = {}) =>
+		select({ location: { pathname: '/course/115/1/COURSE-001', hash: '', state: {} } }),
 }));
 
 const baseCourse: Course = {
@@ -458,8 +460,6 @@ describe('CourseDetailPage course and syllabus fields', () => {
 
 		expect(await screen.findByRole('heading', { name: '測試課程' })).toBeInTheDocument();
 		expect(screen.getByText('CODE-001', { exact: true })).toBeInTheDocument();
-		expect(screen.getByRole('alert')).toHaveTextContent(
-			'課程大綱暫時無法載入，請稍後再試。',
-		);
+		expect(screen.getByRole('alert')).toHaveTextContent('課程大綱暫時無法載入，請稍後再試。');
 	});
 });

@@ -129,6 +129,45 @@ export function CourseLink({
 	);
 }
 
+/**
+ * The course sidebar sticks under the panel's top in a peek and under the navbar on the page, so it
+ * moves on its own while the page is revealed around it.
+ */
+export const COURSE_ASIDE_TRANSITION = 'course-detail-aside';
+
+/**
+ * A peek being expanded: where its content and frame sat on screen, so the page can line itself up
+ * with them, and a callback the page calls once it is ready, which ends the view transition's update.
+ */
+export type PendingExpand = {
+	content: DOMRect | undefined;
+	frame: DOMRect | undefined;
+	arrived: () => void;
+};
+let pendingExpand: PendingExpand | undefined;
+
+/**
+ * Starts the revealed page shifted by `dx` so its content sits over the peek's, with its clip moved
+ * the other way so the visible window still matches the peek's frame; both settle to zero.
+ */
+export function setExpandReveal(frame: DOMRect, dx: number) {
+	const root = document.documentElement;
+	const inset = [
+		frame.top,
+		root.clientWidth - frame.right + dx,
+		window.innerHeight - frame.bottom,
+		frame.left - dx,
+	].map((value) => `${Math.max(0, value)}px`);
+	root.style.setProperty('--peek-expand-from', `inset(${inset.join(' ')} round 18px)`);
+	root.style.setProperty('--peek-expand-dx', `${dx}px`);
+}
+
+export function takePendingExpand() {
+	const pending = pendingExpand;
+	pendingExpand = undefined;
+	return pending;
+}
+
 /** Starts the requests the detail view makes; requests already in flight are shared. */
 function prefetchCourse(year: string, sem: string, id: string) {
 	fetchCourseDetail(year, sem, id).catch(() => {});
@@ -140,6 +179,7 @@ export function CoursePeek() {
 	const router = useRouter();
 	const navigate = useNavigate();
 	const compact = useMediaQuery('(max-width: 767px)');
+	const pathname = useRouterState({ select: (state) => state.location.pathname });
 	// The sheet keeps the last peek rendered after its history entry is gone, so it can slide out.
 	const [shown, setShown] = useState(peek);
 	if (peek && peekKey(peek) !== peekKey(shown)) setShown(peek);
@@ -151,9 +191,44 @@ export function CoursePeek() {
 		if (current) router.history.go(-current.depth);
 	}
 
+	// The router updates its location before its own view transition captures the old state, which
+	// would drop the peek from that snapshot, so the transition is started here instead.
 	function expand({ year, sem, id }: CoursePeekState) {
-		void navigate({ to: `/course/${year}/${sem}/${id}`, replace: true });
+		const content = document.querySelector('[data-peek-body] > *')?.getBoundingClientRect();
+		const frame = document.querySelector('[data-peek-frame]')?.getBoundingClientRect();
+		const go = () =>
+			navigate({ to: `/course/${year}/${sem}/${id}`, replace: true, resetScroll: false });
+		if (reducedMotion() || typeof document.startViewTransition !== 'function') {
+			pendingExpand = { content, frame: undefined, arrived: () => {} };
+			void go();
+			return;
+		}
+		// The page opens out of the peek's frame, the same way the peek opened out of its card.
+		const root = document.documentElement;
+		if (frame) {
+			setExpandReveal(frame, 0);
+			root.classList.add('peek-expanding');
+		}
+		const transition = document.startViewTransition(async () => {
+			const arrived = new Promise<void>((resolve) => {
+				pendingExpand = { content, frame, arrived: resolve };
+				// The page normally has the prefetched data within a few frames; never hold the screen long.
+				window.setTimeout(resolve, 500);
+			});
+			await go();
+			await arrived;
+		});
+		void transition.finished.finally(() => {
+			root.classList.remove('peek-expanding');
+			root.style.removeProperty('--peek-expand-from');
+			root.style.removeProperty('--peek-expand-dx');
+		});
 	}
+
+	// Expanding hands the peek over to the page in a view transition, so it leaves at once instead
+	// of playing its closing animation into the new page's snapshot.
+	const expanded = !peek && shown && pathname === `/course/${shown.year}/${shown.sem}/${shown.id}`;
+	if (expanded) return null;
 
 	return (
 		<MotionConfig reducedMotion='user'>
@@ -265,6 +340,7 @@ function PeekDialog({ peek, onClose, onExpand }: PeekViewProps) {
 					<div
 						ref={attachPanel}
 						data-peek-surface
+						data-peek-frame
 						className='bg-backdrop text-foreground rounded-overlay relative w-full max-w-[1072px] overflow-hidden'
 					>
 						{/* Starts as the card's surface and settles into the page backdrop. */}
@@ -277,6 +353,7 @@ function PeekDialog({ peek, onClose, onExpand }: PeekViewProps) {
 						/>
 						<div
 							ref={bodyRef}
+							data-peek-body
 							className='relative h-full overflow-y-auto overscroll-contain px-6 py-6 [--course-sticky-top:0px]'
 						>
 							<PeekDetail peek={peek} opened={opened.promise} />
@@ -381,6 +458,7 @@ function PeekSheet({ open, peek, onClose, onExpand }: PeekViewProps & { open: bo
 				<Drawer.Overlay className='fixed inset-0 z-50 bg-black/45' />
 				<Drawer.Content
 					aria-describedby={undefined}
+					data-peek-frame
 					className='rounded-t-overlay shadow-overlay bg-backdrop text-foreground fixed inset-x-0 bottom-0 z-50 flex h-[calc(100dvh-2.5rem)] flex-col outline-none'
 				>
 					<Drawer.Title className='sr-only'>課程預覽</Drawer.Title>
@@ -388,7 +466,10 @@ function PeekSheet({ open, peek, onClose, onExpand }: PeekViewProps & { open: bo
 						<Drawer.Handle className='absolute! top-2 left-1/2 -translate-x-1/2' />
 						<PeekActions onClose={onClose} onExpand={onExpand} />
 					</div>
-					<div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]'>
+					<div
+						data-peek-body
+						className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))]'
+					>
 						<PeekDetail peek={peek} opened={opened.promise} />
 					</div>
 				</Drawer.Content>
@@ -408,7 +489,13 @@ const PeekDetail = memo(function PeekDetail({
 	return (
 		<AdsEnabledContext value={false}>
 			<CoursePeekOpenedContext value={opened}>
-				<CourseDetail key={peekKey(peek)} year={peek.year} sem={peek.sem} id={peek.id} />
+				<CourseDetail
+					key={peekKey(peek)}
+					year={peek.year}
+					sem={peek.sem}
+					id={peek.id}
+					asideTransition
+				/>
 			</CoursePeekOpenedContext>
 		</AdsEnabledContext>
 	);

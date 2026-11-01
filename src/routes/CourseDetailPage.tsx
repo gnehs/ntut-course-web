@@ -1,9 +1,17 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
-import { CourseLink, CoursePeekOpenedContext, courseSeed } from '../components/CoursePeek';
+import {
+	COURSE_ASIDE_TRANSITION,
+	CourseLink,
+	CoursePeekOpenedContext,
+	type PendingExpand,
+	courseSeed,
+	setExpandReveal,
+	takePendingExpand,
+} from '../components/CoursePeek';
 import { CourseTimeChips } from '../components/CourseTimeChips';
-import { Link, useParams } from '@tanstack/react-router';
-import { Fragment, startTransition, use, useEffect, useMemo, useState } from 'react';
+import { Link, useParams, useRouterState } from '@tanstack/react-router';
+import { Fragment, startTransition, use, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { ExternalLink, Info, MapPin, Minus, Plus, User } from 'lucide-react';
 import { toast } from 'sonner';
@@ -44,10 +52,60 @@ type InfoCardItem = [string, React.ReactNode];
 
 export function CourseDetailPage() {
 	const { year, sem, id } = useParams({ from: '/course/$year/$sem/$id' });
-	return <CourseDetail year={year} sem={sem} id={id} />;
+	const rootRef = useRef<HTMLDivElement>(null);
+	// A peek opened over this page names its own sidebar while it is open; two would cancel the transition.
+	const peekOpen = useRouterState({ select: (state) => Boolean(state.location.state.coursePeek) });
+
+	const pendingRef = useRef<PendingExpand | undefined>(undefined);
+	const [loaded, setLoaded] = useState(false);
+	useEffect(() => {
+		pendingRef.current ??= takePendingExpand();
+	}, []);
+
+	// Arriving from an expanded peek, the page waits for its data so it is as tall as the peek was,
+	// then scrolls its content to where it already sat on screen and lets the transition capture it.
+	// Passive effects run after the closing peek has released its scroll lock.
+	useEffect(() => {
+		const pending = pendingRef.current;
+		const root = rootRef.current;
+		if (!loaded || !pending) return;
+		pendingRef.current = undefined;
+		if (pending.content && root) {
+			const top = root.getBoundingClientRect().top + window.scrollY - pending.content.top;
+			window.scrollTo(0, Math.max(0, top));
+			if (pending.frame) {
+				setExpandReveal(pending.frame, pending.content.left - root.getBoundingClientRect().left);
+			}
+		}
+		pending.arrived();
+	}, [loaded]);
+
+	return (
+		<div ref={rootRef}>
+			<CourseDetail
+				year={year}
+				sem={sem}
+				id={id}
+				asideTransition={!peekOpen}
+				onLoaded={() => setLoaded(true)}
+			/>
+		</div>
+	);
 }
 
-export function CourseDetail({ year, sem, id }: { year: string; sem: string; id: string }) {
+export function CourseDetail({
+	year,
+	sem,
+	id,
+	asideTransition = false,
+	onLoaded,
+}: {
+	year: string;
+	sem: string;
+	id: string;
+	asideTransition?: boolean;
+	onLoaded?: () => void;
+}) {
 	const { dataset, getCourses, getMyCourseIds, addCourse, removeCourse } = useApp();
 	// A course opened from a list is already in hand, so its summary renders before the fetches settle.
 	const [courseDepartment, setCourseDepartment] = useState(
@@ -58,6 +116,9 @@ export function CourseDetail({ year, sem, id }: { year: string; sem: string; id:
 	);
 	const [loaded, setLoaded] = useState(false);
 	const opened = use(CoursePeekOpenedContext);
+	useEffect(() => {
+		if (loaded) onLoaded?.();
+	}, [loaded]);
 	const [syllabus, setSyllabus] = useState<SyllabusItem[]>([]);
 	const [relatedCourses, setRelatedCourses] = useState<Course[]>([]);
 	const [withdrawalRate, setWithdrawalRate] = useState<number | null>(null);
@@ -206,6 +267,7 @@ export function CourseDetail({ year, sem, id }: { year: string; sem: string; id:
 			</header>
 			<aside
 				aria-label='課程詳細資訊'
+				style={{ viewTransitionName: asideTransition ? COURSE_ASIDE_TRANSITION : undefined }}
 				className='flex min-w-0 flex-col gap-3 lg:sticky lg:top-[var(--course-sticky-top,74px)] lg:col-start-2 lg:row-span-2 lg:row-start-1'
 			>
 				<Button
