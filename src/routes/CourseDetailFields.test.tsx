@@ -218,12 +218,13 @@ describe('CourseDetailPage course and syllabus fields', () => {
 
 		for (const [label, value] of [
 			['延伸教學與資源', '延伸教學資源測試'],
-			['課程對應SDGs指標', 'SDG4：優質教育測試'],
 			['課程是否導入AI', '導入 AI 測試'],
 		]) {
 			expect(screen.getByRole('heading', { name: label })).toBeInTheDocument();
 			expect(screen.getByText(value, { exact: true })).toBeInTheDocument();
 		}
+		expect(screen.getByRole('heading', { name: '課程對應SDGs指標' })).toBeInTheDocument();
+		expect(screen.getByRole('img', { name: 'SDG 4：優質教育' })).toBeInTheDocument();
 	});
 
 	it('renders office hours as one safe dedicated link without exposing its raw key', async () => {
@@ -302,6 +303,33 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		const content = heading.nextElementSibling;
 		expect(content?.textContent).toBe('第一段\n\n第二段\n第三段');
 	});
+
+	it.each([
+		[
+			'讓學生了解投資的基本觀念，課程內容介紹證券、期貨與選擇權的投資，以及 CAPM 等訂價模式。\n\nThe course helps students understand the knowledge of investment.',
+			'讓學生了解投資的基本觀念，課程內容介紹證券、期貨與選擇權的投資，以及 CAPM 等訂價模式。',
+		],
+		[
+			'This course is taught in English and covers investment fundamentals.',
+			'This course is taught in English and covers investment fundamentals.',
+		],
+		[
+			'Course Title: Dynamics (動力學)\nCourse Contents: Force, mass, and acceleration, particle kinematics, particle dynamics, work and energy.',
+			'Course Title: Dynamics (動力學)\n\nCourse Contents: Force, mass, and acceleration, particle kinematics, particle dynamics, work and energy.',
+		],
+		[
+			'讓學生了解投資的基本觀念，以及證券、期貨與選擇權的投資和評價模式。請參閱連結:\nhttps://example.com/course\nStudents learn the basic ideas of investment and how securities are valued.',
+			'讓學生了解投資的基本觀念，以及證券、期貨與選擇權的投資和評價模式。請參閱連結:\nhttps://example.com/course',
+		],
+	])(
+		'drops only the English translation of a Chinese course outline',
+		async (objective, expected) => {
+			await renderCourseDetail([{ ...baseSyllabus, objective }]);
+
+			const heading = screen.getByRole('heading', { name: '課程大綱' });
+			expect(heading.nextElementSibling?.textContent).toBe(expected);
+		},
+	);
 
 	it('renders populated audit, lab, and interdisciplinary course attributes', async () => {
 		mocks.getCourses.mockResolvedValue([

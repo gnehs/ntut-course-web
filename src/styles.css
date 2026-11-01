@@ -320,7 +320,6 @@
 	:root {
 		color-scheme: dark;
 		--vs-primary: 255, 132, 64;
-		--vs-primary-foreground: 32, 14, 4;
 		--vs-text: 245, 245, 247;
 		/* Surfaces sit above the page, so they are the lighter of the two. */
 		--vs-background: 44, 44, 46;

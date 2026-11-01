@@ -17,9 +17,9 @@ import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { CourseDetailSkeleton, SkeletonBlock } from '../components/ui-kit/PageSkeletons';
-import { Select, SelectOption } from '../components/ui-kit/Select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
+import { checklistFields, renderSyllabusIndicator } from '../components/SyllabusIndicators';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import { isCourseHidden } from '../lib/contentVisibility';
 import { hasMeaningfulValue } from '../lib/courseFilters';
@@ -145,7 +145,6 @@ export function CourseDetail({
 	);
 	const [withdrawalDistribution, setWithdrawalDistribution] =
 		useState<WithdrawalRateDistribution | null>(cached?.withdrawalDistribution ?? null);
-	const [selectedSyllabusIndex, setSelectedSyllabusIndex] = useState('0');
 	const [error, setError] = useState<unknown>(null);
 	const [syllabusError, setSyllabusError] = useState(cached?.syllabusError ?? false);
 	const [version, setVersion] = useState(0);
@@ -175,7 +174,6 @@ export function CourseDetail({
 			setCourse(seed?.course ?? null);
 			if (seed?.department) setCourseDepartment(seed.department);
 			setSyllabusError(false);
-			setSelectedSyllabusIndex('0');
 			try {
 				const [detailResult, coursesResult, rateResult] = await Promise.allSettled([
 					fetchCourseDetail(year, sem, id),
@@ -261,7 +259,7 @@ export function CourseDetail({
 		);
 	}, [course, relatedCourses, courseDepartment, version]);
 	const conflicted = conflictCourses.length > 0;
-	const selectedSyllabus = syllabus[Number(selectedSyllabusIndex)] || null;
+	const selectedSyllabus = syllabus[0] ?? null;
 	// The sidebar only sits beside the content on wide screens; on phones this slot would push the description down.
 	const [showSidebarAd] = useState(
 		() =>
@@ -456,28 +454,7 @@ export function CourseDetail({
 				) : null}
 				{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
 				{loaded && !syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
-				{syllabus.length > 1 ? (
-					<Alert className='flex flex-col gap-3'>
-						<div>
-							<strong>含有多項資料</strong>
-							<div className='text-sm opacity-80'>
-								本課程含有多項資料可供查詢，請使用下拉式選單選取教師來查看資料。
-							</div>
-						</div>
-						<Select
-							aria-label='選擇課綱教師'
-							value={selectedSyllabusIndex}
-							onChange={(value) => setSelectedSyllabusIndex(value)}
-						>
-							{syllabus.map((item, index) => (
-								<SelectOption key={`${item.name}-${index}`} value={String(index)}>
-									{item.name || `課綱 ${index + 1}`}
-								</SelectOption>
-							))}
-						</Select>
-					</Alert>
-				) : null}
-				{selectedSyllabus ? <SyllabusDetail item={selectedSyllabus} /> : null}
+				{syllabus.length ? <SyllabusDetail items={syllabus} /> : null}
 				{/* An unfilled slot is removed from the column so it leaves no gap between the panels. */}
 				<div className='empty:hidden has-[[data-ad-collapsed]]:hidden'>
 					<AdsByGoogle placement='section' />
@@ -754,46 +731,124 @@ const syllabusMetadata = new Set([
 	'covid19',
 ]);
 
-function SyllabusDetail({ item }: { item: SyllabusItem }) {
-	const officeHoursUrl = officialCourseUrl(item.officeHoursLink, 'mobile');
-	const additionalFields = Object.entries(item).filter(
-		([key]) => !syllabusMetadata.has(key) && !Object.hasOwn(syllabusTextFields, key),
-	);
+function comparableValue(value: unknown) {
+	return typeof value === 'string' ? value.replace(/\s+/g, '') : JSON.stringify(value ?? null);
+}
+
+function teacherName(item: SyllabusItem, index: number) {
+	return item.name?.trim() || `教師 ${index + 1}`;
+}
+
+type SyllabusVariant = { teachers: string[]; text: string };
+
+// Teachers who share a course mostly agree on some fields and differ on others, so each field is
+// shown once when everyone filed the same text and otherwise lists each distinct version under
+// the teachers who wrote it.
+function syllabusVariants(items: SyllabusItem[], field: string) {
+	const variants = new Map<string, SyllabusVariant>();
+	items.forEach((item, index) => {
+		const value = item[field];
+		const raw =
+			checklistFields.has(field ?? '') && typeof value === 'string'
+				? value.trim()
+				: syllabusDisplayText(value);
+		const text = field === 'objective' ? withoutEnglishTranslation(raw) : raw;
+		if (!text) return;
+		const key = comparableValue(text);
+		const variant = variants.get(key);
+		if (variant) variant.teachers.push(teacherName(item, index));
+		else variants.set(key, { teachers: [teacherName(item, index)], text });
+	});
+	return [...variants.values()];
+}
+
+function SyllabusDetail({ items }: { items: SyllabusItem[] }) {
+	const covid19 = items.find((item) => item.covid19)?.covid19;
+	const additionalFields = [
+		...new Set(
+			items.flatMap((item) =>
+				Object.keys(item).filter(
+					(key) => !syllabusMetadata.has(key) && !Object.hasOwn(syllabusTextFields, key),
+				),
+			),
+		),
+	];
+	const foreignTextbooks = syllabusVariants(
+		items.map((item) => ({
+			...item,
+			foreignLanguageTextbooks: item.foreignLanguageTextbooks === true,
+		})),
+		'foreignLanguageTextbooks',
+	).find((variant) => variant.text === '是');
+	const latestUpdate = items
+		.map((item) => item.latestUpdate?.trim())
+		.filter(Boolean)
+		.sort()
+		.at(-1);
 	return (
 		<div className={`${panelClassName} ${dividerClassName}`}>
-			{item.covid19 ? <CovidInfo covid19={item.covid19} /> : null}
+			{covid19 ? <CovidInfo covid19={covid19} /> : null}
 			<section className={docSectionClassName}>
 				<h3 className={docHeadingClassName}>教師</h3>
-				<div className='flex min-w-0 flex-col items-start gap-1'>
-					<HtmlText as='p' text={[item.name, item.email].filter(Boolean).join(' ') || '無資料'} />
-					{officeHoursUrl ? (
-						<a
-							href={officeHoursUrl}
-							className={courseTextLinkClassName}
-							target='_blank'
-							rel='noreferrer'
-						>
-							教師諮商時間
-						</a>
-					) : null}
-				</div>
+				<ul className='m-0 flex min-w-0 list-none flex-col gap-1.5 p-0'>
+					{items.map((teacher, index) => {
+						const officeHoursUrl = officialCourseUrl(teacher.officeHoursLink, 'mobile');
+						return (
+							<li key={index} className='flex min-w-0 flex-wrap items-baseline gap-x-3'>
+								<HtmlText
+									as='p'
+									text={[teacher.name, teacher.email].filter(Boolean).join(' ') || '無資料'}
+								/>
+								{officeHoursUrl ? (
+									<a
+										href={officeHoursUrl}
+										className={courseTextLinkClassName}
+										target='_blank'
+										rel='noreferrer'
+									>
+										教師諮商時間
+									</a>
+								) : null}
+							</li>
+						);
+					})}
+				</ul>
 			</section>
 			{Object.entries(syllabusTextFields).map(([key, label]) => (
-				<TextSection key={key} label={label} value={item[key]} weekly={key === 'schedule'} />
+				<VariantSection
+					key={key}
+					label={label}
+					variants={syllabusVariants(items, key)}
+					teacherCount={items.length}
+					field={key}
+				/>
 			))}
-			{additionalFields.map(([key, value]) => (
-				<TextSection key={key} label={key} value={value} />
+			{additionalFields.map((key) => (
+				<VariantSection
+					key={key}
+					label={key}
+					variants={syllabusVariants(items, key)}
+					teacherCount={items.length}
+					field={key}
+				/>
 			))}
 			{/* The crawler also emits false when the school's answer is blank. */}
-			{item.foreignLanguageTextbooks === true ? (
+			{foreignTextbooks ? (
 				<section className={docSectionClassName}>
-					<h3 className={`${docHeadingClassName} col-span-full`}>使用外文原文書籍：是</h3>
+					<h3 className={`${docHeadingClassName} col-span-full`}>
+						使用外文原文書籍：是
+						{foreignTextbooks.teachers.length < items.length ? (
+							<span className='text-muted-foreground font-normal'>
+								（{foreignTextbooks.teachers.join('、')}）
+							</span>
+						) : null}
+					</h3>
 				</section>
 			) : null}
-			{item.latestUpdate?.trim() ? (
+			{latestUpdate ? (
 				<section className={docSectionClassName}>
 					<h3 className={docHeadingClassName}>最後更新</h3>
-					<p className='my-0 opacity-75'>{formatLatestUpdate(item.latestUpdate)}</p>
+					<p className='my-0 opacity-75'>{formatLatestUpdate(latestUpdate)}</p>
 				</section>
 			) : null}
 		</div>
@@ -802,15 +857,7 @@ function SyllabusDetail({ item }: { item: SyllabusItem }) {
 
 const emptySyllabusText = new Set(['無', '● 無 (None)', '無（None）', '● 無（None）']);
 
-function TextSection({
-	label,
-	value,
-	weekly = false,
-}: {
-	label: string;
-	value: unknown;
-	weekly?: boolean;
-}) {
+function syllabusDisplayText(value: unknown) {
 	const text =
 		typeof value === 'string'
 			? value.trim()
@@ -821,32 +868,80 @@ function TextSection({
 				: typeof value === 'number' && Number.isFinite(value)
 					? String(value)
 					: '';
-	if (!text || emptySyllabusText.has(text)) return null;
-	const schedule = weekly ? parseWeeklySchedule(text) : null;
+	return text && !emptySyllabusText.has(text) ? text : '';
+}
+
+function TextSection({ label, value, field }: { label: string; value: unknown; field?: string }) {
+	const text =
+		checklistFields.has(field ?? '') && typeof value === 'string'
+			? value.trim()
+			: syllabusDisplayText(value);
+	if (!text) return null;
 	return (
 		<section className={docSectionClassName}>
 			<h3 className={docHeadingClassName}>{label}</h3>
-			{schedule ? (
-				<div className='flex min-w-0 flex-col gap-3'>
-					{schedule.intro ? <HtmlText as='p' text={schedule.intro} /> : null}
-					<ol className='m-0 grid list-none grid-cols-[auto_minmax(0,1fr)] gap-x-4 p-0'>
-						{schedule.weeks.map((week, index) => (
-							<li
-								key={`${week.label}-${index}`}
-								className='col-span-full grid grid-cols-subgrid border-t border-[rgba(var(--vs-text),0.08)] py-2 first:border-t-0 first:pt-0 last:pb-0'
-							>
-								<span className='text-muted-foreground font-medium whitespace-nowrap tabular-nums'>
-									{week.label}
-								</span>
-								<HtmlText as='div' text={week.content} />
-							</li>
-						))}
-					</ol>
-				</div>
-			) : (
-				<HtmlText as='p' text={formatSyllabusText(text)} />
-			)}
+			<SyllabusText text={text} field={field} />
 		</section>
+	);
+}
+
+function VariantSection({
+	label,
+	variants,
+	teacherCount,
+	field,
+}: {
+	label: string;
+	variants: SyllabusVariant[];
+	teacherCount: number;
+	field?: string;
+}) {
+	if (!variants.length) return null;
+	if (variants.length === 1 && variants[0].teachers.length === teacherCount) {
+		return <TextSection label={label} value={variants[0].text} field={field} />;
+	}
+	return (
+		<section className={docSectionClassName}>
+			<h3 className={docHeadingClassName}>{label}</h3>
+			<div className='flex min-w-0 flex-col'>
+				{variants.map((variant, index) => (
+					<div
+						key={index}
+						className='flex min-w-0 flex-col gap-1 border-t border-[rgba(var(--vs-text),0.08)] py-3 first:border-t-0 first:pt-0 last:pb-0'
+					>
+						<p className='text-muted-foreground m-0 text-sm font-medium'>
+							{variant.teachers.join('、')}
+						</p>
+						<SyllabusText text={variant.text} field={field} />
+					</div>
+				))}
+			</div>
+		</section>
+	);
+}
+
+function SyllabusText({ text, field }: { text: string; field?: string }) {
+	const indicator = renderSyllabusIndicator(field, text);
+	if (indicator) return indicator;
+	const schedule = field === 'schedule' ? parseWeeklySchedule(text) : null;
+	if (!schedule) return <HtmlText as='p' text={formatSyllabusText(text)} />;
+	return (
+		<div className='flex min-w-0 flex-col gap-3'>
+			{schedule.intro ? <HtmlText as='p' text={schedule.intro} /> : null}
+			<ol className='m-0 grid list-none grid-cols-[auto_minmax(0,1fr)] gap-x-4 p-0'>
+				{schedule.weeks.map((week, index) => (
+					<li
+						key={`${week.label}-${index}`}
+						className='col-span-full grid grid-cols-subgrid border-t border-[rgba(var(--vs-text),0.08)] py-2 first:border-t-0 first:pt-0 last:pb-0'
+					>
+						<span className='text-muted-foreground font-medium whitespace-nowrap tabular-nums'>
+							{week.label}
+						</span>
+						<HtmlText as='div' text={week.content} />
+					</li>
+				))}
+			</ol>
+		</div>
 	);
 }
 
@@ -858,11 +953,52 @@ function formatSyllabusText(text: string) {
 
 const cjkPattern = /[\u3400-\u9fff]/;
 
+const isEnglishParagraph = (line: string) =>
+	line.length >= 40 && !cjkPattern.test(line) && /[A-Za-z]{3}/.test(line);
+
+const listItemPattern = /^\s*(\d+\s*[.)、．]|[(（]\d+[)）]|[-•●■▪*])/;
+const urlLinePattern = /^\s*https?:\/\/\S+\s*$/;
+const visibleLength = (text: string) => text.replace(/\s/g, '').length;
+
+// The course outline usually repeats itself in English beside the Chinese. Checked against every
+// outline of 115-1, a run of lines without Chinese is only taken for that translation when most of
+// it is English prose; list items are left out of that count so a list that mixes languages keeps
+// its English entries, and a link stays in place. When little Chinese remains, or the English
+// outweighs it many times over, the English is the real content (an English-taught course with a
+// Chinese heading), so the outline is kept whole.
+function withoutEnglishTranslation(text: string) {
+	if (!cjkPattern.test(text)) return text;
+	const isProse = (line: string) => isEnglishParagraph(line) && !listItemPattern.test(line);
+	const kept: string[] = [];
+	let run: string[] = [];
+	let removed = 0;
+	const flush = () => {
+		const prose = visibleLength(run.filter(isProse).join(''));
+		if (prose && prose * 2 >= visibleLength(run.join(''))) {
+			removed += visibleLength(run.filter((line) => !urlLinePattern.test(line)).join(''));
+			kept.push(...run.filter((line) => urlLinePattern.test(line)));
+		} else {
+			kept.push(...run);
+		}
+		run = [];
+	};
+	for (const line of text.split('\n')) {
+		if (cjkPattern.test(line)) {
+			flush();
+			kept.push(line);
+		} else {
+			run.push(line);
+		}
+	}
+	flush();
+	const result = kept.join('\n').trim();
+	const chinese = result.match(new RegExp(cjkPattern.source, 'g'))?.length ?? 0;
+	return removed && chinese >= 30 && removed <= chinese * 12 ? result : text;
+}
+
 // Teachers often paste the English translation right under the Chinese text; a blank line keeps
 // the two from reading as one paragraph.
 function separateLanguages(text: string) {
-	const isEnglishParagraph = (line: string) =>
-		line.length >= 40 && !cjkPattern.test(line) && /[A-Za-z]{3}/.test(line);
 	const lines = text.split('\n');
 	return lines
 		.flatMap((line, index) => {
