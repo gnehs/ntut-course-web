@@ -294,7 +294,7 @@ export function CourseDetail({
 	}
 
 	return (
-		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-x-6'>
+		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-6'>
 			<header className='flex min-w-0 flex-col gap-1 lg:col-start-1'>
 				<h1 className='m-0 text-2xl leading-snug font-semibold'>
 					<CourseDetailTitle course={currentCourse} />

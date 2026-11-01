@@ -375,7 +375,7 @@ export function EmptyRoomSkeleton() {
 
 export function CourseDetailSkeleton() {
 	return (
-		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-x-6'>
+		<div className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-6'>
 			<div className='grid gap-2 lg:col-start-1'>
 				<SkeletonBlock className='h-8 w-48 max-w-full' />
 				<SkeletonBlock className='h-4 w-72 max-w-full' />
