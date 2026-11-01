@@ -380,7 +380,8 @@ type CoverContent = {
 };
 
 // The cover is laid out like a printed book: flat artwork with the lettering
-// printed on top in a pale tint of the glass.
+// printed on top in a pale tint of the glass, then the glass's frosted grain
+// clipped to the lettering so the print sits in the same surface.
 function BookCoverDesign({ cover, ...content }: CoverContent & { cover: BookCover }) {
 	return (
 		<div
@@ -395,6 +396,7 @@ function BookCoverDesign({ cover, ...content }: CoverContent & { cover: BookCove
 		>
 			<CoverArt cover={cover} />
 			<CoverText {...content} color={cover.tint} />
+			<CoverText {...content} color='transparent' grain={coverGrainUri(cover)} />
 		</div>
 	);
 }
@@ -635,7 +637,34 @@ function CoverArt({ cover }: { cover: BookCover }) {
 	);
 }
 
-function CoverText({ code, title, subtitle, period, color }: CoverContent & { color: string }) {
+// Tileable speckles: sparse dark flecks of the glass colour and fainter white ones,
+// the same frost the render's bump map gives the book.
+function coverGrainUri(cover: BookCover) {
+	const speckles = (
+		channel: number,
+		color: string,
+		alpha: string,
+		opacity: number,
+		seed: number,
+	) => `
+		<filter id="s${seed}" x="0" y="0" width="100%" height="100%">
+			<feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="${seed}" stitchTiles="stitch"/>
+			<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  ${[0, 1, 2].map((i) => (i === channel ? 3.2 : 0)).join(' ')} 0 ${alpha}"/>
+			<feComposite operator="in" in="SourceGraphic"/>
+		</filter>
+		<rect width="96" height="96" fill="${color}" opacity="${opacity}" filter="url(#s${seed})"/>`;
+	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96">${speckles(0, `rgb(${cover.shade})`, '-2.05', 0.35, 1)}${speckles(1, '#ffffff', '-1.95', 0.8, 2)}</svg>`;
+	return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+}
+
+function CoverText({
+	code,
+	title,
+	subtitle,
+	period,
+	color,
+	grain,
+}: CoverContent & { color: string; grain?: string }) {
 	const titleSize =
 		title.length <= 2
 			? 92
@@ -648,7 +677,12 @@ function CoverText({ code, title, subtitle, period, color }: CoverContent & { co
 						: title.length <= 10
 							? 40
 							: 32;
-	const rule = { height: 2, width: '100%', background: color } as const;
+	const paint = grain
+		? ({ backgroundImage: grain, backgroundClip: 'text' } as const)
+		: ({} as const);
+	const rule = grain
+		? ({ height: 2, width: '100%', backgroundImage: grain } as const)
+		: ({ height: 2, width: '100%', background: color } as const);
 	return (
 		<div
 			style={{
@@ -656,6 +690,7 @@ function CoverText({ code, title, subtitle, period, color }: CoverContent & { co
 				flexDirection: 'column',
 				padding: '22px 24px',
 				color,
+				...paint,
 				fontWeight: 700,
 			}}
 		>
