@@ -47,6 +47,10 @@ const changelogEntries: ChangelogEntry[] = [
 		date: '2026-11-01',
 		changes: [
 			{
+				title: '在課程列表與搜尋結果點選課程時，改以預覽視窗開啟，不必離開目前頁面。',
+				details: ['預覽時網址會同步成課程頁面，可直接分享；按右側按鈕可開啟完整頁面。'],
+			},
+			{
 				title: '我的課程新增「請 AI 推薦課程」。',
 				details: [
 					'一鍵把目前的課表帶進 ChatGPT 或 Claude，請它推薦不會衝堂的課程。',
