@@ -23,6 +23,15 @@ describe('AddCalendarPage date defaults', () => {
 		expect(resolveEndDate(calendar, '114', '1')).toBe('2026-01-04');
 	});
 
+	it('ignores the previous term finals that fall in January', () => {
+		const spring = [
+			...calendar,
+			event('2026-02-23T00:00:00.000Z', '2026-02-24T00:00:00.000Z', '開學正式上課'),
+			event('2026-06-15T00:00:00.000Z', '2026-06-21T00:00:00.000Z', '期末考試'),
+		];
+		expect(resolveEndDate(spring, '114', '2')).toBe('2026-06-14');
+	});
+
 	it('falls back to valid semester dates when calendar events are missing', () => {
 		expect(resolveStartDate([], '113', '2')).toBe('2025-01-02');
 		expect(resolveEndDate([], '113', '2')).toBe('2025-06-30');

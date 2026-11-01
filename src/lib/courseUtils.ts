@@ -122,7 +122,8 @@ const generalCourseDomains: { name: string; pattern: RegExp; color: string }[] =
 	{ name: '社會與法治', pattern: /社會與法治|社法/, color: '#2196F3' },
 	{ name: '自然與科學', pattern: /自然與科學|自然/, color: '#4CAF50' },
 ];
-const generalCourseDomainToken = /(創新與創業|人文與藝術|社會與法治|自然與科學|創創|人文|社法|自然)(向度)?/;
+const generalCourseDomainToken =
+	/(創新與創業|人文與藝術|社會與法治|自然與科學|創創|人文|社法|自然)(向度)?/;
 // Pre-109 tracks map onto the current domains by their wording, e.g. 歷史與文化 → 人文與藝術.
 const legacyTrackColors: [RegExp, string][] = [
 	[/創新與創業/, '#FFC107'],
@@ -228,7 +229,8 @@ export function findSimilarCourses(course: Course, courses: Course[]) {
 	const sameName = key ? candidates.filter((item) => similarCourseKey(item) === key) : [];
 	const sameTeacher = candidates.filter(
 		(item) =>
-			!sameName.includes(item) && (item.teacher || []).some((teacher) => teachers.has(teacher.name)),
+			!sameName.includes(item) &&
+			(item.teacher || []).some((teacher) => teachers.has(teacher.name)),
 	);
 	return { sameName, sameTeacher };
 }
@@ -320,6 +322,11 @@ export function formatIcsDate(date: Date) {
 	].join('');
 }
 
+function formatIsoDate(date: Date) {
+	const pad = (value: number) => String(value).padStart(2, '0');
+	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 export function escapeIcsText(value: unknown) {
 	return String(value || '')
 		.replaceAll('\\', '\\\\')
@@ -349,14 +356,18 @@ export function buildCourseCalendar({
 	untilDate,
 	year,
 	sem,
+	holidays = [],
 }: {
 	courses: CalendarCourse[];
 	startDate: string;
 	untilDate: string;
 	year: string;
 	sem: string;
+	holidays?: string[];
 }) {
 	const events: string[] = [];
+	const until = parseLocalDate(untilDate);
+	const daysOff = new Set(holidays);
 	for (const course of courses) {
 		for (const [weekday, slots] of Object.entries(course.time || {}) as [string, string[]][]) {
 			if (!slots.length) continue;
@@ -370,6 +381,10 @@ export function buildCourseCalendar({
 			begin.setHours(startHour, startMinute, 0, 0);
 			const stop = new Date(eventDay);
 			stop.setHours(endHour, endMinute, 0, 0);
+			const skipped: string[] = [];
+			for (const day = new Date(begin); day <= until; day.setDate(day.getDate() + 7)) {
+				if (daysOff.has(formatIsoDate(day))) skipped.push(formatIcsDate(day));
+			}
 			events.push(
 				[
 					'BEGIN:VEVENT',
@@ -377,7 +392,8 @@ export function buildCourseCalendar({
 					`DTSTAMP;TZID=Asia/Taipei:${formatIcsDate(new Date())}`,
 					`DTSTART;TZID=Asia/Taipei:${formatIcsDate(begin)}`,
 					`DTEND;TZID=Asia/Taipei:${formatIcsDate(stop)}`,
-					`RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=${formatIcsDate(parseLocalDate(untilDate))}`,
+					`RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=${formatIcsDate(until)}`,
+					...(skipped.length ? [`EXDATE;TZID=Asia/Taipei:${skipped.join(',')}`] : []),
 					`SUMMARY:${escapeIcsText(course.name)}`,
 					`DESCRIPTION:${escapeIcsText(course.description)}`,
 					`LOCATION:${escapeIcsText(course.classroom)}`,

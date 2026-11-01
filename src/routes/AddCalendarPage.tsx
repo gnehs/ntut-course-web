@@ -1,6 +1,14 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Clock, Download, RefreshCw, Search } from 'lucide-react';
+import {
+	AlertCircle,
+	CalendarOff,
+	CheckCircle2,
+	Clock,
+	Download,
+	RefreshCw,
+	Search,
+} from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,10 +17,10 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '../components/ui-kit/Button';
 import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
-import { fetchCalendar } from '../lib/courseApi';
+import { fetchCalendar, fetchHolidays } from '../lib/courseApi';
 import { buildCourseCalendar, trimEllip } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
-import type { CalendarCourse, CalendarEvent } from '../types/course';
+import type { CalendarCourse, CalendarEvent, Holiday } from '../types/course';
 
 export function AddCalendarPage() {
 	const { dataset, getCourses, getMyCourseIds } = useApp();
@@ -20,6 +28,8 @@ export function AddCalendarPage() {
 	const [start, setStart] = useState('');
 	const [until, setUntil] = useState('');
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [holidays, setHolidays] = useState<Holiday[] | null>(null);
+	const [holidaysFailed, setHolidaysFailed] = useState(false);
 
 	useEffect(() => {
 		if (!dataset.year || !dataset.sem) return undefined;
@@ -59,6 +69,30 @@ export function AddCalendarPage() {
 		};
 	}, [dataset.year, dataset.sem, dataset.department]);
 
+	const startYear = Number(start.slice(0, 4));
+	const untilYear = Number(until.slice(0, 4));
+	useEffect(() => {
+		if (!startYear || !untilYear || untilYear < startYear) return undefined;
+		let cancelled = false;
+		const years = Array.from(
+			{ length: untilYear - startYear + 1 },
+			(_, index) => startYear + index,
+		);
+		Promise.allSettled(years.map(fetchHolidays)).then((results) => {
+			if (cancelled) return;
+			setHolidays(results.flatMap((result) => (result.status === 'fulfilled' ? result.value : [])));
+			setHolidaysFailed(results.some((result) => result.status === 'rejected'));
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [startYear, untilYear]);
+
+	const holidaysInRange = useMemo(
+		() => (holidays || []).filter((holiday) => holiday.date >= start && holiday.date <= until),
+		[holidays, start, until],
+	);
+
 	const selectedCourses = useMemo(
 		() => (courses || []).filter((course) => selectedIds.includes(course.id)),
 		[courses, selectedIds],
@@ -78,6 +112,7 @@ export function AddCalendarPage() {
 			untilDate: until,
 			year: dataset.year,
 			sem: dataset.sem,
+			holidays: holidaysInRange.map((holiday) => holiday.date),
 		});
 		const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
 		const a = document.createElement('a');
@@ -225,13 +260,33 @@ export function AddCalendarPage() {
 					</Button>
 				</CardContent>
 			</Card>
-			<Alert>
-				<AlertCircle />
-				<AlertTitle>已知問題</AlertTitle>
-				<AlertDescription>
-					目前尚未撰寫跳過連假的功能，因此遇到連假時行事曆上仍會有課程。
-				</AlertDescription>
-			</Alert>
+			{hasCourses ? (
+				<Alert>
+					{holidaysFailed ? <AlertCircle /> : <CalendarOff />}
+					<AlertTitle>
+						{holidaysFailed
+							? '無法取得完整的放假日'
+							: holidays
+								? `會跳過 ${holidaysInRange.length} 天放假日`
+								: '正在讀取放假日…'}
+					</AlertTitle>
+					<AlertDescription>
+						{holidaysFailed
+							? '部分年度的政府行政機關辦公日曆表尚未公布或讀取失敗，那些日子的課程仍會出現在行事曆上。'
+							: '依人事行政總處「政府行政機關辦公日曆表」排除國定假日與補假；校慶等學校自訂的停課日仍需自行刪除。'}
+						{holidaysInRange.length ? (
+							<div className='mt-2 flex flex-wrap gap-1.5'>
+								{holidaysInRange.map((holiday) => (
+									<Badge key={holiday.date} variant='outline'>
+										{Number(holiday.date.slice(5, 7))}/{Number(holiday.date.slice(8, 10))}{' '}
+										{holiday.name}
+									</Badge>
+								))}
+							</div>
+						) : null}
+					</AlertDescription>
+				</Alert>
+			) : null}
 		</div>
 	);
 }
@@ -247,9 +302,12 @@ export function resolveStartDate(calendar: CalendarEvent[], rocYear: string, sem
 
 export function resolveEndDate(calendar: CalendarEvent[], rocYear: string, sem: string) {
 	const window = semesterWindow(rocYear, sem);
+	// The spring window opens in January, while the autumn term's finals are still on.
+	const firstDay = parseIsoDate(resolveStartDate(calendar, rocYear, sem));
 	const finalExam = calendar
 		.filter((item) => isInsideSemesterWindow(item, window))
 		.filter((item) => item.summary?.includes('期末考試'))
+		.filter((item) => calendarDate(item.start) > firstDay)
 		.sort((a, b) => calendarDate(a.start).getTime() - calendarDate(b.start).getTime())[0];
 	if (!finalExam) return isoDate(window.fallbackEnd);
 
@@ -290,6 +348,11 @@ function calendarDate(value: string) {
 
 function calendarIsoDate(value: string) {
 	return isoDate(calendarDate(value));
+}
+
+function parseIsoDate(value: string) {
+	const [year, month, day] = value.split('-').map(Number);
+	return new Date(year, month - 1, day);
 }
 
 function isoDate(date: Date) {

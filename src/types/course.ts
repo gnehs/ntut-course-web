@@ -134,6 +134,12 @@ export type WithdrawalResponse = {
 	stat?: WithdrawalStat[] | Record<string, string | number>;
 };
 
+/** A day off, as `YYYY-MM-DD`. */
+export type Holiday = {
+	date: string;
+	name: string;
+};
+
 export type CalendarEvent = {
 	type: string;
 	uid?: string;

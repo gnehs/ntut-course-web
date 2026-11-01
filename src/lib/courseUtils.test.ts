@@ -83,7 +83,11 @@ describe('courseUtils', () => {
 				notes,
 			}) as unknown as Course;
 		const current = sports('1', '羽球');
-		const { sameName } = findSimilarCourses(current, [current, sports('2', '羽球'), sports('3', '籃球')]);
+		const { sameName } = findSimilarCourses(current, [
+			current,
+			sports('2', '羽球'),
+			sports('3', '籃球'),
+		]);
 
 		expect(sameName.map((item) => item.id)).toEqual(['2']);
 	});
@@ -135,6 +139,27 @@ describe('courseUtils', () => {
 		expect(calendar).toContain('RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20240112T000000');
 	});
 
+	it('skips class meetings that fall on holidays', () => {
+		const calendar = buildCourseCalendar({
+			year: '112',
+			sem: '1',
+			startDate: '2023-09-04',
+			untilDate: '2024-01-12',
+			holidays: ['2023-10-09', '2023-10-10', '2024-01-01'],
+			courses: [
+				{
+					id: '123456',
+					name: '微積分',
+					description: '',
+					classroom: '',
+					link: '',
+					time: { mon: ['1', '2'], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] },
+				},
+			],
+		});
+		expect(calendar).toContain('EXDATE;TZID=Asia/Taipei:20231009T081000,20240101T081000');
+	});
+
 	it('splits the domain out of general course notes', () => {
 		const general = (notes: string) =>
 			getGeneralCourseTags({ class: [{ name: '博雅課程(一)' }], notes } as Course);
@@ -158,7 +183,9 @@ describe('courseUtils', () => {
 			tags: ['歷史與文化選修', '人文與藝術'],
 			rest: '',
 		});
-		expect(general('自然與科學向度').tags[0].color).not.toBe(general('社會與法治向度').tags[0].color);
+		expect(general('自然與科學向度').tags[0].color).not.toBe(
+			general('社會與法治向度').tags[0].color,
+		);
 		expect(summary('2 週【停開】')).toEqual({ tags: [], rest: '' });
 	});
 });

@@ -6,6 +6,7 @@ import type {
 	Course,
 	CompetencyDepartment,
 	DepartmentGroup,
+	Holiday,
 	MicroProgram,
 	Program,
 	StandardYearData,
@@ -98,6 +99,32 @@ export function fetchWithdrawal(period = ''): Promise<WithdrawalResponse> {
 export function fetchCalendar(): Promise<CalendarEvent[]> {
 	const url = `${API_BASE}/calendar.json`;
 	return shared(url, () => fetchJson<CalendarEvent[]>(url));
+}
+
+/** 人事行政總處「政府行政機關辦公日曆表」，經 ruyut/TaiwanCalendar 轉成可跨站讀取的 JSON。 */
+const HOLIDAY_BASE = 'https://cdn.jsdelivr.net/gh/ruyut/TaiwanCalendar/data';
+
+type GovernmentCalendarDay = {
+	date: string;
+	week: string;
+	isHoliday: boolean;
+	description: string;
+};
+
+/**
+ * Days off that fall where classes could meet: every weekday off, plus named holidays on
+ * weekends. A plain Saturday is also marked off, yet evening and weekend classes still run.
+ */
+export function fetchHolidays(year: number): Promise<Holiday[]> {
+	const url = `${HOLIDAY_BASE}/${year}.json`;
+	return shared(url, async () =>
+		(await fetchJson<GovernmentCalendarDay[]>(url))
+			.filter((day) => day.isHoliday && (day.description || !['六', '日'].includes(day.week)))
+			.map((day) => ({
+				date: `${day.date.slice(0, 4)}-${day.date.slice(4, 6)}-${day.date.slice(6, 8)}`,
+				name: day.description || '放假',
+			})),
+	);
 }
 
 export function fetchStandards(): Promise<string[]> {
