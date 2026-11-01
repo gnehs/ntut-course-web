@@ -7,7 +7,7 @@ import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import { CourseDetail } from '../routes/CourseDetailPage';
 import type { Course } from '../types/course';
 import { AdsEnabledContext } from './AdsByGoogle';
-import { cn } from '@/lib/utils';
+import { Button } from './ui-kit/Button';
 
 /** `origin` names the link that opened the peek, so the panel grows out of it and back into it. */
 export type CoursePeekState = {
@@ -283,19 +283,17 @@ function PeekSheet({ open, peek, onClose, onExpand }: PeekViewProps & { open: bo
 					data-peek-frame
 					className='rounded-t-overlay shadow-overlay bg-backdrop text-foreground fixed inset-x-0 bottom-0 z-50 mx-auto flex h-[calc(100dvh-2.5rem)] w-full max-w-[1072px] flex-col outline-none'
 				>
-					<div
-						data-peek-actions
-						className='relative flex h-14 shrink-0 items-center gap-1 pr-3 pl-4 sm:pl-6'
-					>
-						<Drawer.Handle className='absolute! top-2 left-1/2 -translate-x-1/2' />
-						<Drawer.Title className='min-w-0 flex-1 truncate text-sm font-medium tabular-nums'>
-							{seed ? `${peek.id} ${seed.course.name?.zh || ''}` : peek.id}
-						</Drawer.Title>
+					<Drawer.Title className='sr-only'>
+						{seed ? `${peek.id} ${seed.course.name?.zh || ''}` : peek.id}
+					</Drawer.Title>
+					<Drawer.Handle className='absolute! top-2 left-1/2 z-10 -translate-x-1/2' />
+					{/* The buttons float over the content so the course title starts at the top of the sheet. */}
+					<div data-peek-actions className='absolute top-3 right-3 z-10 flex gap-2'>
 						<PeekActions onClose={onClose} onExpand={onExpand} />
 					</div>
 					<div
 						data-peek-body
-						className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] [--course-sticky-top:0px] sm:px-6'
+						className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] [--course-header-inset:7rem] [--course-sticky-top:3.5rem] sm:px-6'
 					>
 						<div className='@container'>
 							<PeekDetail peek={peek} opened={opened.promise} />
@@ -334,35 +332,16 @@ const PeekDetail = memo(function PeekDetail({
 function PeekActions({ onClose, onExpand }: { onClose: () => void; onExpand: () => void }) {
 	return (
 		<>
-			<PeekButton label='開啟完整頁面' onClick={onExpand}>
-				<Maximize2 />
-			</PeekButton>
-			<PeekButton label='關閉預覽' onClick={onClose}>
-				<X />
-			</PeekButton>
+			<Button icon aria-label='開啟完整頁面' title='開啟完整頁面' onClick={onExpand}>
+				<Maximize2 className='size-4' aria-hidden='true' />
+			</Button>
+			<Button icon aria-label='關閉預覽' title='關閉預覽' onClick={onClose}>
+				<X className='size-4' aria-hidden='true' />
+			</Button>
 		</>
 	);
 }
 
 function peekKey(peek: CoursePeekState | undefined) {
 	return peek ? `${peek.year}/${peek.sem}/${peek.id}/${peek.depth}` : '';
-}
-
-function PeekButton({
-	label,
-	className,
-	...props
-}: React.ComponentProps<'button'> & { label: string }) {
-	return (
-		<button
-			type='button'
-			aria-label={label}
-			title={label}
-			className={cn(
-				'flex size-9 items-center justify-center rounded-full text-[rgb(var(--vs-text))] transition-colors hover:bg-[rgba(var(--vs-text),0.06)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none [&_svg]:size-[18px]',
-				className,
-			)}
-			{...props}
-		/>
-	);
 }

@@ -295,7 +295,8 @@ export function CourseDetail({
 
 	return (
 		<div className='grid min-w-0 gap-4 @3xl:grid-cols-[minmax(0,1fr)_20rem] @3xl:grid-rows-[auto_1fr] @3xl:items-start @3xl:gap-x-6'>
-			<header className='flex min-w-0 flex-col gap-1 @3xl:col-start-1'>
+			{/* A peek's floating buttons sit over the top right; one column keeps the title clear of them. */}
+			<header className='flex min-w-0 flex-col gap-1 pr-[var(--course-header-inset,0px)] @3xl:col-start-1 @3xl:pr-0'>
 				<h1 className='m-0 text-2xl leading-snug font-semibold'>
 					<CourseDetailTitle course={currentCourse} />
 				</h1>
