@@ -44,6 +44,24 @@ type ChangelogEntry = {
 
 const changelogEntries: ChangelogEntry[] = [
 	{
+		date: '2026-11-01',
+		changes: [
+			{
+				title: '我的課程新增「請 AI 推薦課程」。',
+				details: [
+					'一鍵把目前的課表帶進 ChatGPT 或 Claude，請它推薦不會衝堂的課程。',
+					'新增 /llms.txt，讓 AI 助理直接讀取課程原始資料，文件頁也加上說明。',
+				],
+			},
+			{
+				title: '課程頁面列出同名課程與同教師的其他課程，手機上可以左右滑動瀏覽。',
+			},
+			{
+				title: '學程與微學程分享到社群時會顯示專屬的預覽圖。',
+			},
+		],
+	},
+	{
 		date: '2026-10-10',
 		changes: [
 			{
