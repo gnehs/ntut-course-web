@@ -623,7 +623,7 @@ function CourseDetailTitle({ course }: { course: Course }) {
 	if (isSportsCourse(course)) {
 		const title = getSportsCourseTitle(course);
 		return (
-			<span className='inline-flex items-center gap-1'>
+			<span className='inline-flex items-center gap-2'>
 				<SportsCourseIcon title={title} />
 				<span>{title}</span>
 			</span>

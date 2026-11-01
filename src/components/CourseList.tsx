@@ -424,7 +424,7 @@ function CourseDisplayHeading({ course }: { course: Course }) {
 	if (isSportsCourse(course)) {
 		const title = getSportsCourseTitle(course);
 		return (
-			<span className='flex items-center gap-1'>
+			<span className='flex items-center gap-1.5'>
 				<SportsCourseIcon title={title} className='text-base' />
 				<span>{title}</span>
 			</span>
