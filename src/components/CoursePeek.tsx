@@ -10,7 +10,7 @@ import {
 } from 'react';
 import type React from 'react';
 import { Maximize2, X } from 'lucide-react';
-import { AnimatePresence, MotionConfig, motion } from 'motion/react';
+import { AnimatePresence, MotionConfig, motion, useIsPresent } from 'motion/react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import { Drawer } from 'vaul';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
@@ -166,6 +166,8 @@ function growPeekIntoPage() {
 	const root = document.documentElement;
 	const backdrop = document.createElement('div');
 	backdrop.className = 'bg-backdrop fixed inset-0 z-50';
+	// It sits outside React (the drawer portals into <body>), so whoever expands removes it after.
+	backdrop.setAttribute('data-peek-expand-backdrop', '');
 	frame.before(backdrop);
 	const timing: KeyframeAnimationOptions = { duration: 300, easing: panelEasing, fill: 'forwards' };
 	const inset = [
@@ -191,6 +193,11 @@ function growPeekIntoPage() {
 			() => {},
 			() => {},
 		);
+}
+
+function removeExpandBackdrops() {
+	for (const backdrop of document.querySelectorAll('[data-peek-expand-backdrop]'))
+		backdrop.remove();
 }
 
 /** Starts the requests the detail view makes; requests already in flight are shared. */
@@ -232,7 +239,7 @@ export function CoursePeek() {
 		}
 		await growPeekIntoPage();
 		const top = contentTop();
-		document.startViewTransition(async () => {
+		const transition = document.startViewTransition(async () => {
 			const arrived = new Promise<void>((resolve) => {
 				pendingExpand = { contentTop: top, arrived: resolve };
 				// The page normally has the peek's data at once; never hold the screen long.
@@ -240,7 +247,10 @@ export function CoursePeek() {
 			});
 			await go();
 			await arrived;
+			// The new state is the page alone; the old snapshot already holds the backdrop.
+			removeExpandBackdrops();
 		});
+		void transition.finished.finally(removeExpandBackdrops);
 	}
 
 	// Expanding hands the peek over to the page in a view transition, so it leaves at once instead
@@ -284,6 +294,9 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 		const timeout = window.setTimeout(opened.resolve, 500);
 		return () => window.clearTimeout(timeout);
 	}, []);
+	// Released as soon as the drawer starts to close, not once it has slid away.
+	const present = useIsPresent();
+	useEffect(() => (present ? lockPageScroll() : undefined), [present]);
 	return (
 		<DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
 			<DialogPrimitive.Portal forceMount>
@@ -340,6 +353,27 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 			</DialogPrimitive.Portal>
 		</DialogPrimitive.Root>
 	);
+}
+
+let pageScrollLocks = 0;
+
+/**
+ * Holds the page still behind the drawer while leaving it clickable, so another course can still be
+ * chosen. The scrollbar's width is padded back so the page does not shift sideways. Counted, so a
+ * drawer opening while the last one is still sliding out does not restore a locked state.
+ */
+function lockPageScroll() {
+	const root = document.documentElement;
+	if (pageScrollLocks++ === 0) {
+		const scrollbar = window.innerWidth - root.clientWidth;
+		root.style.overflow = 'hidden';
+		if (scrollbar > 0) root.style.paddingRight = `${scrollbar}px`;
+	}
+	return () => {
+		if (--pageScrollLocks > 0) return;
+		root.style.overflow = '';
+		root.style.paddingRight = '';
+	};
 }
 
 // Even enough that the motion reads as movement rather than a jump in the first few frames.
