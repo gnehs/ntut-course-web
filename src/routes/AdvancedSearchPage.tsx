@@ -949,7 +949,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 				) : null}
 				<div
 					ref={filterScrollRef}
-					className='flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [-webkit-overflow-scrolling:touch]'
+					className='-mt-1 flex min-w-0 gap-2 overflow-x-auto overscroll-x-contain px-1 pt-1 pb-1 [-webkit-overflow-scrolling:touch]'
 				>
 					{hasActiveCondition ? (
 						<button
@@ -1021,7 +1021,8 @@ function SuggestedKeywords({
 		<div
 			className={`flex min-w-0 items-center gap-2 text-sm ${
 				scrollable
-					? 'overflow-x-auto overscroll-x-contain pb-1 [-webkit-overflow-scrolling:touch]'
+					? // A scroller clips both axes, so it pads room for the chips' ring and shadow and gives it back.
+						'-mx-1 -mt-1 overflow-x-auto overscroll-x-contain px-1 pt-1 pb-1 [-webkit-overflow-scrolling:touch]'
 					: 'flex-wrap'
 			}`}
 		>
