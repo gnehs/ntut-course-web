@@ -1,7 +1,8 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { useState } from 'react';
 import { displayDepartment, parseYearSemVal, storageDepartment } from '../lib/courseUtils';
-import { pageTitleForPath, usePageTitle } from '../lib/pageTitle';
+import { SITE_TITLE, pageTitleForPath, usePageTitle } from '../lib/pageTitle';
+import { DESKTOP_MEDIA_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import { ChevronsUpDown, GitBranch, Search } from 'lucide-react';
@@ -63,62 +64,56 @@ export function Layout() {
 		setDatasetDialogOpen(false);
 	}
 
-	const semesterButton = (
-		<Button
-			className='whitespace-nowrap'
-			aria-haspopup='dialog'
-			title='切換學期與學制'
-			onClick={() => setDatasetDialogOpen(true)}
-		>
-			{yearSemLabel}
-			<ChevronsUpDown className='text-icon-muted size-3.5' aria-hidden='true' />
-		</Button>
-	);
+	// On desktop, search draws the brand and semester picker at the top of its filter panel instead.
+	const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
+	const showToolbar = !isIframe && !(isAdvancedSearch && isDesktop);
 
 	return (
 		// Grid track sizing survives AdSense's inline height/min-height resets on ad ancestors.
-		<div className='grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(100svh,auto)]'>
-			<div className='bg-backdrop text-foreground flex flex-col font-sans'>
-				<a
-					href='#main-content'
-					className='rounded-control shadow-overlay sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] focus:not-sr-only'
-				>
-					跳至主要內容
-				</a>
-				{!isIframe ? (
+		<div className='text-foreground grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(100svh,auto)] font-sans'>
+			<a
+				href='#main-content'
+				className='rounded-control shadow-overlay sr-only fixed top-2 left-2 z-50 bg-[rgb(var(--vs-background))] px-4 py-3 text-[rgb(var(--vs-primary))] focus:not-sr-only'
+			>
+				跳至主要內容
+			</a>
+			<div className='bg-page flex min-w-0 flex-col'>
+				{showToolbar ? (
 					<nav
+						aria-label='頁面工具列'
 						className={cn(
-							'bg-sheen-surface shadow-bar sticky inset-x-0 top-0 z-20 grid h-[58px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-[rgba(var(--vs-background),0.78)] px-4 py-2 backdrop-blur-[20px] backdrop-saturate-150 md:grid-cols-[1fr_minmax(250px,430px)_1fr]',
-							isAdvancedSearch && 'lg:hidden',
+							'shadow-bar sticky inset-x-0 top-0 z-20 bg-[rgba(var(--vs-background),0.8)] px-4 backdrop-blur-[20px] backdrop-saturate-[180%]',
+							!isAdvancedSearch && 'lg:px-6',
 						)}
-						style={{ paddingInline: 'max(16px, calc((100vw - 1024px) / 2))' }}
 					>
-						<Link
-							to='/'
-							className='text-shadow-emboss flex min-w-0 items-center gap-1.5 font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
+						{/* Search spans the full width, so its toolbar lines up with the filter panel instead of centring. */}
+						<div
+							className={cn(
+								'mx-auto grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:grid-cols-[1fr_minmax(250px,400px)_1fr]',
+								!isAdvancedSearch && 'max-w-[1024px]',
+							)}
 						>
-							<span aria-hidden='true' className='shrink-0'>
-								🍤
-							</span>
-							<span className='truncate'>北科課程好朋友</span>
-						</Link>
-						<div className='hidden md:block'>
-							{!isAdvancedSearch ? <UniversalSearch navbar /> : null}
-						</div>
-						<div className='flex justify-end gap-2'>
-							{/* The navbar search box is desktop-only, so small screens get a shortcut instead. */}
-							{location.pathname !== '/' && !isAdvancedSearch ? (
-								<Button
-									as={Link}
-									icon
-									to='/advanced-search'
-									aria-label='搜尋課程'
-									className='md:hidden'
-								>
-									<Search className='size-4' aria-hidden='true' />
-								</Button>
-							) : null}
-							{semesterButton}
+							<div className='flex min-w-0 items-center'>
+								<SiteBrand />
+							</div>
+							<div className='hidden md:block'>
+								{!isAdvancedSearch ? <UniversalSearch navbar /> : null}
+							</div>
+							<div className='flex justify-end gap-2'>
+								{/* The navbar search box is desktop-only, so small screens get a shortcut instead. */}
+								{location.pathname !== '/' && !isAdvancedSearch ? (
+									<Button
+										as={Link}
+										icon
+										to='/advanced-search'
+										aria-label='搜尋課程'
+										className='md:hidden'
+									>
+										<Search className='size-4' aria-hidden='true' />
+									</Button>
+								) : null}
+								<SemesterButton label={yearSemLabel} onOpen={() => setDatasetDialogOpen(true)} />
+							</div>
 						</div>
 					</nav>
 				) : null}
@@ -128,7 +123,10 @@ export function Layout() {
 					tabIndex={-1}
 					className={cn(
 						'flex-1 scroll-mt-20',
-						isAdvancedSearch ? 'w-full' : 'mx-auto w-full max-w-[1024px] px-4 py-8',
+						isAdvancedSearch
+							? 'w-full'
+							: // Padding sits outside the 1024px column, as in the toolbar and footer, so their edges line up.
+								'w-full px-[max(1rem,calc((100%-1024px)/2))] py-8 lg:px-[max(1.5rem,calc((100%-1024px)/2))]',
 						isIframe ? 'pt-0' : '',
 					)}
 				>
@@ -154,7 +152,7 @@ export function Layout() {
 					<Outlet />
 				</ContentSurface>
 				{isIframe && !isAdvancedSearch ? (
-					<div className='my-4 text-center text-[0.75em] opacity-75'>
+					<div className='text-muted-foreground my-4 text-center text-xs'>
 						本資料由{' '}
 						<a href='https://ntut-course.gnehs.net/' target='_blank' rel='noreferrer'>
 							北科課程好朋友
@@ -163,54 +161,79 @@ export function Layout() {
 					</div>
 				) : null}
 				{!isIframe && !isAdvancedSearch ? (
-					<footer className='mt-auto w-full bg-[rgb(var(--vs-background))] px-4 py-3 text-center text-sm shadow-[0_-1px_0_var(--hairline)]'>
-						<div className='text-foreground-soft mx-auto max-w-[1024px] space-y-2'>
-							<div className='flex items-center justify-between gap-2'>
-								<div>
-									Developed by{' '}
-									<a
-										href='https://gnehs.net'
-										target='_blank'
-										rel='noreferrer'
-										className='text-[rgb(var(--vs-primary))] underline hover:opacity-80'
-									>
-										勝勝
-									</a>
-								</div>
-								<div className='flex justify-end'>
-									<Button
-										as='a'
-										icon
-										href='https://github.com/gnehs/ntut-course-web'
-										aria-label='查看 GitHub 原始碼'
-										target='_blank'
-										rel='noreferrer'
-									>
-										<GitBranch className='size-4' />
-									</Button>
-								</div>
+					<footer className='mt-auto w-full border-t px-4 py-3 text-sm lg:px-6'>
+						<div className='text-muted-foreground mx-auto flex max-w-[1024px] items-center justify-between gap-2'>
+							<div>
+								Developed by{' '}
+								<a
+									href='https://gnehs.net'
+									target='_blank'
+									rel='noreferrer'
+									className='text-[rgb(var(--vs-primary))] no-underline hover:underline'
+								>
+									勝勝
+								</a>
 							</div>
+							<Button
+								as='a'
+								icon
+								href='https://github.com/gnehs/ntut-course-web'
+								aria-label='查看 GitHub 原始碼'
+								target='_blank'
+								rel='noreferrer'
+								className='bg-transparent'
+							>
+								<GitBranch className='size-4' />
+							</Button>
 						</div>
 					</footer>
 				) : null}
-				<Dialog
-					open={datasetDialogOpen}
-					title='選擇學期與學制'
-					onClose={() => setDatasetDialogOpen(false)}
-				>
-					<DatasetForm
-						// Radix Select keeps a blank trigger when its value arrives after mount.
-						key={yearSemItems.length ? 'ready' : 'loading'}
-						year={viewYear}
-						sem={viewSem}
-						department={viewDepartment}
-						yearSemItems={yearSemItems}
-						departmentItems={departmentItems}
-						onSubmit={applyDataset}
-					/>
-				</Dialog>
 			</div>
+			<Dialog
+				open={datasetDialogOpen}
+				title='選擇學期與學制'
+				onClose={() => setDatasetDialogOpen(false)}
+			>
+				<DatasetForm
+					// Radix Select keeps a blank trigger when its value arrives after mount.
+					key={yearSemItems.length ? 'ready' : 'loading'}
+					year={viewYear}
+					sem={viewSem}
+					department={viewDepartment}
+					yearSemItems={yearSemItems}
+					departmentItems={departmentItems}
+					onSubmit={applyDataset}
+				/>
+			</Dialog>
 		</div>
+	);
+}
+
+export function SiteBrand() {
+	return (
+		<Link
+			to='/'
+			className='flex min-w-0 items-center gap-1.5 font-semibold whitespace-nowrap text-[rgb(var(--vs-text))] no-underline hover:text-[rgb(var(--vs-text))]'
+		>
+			<span aria-hidden='true' className='shrink-0'>
+				🍤
+			</span>
+			<span className='truncate'>{SITE_TITLE}</span>
+		</Link>
+	);
+}
+
+export function SemesterButton({ label, onOpen }: { label: string; onOpen: () => void }) {
+	return (
+		<Button
+			className='whitespace-nowrap'
+			aria-haspopup='dialog'
+			title='切換學期與學制'
+			onClick={onOpen}
+		>
+			{label}
+			<ChevronsUpDown className='text-icon-muted size-3.5' aria-hidden='true' />
+		</Button>
 	);
 }
 

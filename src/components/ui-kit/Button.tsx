@@ -35,7 +35,7 @@ export function Button({
 			'bg-[rgba(var(--vs-danger),0.15)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.2)]',
 		!isSolid &&
 			!danger &&
-			'bg-[rgba(var(--vs-text),0.06)] text-[rgb(var(--vs-text))] hover:bg-[rgba(var(--vs-text),0.1)]',
+			'bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))] hover:bg-[color-mix(in_srgb,rgb(var(--vs-background))_96%,rgb(var(--vs-text)))]',
 		className,
 	);
 	return (

@@ -1,10 +1,11 @@
-import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
+import { SemesterButton, SiteBrand } from '../components/Layout';
 import type { CourseListLayout } from '../components/CourseList';
 
 import {
@@ -30,7 +31,7 @@ import { Input } from '../components/ui-kit/Input';
 import { AdvancedSearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { MiniNotify } from '../components/ui-kit/MiniNotify';
 import { Select, SelectOption } from '../components/ui-kit/Select';
-import { categoryFilterList, courseStandard, timetable } from '../lib/courseUtils';
+import { categoryFilterList, courseStandard, parseYearSemVal, timetable } from '../lib/courseUtils';
 import { fetchDepartment, fetchSyllabusIndex, fetchWithdrawalRate } from '../lib/courseApi';
 import {
 	AI_ANY_FILTER,
@@ -46,6 +47,7 @@ import {
 } from '../lib/courseFilters';
 import type { CourseAttribute } from '../lib/courseFilters';
 import { createSearchObject, createSearchParams } from '../lib/urlState';
+import { DESKTOP_MEDIA_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { useApp } from '../state/AppContext';
 import type {
 	Course,
@@ -156,7 +158,8 @@ const filterSections: {
 export function AdvancedSearchPage() {
 	const { location } = useRouterState();
 	const navigate = useNavigate();
-	const { dataset, getCourses } = useApp();
+	const { dataset, getCourses, setDatasetDialogOpen } = useApp();
+	const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
 	const params = useMemo(() => createSearchParams(location.search), [location.search]);
 	const locationKey = createLocationKey(location.pathname, location.search);
 	const restoredQuery = useMemo<AdvancedSearchQuery>(
@@ -757,7 +760,17 @@ export function AdvancedSearchPage() {
 
 	return (
 		<div className='grid min-w-0 gap-[18px] lg:grid-cols-[340px_minmax(0,1fr)]'>
-			<aside className='shadow-raised hidden h-screen overflow-auto bg-[rgb(var(--vs-background))] p-4 lg:sticky lg:top-0 lg:block lg:w-auto'>
+			<aside className='hidden h-svh overflow-auto border-r bg-[rgb(var(--vs-background))] p-4 lg:sticky lg:top-0 lg:block lg:w-auto'>
+				{/* The site toolbar is hidden on desktop search, so its brand and semester picker live here. */}
+				{isDesktop ? (
+					<div className='-mt-1 mb-3 flex items-center justify-between gap-2 border-b pb-3'>
+						<SiteBrand />
+						<SemesterButton
+							label={year && sem ? parseYearSemVal(`${year}-${sem}`) : '選擇學期'}
+							onOpen={() => setDatasetDialogOpen(true)}
+						/>
+					</div>
+				) : null}
 				<AdvancedSearchSidebarContent {...searchControlsProps} />
 			</aside>
 			<section className='min-w-0 px-3 pt-4 pb-10 lg:pr-4 lg:pl-0'>
@@ -1018,7 +1031,7 @@ function SuggestedKeywords({
 				<Button
 					key={keyword}
 					active={value === keyword}
-					className={`rounded-control m-0 px-3 ${scrollable ? 'min-h-11' : 'min-h-8 text-xs'}`}
+					className={`rounded-control m-0 px-3 ${scrollable ? 'min-h-11' : 'min-h-7 py-1 text-xs sm:min-h-7'}`}
 					onClick={() => onSelect(keyword)}
 				>
 					{keyword}
@@ -1032,13 +1045,7 @@ function AdvancedSearchSidebarContent(props: AdvancedSearchControlsProps) {
 	return (
 		<div className='grid gap-3'>
 			<div className='flex items-center justify-between gap-3'>
-				<Link
-					to='/'
-					aria-label='回首頁'
-					className='font-semibold text-[rgb(var(--vs-text))] no-underline hover:text-[rgba(var(--vs-text),0.8)]'
-				>
-					🍤 北科課程好朋友
-				</Link>
+				<h2 className='m-0 text-[15px] font-semibold'>篩選條件</h2>
 				<div className='flex items-center gap-1'>
 					<Button className='m-0' onClick={props.onReset}>
 						重設
@@ -1309,7 +1316,12 @@ function SearchSection({
 				<ChevronDown ref={iconRef} className='size-4 shrink-0' />
 			</button>
 			{rendered ? (
-				<div ref={contentRef} aria-hidden={!expanded} className='overflow-hidden'>
+				// The clip box bleeds 8px past the content so control shadows are not cut off.
+				<div
+					ref={contentRef}
+					aria-hidden={!expanded}
+					className='-mx-2 -mb-2 overflow-hidden px-2 pb-2'
+				>
 					<div className='mt-3 grid gap-2'>{children}</div>
 				</div>
 			) : null}

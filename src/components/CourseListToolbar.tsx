@@ -26,7 +26,7 @@ export function CourseListToolbar({
 				<div
 					role='group'
 					aria-label='課程顯示方式'
-					className='rounded-control bg-sheen-well shadow-well col-span-2 flex gap-1 justify-self-center bg-[rgba(var(--vs-text),0.06)] p-1 md:col-span-1 md:col-start-2 md:row-start-1'
+					className='bg-sheen-well shadow-well col-span-2 flex gap-0.5 justify-self-center rounded-[calc(var(--radius-control)+3px)] bg-[rgba(var(--vs-text),0.06)] p-[3px] md:col-span-1 md:col-start-2 md:row-start-1'
 				>
 					{(
 						[
@@ -39,7 +39,7 @@ export function CourseListToolbar({
 							key={value}
 							aria-pressed={layout === value}
 							className={cn(
-								'm-0 px-2.5',
+								'm-0 px-2.5 py-1 sm:min-h-8',
 								layout === value
 									? 'bg-background bg-sheen-surface text-foreground hover:bg-background shadow-thumb hover:shadow-thumb'
 									: 'text-muted-foreground hover:text-foreground bg-transparent bg-none shadow-none hover:bg-[rgba(var(--vs-text),0.06)] hover:shadow-none',

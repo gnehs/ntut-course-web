@@ -84,9 +84,12 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 		activeNode?.scrollIntoView?.({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
 	}, [currentSelectionIndex]);
 
+	// An empty listbox would still paint its overlay shadow as a stray line under the field.
+	const resultsOpen = focused && items.length > 0;
+
 	useEffect(() => {
-		return animateSearchResults(resultsRef.current, focused);
-	}, [focused, items.length]);
+		return animateSearchResults(resultsRef.current, resultsOpen);
+	}, [resultsOpen, items.length]);
 
 	function remember(item) {
 		setInput('');
@@ -150,8 +153,8 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				className={cn(
 					'rounded-control flex border transition-[background-color,border-color,box-shadow] duration-200',
 					focused
-						? 'shadow-raised border-[rgba(var(--vs-primary),0.55)] bg-[rgb(var(--vs-background))] ring-[3px] ring-[rgba(var(--vs-primary),0.16)]'
-						: 'border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] hover:border-[rgba(var(--vs-text),0.24)]',
+						? 'border-[rgba(var(--vs-primary),0.55)] bg-[rgb(var(--vs-background))] ring-[3px] ring-[rgba(var(--vs-primary),0.2)]'
+						: 'bg-field shadow-field border-[rgba(var(--vs-text),0.1)] hover:border-[rgba(var(--vs-text),0.16)]',
 				)}
 			>
 				<input
@@ -160,7 +163,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					role='combobox'
 					aria-label='搜尋課程、教師、課號、班級'
 					aria-autocomplete='list'
-					aria-expanded={focused && items.length > 0}
+					aria-expanded={resultsOpen}
 					aria-controls={resultsId}
 					aria-activedescendant={
 						currentSelectionIndex >= 0 ? `${resultsId}-item-${currentSelectionIndex}` : undefined
@@ -178,8 +181,8 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					onKeyDown={onKeyDown}
 					onMouseEnter={() => setCurrentSelectionIndex(-1)}
 					className={cn(
-						'min-w-0 flex-1 bg-transparent text-[16px] text-[rgb(var(--vs-text))] outline-none',
-						navbar ? 'px-3 py-2' : 'px-4 py-3',
+						'min-w-0 flex-1 bg-transparent text-[16px] text-[rgb(var(--vs-text))] outline-none placeholder:text-[var(--muted-foreground)]',
+						navbar ? 'px-3 py-1.5 md:text-sm' : 'px-4 py-3',
 					)}
 				/>
 				<button
@@ -187,7 +190,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 					aria-label={input ? '清除搜尋' : '搜尋'}
 					className={cn(
 						'text-foreground-soft flex shrink-0 items-center justify-center transition-colors duration-200 hover:text-[rgb(var(--vs-text))]',
-						navbar ? 'px-3 py-2' : 'px-4 py-3',
+						navbar ? 'px-3 py-1.5 [&_svg]:size-4' : 'px-4 py-3',
 					)}
 					onClick={() => {
 						if (input) {
@@ -214,7 +217,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 				aria-label='搜尋建議'
 				className={cn(
 					'rounded-surface bg-sheen-surface shadow-overlay absolute top-full right-0 left-0 z-[999] mt-2 max-h-[512px] overflow-y-auto bg-[rgb(var(--vs-background))] transition-[opacity,transform] duration-200',
-					focused
+					resultsOpen
 						? 'pointer-events-auto opacity-100'
 						: 'pointer-events-none -translate-y-2 opacity-0',
 					'max-h-[256px] md:max-h-[512px]',

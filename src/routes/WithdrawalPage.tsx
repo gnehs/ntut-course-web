@@ -203,7 +203,7 @@ export function WithdrawalPage() {
 									const maxRate = Math.max(...group.rows.map(rateValue));
 									return (
 										<section key={group.title} className='relative grid'>
-											<div className='sticky top-14.5 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
+											<div className='sticky top-14 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
 												<h2 className='text-lg font-semibold'>{group.title}</h2>
 												<div className='text-sm opacity-70'>
 													{group.rows.length === group.totalRows

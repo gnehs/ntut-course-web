@@ -1,6 +1,6 @@
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ExternalLink, Search } from 'lucide-react';
+import { ExternalLink, Minus, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
@@ -350,6 +350,7 @@ export function ProgramDetailPage() {
 					danger={allSaved}
 					onClick={allSaved ? removeProgramCourses : addProgramCourses}
 				>
+					{allSaved ? <Minus className='size-4' /> : <Plus className='size-4' />}
 					{allSaved ? '從我的課程移除全部' : '全部加入我的課程'}
 				</Button>
 			}

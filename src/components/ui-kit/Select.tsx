@@ -34,7 +34,7 @@ export function Select({
 				id={id}
 				aria-label={ariaLabel}
 				className={cn(
-					'rounded-control min-h-11 w-full min-w-0 border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))] px-3 py-2 text-base text-[rgb(var(--vs-text))] transition-[background-color,border-color,box-shadow] outline-none md:text-sm',
+					'rounded-control bg-field shadow-field min-h-11 w-full min-w-0 border border-[rgba(var(--vs-text),0.1)] px-3 py-2 text-base text-[rgb(var(--vs-text))] transition-[background-color,border-color,box-shadow] outline-none focus:bg-[rgb(var(--vs-background))] md:min-h-9 md:py-1.5 md:text-sm',
 					'focus:border-[rgba(var(--vs-primary),0.7)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.24)]',
 					className,
 				)}
@@ -45,7 +45,7 @@ export function Select({
 				position='popper'
 				align='start'
 				sideOffset={6}
-				className='rounded-popover bg-sheen-surface shadow-overlay max-h-[min(20rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] border-0 bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
+				className='bg-sheen-surface shadow-overlay max-h-[min(20rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] rounded-[calc(var(--radius-control)+0.25rem)] border-0 bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
 			>
 				<SelectGroup className='flex flex-col gap-0.5'>{children}</SelectGroup>
 			</SelectContent>

@@ -5,8 +5,8 @@
 	"lang": "zh-TW",
 	"start_url": "/",
 	"display": "standalone",
-	"background_color": "#ffffff",
-	"theme_color": "#ffffff",
+	"background_color": "#f5f5f7",
+	"theme_color": "#f5f5f7",
 	"icons": [
 		{
 			"src": "/icon-pwa.png",
