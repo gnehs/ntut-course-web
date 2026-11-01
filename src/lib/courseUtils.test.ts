@@ -4,6 +4,7 @@ import {
 	filterPlaceholderCourses,
 	findSimilarCourses,
 	formatCredit,
+	getGeneralCourseTags,
 	isZeroCreditValue,
 	parseCourseTime,
 	parseYearSemVal,
@@ -132,5 +133,32 @@ describe('courseUtils', () => {
 		expect(calendar).toContain('DTSTART;TZID=Asia/Taipei:20230904T081000');
 		expect(calendar).toContain('DTEND;TZID=Asia/Taipei:20230904T100000');
 		expect(calendar).toContain('RRULE:FREQ=WEEKLY;INTERVAL=1;UNTIL=20240112T000000');
+	});
+
+	it('splits the domain out of general course notes', () => {
+		const general = (notes: string) =>
+			getGeneralCourseTags({ class: [{ name: '博雅課程(一)' }], notes } as Course);
+		const summary = (notes: string) => {
+			const { tags, rest } = general(notes);
+			return { tags: tags.map((tag) => tag.name), rest };
+		};
+		expect(summary('創新與創業向度, 計中電腦教室')).toEqual({
+			tags: ['創新與創業向度'],
+			rest: '計中電腦教室',
+		});
+		expect(summary('北大/社會與法治/教師張朝琴/社 102 教室')).toEqual({
+			tags: ['社會與法治向度'],
+			rest: '北大 / 教師張朝琴/社 102 教室',
+		});
+		expect(summary('海洋 / 社法向度 / 教師黃駿 / MAF623 教室')).toEqual({
+			tags: ['社會與法治向度'],
+			rest: '海洋 / 教師黃駿 / MAF623 教室',
+		});
+		expect(summary('◎106-108：歷史與文化選修。109 (含) 後：人文與藝術')).toEqual({
+			tags: ['歷史與文化選修', '人文與藝術'],
+			rest: '',
+		});
+		expect(general('自然與科學向度').tags[0].color).not.toBe(general('社會與法治向度').tags[0].color);
+		expect(summary('2 週【停開】')).toEqual({ tags: [], rest: '' });
 	});
 });

@@ -116,24 +116,47 @@ export function getSportsCourseTitle(course?: CourseTitleLike | null) {
 	);
 }
 
+const generalCourseDomains: { name: string; pattern: RegExp; color: string }[] = [
+	{ name: '創新與創業', pattern: /創新與創業|創創/, color: '#FFC107' },
+	{ name: '人文與藝術', pattern: /人文與藝術|人文/, color: '#FF5722' },
+	{ name: '社會與法治', pattern: /社會與法治|社法/, color: '#2196F3' },
+	{ name: '自然與科學', pattern: /自然與科學|自然/, color: '#4CAF50' },
+];
+const generalCourseDomainToken = /(創新與創業|人文與藝術|社會與法治|自然與科學|創創|人文|社法|自然)(向度)?/;
+// Pre-109 tracks map onto the current domains by their wording, e.g. 歷史與文化 → 人文與藝術.
+const legacyTrackColors: [RegExp, string][] = [
+	[/創新與創業/, '#FFC107'],
+	[/文化|美學與藝術|人文與藝術/, '#FF5722'],
+	[/自然與科學/, '#4CAF50'],
+	[/社會|法治/, '#2196F3'],
+];
+
+// 博雅 notes mix the domain with campus, teacher or room details; the domain becomes a colored tag and the rest stays a note.
 export function getGeneralCourseTags(course: Course) {
-	if (!(course?.class || []).some((item) => /^博雅/.test(item.name))) return [];
-	const colors: [RegExp, string][] = [
-		[/創新與創業|創創/, '#FFC107'],
-		[/文化|美學與藝術|人文與藝術/, '#FF5722'],
-		[/自然與科學|自然向度/, '#03A9F4'],
-		[/社會|法治/, '#2196F3'],
-	];
-	return String(course?.notes || '')
-		.replace(/◎|\*/g, '')
-		.split(/106-108：|。109 \(含\) 後：/)
-		.map((item) => item.trim())
-		.filter(Boolean)
-		.map((name) => ({
-			name,
-			color: colors.find(([pattern]) => pattern.test(name))?.[1] || '#777',
-			textColor: '#FFF',
-		}));
+	const empty = { tags: [] as { name: string; color: string; textColor: string }[], rest: '' };
+	if (!(course?.class || []).some((item) => /^博雅/.test(item.name))) return empty;
+	const notes = String(course?.notes || '');
+	if (/106-108：/.test(notes)) {
+		const tags = notes
+			.replace(/◎|\*/g, '')
+			.split(/106-108：|。109 \(含\) 後：/)
+			.map((item) => item.trim())
+			.filter(Boolean)
+			.map((name) => ({
+				name,
+				color: legacyTrackColors.find(([pattern]) => pattern.test(name))?.[1] || '#777',
+				textColor: '#FFF',
+			}));
+		return { tags, rest: '' };
+	}
+	const token = notes.match(generalCourseDomainToken)?.[0];
+	const domain = token && generalCourseDomains.find(({ pattern }) => pattern.test(token));
+	if (!token || !domain) return empty;
+	const rest = notes
+		.replace(token, '')
+		.replace(/\s*\/\s*(\/\s*)+/g, ' / ')
+		.replace(/^[\s,，、/◎*]+|[\s,，、/]+$/g, '');
+	return { tags: [{ name: `${domain.name}向度`, color: domain.color, textColor: '#FFF' }], rest };
 }
 
 export function getCourseDisplayTitle(course: CourseTitleLike) {

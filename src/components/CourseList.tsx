@@ -234,6 +234,7 @@ export function CourseList({
 						{pageItems.map((course, index) => {
 							const saved = savedCourseIds.includes(course.id);
 							const conflicted = conflictCourseData.includes(course.id);
+							const generalCourse = getGeneralCourseTags(course);
 							return (
 								<Fragment key={course.id}>
 									{showSectionAd && index === 6 ? (
@@ -243,7 +244,7 @@ export function CourseList({
 									) : null}
 									<Card
 										className={cn(
-											'hoverable px-4 py-4',
+											'hoverable flex flex-col px-4 py-4',
 											desktopLimit !== undefined && index >= desktopLimit && 'sm:hidden',
 										)}
 									>
@@ -256,7 +257,7 @@ export function CourseList({
 											aria-label={`查看 ${courseTitle(course)} 課程詳情`}
 											className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 										/>
-										<div className='pointer-events-none relative z-[1] flex flex-col gap-3'>
+										<div className='pointer-events-none relative z-[1] flex flex-1 flex-col gap-3'>
 											<div className='relative flex flex-col gap-1 pr-11'>
 												<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
 													<CourseDisplayHeading course={course} />
@@ -266,11 +267,6 @@ export function CourseList({
 												</div>
 												<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
 											</div>
-											{getGeneralCourseTags(course).length ? (
-												<div className='flex flex-wrap gap-1'>
-													<CourseTags course={course} />
-												</div>
-											) : null}
 											<dl className='m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm leading-5'>
 												<CourseMetaLine label='時間'>
 													<CourseTimeChips time={course.time}>
@@ -289,10 +285,33 @@ export function CourseList({
 												<CourseMetaLine label='班級' truncate>
 													{(course.class || []).map((item) => item.name).join('、') || '無資料'}
 												</CourseMetaLine>
-												{hasCourseNotes(course) ? (
+												{generalCourse.tags.length ? (
+													generalCourse.rest ? (
+														<CourseMetaLine label='備註'>{generalCourse.rest}</CourseMetaLine>
+													) : null
+												) : hasCourseNotes(course) ? (
 													<CourseMetaLine label='備註'>{course.notes}</CourseMetaLine>
 												) : null}
 											</dl>
+											{/* Pinned to the card's bottom edge so domains line up across a row of cards. */}
+											{generalCourse.tags.length ? (
+												<div className='-mx-4 -mb-4 mt-auto flex flex-wrap'>
+													{generalCourse.tags.map((tag) => (
+														<span
+															key={tag.name}
+															className='flex-1 px-4 pt-5 pb-2 text-center text-xs leading-none font-semibold whitespace-nowrap'
+															style={{
+																// The domain color rises from the bottom edge and fades into the card.
+																background: `linear-gradient(to top, color-mix(in srgb, ${tag.color} 30%, transparent), transparent)`,
+																color: `color-mix(in srgb, ${tag.color} 65%, rgb(var(--vs-text)))`,
+																textShadow: `0 1px 6px color-mix(in srgb, ${tag.color} 55%, transparent)`,
+															}}
+														>
+															{tag.name}
+														</span>
+													))}
+												</div>
+											) : null}
 										</div>
 									</Card>
 								</Fragment>
@@ -366,7 +385,7 @@ export function CourseList({
 												{conflictCourseData.includes(course.id) ? (
 													<span className='text-[rgb(var(--vs-danger))]'>衝堂</span>
 												) : (
-													course.notes
+													<GeneralCourseNotes course={course} />
 												)}
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
@@ -414,12 +433,29 @@ function CourseDisplayHeading({ course }: { course: Course }) {
 	return <span>{getCourseDisplayTitle(course)}</span>;
 }
 
-function CourseTags({ course }: { course: Course }) {
-	return getGeneralCourseTags(course).map((tag) => (
-		<Tag key={tag.name} color={tag.color} textColor={tag.textColor}>
+function CourseTags({
+	tags,
+	className,
+}: {
+	tags: ReturnType<typeof getGeneralCourseTags>['tags'];
+	className?: string;
+}) {
+	return tags.map((tag) => (
+		<Tag key={tag.name} color={tag.color} textColor={tag.textColor} className={className}>
 			{tag.name}
 		</Tag>
 	));
+}
+
+function GeneralCourseNotes({ course }: { course: Course }) {
+	const { tags, rest } = getGeneralCourseTags(course);
+	if (!tags.length) return course.notes;
+	return (
+		<span className='inline-flex flex-wrap items-center gap-1'>
+			<CourseTags tags={tags} />
+			{rest ? <span>{rest}</span> : null}
+		</span>
+	);
 }
 
 // iOS only shows its overlay scrollbar mid-swipe, so the row keeps its own track to show how much is left.
