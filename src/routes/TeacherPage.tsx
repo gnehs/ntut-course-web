@@ -68,7 +68,7 @@ export function TeacherPage() {
 	return (
 		<div className='space-y-4'>
 			<h1>{id}</h1>
-			<dl className='rounded-surface shadow-rest m-0 grid grid-cols-3 gap-px overflow-hidden bg-[rgba(var(--vs-text),0.08)] lg:grid-cols-6'>
+			<dl className='rounded-surface shadow-rest grid grid-cols-3 gap-px overflow-hidden bg-[rgba(var(--vs-text),0.08)] lg:grid-cols-6'>
 				{[
 					{ name: '退選人數', value: teacher.withdraw },
 					{ name: '選課人數', value: teacher.people },
