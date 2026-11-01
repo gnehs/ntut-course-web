@@ -238,6 +238,8 @@ export function CoursePeek() {
 			return;
 		}
 		await growPeekIntoPage();
+		// The backdrop now covers everything, so the pushed page can snap home unseen.
+		releasePagePush();
 		const top = contentTop();
 		const transition = document.startViewTransition(async () => {
 			const arrived = new Promise<void>((resolve) => {
@@ -296,7 +298,16 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 	}, []);
 	// Released as soon as the drawer starts to close, not once it has slid away.
 	const present = useIsPresent();
-	useEffect(() => (present ? lockPageScroll() : undefined), [present]);
+	const [width] = useState(drawerWidth);
+	useEffect(() => {
+		if (!present) return;
+		const unlock = lockPageScroll();
+		const unpush = pushPage(width);
+		return () => {
+			unlock();
+			unpush();
+		};
+	}, [present]);
 	return (
 		<DialogPrimitive.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
 			<DialogPrimitive.Portal forceMount>
@@ -322,7 +333,8 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 				>
 					<motion.div
 						data-peek-frame
-						className='bg-backdrop text-foreground shadow-overlay fixed inset-y-0 right-0 z-50 flex w-[min(40rem,calc(100vw-4rem))] flex-col outline-none'
+						style={{ width }}
+						className='bg-backdrop text-foreground shadow-overlay fixed inset-y-0 right-0 z-50 flex flex-col outline-none'
 						initial={{ x: '100%' }}
 						animate={{ x: 0 }}
 						exit={{ x: '100%' }}
@@ -353,6 +365,39 @@ function PeekDrawer({ peek, onClose, onExpand }: PeekViewProps) {
 			</DialogPrimitive.Portal>
 		</DialogPrimitive.Root>
 	);
+}
+
+/** Wide enough for the course's two-column layout, leaving at least 22rem of the page in view. */
+function drawerWidth() {
+	return Math.min(896, window.innerWidth - 352);
+}
+
+/**
+ * Nudges the whole page a little to the left as the drawer slides in, so the drawer reads as
+ * pushing the page aside rather than covering it. The returned function slides it back.
+ */
+function pushPage(width: number) {
+	const shift = Math.min(120, Math.round(width * 0.15));
+	const page = document.getElementById('root');
+	if (!page) return () => {};
+	const timing: KeyframeAnimationOptions = {
+		duration: reducedMotion() ? 0 : 320,
+		easing: panelEasing,
+	};
+	page.animate([{ transform: 'none' }, { transform: `translateX(${-shift}px)` }], {
+		...timing,
+		fill: 'forwards',
+	});
+	return () => {
+		const from = getComputedStyle(page).transform;
+		releasePagePush();
+		if (from !== 'none') page.animate([{ transform: from }, { transform: 'none' }], timing);
+	};
+}
+
+function releasePagePush() {
+	for (const animation of document.getElementById('root')?.getAnimations() ?? [])
+		animation.cancel();
 }
 
 let pageScrollLocks = 0;
