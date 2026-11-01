@@ -164,9 +164,7 @@ export function MyCoursePage() {
 					</section>
 					<section className='flex flex-col gap-3'>
 						<h3 className='m-0'>請 AI 推薦課程</h3>
-						<p className='m-0 text-sm opacity-75'>
-							會把目前課表帶進新對話，AI 依課程資料推薦不衝堂的課。
-						</p>
+						<p className='m-0 text-sm opacity-75'>把目前的課表交給 AI，請它推薦不會衝堂的課程。</p>
 						<div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
 							{aiChatLinks.map((chat) => (
 								<Card key={chat.name} href={chat.url(advicePrompt)}>
