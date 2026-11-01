@@ -77,6 +77,9 @@ export function CourseLink({
 	course,
 	department,
 	onClick,
+	onFocus,
+	onPointerEnter,
+	onPointerLeave,
 	...props
 }: CourseLinkProps) {
 	// Only what the link needs, so opening a peek re-renders the one link it hides and not every list.
@@ -88,6 +91,8 @@ export function CourseLink({
 		select: (state) => state.location.state.coursePeek?.origin === origin,
 	});
 	const coursePeek: CoursePeekState = { year, sem, id, depth: depth + 1, origin };
+	const hoverRef = useRef<number | undefined>(undefined);
+	const prefetch = () => prefetchCourse(year, sem, id);
 	return (
 		<Link
 			{...props}
@@ -100,15 +105,34 @@ export function CourseLink({
 			state={{ coursePeek }}
 			mask={{ to: `/course/${year}/${sem}/${id}`, unmaskOnReload: true }}
 			resetScroll={false}
+			// Resting on a link starts the detail requests, so the data is usually in hand by the time
+			// the opening animation ends; passing over a list does not fetch every course.
+			onPointerEnter={(event) => {
+				if (event.pointerType === 'mouse') hoverRef.current = window.setTimeout(prefetch, 80);
+				onPointerEnter?.(event);
+			}}
+			onPointerLeave={(event) => {
+				window.clearTimeout(hoverRef.current);
+				onPointerLeave?.(event);
+			}}
+			onFocus={(event) => {
+				prefetch();
+				onFocus?.(event);
+			}}
 			onClick={(event) => {
+				window.clearTimeout(hoverRef.current);
 				if (course) courseSeeds.set(`${year}/${sem}/${id}`, { course, department });
-				// Start the requests the detail view makes, so they overlap the opening animation.
-				fetchCourseDetail(year, sem, id).catch(() => {});
-				fetchWithdrawalRate('').catch(() => {});
+				prefetch();
 				onClick?.(event);
 			}}
 		/>
 	);
+}
+
+/** Starts the requests the detail view makes; requests already in flight are shared. */
+function prefetchCourse(year: string, sem: string, id: string) {
+	fetchCourseDetail(year, sem, id).catch(() => {});
+	fetchWithdrawalRate('').catch(() => {});
 }
 
 export function CoursePeek() {
