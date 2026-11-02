@@ -921,12 +921,13 @@ function SyllabusSection({
 						type='button'
 						aria-expanded={expanded}
 						onClick={() => setExpanded((value) => !value)}
-						className='flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-left font-semibold text-inherit'
+						className='flex w-full cursor-pointer items-start justify-between gap-2 border-0 bg-transparent p-0 text-left font-semibold text-inherit'
 					>
 						{label}
+						{/* Pinned to the first line so a wrapped label does not push the chevron down. */}
 						<IconChevronDown
 							aria-hidden='true'
-							className={`text-icon-muted size-4 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+							className={`text-icon-muted mt-1 size-4 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
 						/>
 					</button>
 				) : (
