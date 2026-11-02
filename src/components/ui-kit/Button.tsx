@@ -29,7 +29,7 @@ export function Button({
 		icon && 'size-11 p-0 sm:size-9',
 		danger ? 'tone-danger' : isSolid ? 'tone-primary' : 'tone-neutral',
 		isSolid
-			? 'bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))] shadow-solid hover:bg-[rgb(var(--vs-primary))] hover:shadow-solid-hover'
+			? 'rim-light bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))] shadow-solid hover:bg-[rgb(var(--vs-primary))] hover:shadow-solid-hover'
 			: 'shadow-soft hover:shadow-soft-hover',
 		danger &&
 			'bg-[rgba(var(--vs-danger),0.15)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.2)]',

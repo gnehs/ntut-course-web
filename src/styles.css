@@ -91,8 +91,24 @@
 	background-image: var(--sheen-well);
 }
 
+/* A white rim around solid controls, masked so it fades from the lit top edge down to nothing at the bottom. */
+@utility rim-light {
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+		mask-image: linear-gradient(to bottom, #000, transparent);
+		pointer-events: none;
+	}
+}
+
 /* App-icon style tile: sea-glass specks over a lit gradient, tinted rim, coloured glow and a frosted glyph. */
 @utility glass-tile {
+	@apply rim-light;
 	background-image:
 		var(--sea-glass),
 		linear-gradient(

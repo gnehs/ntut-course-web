@@ -978,7 +978,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 										aria-pressed={active}
 										className={`rounded-control inline-flex min-h-11 shrink-0 items-center gap-1.5 px-3 text-sm transition-[background-color,color,box-shadow] ${
 											active
-												? 'shadow-solid bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
+												? 'rim-light shadow-solid bg-[rgb(var(--vs-primary))] text-[rgb(var(--vs-primary-foreground))]'
 												: count
 													? 'shadow-soft bg-[rgba(var(--vs-primary),0.16)] text-[rgb(var(--vs-primary))]'
 													: 'bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))] text-[rgb(var(--vs-text))]'
