@@ -340,21 +340,33 @@ export function CourseList({
 				</>
 			) : null}
 			{layout === 'table' ? (
-				<Card className='overflow-hidden p-0'>
-					<div className='overflow-x-auto'>
+				<Card className='overflow-hidden p-0 max-sm:-mx-4 max-sm:w-auto max-sm:rounded-none'>
+					<div className='scroll-fade-x overflow-x-auto overscroll-x-contain'>
 						<table className='w-full min-w-[860px] border-collapse text-left'>
 							<thead>
 								<tr className='text-shadow-emboss bg-[rgba(var(--vs-text),0.035)] text-sm'>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>課號</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
+										課號
+									</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
 										課程名稱
 									</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>學分</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>時間</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>教師</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>班級</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>備註</th>
-									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
+										學分
+									</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
+										時間
+									</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
+										教師
+									</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
+										班級
+									</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
+										備註
+									</th>
+									<th className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
 										我的課程
 									</th>
 								</tr>
@@ -387,19 +399,19 @@ export function CourseList({
 													)}
 												</CourseLink>
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 tabular-nums'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap tabular-nums'>
 												{formatCredit(course.credit)}
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap tabular-nums'>
 												<CourseTimeChips time={course.time} fallback='' wrap={false} />
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
 												{trimEllip((course.teacher || []).map((item) => item.name).join('、'), 9)}
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
+											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 whitespace-nowrap'>
 												{trimEllip((course.class || []).map((item) => item.name).join('、'), 9)}
 											</td>
-											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
+											<td className='min-w-48 border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5'>
 												{conflictCourseData.includes(course.id) ? (
 													<span className='text-[rgb(var(--vs-danger))]'>衝堂</span>
 												) : (
