@@ -2,12 +2,11 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
+import { ProgramList, ProgramListSkeleton } from '../components/ProgramList';
 import { IconMinus, IconPlus, IconSearch } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
 import { Skeleton } from '../components/ui/skeleton';
 import { fetchCourse, fetchMicroPrograms } from '../lib/courseApi';
@@ -81,21 +80,16 @@ export function MProgramIndexPage() {
 				<Alert>{filter.trim() ? '沒有符合的微學程。' : '本學期目前沒有微學程資料。'}</Alert>
 			) : null}
 
-			<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
-				{filteredPrograms.map((program) => (
-					<Card
-						key={program.id}
-						className='flex flex-col gap-2 px-4 py-3 transition-transform duration-200 hover:-translate-y-1'
-						to={`/mprogram/${dataset.year}/${dataset.sem}/${program.id}`}
-					>
-						<p className='font-mono text-xs opacity-65'>{program.id}</p>
-						<CardTitle>{program.name}</CardTitle>
-						<p className='mt-auto text-sm opacity-65'>
-							{(program.course || program.courses || []).length} 門課程
-						</p>
-					</Card>
-				))}
-			</div>
+			{filteredPrograms.length ? (
+				<ProgramList
+					items={filteredPrograms.map((program) => ({
+						id: program.id,
+						name: program.name,
+						courseCount: (program.course || program.courses || []).length,
+						to: `/mprogram/${dataset.year}/${dataset.sem}/${program.id}`,
+					}))}
+				/>
+			) : null}
 		</div>
 	);
 }
@@ -105,11 +99,7 @@ function MProgramIndexSkeleton() {
 		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入微學程'>
 			<Skeleton className='h-8 w-32' />
 			<Skeleton className='h-11 w-full' />
-			<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
-				{Array.from({ length: 6 }, (_, index) => (
-					<Skeleton key={index} className='h-32 w-full' />
-				))}
-			</div>
+			<ProgramListSkeleton />
 		</div>
 	);
 }
