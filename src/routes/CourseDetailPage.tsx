@@ -579,16 +579,17 @@ function WithdrawalRateStat({
 					<div className='truncate text-lg leading-tight font-semibold tabular-nums'>
 						{loading ? <SkeletonBlock className='h-[1lh] w-14' /> : withdrawalRateLabel}
 					</div>
-					<div className='mt-1 flex flex-wrap items-center gap-x-1 text-xs leading-tight'>
-						<span className='text-muted-foreground inline-flex items-center gap-0.5'>
-							退選率
-							<IconInfoCircle aria-hidden='true' className='size-[1em]' />
-						</span>
+					<div className='mt-1 text-xs leading-tight'>
 						{loading ? (
-							<SkeletonBlock className='h-[1lh] w-16 text-xs' />
-						) : withdrawalRate !== null ? (
-							<WithdrawalRateBadge level={classification.level} label={classification.label} />
-						) : null}
+							<SkeletonBlock className='h-[1lh] w-16' />
+						) : (
+							<span
+								className={`inline-flex items-center gap-0.5 ${withdrawalRate !== null ? withdrawalLevelClassName(classification.level) : 'text-muted-foreground'}`}
+							>
+								{withdrawalRate !== null ? classification.label : '退選率'}
+								<IconInfoCircle aria-hidden='true' className='size-[1em]' />
+							</span>
+						)}
 					</div>
 				</div>
 				<TooltipContent
@@ -613,14 +614,10 @@ function WithdrawalRateStat({
 	);
 }
 
-function WithdrawalRateBadge({ level, label }: { level: WithdrawalRateLevel; label: string }) {
-	const className =
-		level === 'high'
-			? 'text-[rgb(var(--vs-danger))]'
-			: level === 'low'
-				? 'text-emerald-700 dark:text-emerald-300'
-				: 'text-[rgba(var(--vs-text),0.78)]';
-	return <span className={`text-xs font-medium ${className}`}>{label}</span>;
+function withdrawalLevelClassName(level: WithdrawalRateLevel) {
+	if (level === 'high') return 'font-medium text-[rgb(var(--vs-danger))]';
+	if (level === 'low') return 'font-medium text-emerald-700 dark:text-emerald-300';
+	return 'text-muted-foreground';
 }
 
 function withdrawalRateDescription(distribution: WithdrawalRateDistribution | null) {
