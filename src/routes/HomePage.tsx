@@ -6,7 +6,6 @@ import {
 	IconCalendar,
 	IconCalendarPlus,
 	IconChartBar,
-	IconChevronRight,
 	IconClock,
 	IconFileText,
 	IconHelpCircle,
@@ -25,6 +24,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { UniversalSearch } from '../components/UniversalSearch';
+import { ActionList } from '../components/ui-kit/ActionList';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Skeleton } from '../components/ui/skeleton';
@@ -232,10 +232,10 @@ export function HomePage() {
 
 			<div className='grid items-start gap-6 md:grid-cols-2'>
 				<PageSection title='探索與規劃'>
-					<HomeLinkList items={planningLinks} />
+					<ActionList items={planningLinks} />
 				</PageSection>
 				<PageSection title='課表與校園工具'>
-					<HomeLinkList items={toolLinks} />
+					<ActionList items={toolLinks} />
 				</PageSection>
 			</div>
 
@@ -288,34 +288,6 @@ function PrimaryActionCard({ item }: { item: HomeLink }) {
 				<CardTitle>{item.title}</CardTitle>
 				<p>{item.text}</p>
 			</div>
-		</Card>
-	);
-}
-
-// Secondary destinations share one surface so they read as a list, not as competing cards.
-function HomeLinkList({ items }: { items: HomeLink[] }) {
-	return (
-		<Card className='!p-0'>
-			{items.map((item) => {
-				const Icon = item.icon;
-				return (
-					<Link
-						key={item.to}
-						to={item.to}
-						className='group flex min-h-14 items-center gap-3 border-t px-4 py-2.5 !text-[rgb(var(--vs-text))] !no-underline transition-colors duration-200 first:border-t-0 hover:bg-[rgba(var(--vs-text),0.04)] focus-visible:bg-[rgba(var(--vs-text),0.06)] focus-visible:outline-none'
-					>
-						<Icon className='text-muted-foreground size-5 shrink-0' aria-hidden='true' />
-						<div className='min-w-0 flex-1'>
-							<div className='font-medium'>{item.title}</div>
-							<p>{item.text}</p>
-						</div>
-						<IconChevronRight
-							className='text-icon-subtle group-hover:text-icon-muted size-4 shrink-0 transition-[color,translate] duration-200 group-hover:translate-x-0.5'
-							aria-hidden='true'
-						/>
-					</Link>
-				);
-			})}
 		</Card>
 	);
 }

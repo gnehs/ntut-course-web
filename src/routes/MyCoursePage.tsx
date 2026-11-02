@@ -12,8 +12,7 @@ import {
 } from '@tabler/icons-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
+import { ActionList } from '../components/ui-kit/ActionList';
 import { Skeleton } from '../components/ui/skeleton';
 import { aiChatLinks, buildCourseAdvicePrompt } from '../lib/aiPrompt';
 import { formatCredit } from '../lib/courseUtils';
@@ -27,7 +26,6 @@ const statItemClassName =
 	'flex min-w-0 flex-col-reverse gap-1 bg-[rgb(var(--vs-background))] px-4 py-3';
 const statLabelClassName = 'text-xs leading-tight opacity-70';
 const statValueClassName = 'm-0 truncate text-xl leading-tight font-semibold tabular-nums';
-const cardGridClassName = 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3';
 
 export function MyCoursePage() {
 	const { dataset, getCourses, getMyCourseIds } = useApp();
@@ -145,8 +143,7 @@ export function MyCoursePage() {
 						))}
 					</dl>
 					<CourseList courses={shownCourses} showTimetable />
-					<TakeAlongSection year={dataset.year} />
-					<AiAdviceSection prompt={advicePrompt} />
+					<MoreSections year={dataset.year} prompt={advicePrompt} />
 				</>
 			)}
 			<section className='has-[[data-ad-collapsed]]:hidden'>
@@ -174,48 +171,43 @@ function MyCourseHeader() {
 	);
 }
 
-function TakeAlongSection({ year }: { year: string }) {
-	return (
-		<section className='flex flex-col gap-3'>
-			<h3 className='m-0'>帶著課表走</h3>
-			<div className={cardGridClassName}>
-				<Card to={`/widget?year=${year}`}>
-					<CardTitle>iOS 小工具</CardTitle>
-					<p>在桌面上檢視接下來的課程</p>
-					<IconPuzzle data-card-icon />
-				</Card>
-				<Card to={`/add-calendar?year=${year}`}>
-					<CardTitle>新增到行事曆</CardTitle>
-					<p>將我的課程匯入至行事曆</p>
-					<IconCalendar data-card-icon />
-				</Card>
-			</div>
-		</section>
-	);
-}
+const sectionHeadingClassName = 'text-muted-foreground m-0 px-1 text-sm font-medium';
 
-// Without a prompt the chat links have nowhere to go yet, so the cards keep the linked surface but stay inert.
-function AiAdviceSection({ prompt }: { prompt?: string }) {
+// Without a prompt the chat links have nowhere to go yet, so those rows hold their place but stay inert.
+function MoreSections({ year, prompt }: { year: string; prompt?: string }) {
 	return (
-		<section className='flex flex-col gap-3'>
-			<div className='flex flex-col gap-1'>
-				<h3 className='m-0'>請 AI 推薦課程</h3>
-				<p className='m-0 text-sm opacity-75'>把目前的課表交給 AI，請它推薦不會衝堂的課程。</p>
-			</div>
-			<div className={cardGridClassName}>
-				{aiChatLinks.map((chat) => (
-					<Card
-						key={chat.name}
-						href={prompt === undefined ? undefined : chat.url(prompt)}
-						className={prompt === undefined ? 'bg-sheen-glow shadow-raised' : undefined}
-					>
-						<CardTitle>問 {chat.name}</CardTitle>
-						<p>在新分頁開啟對話</p>
-						<IconSparkles data-card-icon />
-					</Card>
-				))}
-			</div>
-		</section>
+		<div className='grid items-start gap-6 md:grid-cols-2'>
+			<section className='flex min-w-0 flex-col gap-3'>
+				<h2 className={sectionHeadingClassName}>帶著課表走</h2>
+				<ActionList
+					items={[
+						{
+							to: `/widget?year=${year}`,
+							title: 'iOS 小工具',
+							text: '在桌面上檢視接下來的課程',
+							icon: IconPuzzle,
+						},
+						{
+							to: `/add-calendar?year=${year}`,
+							title: '新增到行事曆',
+							text: '將我的課程匯入至行事曆',
+							icon: IconCalendar,
+						},
+					]}
+				/>
+			</section>
+			<section className='flex min-w-0 flex-col gap-3'>
+				<h2 className={sectionHeadingClassName}>請 AI 推薦課程</h2>
+				<ActionList
+					items={aiChatLinks.map((chat) => ({
+						href: prompt === undefined ? undefined : chat.url(prompt),
+						title: `問 ${chat.name}`,
+						text: '帶入目前課表，推薦不會衝堂的課程',
+						icon: IconSparkles,
+					}))}
+				/>
+			</section>
+		</div>
 	);
 }
 
@@ -234,8 +226,7 @@ function MyCourseSkeleton({ year }: { year: string }) {
 				))}
 			</dl>
 			<CourseListSkeleton showTimetable />
-			<TakeAlongSection year={year} />
-			<AiAdviceSection />
+			<MoreSections year={year} />
 		</div>
 	);
 }
