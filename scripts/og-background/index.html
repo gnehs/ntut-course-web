@@ -3,6 +3,7 @@
   Renders the sea glass book behind the worker's og images.
   1. python3 scripts/og-background/server.py scripts/og-background
   2. open http://127.0.0.1:8765/index.html?save in a browser
+     (index.html?home&save renders out-home.png, the pebbles alone for the home page, see home.html)
   3. for f in scripts/og-background/out-*.png; do n=${f##*/out-}; sips -z 600 1200 -s format jpeg -s formatOptions 88 "$f" --out "static/og/book-${n%.png}.jpg"; done
   If the book moves, copy out-label.json's corners into COVER in src/worker/ogImage.tsx.
 -->
@@ -26,6 +27,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const params = new URLSearchParams(location.search);
 const SAVE = params.has('save');
+const HOME = params.has('home');
 const W = 1200, H = 600, SCALE = 2;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -116,7 +118,7 @@ const BOOK = { x: 2.95, y: 0.02, w: 3.25, h: 4.25, rx: 0.1, ry: -0.42, rz: -0.13
 const book = new THREE.Group();
 book.position.set(BOOK.x, BOOK.y, 0);
 book.rotation.set(BOOK.rx, BOOK.ry, BOOK.rz);
-scene.add(book);
+if (!HOME) scene.add(book);
 
 // one render per college; the worker picks the file by name
 const COVERS = {
@@ -244,8 +246,22 @@ function paintCover(color) {
 const save = (name, body) => fetch(`/save/${name}`, { method: 'POST', body });
 const snapshot = () => new Promise((resolve) => renderer.domElement.toBlob(resolve, 'image/png'));
 
-paintCover(COVERS[params.get('cover')] || COVERS.seafoam);
-if (SAVE) {
+// the home page has no college, so its pebbles take every college's glass in turn
+function paintHome() {
+  const glass = [...Object.values(COVERS), '#e6efec', '#f2f5f3'];
+  pebbleMats.forEach((mat, index) => {
+    const tone = new THREE.Color(glass[(index * 3) % glass.length]);
+    mat.color.copy(tone).lerp(new THREE.Color('#ffffff'), 0.12);
+    mat.attenuationColor.copy(tone);
+  });
+  renderer.render(scene, camera);
+}
+
+if (HOME) {
+  paintHome();
+  if (SAVE) { await save('home.png', await snapshot()); document.title = 'saved'; }
+} else paintCover(COVERS[params.get('cover')] || COVERS.seafoam);
+if (SAVE && !HOME) {
   for (const [name, color] of Object.entries(COVERS)) {
     paintCover(color);
     await save(`${name}.png`, await snapshot());
