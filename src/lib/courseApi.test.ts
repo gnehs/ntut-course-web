@@ -7,7 +7,6 @@ import {
 	fetchDepartment,
 	fetchMicroPrograms,
 	fetchPrograms,
-	fetchSyllabusIndex,
 	fetchStandardDepartments,
 } from './courseApi';
 
@@ -40,14 +39,6 @@ const datasets = {
 			courses: [{ code: 'CODE-001', name: '測試課程', abilityIds: ['ability-001'] }],
 		},
 	],
-	syllabusIndex: {
-		'COURSE-001': {
-			ai: ['導入 AI 測試'],
-			sdgs: [4],
-			resources: ['延伸資源測試'],
-			hasSyllabus: true,
-		},
-	},
 } as const;
 
 const requests = [
@@ -62,12 +53,6 @@ const requests = [
 		path: 'competencies.json',
 		call: () => fetchCompetencies(),
 		data: datasets.competencies,
-	},
-	{
-		name: 'syllabus index',
-		path: '115/1/syllabus-index.json',
-		call: () => fetchSyllabusIndex('115', '1'),
-		data: datasets.syllabusIndex,
 	},
 ] as const;
 
@@ -131,7 +116,6 @@ describe('semester datasets without a selected semester', () => {
 		await expect(fetchDepartment('', '')).resolves.toEqual([]);
 		await expect(fetchMicroPrograms('', '')).resolves.toEqual([]);
 		await expect(fetchPrograms('', '')).resolves.toBeNull();
-		await expect(fetchSyllabusIndex('', '')).resolves.toBeNull();
 
 		expect(mocks.fetch).not.toHaveBeenCalled();
 		expect(mocks.getStore).not.toHaveBeenCalled();

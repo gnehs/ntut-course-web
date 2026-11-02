@@ -19,7 +19,6 @@ import {
 	IconLanguage,
 	IconSchool,
 	IconSearch,
-	IconSparkles,
 	IconTags,
 	IconX,
 } from '@tabler/icons-react';
@@ -33,15 +32,13 @@ import { AdvancedSearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { MiniNotify } from '../components/ui-kit/MiniNotify';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { categoryFilterList, courseStandard, parseYearSemVal, timetable } from '../lib/courseUtils';
-import { fetchDepartment, fetchSyllabusIndex, fetchWithdrawalRate } from '../lib/courseApi';
+import { fetchDepartment, fetchWithdrawalRate } from '../lib/courseApi';
 import {
-	AI_ANY_FILTER,
 	ALL_LANGUAGE_FILTER,
 	courseAttributeLabels,
 	filterCoursesByMetadata,
 	getCourseAttributeOptions,
 	getLanguageOptions,
-	getSyllabusFilterOptions,
 	languageLabel,
 	parseMetadataFilterState,
 	serializeMetadataFilterState,
@@ -54,7 +51,6 @@ import type {
 	Course,
 	DepartmentGroup,
 	QueryValue,
-	SyllabusIndex,
 	WithdrawalRateMap,
 } from '../types/course';
 import { errorMessage } from '../lib/error';
@@ -87,8 +83,6 @@ type AdvancedSearchQuery = {
 	tf?: Record<string, string[]>;
 	af?: string;
 	sph?: boolean;
-	ai?: boolean | string[];
-	sdgs?: number[];
 	attrs?: string[];
 };
 
@@ -99,14 +93,11 @@ type SearchSectionId =
 	| 'category'
 	| 'academy'
 	| 'attributes'
-	| 'syllabus'
 	| 'time';
 
 type AdvancedSearchControlsProps = {
 	academyFilter: string[];
 	academyList: string[];
-	aiFilter: string[];
-	aiOptions: string[];
 	attributeFilter: CourseAttribute[];
 	attributeOptions: CourseAttribute[];
 	categoryFilter: string[];
@@ -119,19 +110,15 @@ type AdvancedSearchControlsProps = {
 	onKeywordChange: (value: string) => void;
 	onLanguageChange: (value: string) => void;
 	onReset: () => void;
-	onToggleAi: (value: string) => void;
 	onToggleAcademy: (item: string) => void;
 	onToggleAttribute: (value: CourseAttribute) => void;
 	onToggleCategory: (value: string) => void;
 	onToggleConflict: (checked: unknown) => void;
 	onTogglePlaceholder: (checked: unknown) => void;
-	onToggleSdgs: (value: number) => void;
 	onToggleStandard: (symbol: string, checked: unknown) => void;
 	onToggleTimetable: (date?: string | null, slot?: string) => void;
 	recommandKeyword: string[];
 	searchCourseKeyword: string;
-	sdgsFilter: number[];
-	sdgsOptions: number[];
 	setSortBy: (value: string) => void;
 	showCloseButton?: boolean;
 	showConflictCourse: boolean;
@@ -152,7 +139,6 @@ const filterSections: {
 	{ id: 'category', label: '博雅類別', title: '依博雅類別篩選課程', icon: IconCategory },
 	{ id: 'academy', label: '學院', title: '依學院篩選', icon: IconBooks },
 	{ id: 'attributes', label: '課程屬性', title: '依課程屬性篩選', icon: IconTags },
-	{ id: 'syllabus', label: '課綱主題', title: '依課綱主題篩選', icon: IconSparkles },
 	{ id: 'time', label: '時間', title: '依時間篩選', icon: IconClock },
 ];
 
@@ -171,8 +157,6 @@ export function AdvancedSearchPage() {
 		() =>
 			parseMetadataFilterState({
 				language: params.get('language'),
-				ai: restoredQuery.ai,
-				sdgs: restoredQuery.sdgs,
 				attrs: restoredQuery.attrs,
 			}),
 		[params, restoredQuery],
@@ -184,8 +168,6 @@ export function AdvancedSearchPage() {
 	const [showPlaceholder, setShowPlaceholder] = useState(restoredQuery.sph ?? false);
 	const [sortBy, setSortBy] = useState(restoredQuery.sb || 'default');
 	const [languageFilter, setLanguageFilter] = useState(restoredMetadata.language);
-	const [aiFilter, setAiFilter] = useState(restoredMetadata.ai);
-	const [sdgsFilter, setSdgsFilter] = useState(restoredMetadata.sdgs);
 	const [attributeFilter, setAttributeFilter] = useState<CourseAttribute[]>(
 		restoredMetadata.attributes,
 	);
@@ -208,9 +190,6 @@ export function AdvancedSearchPage() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [departmentData, setDepartmentData] = useState<DepartmentGroup[] | null>(null);
 	const [withdrawalRate, setWithdrawalRate] = useState<WithdrawalRateMap | null>(null);
-	const [syllabusIndex, setSyllabusIndex] = useState<SyllabusIndex | null>(null);
-	const [syllabusIndexLoaded, setSyllabusIndexLoaded] = useState(false);
-	const [syllabusIndexError, setSyllabusIndexError] = useState<unknown>(null);
 	const [onError, setOnError] = useState<unknown>(null);
 	const [recommandKeyword, setRecommandKeyword] = useState(['體育', '博雅']);
 	const [resultPage, setResultPage] = useState(restoredPage);
@@ -235,10 +214,6 @@ export function AdvancedSearchPage() {
 	);
 	const languageOptions = useMemo(() => getLanguageOptions(allCourses || []), [allCourses]);
 	const attributeOptions = useMemo(() => getCourseAttributeOptions(allCourses || []), [allCourses]);
-	const syllabusFilterOptions = useMemo(
-		() => getSyllabusFilterOptions(syllabusIndex),
-		[syllabusIndex],
-	);
 	const courseStandardFilterEnabled = useMemo(
 		() => Object.values(courseStandardFilter).some((item) => item),
 		[courseStandardFilter],
@@ -261,8 +236,6 @@ export function AdvancedSearchPage() {
 		setShowPlaceholder(restoredQuery.sph ?? false);
 		setSortBy(restoredQuery.sb || 'default');
 		setLanguageFilter(restoredMetadata.language);
-		setAiFilter(restoredMetadata.ai);
-		setSdgsFilter(restoredMetadata.sdgs);
 		setAttributeFilter(restoredMetadata.attributes);
 		setCategoryFilter(restoredQuery.cf || []);
 		setCourseStandardFilter(() => {
@@ -311,25 +284,15 @@ export function AdvancedSearchPage() {
 			try {
 				setAllCourses(null);
 				setDepartmentData(null);
-				setSyllabusIndex(null);
-				setSyllabusIndexLoaded(false);
-				setSyllabusIndexError(null);
-				const syllabusIndexPromise = fetchSyllabusIndex(year, sem).catch((error) => {
-					if (!cancelled) setSyllabusIndexError(error);
-					return null;
-				});
-				const [departments, rate, courses, index] = await Promise.all([
+				const [departments, rate, courses] = await Promise.all([
 					fetchDepartment(year, sem),
 					fetchWithdrawalRate(''),
 					getCourses({ year, sem, department }),
-					syllabusIndexPromise,
 				]);
 				if (cancelled) return;
 				setDepartmentData(departments);
 				setWithdrawalRate(rate);
 				setAllCourses(courses);
-				setSyllabusIndex(index);
-				setSyllabusIndexLoaded(true);
 				const classData = departments.flatMap((item) => item.class || []);
 				const classID = localStorage.getItem('my-class');
 				const className = classData.find((item) => item.id === classID)?.name;
@@ -342,8 +305,6 @@ export function AdvancedSearchPage() {
 				if (!cancelled) {
 					setAllCourses([]);
 					setDepartmentData(null);
-					setSyllabusIndex(null);
-					setSyllabusIndexLoaded(false);
 					setOnError(e);
 				}
 			} finally {
@@ -361,10 +322,7 @@ export function AdvancedSearchPage() {
 		try {
 			let filtered = filterCoursesByMetadata(allCourses, {
 				language: languageFilter,
-				ai: aiFilter,
-				sdgs: sdgsFilter,
 				attributes: attributeFilter,
-				syllabusIndex,
 			});
 
 			if (searchCourseKeyword.length) {
@@ -487,10 +445,7 @@ export function AdvancedSearchPage() {
 	}, [
 		allCourses,
 		languageFilter,
-		aiFilter,
-		sdgsFilter,
 		attributeFilter,
-		syllabusIndex,
 		searchCourseKeyword,
 		courseStandardFilterEnabled,
 		courseStandardFilter,
@@ -510,34 +465,10 @@ export function AdvancedSearchPage() {
 		if (languageFilter && languageOptions.length === 0)
 			warnings.push('目前學期沒有可用的授課語言資料，語言條件未套用。');
 
-		if (
-			(aiFilter.length || sdgsFilter.length) &&
-			syllabusIndexLoaded &&
-			(syllabusIndexError || syllabusIndex == null)
-		) {
-			if (syllabusIndexError) {
-				warnings.push('課綱分析資料暫時無法載入，AI 與 SDGs 條件未套用。');
-			} else {
-				warnings.push('目前學期沒有課綱索引資料，AI 與 SDGs 條件未套用。');
-			}
-		}
-
 		if (attributeFilter.length && attributeOptions.length === 0)
 			warnings.push('目前學期沒有可用的課程屬性資料，課程屬性條件未套用。');
 		return warnings;
-	}, [
-		aiFilter,
-		allCourses,
-		attributeFilter,
-		attributeOptions,
-		languageFilter,
-		languageOptions,
-		onError,
-		sdgsFilter,
-		syllabusIndex,
-		syllabusIndexError,
-		syllabusIndexLoaded,
-	]);
+	}, [allCourses, attributeFilter, attributeOptions, languageFilter, languageOptions, onError]);
 	useEffect(() => {
 		if (location.pathname !== '/advanced-search') return;
 		// A route navigation can render once with the previous local state. Let the
@@ -561,12 +492,8 @@ export function AdvancedSearchPage() {
 		if (showPlaceholder) q.sph = showPlaceholder;
 		const metadataQuery = serializeMetadataFilterState({
 			language: languageFilter,
-			ai: aiFilter,
-			sdgs: sdgsFilter,
 			attributes: attributeFilter,
 		});
-		if (metadataQuery.ai !== undefined) q.ai = metadataQuery.ai;
-		if (metadataQuery.sdgs !== undefined) q.sdgs = metadataQuery.sdgs as unknown as QueryValue;
 		if (metadataQuery.attrs !== undefined) q.attrs = metadataQuery.attrs;
 		const nextSearch = createSearchObject({
 			year,
@@ -597,8 +524,6 @@ export function AdvancedSearchPage() {
 		showConflictCourse,
 		showPlaceholder,
 		languageFilter,
-		aiFilter,
-		sdgsFilter,
 		attributeFilter,
 		sortBy,
 		categoryFilter,
@@ -616,8 +541,6 @@ export function AdvancedSearchPage() {
 		setShowPlaceholder(false);
 		setSortBy('default');
 		setLanguageFilter('');
-		setAiFilter([]);
-		setSdgsFilter([]);
 		setAttributeFilter([]);
 		setCategoryFilter([]);
 		setCourseStandardFilter({ ...emptyStandardFilter });
@@ -660,8 +583,6 @@ export function AdvancedSearchPage() {
 	const searchControlsProps: AdvancedSearchControlsProps = {
 		academyFilter,
 		academyList,
-		aiFilter,
-		aiOptions: syllabusFilterOptions.ai,
 		attributeFilter,
 		attributeOptions,
 		categoryFilter,
@@ -679,14 +600,6 @@ export function AdvancedSearchPage() {
 			resetPage();
 		},
 		onReset: reset,
-		onToggleAi: (value) => {
-			setAiFilter((items) => {
-				if (value === AI_ANY_FILTER) return items.includes(value) ? [] : [value];
-				const next = items.filter((item) => item !== AI_ANY_FILTER);
-				return toggleArrayValue(next, value);
-			});
-			resetPage();
-		},
 		onToggleAcademy: (item) => {
 			setAcademyFilter((items) => toggleArrayValue(items, item));
 			resetPage();
@@ -703,14 +616,6 @@ export function AdvancedSearchPage() {
 			setShowPlaceholder(Boolean(checked));
 			resetPage();
 		},
-		onToggleSdgs: (value) => {
-			setSdgsFilter((items) =>
-				items.includes(value)
-					? items.filter((item) => item !== value)
-					: [...items, value].sort((a, b) => a - b),
-			);
-			resetPage();
-		},
 		onToggleStandard: (symbol, checked) => {
 			setCourseStandardFilter((value) => ({ ...value, [symbol]: Boolean(checked) }));
 			resetPage();
@@ -725,8 +630,6 @@ export function AdvancedSearchPage() {
 		},
 		recommandKeyword,
 		searchCourseKeyword,
-		sdgsFilter,
-		sdgsOptions: syllabusFilterOptions.sdgs,
 		showConflictCourse,
 		showPlaceholder,
 		sortBy,
@@ -754,8 +657,6 @@ export function AdvancedSearchPage() {
 		categoryFilter.length ||
 		academyFilter.length ||
 		attributeFilter.length ||
-		aiFilter.length ||
-		sdgsFilter.length ||
 		timetableFilterCount,
 	);
 
@@ -847,7 +748,6 @@ function getFilterSectionCount(id: SearchSectionId, props: AdvancedSearchControl
 	if (id === 'category') return props.categoryFilter.length;
 	if (id === 'academy') return props.academyFilter.length;
 	if (id === 'attributes') return props.attributeFilter.length;
-	if (id === 'syllabus') return Number(props.aiFilter.length > 0) + props.sdgsFilter.length;
 	return Object.values(props.timetableFilter).reduce((sum, items) => sum + items.length, 0);
 }
 
@@ -858,7 +758,6 @@ function getFilterSection(id: SearchSectionId) {
 function isFilterSectionVisible(id: SearchSectionId, props: AdvancedSearchControlsProps) {
 	if (id === 'language') return props.languageOptions.length > 0;
 	if (id === 'attributes') return props.attributeOptions.length > 0;
-	if (id === 'syllabus') return props.aiOptions.length > 0 || props.sdgsOptions.length > 0;
 	return true;
 }
 
@@ -1200,50 +1099,6 @@ function FilterSectionContent({
 					</label>
 				))}
 			</fieldset>
-		);
-	}
-
-	if (id === 'syllabus') {
-		return (
-			<div className='grid gap-3'>
-				{props.aiOptions.length ? (
-					<fieldset className='grid gap-2 border-0 p-0'>
-						<legend className='text-sm font-medium'>AI 教學方式</legend>
-						<label className='flex min-h-7 cursor-pointer items-center gap-2'>
-							<Checkbox
-								checked={props.aiFilter.includes(AI_ANY_FILTER)}
-								onCheckedChange={() => props.onToggleAi(AI_ANY_FILTER)}
-							/>
-							<span>有導入 AI</span>
-						</label>
-						{props.aiOptions.map((value) => (
-							<label key={value} className='flex min-h-7 cursor-pointer items-center gap-2'>
-								<Checkbox
-									checked={props.aiFilter.includes(value)}
-									onCheckedChange={() => props.onToggleAi(value)}
-								/>
-								<span>{value}</span>
-							</label>
-						))}
-					</fieldset>
-				) : null}
-				{props.sdgsOptions.length ? (
-					<fieldset className='grid gap-2 border-0 p-0'>
-						<legend className='text-sm font-medium'>聯合國永續發展目標（SDGs）</legend>
-						<div className='grid grid-cols-2 gap-x-3 gap-y-2'>
-							{props.sdgsOptions.map((value) => (
-								<label key={value} className='flex min-h-7 cursor-pointer items-center gap-2'>
-									<Checkbox
-										checked={props.sdgsFilter.includes(value)}
-										onCheckedChange={() => props.onToggleSdgs(value)}
-									/>
-									<span>SDG {value}</span>
-								</label>
-							))}
-						</div>
-					</fieldset>
-				) : null}
-			</div>
 		);
 	}
 

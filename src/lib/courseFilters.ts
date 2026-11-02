@@ -1,6 +1,5 @@
-import type { Course, SyllabusIndex } from '../types/course';
+import type { Course } from '../types/course';
 
-export const AI_ANY_FILTER = '__any__';
 export const ALL_LANGUAGE_FILTER = '__all__';
 
 export const courseAttributeKeys = ['audit', 'lab', 'interdisciplinary'] as const;
@@ -14,8 +13,6 @@ export const courseAttributeLabels: Record<CourseAttribute, string> = {
 
 export type MetadataFilterState = {
 	language: string;
-	ai: string[];
-	sdgs: number[];
 	attributes: CourseAttribute[];
 };
 
@@ -113,50 +110,18 @@ export function getCourseAttributeOptions(courses: Course[]) {
 	);
 }
 
-function indexEntries(index: SyllabusIndex | null | undefined) {
-	return Object.values(index || {});
-}
-
-export function getSyllabusFilterOptions(index: SyllabusIndex | null | undefined) {
-	const ai = uniqueStrings(indexEntries(index).flatMap((item) => item?.ai || []));
-	const sdgs = [
-		...new Set(
-			indexEntries(index)
-				.flatMap((item) => item?.sdgs || [])
-				.filter((value) => Number.isInteger(value) && value >= 1 && value <= 17),
-		),
-	].sort((a, b) => a - b);
-	return { ai, sdgs };
-}
-
 function stringList(value: unknown) {
 	if (Array.isArray(value)) return uniqueStrings(value);
 	if (typeof value === 'string') return uniqueStrings(value.split(','));
 	return [];
 }
 
-function numberList(value: unknown) {
-	const values = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
-	return [
-		...new Set(
-			values
-				.map((item) => (typeof item === 'number' ? item : Number(item)))
-				.filter((item) => Number.isInteger(item) && item >= 1 && item <= 17),
-		),
-	].sort((a, b) => a - b);
-}
-
 export function parseMetadataFilterState(query: {
 	language?: unknown;
-	ai?: unknown;
-	sdgs?: unknown;
 	attrs?: unknown;
 }): MetadataFilterState {
-	const ai = query.ai === true ? [AI_ANY_FILTER] : stringList(query.ai);
 	return {
 		language: normalizeLanguage(query.language),
-		ai,
-		sdgs: numberList(query.sdgs),
 		attributes: stringList(query.attrs).filter((value): value is CourseAttribute =>
 			(courseAttributeKeys as readonly string[]).includes(value),
 		),
@@ -166,14 +131,8 @@ export function parseMetadataFilterState(query: {
 export function serializeMetadataFilterState(state: MetadataFilterState) {
 	return {
 		language: normalizeLanguage(state.language) || undefined,
-		ai: state.ai.length ? (state.ai.includes(AI_ANY_FILTER) ? true : state.ai) : undefined,
-		sdgs: state.sdgs.length ? state.sdgs : undefined,
 		attrs: state.attributes.length ? state.attributes : undefined,
 	};
-}
-
-function syllabusItem(index: SyllabusIndex | null | undefined, id: string) {
-	return index?.[String(id)];
 }
 
 function hasLanguageData(courses: Course[]) {
@@ -187,18 +146,12 @@ function hasCourseAttributeData(courses: Course[]) {
 }
 
 /**
- * Applies only metadata filters. Filters whose source is unavailable are ignored so a
- * missing optional index can never masquerade as "no AI" or make a shared URL empty.
+ * Applies only metadata filters. Filters whose source is unavailable are ignored so
+ * missing optional data can never make a shared URL empty.
  */
 export function filterCoursesByMetadata(
 	courses: Course[],
-	{
-		language,
-		ai,
-		sdgs,
-		attributes,
-		syllabusIndex,
-	}: MetadataFilterState & { syllabusIndex: SyllabusIndex | null | undefined },
+	{ language, attributes }: MetadataFilterState,
 ) {
 	let result = courses;
 
@@ -208,21 +161,6 @@ export function filterCoursesByMetadata(
 
 	if (attributes.length && hasCourseAttributeData(courses)) {
 		result = result.filter((course) => attributes.some((key) => hasMeaningfulValue(course[key])));
-	}
-
-	if (ai.length && syllabusIndex) {
-		result = result.filter((course) => {
-			const values = uniqueStrings(syllabusItem(syllabusIndex, course.id)?.ai || []);
-			if (ai.includes(AI_ANY_FILTER)) return values.length > 0;
-			return ai.some((value) => values.includes(value));
-		});
-	}
-
-	if (sdgs.length && syllabusIndex) {
-		result = result.filter((course) => {
-			const values = syllabusItem(syllabusIndex, course.id)?.sdgs || [];
-			return sdgs.some((value) => values.includes(value));
-		});
 	}
 
 	return result;

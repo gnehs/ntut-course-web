@@ -204,16 +204,6 @@ export type CompetencyDepartment = {
 	courses: { code: string; name: string; abilityIds: string[] }[];
 };
 
-export type SyllabusIndex = Record<
-	string,
-	{
-		ai: string[];
-		sdgs: number[];
-		resources: string[];
-		hasSyllabus: boolean;
-	}
->;
-
 export type WorkflowRun = {
 	id: number;
 	html_url: string;

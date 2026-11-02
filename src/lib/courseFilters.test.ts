@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import type { Course, SyllabusIndex } from '../types/course';
+import type { Course } from '../types/course';
 import {
-	AI_ANY_FILTER,
 	courseAttributeKeys,
 	filterCoursesByMetadata,
 	getCourseAttributeOptions,
 	getLanguageOptions,
-	getSyllabusFilterOptions,
 	hasMeaningfulValue,
 	normalizeLanguage,
 	parseMetadataFilterState,
@@ -56,95 +54,24 @@ describe('course metadata filters', () => {
 		expect(courseAttributeKeys).toEqual(['audit', 'lab', 'interdisciplinary']);
 	});
 
-	it('derives AI options and valid SDG values from one syllabus index', () => {
-		const index: SyllabusIndex = {
-			'1': { ai: ['生成式 AI'], sdgs: [4, 17, 0, 18], resources: [], hasSyllabus: true },
-			'2': { ai: [], sdgs: [4], resources: [], hasSyllabus: true },
-		};
-		expect(getSyllabusFilterOptions(index)).toEqual({ ai: ['生成式 AI'], sdgs: [4, 17] });
-	});
-
-	it('filters language, course attributes, AI, and SDGs with OR semantics', () => {
+	it('filters language and course attributes with OR semantics', () => {
 		const courses = [
 			course({ id: '1', language: '英文', lab: '是' }),
 			course({ id: '2', language: '英語', audit: '是' }),
 			course({ id: '3', language: '中文', interdisciplinary: '是' }),
 		];
-		const syllabusIndex: SyllabusIndex = {
-			'1': { ai: ['生成式 AI'], sdgs: [4], resources: [], hasSyllabus: true },
-			'2': { ai: ['AI 輔助評量'], sdgs: [17], resources: [], hasSyllabus: true },
-			'3': { ai: [], sdgs: [10], resources: [], hasSyllabus: true },
-		};
 		expect(
 			filterCoursesByMetadata(courses, {
 				language: 'English',
-				ai: ['生成式 AI'],
-				sdgs: [4],
 				attributes: ['lab'],
-				syllabusIndex,
 			}).map((item) => item.id),
 		).toEqual(['1']);
 		expect(
 			filterCoursesByMetadata(courses, {
 				language: '',
-				ai: [AI_ANY_FILTER],
-				sdgs: [17, 10],
 				attributes: ['audit', 'interdisciplinary'],
-				syllabusIndex,
 			}).map((item) => item.id),
-		).toEqual(['2']);
-	});
-
-	it('ignores index-backed filters when the optional index is unavailable', () => {
-		const courses = [course({ id: '1', language: '英文' }), course({ id: '2', language: '中文' })];
-		expect(
-			filterCoursesByMetadata(courses, {
-				language: '',
-				ai: [AI_ANY_FILTER],
-				sdgs: [4],
-				attributes: [],
-				syllabusIndex: null,
-			}),
-		).toEqual(courses);
-	});
-
-	it('treats an existing empty index as a real zero-match source', () => {
-		const courses = [course({ id: '1' }), course({ id: '2' })];
-		expect(
-			filterCoursesByMetadata(courses, {
-				language: '',
-				ai: [AI_ANY_FILTER],
-				sdgs: [],
-				attributes: [],
-				syllabusIndex: {},
-			}),
-		).toEqual([]);
-	});
-
-	it('returns no matches for unknown AI and SDG selections when the index exists', () => {
-		const courses = [course({ id: '1' })];
-		const syllabusIndex: SyllabusIndex = {
-			'1': { ai: ['生成式 AI'], sdgs: [4], resources: [], hasSyllabus: true },
-		};
-
-		expect(
-			filterCoursesByMetadata(courses, {
-				language: '',
-				ai: ['未收錄的教學方式'],
-				sdgs: [],
-				attributes: [],
-				syllabusIndex,
-			}),
-		).toEqual([]);
-		expect(
-			filterCoursesByMetadata(courses, {
-				language: '',
-				ai: [],
-				sdgs: [17],
-				attributes: [],
-				syllabusIndex,
-			}),
-		).toEqual([]);
+		).toEqual(['2', '3']);
 	});
 
 	it('returns no matches for an unknown language or attribute when that field has data', () => {
@@ -156,19 +83,13 @@ describe('course metadata filters', () => {
 		expect(
 			filterCoursesByMetadata(courses, {
 				language: '日文',
-				ai: [],
-				sdgs: [],
 				attributes: [],
-				syllabusIndex: null,
 			}),
 		).toEqual([]);
 		expect(
 			filterCoursesByMetadata(courses, {
 				language: '',
-				ai: [],
-				sdgs: [],
 				attributes: ['interdisciplinary'],
-				syllabusIndex: null,
 			}),
 		).toEqual([]);
 	});
@@ -178,10 +99,7 @@ describe('course metadata filters', () => {
 		expect(
 			filterCoursesByMetadata(courses, {
 				language: 'English',
-				ai: [],
-				sdgs: [],
 				attributes: ['audit'],
-				syllabusIndex: null,
 			}),
 		).toEqual(courses);
 	});
@@ -189,16 +107,12 @@ describe('course metadata filters', () => {
 	it('round trips metadata filters through the URL query shape', () => {
 		const state: MetadataFilterState = {
 			language: 'English',
-			ai: [AI_ANY_FILTER],
-			sdgs: [17, 4],
 			attributes: ['lab', 'audit'] as CourseAttribute[],
 		};
 		const encoded = serializeMetadataFilterState(state);
 		const decoded = parseMetadataFilterState(encoded);
 		expect(decoded).toEqual({
 			language: 'English',
-			ai: [AI_ANY_FILTER],
-			sdgs: [4, 17],
 			attributes: ['lab', 'audit'],
 		});
 	});

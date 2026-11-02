@@ -11,7 +11,6 @@ import type {
 	Program,
 	StandardYearData,
 	SyllabusItem,
-	SyllabusIndex,
 	WithdrawalRateMap,
 	WithdrawalResponse,
 	YearSemData,
@@ -185,9 +184,4 @@ export function fetchPrograms(year: string, sem: string): Promise<Program[] | nu
 
 export function fetchCompetencies(): Promise<CompetencyDepartment[] | null> {
 	return fetchOptionalDataset('competencies.json');
-}
-
-export function fetchSyllabusIndex(year: string, sem: string): Promise<SyllabusIndex | null> {
-	if (!year || !sem) return Promise.resolve(null);
-	return fetchOptionalDataset(`${year}/${sem}/syllabus-index.json`);
 }
