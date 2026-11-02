@@ -1,9 +1,24 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Link, useParams } from '@tanstack/react-router';
 import { useRouteLocation } from '../lib/routeLocation';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
-import { Minus, Plus, Star } from 'lucide-react';
+import {
+	BookOpen,
+	Briefcase,
+	Building2,
+	ChevronDown,
+	Cog,
+	Cpu,
+	FlaskConical,
+	Minus,
+	PenTool,
+	Plus,
+	Rocket,
+	School,
+	Star,
+	type LucideIcon,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -18,6 +33,10 @@ import { createSearchParams } from '../lib/urlState';
 import { useApp } from '../state/AppContext';
 import type { Course, DepartmentClass, DepartmentGroup } from '../types/course';
 import { errorMessage } from '../lib/error';
+import { groupClassNames } from '../lib/classGroups';
+import { useMediaQuery } from '../lib/useMediaQuery';
+import { animateFilterSection, isReducedMotion } from '../lib/motion';
+import { cn } from '../lib/utils';
 
 const validClassDepartments = new Set(departmentItems.map(storageDepartment));
 
@@ -110,6 +129,45 @@ export function ClassIndexPage() {
 		}
 	}, [departments, filter]);
 
+	const colleges = useMemo(() => {
+		const byCategory = new Map<string, DepartmentGroup[]>();
+		for (const department of filteredDepartmentData || []) {
+			const name = department.category || '其他';
+			byCategory.set(name, [...(byCategory.get(name) || []), department]);
+		}
+		return [...byCategory].map(([name, departments]) => ({ name, departments }));
+	}, [filteredDepartmentData]);
+
+	const isWide = useMediaQuery('(min-width: 48rem)');
+	const [expandedDepartment, setExpandedDepartment] = useState<string | null>(null);
+	const userClassName = recommendClass.find((item) => item.description === '你的班級')?.name;
+	const userDepartment = (departments || []).find((department) =>
+		(department.class || []).some((item) => item.name === userClassName),
+	)?.name;
+	// Until someone opens a department on mobile, open the one holding their saved class.
+	const openDepartment = expandedDepartment ?? userDepartment;
+	const departmentNames = useMemo(
+		() => (filteredDepartmentData || []).map((department) => department.name),
+		[filteredDepartmentData],
+	);
+	const spiedDepartment = useScrollSpy(isWide ? departmentNames : [], departmentAnchor);
+	const navRef = useRef<HTMLElement | null>(null);
+	const classHref = (name: string) =>
+		`/class/${dataset.year}/${dataset.sem}/${name}?d=${dataset.department}`;
+
+	useEffect(() => {
+		// Keep the highlighted entry inside the nav's own scroll box without moving the page.
+		const nav = navRef.current;
+		const item = nav?.querySelector<HTMLElement>('[aria-current="true"]');
+		if (!nav || !item) return;
+		const navBox = nav.getBoundingClientRect();
+		const itemBox = item.getBoundingClientRect();
+		const margin = 48;
+		if (itemBox.top < navBox.top + margin) nav.scrollTop -= navBox.top + margin - itemBox.top;
+		else if (itemBox.bottom > navBox.bottom - margin)
+			nav.scrollTop += itemBox.bottom - (navBox.bottom - margin);
+	}, [spiedDepartment]);
+
 	if (!departments) return <ClassIndexSkeleton />;
 
 	return (
@@ -145,28 +203,317 @@ export function ClassIndexPage() {
 					</div>
 				</>
 			) : null}
-			{(filteredDepartmentData || []).map((department) => (
-				<section key={department.name} className='space-y-2'>
-					<div className='flex items-baseline justify-between gap-3'>
-						<h3 className='m-0'>{department.name}</h3>
-						<span className='shrink-0 text-xs tabular-nums opacity-60'>
-							{(department.class || []).length} 個班級
-						</span>
+			{colleges.length ? (
+				isWide ? (
+					<div className='grid grid-cols-[13rem_minmax(0,1fr)] items-start gap-6'>
+						<nav
+							aria-label='系所'
+							className='sticky top-20 -mx-2 max-h-[calc(100dvh-6rem)] space-y-4 overflow-y-auto px-2 pb-4'
+							ref={navRef}
+						>
+							{colleges.map((college) => (
+								<div key={college.name}>
+									<p className='m-0 mb-1 flex items-center gap-1.5 px-2 text-xs font-medium text-[var(--muted-foreground)]'>
+										<CollegeIcon className='size-3.5' name={college.name} />
+										{college.name}
+									</p>
+									{college.departments.map((department) => (
+										<DepartmentNavItem
+											active={department.name === spiedDepartment}
+											department={department}
+											key={department.name}
+											onSelect={() => scrollToDepartment(department.name)}
+										/>
+									))}
+								</div>
+							))}
+						</nav>
+						<div className='space-y-10'>
+							{colleges.map((college) => (
+								<section className='flex flex-col gap-3' key={college.name}>
+									<h2 className='m-0 flex items-center gap-2 px-1 pt-2 pb-1 text-xl font-bold'>
+										<CollegeIcon className='size-5' name={college.name} />
+										{college.name}
+									</h2>
+									{college.departments.map((department) => (
+										<section
+											className='scroll-mt-20 rounded-xl bg-[rgb(var(--vs-background))] p-5 shadow-[var(--shadow-rest)]'
+											id={departmentAnchor(department.name)}
+											key={department.name}
+										>
+											<h3 className='m-0 mb-4 text-lg font-bold'>
+												{department.name}
+											</h3>
+											<DepartmentClasses department={department} href={classHref} />
+										</section>
+									))}
+								</section>
+							))}
+						</div>
 					</div>
-					<div className='grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-2'>
-						{(department.class || []).map(({ name }) => (
-							// A long index reads as a menu, so entries stay flat instead of each casting a card shadow.
-							<Link
-								className='rounded-control !text-foreground flex min-h-11 items-center border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-background))] px-3 py-2 text-[0.95rem] leading-snug font-medium [overflow-wrap:anywhere] !no-underline transition-colors duration-150 hover:border-[rgba(var(--vs-primary),0.5)] hover:bg-[rgba(var(--vs-primary),0.06)] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
-								key={name}
-								to={`/class/${dataset.year}/${dataset.sem}/${name}?d=${dataset.department}`}
-							>
-								{name}
-							</Link>
+				) : (
+					colleges.map((college) => (
+						<section className='flex flex-col gap-3 pt-3 first:pt-0' key={college.name}>
+							<h2 className='m-0 flex items-center gap-2 px-1 text-lg font-bold'>
+								<CollegeIcon className='size-5' name={college.name} />
+								{college.name}
+							</h2>
+							<div className='divide-y divide-[rgba(var(--vs-text),0.08)] overflow-hidden rounded-xl bg-[rgb(var(--vs-background))] shadow-[var(--shadow-rest)]'>
+								{college.departments.map((department) => (
+									<DepartmentDisclosure
+										department={department}
+										href={classHref}
+										key={department.name}
+										onToggle={(open) => setExpandedDepartment(open ? department.name : '')}
+										open={department.name === openDepartment}
+									/>
+								))}
+							</div>
+						</section>
+					))
+				)
+			) : null}
+		</div>
+	);
+}
+
+const collegeIcons: Record<string, LucideIcon> = {
+	校院級: School,
+	機電學院: Cog,
+	工程學院: FlaskConical,
+	管理學院: Briefcase,
+	設計學院: PenTool,
+	人文與社會科學學院: BookOpen,
+	電資學院: Cpu,
+	創新前瞻科技研究學院: Rocket,
+};
+
+function CollegeIcon({ name, className }: { name: string; className?: string }) {
+	const Icon = collegeIcons[name] ?? Building2;
+	return <Icon aria-hidden className={cn('shrink-0 text-[var(--icon-muted)]', className)} />;
+}
+
+function departmentAnchor(name: string) {
+	return `department-${name}`;
+}
+
+const SECTION_GAP = 16;
+
+/** Where content stops being hidden: the bottom edge of the sticky page toolbar, if one is shown. */
+function stickyToolbarBottom() {
+	const toolbar = document.querySelector('nav[aria-label="頁面工具列"]');
+	return Math.max(0, toolbar?.getBoundingClientRect().bottom ?? 0);
+}
+
+function scrollToDepartment(name: string) {
+	const element = document.getElementById(departmentAnchor(name));
+	if (!element) return;
+	window.scrollTo({
+		top: element.getBoundingClientRect().top + window.scrollY - stickyToolbarBottom() - SECTION_GAP,
+		behavior: isReducedMotion() ? 'auto' : 'smooth',
+	});
+}
+
+/** The section whose top last slid under the sticky toolbar is the one being read. */
+function useScrollSpy(names: string[], anchor: (name: string) => string) {
+	const [active, setActive] = useState<string | undefined>(names[0]);
+	useEffect(() => {
+		if (!names.length) return undefined;
+		let frame = 0;
+		function update() {
+			frame = 0;
+			const atBottom =
+				window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+			// A jump lands a section SECTION_GAP below the toolbar, so allow that much slack plus rounding.
+			const line = stickyToolbarBottom() + SECTION_GAP + 2;
+			let current = names[0];
+			for (const name of names) {
+				const element = document.getElementById(anchor(name));
+				if (!element) continue;
+				if (atBottom || element.getBoundingClientRect().top <= line) current = name;
+				else break;
+			}
+			setActive(current);
+		}
+		function schedule() {
+			if (!frame) frame = requestAnimationFrame(update);
+		}
+		update();
+		window.addEventListener('scroll', schedule, { passive: true });
+		window.addEventListener('resize', schedule);
+		return () => {
+			cancelAnimationFrame(frame);
+			window.removeEventListener('scroll', schedule);
+			window.removeEventListener('resize', schedule);
+		};
+	}, [names, anchor]);
+	return active;
+}
+
+function DepartmentDisclosure({
+	department,
+	href,
+	open,
+	onToggle,
+}: {
+	department: DepartmentGroup;
+	href: (name: string) => string;
+	open: boolean;
+	onToggle: (open: boolean) => void;
+}) {
+	// Mirrors the advanced search filter sections: content stays mounted until it has animated shut.
+	const [rendered, setRendered] = useState(open);
+	const contentRef = useRef<HTMLDivElement | null>(null);
+	const iconRef = useRef<SVGSVGElement | null>(null);
+	const mountedRef = useRef(false);
+	const initiallyRenderedRef = useRef(open);
+
+	useEffect(() => {
+		if (open) setRendered(true);
+	}, [open]);
+
+	useEffect(() => {
+		if (!rendered) return undefined;
+		const cleanup = animateFilterSection(
+			contentRef.current,
+			iconRef.current,
+			open,
+			!mountedRef.current && initiallyRenderedRef.current,
+			() => {
+				if (!open) setRendered(false);
+			},
+		);
+		mountedRef.current = true;
+		return cleanup;
+	}, [open, rendered]);
+
+	return (
+		<div>
+			<button
+				aria-expanded={open}
+				className='flex min-h-12 w-full items-center gap-2 px-4 text-left text-[0.95rem] font-medium'
+				onClick={() => onToggle(!open)}
+				type='button'
+			>
+				<span className='flex-1'>{department.name}</span>
+				<ChevronDown aria-hidden className='size-4 text-[var(--icon-muted)]' ref={iconRef} />
+			</button>
+			{rendered ? (
+				// The clip box starts a few px above the buttons so their shadow rims are not cut off.
+				<div aria-hidden={!open} className='overflow-hidden' ref={contentRef}>
+					<div className='px-4 pt-1 pb-4'>
+						<DepartmentClasses department={department} href={href} />
+					</div>
+				</div>
+			) : null}
+		</div>
+	);
+}
+
+function DepartmentNavItem({
+	department,
+	active,
+	onSelect,
+}: {
+	department: DepartmentGroup;
+	active: boolean;
+	onSelect: () => void;
+}) {
+	return (
+		<button
+			aria-current={active ? 'true' : undefined}
+			className={cn(
+				'flex w-full items-baseline gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-150',
+				active
+					? 'bg-[rgba(var(--vs-primary),0.12)] font-medium text-[color-mix(in_srgb,rgb(var(--vs-primary))_86%,rgb(var(--vs-text)))]'
+					: 'text-foreground hover:bg-[rgba(var(--vs-text),0.05)]',
+			)}
+			onClick={onSelect}
+			type='button'
+		>
+			<span className='flex-1'>{department.name}</span>
+		</button>
+	);
+}
+
+function ClassButton({ name, label, href }: { name: string; label: string; href: string }) {
+	return (
+		<Button
+			aria-label={name === label ? undefined : name}
+			as={Link}
+			className='min-w-11 !no-underline'
+			title={name}
+			to={href}
+		>
+			{label}
+		</Button>
+	);
+}
+
+function DepartmentClasses({
+	department,
+	href,
+}: {
+	department: DepartmentGroup;
+	href: (name: string) => string;
+}) {
+	const groups = groupClassNames((department.class || []).map((item) => item.name));
+	// 化工系's numbers are grades of 化工, so they need no prefix; 體育室's 體育專項 does.
+	const captionFor = (prefix: string, fallback: string) =>
+		department.name.startsWith(prefix) ? fallback : prefix;
+	const singles = groups.flatMap((group) => (group.kind === 'single' ? [group.name] : []));
+	const hasPatterns = singles.length < groups.length;
+	const caption = (text: string) =>
+		text ? (
+			<p className='m-0 mb-2 text-xs font-medium text-[var(--muted-foreground)]'>{text}</p>
+		) : null;
+	return (
+		<div className='space-y-5'>
+			{groups.map((group) => {
+				if (group.kind === 'grades')
+					return (
+						<div key={group.prefix}>
+							{caption(captionFor(group.prefix, ''))}
+							<div className='grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2'>
+								{group.rows.map((row) => (
+									<Fragment key={row.label}>
+										<span className='text-sm text-[var(--muted-foreground)]'>{row.label}</span>
+										<div className='flex flex-wrap gap-2'>
+											{row.items.map((item) => (
+												<ClassButton {...item} href={href(item.name)} key={item.name} />
+											))}
+										</div>
+									</Fragment>
+								))}
+							</div>
+						</div>
+					);
+				if (group.kind === 'series' || group.kind === 'variants')
+					return (
+						<div key={group.prefix}>
+							{caption(group.kind === 'series' ? captionFor(group.prefix, '年級') : group.prefix)}
+							<div className='flex flex-wrap gap-2'>
+								{group.kind === 'variants' && group.base ? (
+									<ClassButton name={group.base} label={group.base} href={href(group.base)} />
+								) : null}
+								{group.items.map((item) => (
+									<ClassButton {...item} href={href(item.name)} key={item.name} />
+								))}
+							</div>
+						</div>
+					);
+				return null;
+			})}
+			{singles.length ? (
+				<div>
+					{caption(hasPatterns ? '其他' : '')}
+					<div className='flex flex-wrap gap-2'>
+						{singles.map((name) => (
+							<ClassButton href={href(name)} key={name} label={name} name={name} />
 						))}
 					</div>
-				</section>
-			))}
+				</div>
+			) : null}
 		</div>
 	);
 }
