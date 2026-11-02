@@ -55,6 +55,34 @@ describe('buildTimetableCourseItems', () => {
 		expect(items.map((item) => item.laneIndex)).toEqual([0, 1, 0]);
 	});
 
+	it('gives every course in an overlapping group the same lane count', () => {
+		const items = buildTimetableCourseItems([
+			course('4001', ['1', '2', '3']),
+			course('4002', ['1']),
+			course('4003', ['1']),
+			course('4004', ['3']),
+		]);
+
+		expect(items.map((item) => item.laneIndex)).toEqual([0, 1, 2, 1]);
+		expect(items.map((item) => item.laneCount)).toEqual([3, 3, 3, 3]);
+	});
+
+	it('spans a chain of partially overlapping courses as one group', () => {
+		const items = buildTimetableCourseItems([
+			course('5001', ['1', '2']),
+			course('5002', ['2', '3']),
+			course('5003', ['5']),
+		]);
+
+		const span = (id: string) => {
+			const item = items.find((x) => x.id === id)!;
+			return [item.groupStartIndex, item.groupEndIndex];
+		};
+		expect(span('5001')).toEqual(span('5002'));
+		expect(span('5001')).not.toEqual(span('5003'));
+		expect(span('5002')[1]).toBe(items.find((x) => x.id === '5002')!.endIndex);
+	});
+
 	it('splits non-consecutive slots on the same day into separate blocks', () => {
 		const items = buildTimetableCourseItems([
 			course('3001', ['4', '8']),

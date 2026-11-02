@@ -161,7 +161,8 @@
 	}
 }
 
-/* Adapted from shadcn's scroll-fade-x: each edge fades in only while there is content past it. */
+/* Adapted from shadcn's scroll-fade-x: each edge fades in only while there is content past it.
+   --scroll-fade-inset-s moves the start fade past a sticky leading column. */
 @property --scroll-fade-s {
 	syntax: '<length-percentage>';
 	inherits: false;
@@ -191,8 +192,9 @@
 @utility scroll-fade-x {
 	mask-image: linear-gradient(
 		to right,
-		transparent 0,
-		#000 var(--scroll-fade-s),
+		#000 var(--scroll-fade-inset-s, 0px),
+		transparent var(--scroll-fade-inset-s, 0px),
+		#000 calc(var(--scroll-fade-inset-s, 0px) + var(--scroll-fade-s)),
 		#000 calc(100% - var(--scroll-fade-e)),
 		transparent 100%
 	);
@@ -506,4 +508,38 @@
 		transition-duration: 0ms !important;
 		transition-delay: 0ms !important;
 	}
+}
+
+/* Timetable course blocks share one tint; colors are mixed against the card so grid lines never show through. */
+.timetable-course {
+	--course-tone: var(--vs-primary);
+	background: color-mix(in srgb, rgb(var(--course-tone)) 12%, var(--card));
+	color: rgb(var(--vs-text));
+	transition: background-color 150ms ease;
+}
+
+.timetable-course:hover {
+	background: color-mix(in srgb, rgb(var(--course-tone)) 20%, var(--card));
+}
+
+.timetable-course-sub {
+	color: color-mix(in srgb, rgb(var(--vs-text)) 60%, var(--card));
+}
+
+.timetable-course.timetable-course-conflict {
+	--course-tone: var(--vs-danger);
+	color: rgb(var(--vs-danger));
+}
+
+.timetable-course-conflict .timetable-course-sub {
+	color: color-mix(in srgb, rgb(var(--vs-danger)) 70%, var(--card));
+}
+
+.timetable-slot {
+	background: color-mix(in srgb, rgb(var(--vs-text)) 2.5%, var(--card));
+}
+
+/* Lunch is fainter, so the morning and afternoon read as two blocks. */
+.timetable-slot.timetable-slot-noon {
+	background: color-mix(in srgb, rgb(var(--vs-text)) 1%, var(--card));
 }

@@ -1,8 +1,11 @@
 import { CourseListToolbar, CourseListToolbarSkeleton } from './CourseListToolbar';
 import { CourseLink } from './CoursePeek';
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
-import { IconAlertCircle, IconMinus, IconPlus } from '@tabler/icons-react';
+import { IconAlertCircle, IconMinus, IconPlus, IconStack2 } from '@tabler/icons-react';
+import { Drawer } from 'vaul';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { useMediaQuery } from '../lib/useMediaQuery';
 import { toast } from 'sonner';
 import { AdsByGoogle } from './AdsByGoogle';
 import { CourseTimeChips } from './CourseTimeChips';
@@ -16,6 +19,7 @@ import {
 	getSportsCourseTitle,
 	isSportsCourse,
 	timetable,
+	timetableTime,
 	trimEllip,
 } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
@@ -78,6 +82,9 @@ type TimetableCourseItem = Course & {
 	isConflict: boolean;
 	laneIndex: number;
 	laneCount: number;
+	/** The span of every course chained to this one by overlaps, which is what folds into one block. */
+	groupStartIndex: number;
+	groupEndIndex: number;
 };
 
 export function CourseList({
@@ -677,83 +684,261 @@ function TimetableCourses({
 		courses.some((course) => course.time?.[date]?.length),
 	);
 	const items = buildTimetableCourseItems(courses);
+	const lastSlotIndex = Math.max(timetable.indexOf('9'), ...items.map((item) => item.endIndex - 1));
+	const slots = timetable.slice(0, lastSlotIndex + 1);
+
+	// Every weekday column is the same width, so one header tells whether a group's lanes still fit.
+	const [columnWidth, setColumnWidth] = useState(0);
+	const measureColumn = useCallback((element: HTMLDivElement) => {
+		const update = () => setColumnWidth(element.getBoundingClientRect().width);
+		update();
+		const observer = new ResizeObserver(update);
+		observer.observe(element);
+		return () => observer.disconnect();
+	}, []);
 
 	return (
-		<Card className='overflow-hidden p-0'>
-			<div
-				className='grid gap-2 bg-[rgba(var(--vs-text),0.02)] p-2'
-				style={{
-					gridTemplateColumns: [
-						'[time]',
-						'auto',
-						weekdays.map((item) => `[${dateEng2zh[item].slice(1)}] 1fr`).join(' '),
-						'[end]',
-					].join(' '),
-					gridTemplateRows: [
-						'[weekday] auto',
-						...timetable.map((item) => `[slot${item}] auto`),
-						'[end]',
-					].join(' '),
-				}}
-			>
+		<Card className='overflow-hidden p-0 max-sm:-mx-4 max-sm:w-auto max-sm:rounded-none'>
+			{/* Columns keep a minimum width so phones scroll sideways, with the next column peeking in as the cue. */}
+			<div className='scroll-fade-x overflow-x-auto overscroll-x-contain [--scroll-fade-inset-s:2.5rem]'>
+				{/* No grid lines: every period is its own soft tile, and a course is a tinted tile over the ones it spans. */}
 				<div
-					className='rounded-control bg-sheen-well shadow-well bg-[rgba(var(--vs-text),0.05)]'
-					style={{ gridColumn: 'time / end', gridRow: 'weekday' }}
-				/>
-				{timetable.map((time) => (
+					className='grid gap-1 px-2 pb-2'
+					style={{
+						gridTemplateColumns: [
+							'[time] 2.5rem',
+							weekdays
+								.map((item) => `[${dateEng2zh[item].slice(1)}] minmax(5.5rem, 1fr)`)
+								.join(' '),
+							'[end]',
+						].join(' '),
+						gridTemplateRows: [
+							'[weekday] 2.5rem',
+							...slots.map((item) => `[slot${item}] 3.5rem`),
+							'[end]',
+						].join(' '),
+					}}
+				>
+					{/* One solid strip behind the period labels, so courses scrolled under it never show through the row gaps. */}
 					<div
-						key={time}
-						className='flex min-h-[3em] items-center justify-center px-1 text-[0.85em]'
-						style={{ gridColumn: 'time', gridRow: `slot${time}` }}
-					>
-						{time}
-					</div>
-				))}
-				{weekdays.map((date) => (
-					<div
-						key={date}
-						className='px-4 py-2 text-center text-[0.85em]'
-						style={{ gridColumn: dateEng2zh[date].slice(1), gridRow: 'weekday' }}
-					>
-						{dateEng2zh[date].slice(1)}
-					</div>
-				))}
-				{items.map((item) => {
-					const laneWidth = `${100 / item.laneCount}%`;
-					return (
+						className='bg-card sticky left-0 z-[2] shadow-[0.25rem_0_0_var(--card)]'
+						style={{ gridColumn: 'time', gridRow: 'weekday / end' }}
+					/>
+					{weekdays.map((date, index) => (
+						<div
+							key={date}
+							ref={index === 0 ? measureColumn : undefined}
+							className='text-muted-foreground flex items-center justify-center text-[0.85em] font-medium'
+							style={{ gridColumn: dateEng2zh[date].slice(1), gridRow: 'weekday' }}
+						>
+							{dateEng2zh[date]}
+						</div>
+					))}
+					{slots.map((time) => (
+						<Fragment key={time}>
+							<div
+								className='sticky left-0 z-[3] flex flex-col items-center justify-center leading-tight'
+								style={{ gridColumn: 'time', gridRow: `slot${time}` }}
+							>
+								<span className='text-foreground-soft text-[0.9em] font-semibold'>{time}</span>
+								<span className='text-muted-foreground text-[0.7em] tabular-nums'>
+									{timetableTime[time as keyof typeof timetableTime].start}
+								</span>
+							</div>
+							{weekdays.map((date) => (
+								<div
+									key={date}
+									className={cn('timetable-slot rounded-md', time === 'N' && 'timetable-slot-noon')}
+									style={{ gridColumn: dateEng2zh[date].slice(1), gridRow: `slot${time}` }}
+								/>
+							))}
+						</Fragment>
+					))}
+					{groupTimetableItems(items).map((group) => {
+						const [first] = group;
+						const gridRow = (startIndex: number, endIndex: number) =>
+							`slot${timetable[startIndex]} / ${endIndex < slots.length ? `slot${timetable[endIndex]}` : 'end'}`;
+						if (group.length > 1 && columnWidth / first.laneCount < minLaneWidth) {
+							return (
+								<div
+									key={`${first.date}-${first.groupStartIndex}`}
+									className='relative z-[1] min-w-0'
+									style={{
+										gridColumn: dateEng2zh[first.date].slice(1),
+										gridRow: gridRow(first.groupStartIndex, first.groupEndIndex),
+									}}
+								>
+									<TimetableFold items={group} year={year} sem={sem} />
+								</div>
+							);
+						}
+						return group.map((item) => (
+							<div
+								key={`${item.id}-${item.date}-${item.slots.join('-')}`}
+								className='relative z-[1] min-w-0'
+								style={{
+									gridColumn: dateEng2zh[item.date].slice(1),
+									gridRow: gridRow(item.startIndex, item.endIndex),
+									width: `${100 / item.laneCount}%`,
+									marginLeft: `${(100 / item.laneCount) * item.laneIndex}%`,
+									// Lanes keep the same gap the grid puts between tiles.
+									paddingLeft: item.laneIndex > 0 ? '0.25rem' : undefined,
+								}}
+							>
+								<CourseLink
+									year={year}
+									sem={sem}
+									id={item.id}
+									course={item}
+									className={cn(
+										'timetable-course flex h-full min-w-0 flex-col gap-0.5 overflow-hidden rounded-md px-2 py-1.5 text-left text-[0.9em] no-underline max-sm:px-1.5',
+										item.isConflict && 'timetable-course-conflict',
+									)}
+								>
+									<TimetableCourseText item={item} />
+								</CourseLink>
+							</div>
+						));
+					})}
+				</div>
+			</div>
+		</Card>
+	);
+}
+
+// Below this a lane cannot hold even a couple of characters, so the group folds into one block.
+const minLaneWidth = 56;
+
+function groupTimetableItems(items: TimetableCourseItem[]) {
+	const groups = new Map<string, TimetableCourseItem[]>();
+	for (const item of items) {
+		const key = `${item.date}-${item.groupStartIndex}`;
+		groups.set(key, [...(groups.get(key) || []), item]);
+	}
+	return [...groups.values()];
+}
+
+// Cells on phones only fit the name; the folded list has room for the teachers too.
+function TimetableCourseText({
+	item,
+	inCell = true,
+}: {
+	item: TimetableCourseItem;
+	inCell?: boolean;
+}) {
+	const name = item.name?.zh || '未命名課程';
+	const teachers = (item.teacher || []).map((x) => x.name).join('、');
+	return (
+		<>
+			<div
+				className={cn(
+					'font-semibold',
+					// A one-period block only has room for two lines; longer ones take three.
+					inCell
+						? cn(
+								'[overflow-wrap:anywhere]',
+								item.slots.length > 1 ? 'line-clamp-3' : 'line-clamp-2',
+							)
+						: 'truncate',
+				)}
+				title={name}
+			>
+				{name}
+			</div>
+			<div
+				className={cn('timetable-course-sub truncate text-[0.85em]', inCell && 'max-sm:hidden')}
+				title={teachers}
+			>
+				{teachers || item.id}
+			</div>
+		</>
+	);
+}
+
+/** Courses too many to sit side by side, shown as one block that opens the full list. */
+function TimetableFold({
+	items,
+	year,
+	sem,
+}: {
+	items: TimetableCourseItem[];
+	year: string;
+	sem: string;
+}) {
+	const [open, setOpen] = useState(false);
+	const isDesktop = useMediaQuery('(min-width: 40rem)');
+	const trigger = (
+		<button
+			type='button'
+			className='timetable-course timetable-course-conflict flex h-full w-full min-w-0 cursor-pointer flex-col gap-0.5 overflow-hidden rounded-md px-2 py-1.5 text-left text-[0.9em] max-sm:px-1.5'
+		>
+			{/* The count leads, since a lone course name read as eight sections of that one course. */}
+			<div className='flex items-center gap-1 font-semibold whitespace-nowrap'>
+				<IconStack2 className='size-[1.1em] shrink-0' aria-hidden />
+				{items.length} 門課
+			</div>
+			<div className='timetable-course-sub line-clamp-2 text-[0.85em] [overflow-wrap:anywhere]'>
+				{items.map((item) => item.name?.zh || '未命名課程').join('、')}
+			</div>
+		</button>
+	);
+	const list = (
+		<ul className='m-0 flex list-none flex-col gap-1.5 p-0'>
+			{[...items]
+				.sort((a, b) => a.startIndex - b.startIndex || a.laneIndex - b.laneIndex)
+				.map((item) => (
+					<li key={`${item.id}-${item.slots.join('-')}`}>
 						<CourseLink
-							key={`${item.id}-${item.date}-${item.slots.join('-')}`}
 							year={year}
 							sem={sem}
 							id={item.id}
 							course={item}
-							className={cn(
-								'rounded-control shadow-soft hover:shadow-soft-hover relative z-[1] flex h-full min-w-0 flex-col justify-between gap-1 px-2 py-3 text-left no-underline backdrop-blur-[2px] transition-[background-color,box-shadow]',
-								item.isConflict
-									? 'tone-danger bg-[rgba(var(--vs-danger),0.16)] text-[rgb(var(--vs-danger))] hover:bg-[rgba(var(--vs-danger),0.22)]'
-									: 'tone-primary bg-[rgba(var(--vs-primary),0.15)] text-[rgba(var(--vs-text),0.9)] hover:bg-[rgba(var(--vs-primary),0.22)]',
-							)}
-							style={{
-								gridColumn: dateEng2zh[item.date].slice(1),
-								gridRow: `slot${item.startSlot} / slot${item.endSlot}`,
-								width: laneWidth,
-								marginLeft: `${(100 / item.laneCount) * item.laneIndex}%`,
-							}}
+							onClick={() => setOpen(false)}
+							className='timetable-course flex min-w-0 items-center gap-3 rounded-md px-3 py-2 text-left text-sm no-underline'
 						>
-							<div className='truncate font-semibold' title={item.name?.zh || '未命名課程'}>
-								{item.name?.zh || '未命名課程'}
+							<div className='flex min-w-0 flex-1 flex-col gap-0.5'>
+								<TimetableCourseText item={item} inCell={false} />
 							</div>
-							<div
-								className='truncate text-[0.85em] opacity-75'
-								title={(item.teacher || []).map((x) => x.name).join('、')}
-							>
-								{(item.teacher || []).map((x) => x.name).join('、') || item.id}
-							</div>
+							<span className='timetable-course-sub shrink-0 text-xs tabular-nums'>
+								{item.slots.length > 1 ? `${item.slots[0]}–${item.slots.at(-1)}` : item.slots[0]}
+							</span>
 						</CourseLink>
-					);
-				})}
-			</div>
-		</Card>
+					</li>
+				))}
+		</ul>
+	);
+	const title = `${dateEng2zh[items[0].date]} ${items.length} 門課同時段`;
+
+	if (isDesktop) {
+		return (
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>{trigger}</PopoverTrigger>
+				<PopoverContent className='flex flex-col gap-3 p-3'>
+					<div className='text-muted-foreground px-1 text-xs font-medium'>{title}</div>
+					{list}
+				</PopoverContent>
+			</Popover>
+		);
+	}
+	return (
+		<Drawer.Root open={open} onOpenChange={setOpen}>
+			<Drawer.Trigger asChild>{trigger}</Drawer.Trigger>
+			<Drawer.Portal>
+				<Drawer.Overlay className='bg-sea-glass fixed inset-0 z-50 bg-black/20 backdrop-blur-[2px]' />
+				<Drawer.Content
+					aria-describedby={undefined}
+					className='rounded-t-overlay shadow-overlay bg-backdrop text-foreground fixed inset-x-0 bottom-0 z-50 flex max-h-[80dvh] flex-col outline-none'
+				>
+					<Drawer.Handle className='mt-2' />
+					<Drawer.Title className='text-muted-foreground px-5 pt-3 pb-2 text-xs font-medium'>
+						{title}
+					</Drawer.Title>
+					<div className='min-h-0 overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))]'>
+						{list}
+					</div>
+				</Drawer.Content>
+			</Drawer.Portal>
+		</Drawer.Root>
 	);
 }
 
@@ -785,6 +970,8 @@ export function buildTimetableCourseItems(courses: Course[]) {
 					isConflict: false,
 					laneIndex: 0,
 					laneCount: 1,
+					groupStartIndex: startIndex,
+					groupEndIndex: endIndex,
 				});
 			}
 		}
@@ -798,21 +985,31 @@ export function buildTimetableCourseItems(courses: Course[]) {
 	for (const dayItems of itemsByDate.values()) {
 		dayItems.sort((a, b) => a.startIndex - b.startIndex || b.endIndex - a.endIndex);
 		const active: TimetableCourseItem[] = [];
+		const groups: TimetableCourseItem[][] = [];
 		for (const item of dayItems) {
 			for (let i = active.length - 1; i >= 0; i--) {
 				if (active[i].endIndex <= item.startIndex) active.splice(i, 1);
 			}
+			if (!active.length) groups.push([]);
 			const usedLanes = new Set(active.map((activeItem) => activeItem.laneIndex));
 			let laneIndex = 0;
 			while (usedLanes.has(laneIndex)) laneIndex++;
 			item.laneIndex = laneIndex;
 			active.push(item);
+			groups[groups.length - 1].push(item);
 		}
 
-		for (const item of dayItems) {
-			const overlappingItems = dayItems.filter((other) => intervalsOverlap(item, other));
-			item.isConflict = overlappingItems.length > 1;
-			item.laneCount = Math.max(...overlappingItems.map((other) => other.laneIndex + 1), 1);
+		// Lanes split the cell evenly only if every course chained by overlaps shares one lane count.
+		for (const group of groups) {
+			const laneCount = Math.max(...group.map((item) => item.laneIndex + 1));
+			const groupStartIndex = group[0].startIndex;
+			const groupEndIndex = Math.max(...group.map((item) => item.endIndex));
+			for (const item of group) {
+				item.isConflict = group.some((other) => other !== item && intervalsOverlap(item, other));
+				item.laneCount = laneCount;
+				item.groupStartIndex = groupStartIndex;
+				item.groupEndIndex = groupEndIndex;
+			}
 		}
 	}
 
