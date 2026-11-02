@@ -1,4 +1,5 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { CourseTypeIcon } from '../components/CourseTypeIcon';
 import { useParams } from '@tanstack/react-router';
 import { CourseLink } from '../components/CoursePeek';
 import { useEffect, useState } from 'react';
@@ -213,7 +214,7 @@ export function TeacherPage() {
 						</div>
 						<div className='min-w-0'>
 							<div className='truncate text-base font-semibold'>
-								{course.courseType} {course.name?.zh}
+								<CourseTypeIcon type={course.courseType} /> {course.name?.zh}
 							</div>
 							<div className='truncate text-xs opacity-80'>{course.name?.en}</div>
 						</div>

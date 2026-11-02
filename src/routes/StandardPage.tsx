@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useRouteLocation } from '../lib/routeLocation';
 import { useEffect, useMemo, useState } from 'react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { CourseTypeIcon } from '../components/CourseTypeIcon';
 import { Alert } from '../components/ui-kit/Alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Skeleton } from '../components/ui/skeleton';
@@ -352,9 +353,9 @@ export function StandardPage() {
 													>
 														<span className='flex min-w-0 items-center gap-2.5 text-sm'>
 															<span
-																className={`${courseTypeClassName} text-[rgba(var(--vs-text),0.7)]`}
+																className={`${courseTypeClassName} text-[color-mix(in_srgb,rgb(var(--vs-text))_70%,rgb(var(--vs-background)))]`}
 															>
-																{item.type}
+																<CourseTypeIcon type={item.type} className='size-4' />
 															</span>
 															<span className='truncate'>{item.name}</span>
 														</span>

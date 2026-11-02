@@ -5,6 +5,7 @@ import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { CourseTypeIcon } from '../components/CourseTypeIcon';
 import { CourseList, CourseListSkeleton } from '../components/CourseList';
 import { SemesterButton, SiteBrand } from '../components/Layout';
 import type { CourseListLayout } from '../components/CourseList';
@@ -46,12 +47,7 @@ import type { CourseAttribute } from '../lib/courseFilters';
 import { createSearchObject, createSearchParams } from '../lib/urlState';
 import { DESKTOP_MEDIA_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { useApp } from '../state/AppContext';
-import type {
-	Course,
-	DepartmentGroup,
-	QueryValue,
-	WithdrawalRateMap,
-} from '../types/course';
+import type { Course, DepartmentGroup, QueryValue, WithdrawalRateMap } from '../types/course';
 import { errorMessage } from '../lib/error';
 import { animateFilterSection } from '../lib/motion';
 
@@ -1036,8 +1032,9 @@ function FilterSectionContent({
 								checked={Boolean(props.courseStandardFilter[symbol])}
 								onCheckedChange={(checked) => props.onToggleStandard(symbol, checked)}
 							/>
-							<span>
-								{symbol} {courseStandard[symbol]}
+							<span className='flex items-center gap-1.5'>
+								<CourseTypeIcon type={symbol} />
+								{courseStandard[symbol]}
 							</span>
 						</label>
 					))

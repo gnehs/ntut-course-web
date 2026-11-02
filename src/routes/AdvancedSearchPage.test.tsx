@@ -109,8 +109,8 @@ describe('AdvancedSearchPage navigation', () => {
 		expect(await screen.findByPlaceholderText('搜尋課程、教師、課號、班級')).toBeInTheDocument();
 		expect(screen.queryByRole('button', { name: '搜尋' })).not.toBeInTheDocument();
 		await user.click(screen.getByRole('button', { name: '課程標準' }));
-		expect(await screen.findByText('○ 部訂共同必修')).toBeInTheDocument();
-		expect(screen.queryByText('△ 校訂共同必修')).not.toBeInTheDocument();
+		expect(await screen.findByText('部訂共同必修')).toBeInTheDocument();
+		expect(screen.queryByText('校訂共同必修')).not.toBeInTheDocument();
 		expect(screen.getByRole('button', { name: '博雅類別' })).toBeInTheDocument();
 	});
 

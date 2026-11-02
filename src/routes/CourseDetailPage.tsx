@@ -1,5 +1,6 @@
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseList } from '../components/CourseList';
+import { CourseTypeIcon } from '../components/CourseTypeIcon';
 import {
 	COURSE_ASIDE_TRANSITION,
 	CourseLink,
@@ -347,7 +348,10 @@ export function CourseDetail({
 							items={[
 								infoItem(
 									'課程標準',
-									`${course.courseType || ''} ${course.courseType ? courseStandard[course.courseType] || '' : ''}`,
+									<span className='inline-flex items-center gap-1.5'>
+										<CourseTypeIcon type={course.courseType} />
+										{course.courseType ? courseStandard[course.courseType] || '' : ''}
+									</span>,
 								),
 								...optionalInfoItem('課程代碼', course.code),
 								infoItem('人數', formatQuantity(course.people, '人')),

@@ -12,7 +12,6 @@ import {
 	courseTitle,
 	dateEng2zh,
 	formatCredit,
-	getCourseDisplayTitle,
 	getGeneralCourseTags,
 	getSportsCourseTitle,
 	isSportsCourse,
@@ -28,6 +27,7 @@ import { Tag } from './ui-kit/Tag';
 import { Skeleton } from './ui/skeleton';
 import type { Course } from '../types/course';
 import { SportsCourseIcon } from './SportsCourseIcon';
+import { CourseTypeIcon } from './CourseTypeIcon';
 
 const PAGE_SIZE = 54;
 
@@ -378,7 +378,13 @@ export function CourseList({
 													course={course}
 													department={viewDepartment}
 												>
-													{courseTitle(course)}
+													{isSportsCourse(course) ? (
+														courseTitle(course)
+													) : (
+														<>
+															<CourseTypeIcon type={course.courseType} /> {course.name?.zh}
+														</>
+													)}
 												</CourseLink>
 											</td>
 											<td className='border-b border-[rgba(var(--vs-text),0.08)] px-4 py-2.5 tabular-nums'>
@@ -511,7 +517,12 @@ function CourseDisplayHeading({ course }: { course: Course }) {
 			</span>
 		);
 	}
-	return <span>{getCourseDisplayTitle(course)}</span>;
+	return (
+		<span className='flex items-center gap-1.5'>
+			<CourseTypeIcon type={course.courseType} />
+			<span>{course.name?.zh}</span>
+		</span>
+	);
 }
 
 function CourseTags({
