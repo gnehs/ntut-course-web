@@ -317,7 +317,7 @@ export function CourseDetail({
 			<aside
 				aria-label='課程詳細資訊'
 				style={{ viewTransitionName: asideTransition ? COURSE_ASIDE_TRANSITION : undefined }}
-				className='flex min-w-0 flex-col gap-3 @3xl:sticky @3xl:top-[var(--course-sticky-top,74px)] @3xl:col-start-2 @3xl:row-span-2 @3xl:row-start-1'
+				className='flex min-w-0 flex-col gap-3 @3xl:sticky @3xl:top-[var(--course-sticky-top,74px)] @3xl:col-start-2 @3xl:row-start-2'
 			>
 				<Button
 					primary={!isInMyCourse}
@@ -410,7 +410,7 @@ export function CourseDetail({
 					</div>
 				) : null}
 			</aside>
-			<div className='flex min-w-0 flex-col gap-4 @3xl:col-start-1'>
+			<div className='flex min-w-0 flex-col gap-4 @3xl:col-start-1 @3xl:row-start-2'>
 				{conflicted ? (
 					<Alert danger>
 						<strong>課程衝堂</strong>
