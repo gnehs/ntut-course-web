@@ -15,6 +15,9 @@ const teachingField = '延伸教學與資源';
 // These fields are checklists, so ticking "none" is an answer worth showing rather than a blank.
 export const checklistFields = new Set([aiField, teachingField]);
 
+// Few readers look at these form answers, so they start collapsed to keep the syllabus short.
+export const collapsedFields = new Set([sdgField, aiField, teachingField]);
+
 // Fields filled from fixed options on the school's form get a visual summary; text that does not
 // match the form returns null and is shown as written.
 export function renderSyllabusIndicator(field: string | undefined, text: string) {

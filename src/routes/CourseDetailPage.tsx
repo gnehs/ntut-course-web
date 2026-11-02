@@ -13,6 +13,7 @@ import { Link, useParams, useRouterState } from '@tanstack/react-router';
 import { Fragment, startTransition, use, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
 import {
+	IconChevronDown,
 	IconExternalLink,
 	IconInfoCircle,
 	IconMapPin,
@@ -26,7 +27,11 @@ import { Button } from '../components/ui-kit/Button';
 import { CourseDetailSkeleton, SkeletonBlock } from '../components/ui-kit/PageSkeletons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
-import { checklistFields, renderSyllabusIndicator } from '../components/SyllabusIndicators';
+import {
+	checklistFields,
+	collapsedFields,
+	renderSyllabusIndicator,
+} from '../components/SyllabusIndicators';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import { isCourseHidden } from '../lib/contentVisibility';
 import { hasMeaningfulValue } from '../lib/courseFilters';
@@ -891,9 +896,44 @@ function TextSection({ label, value, field }: { label: string; value: unknown; f
 			: syllabusDisplayText(value);
 	if (!text) return null;
 	return (
-		<section className={docSectionClassName}>
-			<h3 className={docHeadingClassName}>{label}</h3>
+		<SyllabusSection label={label} field={field}>
 			<SyllabusText text={text} field={field} />
+		</SyllabusSection>
+	);
+}
+
+function SyllabusSection({
+	label,
+	field,
+	children,
+}: {
+	label: string;
+	field?: string;
+	children: React.ReactNode;
+}) {
+	const collapsible = collapsedFields.has(field ?? '');
+	const [expanded, setExpanded] = useState(!collapsible);
+	return (
+		<section className={docSectionClassName}>
+			<h3 className={docHeadingClassName}>
+				{collapsible ? (
+					<button
+						type='button'
+						aria-expanded={expanded}
+						onClick={() => setExpanded((value) => !value)}
+						className='flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-left font-semibold text-inherit'
+					>
+						{label}
+						<IconChevronDown
+							aria-hidden='true'
+							className={`text-icon-muted size-4 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+						/>
+					</button>
+				) : (
+					label
+				)}
+			</h3>
+			{expanded ? children : null}
 		</section>
 	);
 }
@@ -914,8 +954,7 @@ function VariantSection({
 		return <TextSection label={label} value={variants[0].text} field={field} />;
 	}
 	return (
-		<section className={docSectionClassName}>
-			<h3 className={docHeadingClassName}>{label}</h3>
+		<SyllabusSection label={label} field={field}>
 			<div className='flex min-w-0 flex-col'>
 				{variants.map((variant, index) => (
 					<div
@@ -929,7 +968,7 @@ function VariantSection({
 					</div>
 				))}
 			</div>
-		</section>
+		</SyllabusSection>
 	);
 }
 

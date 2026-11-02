@@ -205,7 +205,7 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		expect(screen.getByText('案例討論', { exact: true })).toBeInTheDocument();
 	});
 
-	it('renders the three newly crawled syllabus fields', async () => {
+	it('collapses the three syllabus form fields until expanded', async () => {
 		await renderCourseDetail([
 			{
 				...baseSyllabus,
@@ -215,14 +215,22 @@ describe('CourseDetailPage course and syllabus fields', () => {
 			},
 		]);
 
+		const user = userEvent.setup();
 		for (const [label, value] of [
 			['延伸教學與資源', '延伸教學資源測試'],
 			['課程是否導入AI', '導入 AI 測試'],
 		]) {
 			expect(screen.getByRole('heading', { name: label })).toBeInTheDocument();
+			expect(screen.queryByText(value, { exact: true })).not.toBeInTheDocument();
+			const toggle = screen.getByRole('button', { name: label });
+			expect(toggle).toHaveAttribute('aria-expanded', 'false');
+			await user.click(toggle);
+			expect(toggle).toHaveAttribute('aria-expanded', 'true');
 			expect(screen.getByText(value, { exact: true })).toBeInTheDocument();
 		}
 		expect(screen.getByRole('heading', { name: '課程對應SDGs指標' })).toBeInTheDocument();
+		expect(screen.queryByRole('img', { name: 'SDG 4：優質教育' })).not.toBeInTheDocument();
+		await user.click(screen.getByRole('button', { name: '課程對應SDGs指標' }));
 		expect(screen.getByRole('img', { name: 'SDG 4：優質教育' })).toBeInTheDocument();
 	});
 
