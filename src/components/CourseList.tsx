@@ -1,4 +1,4 @@
-import { CourseListToolbar } from './CourseListToolbar';
+import { CourseListToolbar, CourseListToolbarSkeleton } from './CourseListToolbar';
 import { CourseLink } from './CoursePeek';
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
@@ -25,10 +25,21 @@ import { Card } from './ui-kit/Card';
 import { CardTitle } from './ui-kit/CardTitle';
 import { Pagination } from './ui-kit/Pagination';
 import { Tag } from './ui-kit/Tag';
+import { Skeleton } from './ui/skeleton';
 import type { Course } from '../types/course';
 import { SportsCourseIcon } from './SportsCourseIcon';
 
 const PAGE_SIZE = 54;
+
+const courseGridClassName = 'grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3';
+const courseCardClassName = 'flex flex-col px-4 py-4';
+const courseCardBodyClassName = 'relative z-[1] flex flex-1 flex-col gap-3';
+const courseCardHeaderClassName = 'relative flex flex-col gap-1 pr-11';
+const courseCardTitleClassName = 'mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]';
+const courseSummaryClassName = 'text-xs leading-5 tabular-nums';
+const courseMetaListClassName =
+	'm-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm leading-5';
+const saveButtonFrameClassName = 'absolute -top-1 -right-1 grid size-11 place-items-center';
 
 type CourseListProps = {
 	courses: Course[] | null;
@@ -226,7 +237,7 @@ export function CourseList({
 					<div
 						ref={cardRowRef}
 						className={cn(
-							'grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3',
+							courseGridClassName,
 							scrollOnMobile &&
 								'max-sm:no-scrollbar max-sm:scroll-fade-x max-sm:-mx-4 max-sm:-mt-2 max-sm:-mb-6 max-sm:flex max-sm:snap-x max-sm:snap-mandatory max-sm:scroll-px-4 max-sm:overflow-x-auto max-sm:px-4 max-sm:pt-2 max-sm:pb-6 max-sm:*:w-[85%] max-sm:*:shrink-0 max-sm:*:snap-start',
 						)}
@@ -244,7 +255,8 @@ export function CourseList({
 									) : null}
 									<Card
 										className={cn(
-											'hoverable flex flex-col px-4 py-4',
+											'hoverable',
+											courseCardClassName,
 											desktopLimit !== undefined && index >= desktopLimit && 'sm:hidden',
 										)}
 									>
@@ -257,17 +269,17 @@ export function CourseList({
 											aria-label={`查看 ${courseTitle(course)} 課程詳情`}
 											className='absolute inset-0 z-0 rounded-[inherit] focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)] focus-visible:outline-none'
 										/>
-										<div className='pointer-events-none relative z-[1] flex flex-1 flex-col gap-3'>
-											<div className='relative flex flex-col gap-1 pr-11'>
-												<CardTitle className='mb-0 w-auto min-w-0 text-base leading-6 [overflow-wrap:anywhere]'>
+										<div className={cn('pointer-events-none', courseCardBodyClassName)}>
+											<div className={courseCardHeaderClassName}>
+												<CardTitle className={courseCardTitleClassName}>
 													<CourseDisplayHeading course={course} />
 												</CardTitle>
-												<div className='text-xs leading-5 tabular-nums opacity-70'>
+												<div className={cn(courseSummaryClassName, 'opacity-70')}>
 													{courseSummary(course)}
 												</div>
 												<SaveCourseButton saved={saved} onClick={() => toggleSavedCourse(course)} />
 											</div>
-											<dl className='m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm leading-5'>
+											<dl className={courseMetaListClassName}>
 												<CourseMetaLine label='時間'>
 													<CourseTimeChips time={course.time}>
 														{/* A conflict is a property of the time slot, so it sits beside it instead of taking its own row. */}
@@ -424,6 +436,71 @@ export function CourseList({
 	);
 }
 
+export function CourseListSkeleton({
+	count = 6,
+	showToolbar = true,
+	showTimetable = false,
+	toolbarStart,
+	toolbarEnd,
+}: {
+	count?: number;
+	showToolbar?: boolean;
+	showTimetable?: boolean;
+	toolbarStart?: React.ReactNode;
+	toolbarEnd?: React.ReactNode;
+}) {
+	return (
+		<div aria-busy='true' aria-label='載入課程'>
+			{showToolbar ? (
+				<CourseListToolbarSkeleton
+					showTimetable={showTimetable}
+					toolbarStart={toolbarStart}
+					toolbarEnd={toolbarEnd}
+				/>
+			) : null}
+			<div className={courseGridClassName}>
+				{Array.from({ length: count }, (_, index) => (
+					<CourseCardSkeleton key={index} />
+				))}
+			</div>
+		</div>
+	);
+}
+
+function CourseCardSkeleton() {
+	return (
+		<Card className={cn('bg-sheen-glow shadow-raised', courseCardClassName)}>
+			<div className={courseCardBodyClassName}>
+				<div className={courseCardHeaderClassName}>
+					<div className={cn('flex', courseCardTitleClassName)}>
+						<Skeleton className='h-[1lh] w-3/5' />
+					</div>
+					<div className={courseSummaryClassName}>
+						<Skeleton className='h-[1lh] w-32' />
+					</div>
+					<div className={saveButtonFrameClassName}>
+						<Skeleton className='size-8' />
+					</div>
+				</div>
+				<dl className={courseMetaListClassName}>
+					<CourseMetaLine label='時間'>
+						<Skeleton className='h-[1lh] w-24' />
+					</CourseMetaLine>
+					<CourseMetaLine label='教師'>
+						<Skeleton className='h-[1lh] w-20' />
+					</CourseMetaLine>
+					<CourseMetaLine label='班級'>
+						<Skeleton className='h-[1lh] w-28' />
+					</CourseMetaLine>
+					<CourseMetaLine label='備註'>
+						<Skeleton className='h-[1lh] w-2/3' />
+					</CourseMetaLine>
+				</dl>
+			</div>
+		</Card>
+	);
+}
+
 function CourseDisplayHeading({ course }: { course: Course }) {
 	if (isSportsCourse(course)) {
 		const title = getSportsCourseTitle(course);
@@ -505,7 +582,8 @@ function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => v
 			type='button'
 			aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 			className={cn(
-				'rounded-control pointer-events-auto absolute -top-1 -right-1 grid size-11 place-items-center border-0 bg-transparent p-0 transition-colors',
+				saveButtonFrameClassName,
+				'rounded-control pointer-events-auto border-0 bg-transparent p-0 transition-colors',
 				'before:rounded-control before:shadow-soft hover:before:shadow-soft-hover text-[rgb(var(--tone))] outline-none before:absolute before:inset-1.5 before:transition-[background-color,box-shadow]',
 				'focus-visible:ring-[3px] focus-visible:ring-[rgba(var(--vs-primary),0.28)]',
 				saved

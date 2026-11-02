@@ -5,13 +5,43 @@ import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Dialog } from '../components/ui-kit/Dialog';
-import { EmptyRoomSkeleton } from '../components/ui-kit/PageSkeletons';
 import { useApp } from '../state/AppContext';
 import type { Course } from '../types/course';
 import { errorMessage } from '../lib/error';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const timetableSlots = ['1', '2', '3', '4', 'N', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D'];
+const roomGridClassName = 'grid grid-cols-1 gap-3 md:grid-cols-2';
+
+function RoomSectionsSkeleton() {
+	return (
+		<>
+			{[0, 1].map((section) => (
+				<section key={section}>
+					<h2 className='mb-2'>
+						<Skeleton className='h-[1lh] w-24' />
+					</h2>
+					<div className={roomGridClassName}>
+						{Array.from({ length: 4 }, (_, index) => (
+							<Card key={index} className='px-4 py-3'>
+								<CardTitle>
+									<Skeleton className='h-[1lh] w-28' />
+								</CardTitle>
+								<div className='mt-2 flex flex-wrap gap-1'>
+									{timetableSlots.map((slot) => (
+										<Skeleton key={slot} className='size-6 rounded-full' />
+									))}
+								</div>
+							</Card>
+						))}
+					</div>
+				</section>
+			))}
+		</>
+	);
+}
+
 const dateEng2zh = {
 	sun: '週日',
 	mon: '週一',
@@ -134,8 +164,6 @@ export function EmptyRoomPage() {
 	const currentSlot =
 		todayDayOfWeek === Object.keys(dateEng2zh)[new Date().getDay()] ? slotAt(new Date()) : null;
 
-	if (!courses) return <EmptyRoomSkeleton />;
-
 	return (
 		<div className='space-y-4'>
 			{onError ? (
@@ -195,11 +223,16 @@ export function EmptyRoomPage() {
 					</div>
 				) : null}
 			</div>
-			<div className='space-y-4'>
+			<div
+				className='space-y-4'
+				aria-busy={courses ? undefined : true}
+				aria-label={courses ? undefined : '載入教室資料中'}
+			>
+				{!courses ? <RoomSectionsSkeleton /> : null}
 				{categoryList.map((category) => (
 					<section key={category}>
 						<h2 className='mb-2'>{category}</h2>
-						<div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
+						<div className={roomGridClassName}>
 							{roomList
 								.filter((room) => room.category === category)
 								.map((room) => (

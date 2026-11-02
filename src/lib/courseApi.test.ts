@@ -8,6 +8,7 @@ import {
 	fetchMicroPrograms,
 	fetchPrograms,
 	fetchStandardDepartments,
+	loadedCourse,
 } from './courseApi';
 
 const mocks = vi.hoisted(() => ({
@@ -192,5 +193,14 @@ describe('concurrent requests for one dataset', () => {
 		mocks.setStore.mockRejectedValue(new Error('QuotaExceededError'));
 
 		await expect(fetchCourse('115', '1', 'main')).resolves.toEqual(courses);
+	});
+
+	it('holds a settled course list for synchronous reads', async () => {
+		mocks.fetch.mockResolvedValue(response(courses));
+
+		expect(loadedCourse('114', '2', 'main')).toBeUndefined();
+		await fetchCourse('114', '2', 'main');
+		expect(loadedCourse('114', '2', 'main')).toEqual(courses);
+		expect(loadedCourse('114', '2', '進修部')).toBeUndefined();
 	});
 });

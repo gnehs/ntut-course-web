@@ -2,10 +2,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { IconCheck, IconFilter } from '@tabler/icons-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { CalendarSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Skeleton } from '@/components/ui/skeleton';
 import { fetchCalendar } from '../lib/courseApi';
 import { errorMessage } from '../lib/error';
 import type { CalendarEvent } from '../types/course';
+
+const listClassName =
+	'rounded-surface mt-4 overflow-hidden border border-[rgba(var(--vs-text),0.1)]';
+const dateTileClassName =
+	'rounded-control from-background flex size-12 shrink-0 flex-col overflow-hidden bg-gradient-to-b to-[rgba(var(--vs-text),0.04)] text-center shadow-md';
+
+function rowClassName(index: number) {
+	return `flex items-center gap-2 bg-[rgb(var(--vs-background))] px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`;
+}
 
 export function CalendarPage() {
 	const [calendar, setCalendar] = useState<CalendarEvent[] | null>(null);
@@ -70,7 +79,7 @@ export function CalendarPage() {
 			</div>
 		);
 	}
-	if (!calendar) return <CalendarSkeleton />;
+	if (!calendar) return <CalendarSkeleton important={important} />;
 	return (
 		<div>
 			<div className='flex flex-wrap items-center justify-between gap-2'>
@@ -85,15 +94,12 @@ export function CalendarPage() {
 					僅顯示重要日程
 				</Button>
 			</div>
-			<div className='rounded-surface mt-4 overflow-hidden border border-[rgba(var(--vs-text),0.1)]'>
+			<div className={listClassName}>
 				{rows.length ? (
 					rows.map((item, index) => (
-						<div
-							key={item.uid || `${item.summary}-${index}`}
-							className={`flex items-center gap-2 bg-[rgb(var(--vs-background))] px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.1)]' : ''}`}
-						>
+						<div key={item.uid || `${item.summary}-${index}`} className={rowClassName(index)}>
 							<div
-								className='rounded-control from-background flex size-12 shrink-0 flex-col overflow-hidden bg-gradient-to-b to-[rgba(var(--vs-text),0.04)] text-center shadow-md'
+								className={dateTileClassName}
 								style={{
 									opacity: index > 0 && sameCalendarDay(rows[index - 1]?.start, item.start) ? 0 : 1,
 								}}
@@ -137,6 +143,39 @@ export function CalendarPage() {
 						) : null}
 					</Alert>
 				)}
+			</div>
+			<CalendarSource />
+		</div>
+	);
+}
+
+function CalendarSkeleton({ important }: { important: boolean }) {
+	return (
+		<div aria-busy='true' aria-label='載入行事曆中'>
+			<div className='flex flex-wrap items-center justify-between gap-2'>
+				<h1 className='m-0'>行事曆</h1>
+				<Button active={important} aria-pressed={important} className='m-0' disabled>
+					{important ? <IconCheck className='size-4' /> : <IconFilter className='size-4' />}
+					僅顯示重要日程
+				</Button>
+			</div>
+			<div className={listClassName}>
+				{Array.from({ length: 8 }, (_, index) => (
+					<div key={index} className={rowClassName(index)}>
+						<div className={dateTileClassName}>
+							<Skeleton className='h-5 w-full rounded-none' />
+							<Skeleton className='flex-1 rounded-none' />
+						</div>
+						<div className='min-w-0 flex-1'>
+							<div className='text-[1.2em] font-semibold'>
+								<Skeleton className='h-[1lh] w-2/5' />
+							</div>
+							<div>
+								<Skeleton className='h-[1lh] w-48 max-w-full' />
+							</div>
+						</div>
+					</div>
+				))}
 			</div>
 			<CalendarSource />
 		</div>

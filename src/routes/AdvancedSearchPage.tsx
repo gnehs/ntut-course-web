@@ -5,7 +5,7 @@ import type React from 'react';
 import { Checkbox } from '../components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 import { AdsByGoogle } from '../components/AdsByGoogle';
-import { CourseList } from '../components/CourseList';
+import { CourseList, CourseListSkeleton } from '../components/CourseList';
 import { SemesterButton, SiteBrand } from '../components/Layout';
 import type { CourseListLayout } from '../components/CourseList';
 
@@ -28,7 +28,6 @@ import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Field } from '../components/ui-kit/Field';
 import { Input } from '../components/ui-kit/Input';
-import { AdvancedSearchPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { MiniNotify } from '../components/ui-kit/MiniNotify';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { categoryFilterList, courseStandard, parseYearSemVal, timetable } from '../lib/courseUtils';
@@ -688,7 +687,7 @@ export function AdvancedSearchPage() {
 					<Alert key={warning}>{warning}</Alert>
 				))}
 				{onError ? null : isLoading || !searchResult ? (
-					<AdvancedSearchPageSkeleton />
+					<CourseListSkeleton count={12} />
 				) : (
 					<CourseList
 						courses={searchResult}

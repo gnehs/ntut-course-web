@@ -4,10 +4,10 @@ import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
-import { WithdrawalSkeleton } from '../components/ui-kit/PageSkeletons';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchWithdrawal } from '../lib/courseApi';
 import { cn } from '../lib/utils';
+import { Skeleton } from '../components/ui/skeleton';
 import {
 	classifyWithdrawalRate,
 	createWithdrawalRateDistribution,
@@ -24,6 +24,13 @@ type GroupMode = 'risk' | 'none';
 const WITHDRAWAL_DESKTOP_MEDIA_QUERY = '(min-width: 768px)';
 const MOBILE_WITHDRAWAL_BATCH_SIZE = 40;
 const DESKTOP_WITHDRAWAL_BATCH_SIZE = 120;
+const STAT_GRID_CLASS = 'grid gap-3 sm:grid-cols-1 lg:grid-cols-2';
+const SUMMARY_ROW_CLASS =
+	'flex flex-col gap-2 text-sm opacity-75 sm:flex-row sm:items-center sm:justify-between';
+const GROUP_HEADER_CLASS =
+	'sticky top-14 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4';
+const TEACHER_GRID_CLASS = 'grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2';
+const RATE_TRACK_CLASS = 'my-1.5 h-1 overflow-hidden rounded-full bg-[rgba(var(--vs-text),0.08)]';
 
 export function WithdrawalPage() {
 	const [period, setPeriod] = useState('-recent-3-years');
@@ -166,7 +173,7 @@ export function WithdrawalPage() {
 			) : (
 				<>
 					{stat ? (
-						<div className='grid gap-3 sm:grid-cols-1 lg:grid-cols-2'>
+						<div className={STAT_GRID_CLASS}>
 							{Array.isArray(stat)
 								? stat.map((item, index) => (
 										<Card key={`${item.title}-${index}`}>
@@ -182,7 +189,7 @@ export function WithdrawalPage() {
 									))}
 						</div>
 					) : null}
-					<div className='flex flex-col gap-2 text-sm opacity-75 sm:flex-row sm:items-center sm:justify-between'>
+					<div className={SUMMARY_ROW_CLASS}>
 						<div>
 							已呈現 {renderedCount} / {matchingCount} 位符合條件教師
 							{matchingCount !== rows.length ? `（全部 ${rows.length} 位）` : null}
@@ -203,7 +210,7 @@ export function WithdrawalPage() {
 									const maxRate = Math.max(...group.rows.map(rateValue));
 									return (
 										<section key={group.title} className='relative grid'>
-											<div className='sticky top-14 z-10 -mx-4 flex items-baseline justify-between gap-3 bg-linear-to-b from-[rgb(var(--vs-gray-1))] to-[rgb(var(--vs-gray-1))]/0 p-4'>
+											<div className={GROUP_HEADER_CLASS}>
 												<h2 className='text-lg font-semibold'>{group.title}</h2>
 												<div className='text-sm opacity-70'>
 													{group.rows.length === group.totalRows
@@ -211,7 +218,7 @@ export function WithdrawalPage() {
 														: `${group.rows.length} / ${group.totalRows} 位教師`}
 												</div>
 											</div>
-											<div className='grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-2'>
+											<div className={TEACHER_GRID_CLASS}>
 												{group.rows.map((item) => (
 													<WithdrawalTeacherCard
 														item={item}
@@ -249,6 +256,72 @@ export function WithdrawalPage() {
 					{filteredRows.length ? <AdsByGoogle placement='footer' /> : null}
 				</>
 			)}
+		</div>
+	);
+}
+
+function WithdrawalSkeleton() {
+	return (
+		<div className='space-y-4' aria-busy='true' aria-label='載入退選率中'>
+			<div className={STAT_GRID_CLASS}>
+				<Card>
+					<CardTitle>
+						<Skeleton className='h-[1lh] w-16' />
+					</CardTitle>
+					<p>
+						<Skeleton className='h-[1lh] w-24' />
+					</p>
+				</Card>
+				<Card>
+					<dl className='m-0 flex flex-wrap gap-x-6 gap-y-2'>
+						{QUANTILE_LABELS.map((label) => (
+							<div key={label} className='flex flex-col-reverse'>
+								<dt className='text-muted-foreground text-xs'>{label}</dt>
+								<dd className='m-0 text-[1.17em] font-semibold'>
+									<Skeleton className='h-[1lh] w-12' />
+								</dd>
+							</div>
+						))}
+					</dl>
+					<p>
+						<Skeleton className='h-[1lh] w-28' />
+					</p>
+				</Card>
+			</div>
+			<div className={SUMMARY_ROW_CLASS}>
+				<Skeleton className='h-[1lh] w-48' />
+				<Skeleton className='h-[1lh] w-40' />
+			</div>
+			<div className='grid gap-5'>
+				{[0, 1].map((group) => (
+					<section key={group} className='relative grid'>
+						<div className={GROUP_HEADER_CLASS}>
+							<h2 className='text-lg font-semibold'>
+								<Skeleton className='h-[1lh] w-40' />
+							</h2>
+							<div className='text-sm'>
+								<Skeleton className='h-[1lh] w-16' />
+							</div>
+						</div>
+						<div className={TEACHER_GRID_CLASS}>
+							{Array.from({ length: 8 }, (_, index) => (
+								<Card key={index} className='padding'>
+									<CardTitle>
+										<Skeleton className='h-[1lh] w-16' />
+									</CardTitle>
+									<div className='text-lg font-semibold'>
+										<Skeleton className='h-[1lh] w-14' />
+									</div>
+									<div aria-hidden='true' className={RATE_TRACK_CLASS} />
+									<p>
+										<Skeleton className='h-[1lh] w-4/5' />
+									</p>
+								</Card>
+							))}
+						</div>
+					</section>
+				))}
+			</div>
 		</div>
 	);
 }
@@ -318,10 +391,7 @@ function WithdrawalTeacherCard({
 			>
 				{formatWithdrawalRate(rate)}%
 			</div>
-			<div
-				aria-hidden='true'
-				className='my-1.5 h-1 overflow-hidden rounded-full bg-[rgba(var(--vs-text),0.08)]'
-			>
+			<div aria-hidden='true' className={RATE_TRACK_CLASS}>
 				<div
 					className={cn('h-full min-w-0.5 rounded-full', RATE_BAR_COLORS[level])}
 					style={{ width: `${maxRate > 0 ? (rate / maxRate) * 100 : 0}%` }}

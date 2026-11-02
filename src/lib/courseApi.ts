@@ -69,7 +69,18 @@ export async function fetchCourse(
 	department = 'main',
 ): Promise<Course[]> {
 	if (!year || !sem) return [];
-	return fetchCached(`course_${year}_${sem}_${department}`, `${year}/${sem}/${department}.json`);
+	const key = `${year}/${sem}/${department}`;
+	const courses = await fetchCached<Course[]>(`course_${year}_${sem}_${department}`, `${key}.json`);
+	loadedCourses.set(key, courses);
+	return courses;
+}
+
+// Lists this session already holds, so a view can render from them on its first frame.
+const loadedCourses = new Map<string, Course[]>();
+
+/** The course list if this session has already loaded it, without waiting on storage. */
+export function loadedCourse(year: string, sem: string, department = 'main') {
+	return loadedCourses.get(`${year}/${sem}/${department}`);
 }
 
 export async function fetchCourseDetail(

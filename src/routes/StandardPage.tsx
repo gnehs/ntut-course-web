@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { StandardPickerSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Skeleton } from '../components/ui/skeleton';
 import { StudentPrefixSearch } from '../components/StudentPrefixSearch';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchStandards, fetchStandardYear } from '../lib/courseApi';
@@ -20,6 +20,23 @@ import { courseStandard, formatCredit, isZeroCreditValue } from '../lib/courseUt
 import { IconBuilding, IconCalendar, IconSchool, IconSearch } from '@tabler/icons-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
+
+const creditsGridClassName =
+	'rounded-surface shadow-rest m-0 grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-px overflow-hidden bg-[rgba(var(--vs-text),0.08)]';
+const creditCellClassName =
+	'flex min-w-0 flex-col-reverse gap-1 bg-[rgb(var(--vs-background))] px-4 py-3';
+const rulesListClassName =
+	'rounded-surface shadow-rest m-0 list-none divide-y divide-[rgba(var(--vs-text),0.08)] bg-[rgb(var(--vs-background))] p-0';
+const ruleItemClassName =
+	'grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 px-4 py-3 text-[0.95rem] leading-relaxed sm:px-5';
+const ruleIndexClassName = 'text-sm leading-[1.7] font-medium tabular-nums';
+const gradeRowClassName = 'grid items-start gap-4 md:grid-cols-2';
+const semesterCardClassName =
+	'rounded-surface shadow-rest overflow-hidden bg-[rgb(var(--vs-background))]';
+const semesterHeaderClassName =
+	'flex items-baseline justify-between gap-3 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.035)] px-4 py-2.5';
+const courseRowClassName = 'flex items-center justify-between gap-3 px-4 py-2.5';
+const courseTypeClassName = 'grid size-5 shrink-0 place-items-center text-sm leading-none';
 
 export function StandardPage() {
 	const location = useRouteLocation();
@@ -138,93 +155,93 @@ export function StandardPage() {
 				</Alert>
 			) : null}
 
-			{!years ? <StandardPickerSkeleton /> : null}
-
-			{years ? (
-				<Tabs defaultValue='search' className='gap-3'>
-					<TabsList aria-label='課程標準查詢方式'>
-						<TabsTrigger value='search'>快速搜尋</TabsTrigger>
-						<TabsTrigger value='manual'>條件選擇</TabsTrigger>
-					</TabsList>
-					<TabsContent value='search'>
+			<Tabs defaultValue='search' className='gap-3'>
+				<TabsList aria-label='課程標準查詢方式'>
+					<TabsTrigger value='search'>快速搜尋</TabsTrigger>
+					<TabsTrigger value='manual'>條件選擇</TabsTrigger>
+				</TabsList>
+				<TabsContent value='search'>
+					{years ? (
 						<StudentPrefixSearch years={yearItems} onSelect={setQuery} />
-					</TabsContent>
-					<TabsContent value='manual'>
-						<div className='grid gap-3 sm:grid-cols-3'>
-							<div className='flex flex-col gap-1'>
-								<label
-									htmlFor='standard-year'
-									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
-								>
-									<IconCalendar className='size-3.5' />
-									入學年度
-								</label>
-								<Select
-									id='standard-year'
-									className='rounded-surface'
-									value={year}
-									onChange={(v) => setQuery({ year: v, system: '', department: '' })}
-									placeholder='選擇入學年度'
-								>
-									{yearItems.map((item) => (
-										<SelectOption key={item} value={item}>
-											{formatRocYear(item)}
-										</SelectOption>
-									))}
-								</Select>
-							</div>
-
-							<div className='flex flex-col gap-1'>
-								<label
-									htmlFor='standard-system'
-									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
-								>
-									<IconBuilding className='size-3.5' />
-									學制
-								</label>
-								<Select
-									id='standard-system'
-									className='rounded-surface'
-									value={system}
-									onChange={(v) => setQuery({ system: v, department: '' })}
-									placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
-									disabled={!year || !standardData}
-								>
-									{systems.map((item) => (
-										<SelectOption key={item} value={item}>
-											{item}
-										</SelectOption>
-									))}
-								</Select>
-							</div>
-
-							<div className='flex flex-col gap-1'>
-								<label
-									htmlFor='standard-department'
-									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
-								>
-									<IconSearch className='size-3.5' />
-									系所
-								</label>
-								<Select
-									id='standard-department'
-									className='rounded-surface'
-									value={department}
-									onChange={(v) => setQuery({ department: v })}
-									placeholder={!system ? '請先選擇學制' : '選擇系所'}
-									disabled={!system}
-								>
-									{departments.map((item) => (
-										<SelectOption key={item} value={item}>
-											{item}
-										</SelectOption>
-									))}
-								</Select>
-							</div>
+					) : (
+						<PrefixSearchSkeleton />
+					)}
+				</TabsContent>
+				<TabsContent value='manual'>
+					<div className='grid gap-3 sm:grid-cols-3'>
+						<div className='flex flex-col gap-1'>
+							<label
+								htmlFor='standard-year'
+								className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
+							>
+								<IconCalendar className='size-3.5' />
+								入學年度
+							</label>
+							<Select
+								id='standard-year'
+								className='rounded-surface'
+								value={year}
+								onChange={(v) => setQuery({ year: v, system: '', department: '' })}
+								placeholder='選擇入學年度'
+							>
+								{yearItems.map((item) => (
+									<SelectOption key={item} value={item}>
+										{formatRocYear(item)}
+									</SelectOption>
+								))}
+							</Select>
 						</div>
-					</TabsContent>
-				</Tabs>
-			) : null}
+
+						<div className='flex flex-col gap-1'>
+							<label
+								htmlFor='standard-system'
+								className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
+							>
+								<IconBuilding className='size-3.5' />
+								學制
+							</label>
+							<Select
+								id='standard-system'
+								className='rounded-surface'
+								value={system}
+								onChange={(v) => setQuery({ system: v, department: '' })}
+								placeholder={!year ? '請先選擇年度' : !standardData ? '載入中…' : '選擇學制'}
+								disabled={!year || !standardData}
+							>
+								{systems.map((item) => (
+									<SelectOption key={item} value={item}>
+										{item}
+									</SelectOption>
+								))}
+							</Select>
+						</div>
+
+						<div className='flex flex-col gap-1'>
+							<label
+								htmlFor='standard-department'
+								className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
+							>
+								<IconSearch className='size-3.5' />
+								系所
+							</label>
+							<Select
+								id='standard-department'
+								className='rounded-surface'
+								value={department}
+								onChange={(v) => setQuery({ department: v })}
+								placeholder={!system ? '請先選擇學制' : '選擇系所'}
+								disabled={!system}
+							>
+								{departments.map((item) => (
+									<SelectOption key={item} value={item}>
+										{item}
+									</SelectOption>
+								))}
+							</Select>
+						</div>
+					</div>
+				</TabsContent>
+			</Tabs>
 
 			{years && !year ? (
 				<div className='rounded-surface shadow-rest flex flex-col items-center gap-3 bg-[rgb(var(--vs-background))] px-4 py-10 text-center'>
@@ -256,18 +273,15 @@ export function StandardPage() {
 				</p>
 			) : null}
 
-			{year && !standardData ? <StandardPickerSkeleton content /> : null}
+			{year && system && department && !standardData ? <StandardContentSkeleton /> : null}
 
 			{department && current ? (
 				<>
 					<section className='flex flex-col gap-3'>
 						<h2 className='m-0 text-lg font-semibold'>畢業學分要求</h2>
-						<dl className='rounded-surface shadow-rest m-0 grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-px overflow-hidden bg-[rgba(var(--vs-text),0.08)]'>
+						<dl className={creditsGridClassName}>
 							{creditItems.map(([key, value]) => (
-								<div
-									key={key}
-									className='flex min-w-0 flex-col-reverse gap-1 bg-[rgb(var(--vs-background))] px-4 py-3'
-								>
+								<div key={key} className={creditCellClassName}>
 									<dt className='text-xs leading-snug opacity-70'>{key}</dt>
 									<dd className='m-0 text-2xl leading-tight font-semibold tabular-nums'>
 										{formatCredit(value)}
@@ -280,15 +294,12 @@ export function StandardPage() {
 					<section className='flex flex-col gap-3'>
 						<h2 className='m-0 text-lg font-semibold'>相關規定事項</h2>
 						{current.rules?.length ? (
-							<ol className='rounded-surface shadow-rest m-0 list-none divide-y divide-[rgba(var(--vs-text),0.08)] bg-[rgb(var(--vs-background))] p-0'>
+							<ol className={rulesListClassName}>
 								{current.rules.map((item, index) => (
-									<li
-										key={item}
-										className='grid grid-cols-[1.5rem_minmax(0,1fr)] gap-3 px-4 py-3 text-[0.95rem] leading-relaxed sm:px-5'
-									>
+									<li key={item} className={ruleItemClassName}>
 										<span
 											aria-hidden='true'
-											className='text-sm leading-[1.7] font-medium text-[rgba(var(--vs-text),0.5)] tabular-nums'
+											className={`${ruleIndexClassName} text-[rgba(var(--vs-text),0.5)]`}
 										>
 											{index + 1}
 										</span>
@@ -322,14 +333,11 @@ export function StandardPage() {
 						</div>
 						<div className='flex flex-col gap-5'>
 							{Object.entries(current.courses || {}).map(([courseYear, yearData]) => (
-								<div key={courseYear} className='grid items-start gap-4 md:grid-cols-2'>
+								<div key={courseYear} className={gradeRowClassName}>
 									{(Object.entries(yearData) as [string, StandardCourse[]][]).map(
 										([sem, items]) => (
-											<div
-												key={`${courseYear}-${sem}`}
-												className='rounded-surface shadow-rest overflow-hidden bg-[rgb(var(--vs-background))]'
-											>
-												<div className='flex items-baseline justify-between gap-3 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.035)] px-4 py-2.5'>
+											<div key={`${courseYear}-${sem}`} className={semesterCardClassName}>
+												<div className={semesterHeaderClassName}>
 													<h3 className='m-0 text-sm font-semibold'>
 														{gradeLabel(courseYear, sem)}
 													</h3>
@@ -339,11 +347,13 @@ export function StandardPage() {
 												</div>
 												{items.map((item, index) => (
 													<div
-														className={`flex items-center justify-between gap-3 px-4 py-2.5 ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
+														className={`${courseRowClassName} ${index > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
 														key={`${item.type}-${item.name}`}
 													>
 														<span className='flex min-w-0 items-center gap-2.5 text-sm'>
-															<span className='grid size-5 shrink-0 place-items-center text-sm leading-none text-[rgba(var(--vs-text),0.7)]'>
+															<span
+																className={`${courseTypeClassName} text-[rgba(var(--vs-text),0.7)]`}
+															>
 																{item.type}
 															</span>
 															<span className='truncate'>{item.name}</span>
@@ -365,6 +375,102 @@ export function StandardPage() {
 			{!error && current && Object.keys(current.courses || {}).length > 0 ? (
 				<AdsByGoogle placement='footer' />
 			) : null}
+		</div>
+	);
+}
+
+function PrefixSearchSkeleton() {
+	return (
+		<div
+			className='rounded-surface flex border border-[rgba(var(--vs-text),0.12)] bg-[rgb(var(--vs-background))]'
+			aria-busy='true'
+			aria-label='載入課程標準'
+		>
+			<div className='min-w-0 flex-1 px-3 py-3 text-base md:text-sm'>
+				<Skeleton className='h-[1lh] w-48 max-w-full' />
+			</div>
+			<div className='flex shrink-0 items-center px-3'>
+				<Skeleton className='size-6' />
+			</div>
+		</div>
+	);
+}
+
+const skeletonRuleWidths = ['w-11/12', 'w-4/5', 'w-2/3', 'w-5/6'];
+const skeletonCourseWidths = ['w-32', 'w-24', 'w-40', 'w-28', 'w-36'];
+
+function StandardContentSkeleton() {
+	return (
+		<div className='flex flex-col gap-6' aria-busy='true' aria-label='載入課程標準內容'>
+			<section className='flex flex-col gap-3'>
+				<h2 className='m-0 text-lg font-semibold'>畢業學分要求</h2>
+				<div className={creditsGridClassName}>
+					{Array.from({ length: 6 }, (_, index) => (
+						<div key={index} className={creditCellClassName}>
+							<div className='text-xs leading-snug'>
+								<Skeleton className='h-[1lh] w-16' />
+							</div>
+							<div className='text-2xl leading-tight font-semibold'>
+								<Skeleton className='h-[1lh] w-10' />
+							</div>
+						</div>
+					))}
+				</div>
+			</section>
+
+			<section className='flex flex-col gap-3'>
+				<h2 className='m-0 text-lg font-semibold'>相關規定事項</h2>
+				<ol className={rulesListClassName}>
+					{skeletonRuleWidths.map((width, index) => (
+						<li key={index} className={ruleItemClassName}>
+							<span className={ruleIndexClassName}>
+								<Skeleton className='h-[1lh] w-4' />
+							</span>
+							<span>
+								<Skeleton className={`h-[1lh] ${width}`} />
+							</span>
+						</li>
+					))}
+				</ol>
+			</section>
+
+			<section className='flex flex-col gap-3'>
+				<h2 className='m-0 text-lg font-semibold'>課程列表</h2>
+				<div className='flex flex-col gap-5'>
+					{Array.from({ length: 2 }, (_, gradeIndex) => (
+						<div key={gradeIndex} className={gradeRowClassName}>
+							{Array.from({ length: 2 }, (_, semIndex) => (
+								<div key={semIndex} className={semesterCardClassName}>
+									<div className={semesterHeaderClassName}>
+										<h3 className='m-0 text-sm font-semibold'>
+											<Skeleton className='h-[1lh] w-28' />
+										</h3>
+										<span className='text-xs'>
+											<Skeleton className='h-[1lh] w-20' />
+										</span>
+									</div>
+									{skeletonCourseWidths.map((width, rowIndex) => (
+										<div
+											key={rowIndex}
+											className={`${courseRowClassName} ${rowIndex > 0 ? 'border-t border-[rgba(var(--vs-text),0.06)]' : ''}`}
+										>
+											<span className='flex min-w-0 items-center gap-2.5 text-sm'>
+												<span className={courseTypeClassName}>
+													<Skeleton className='size-4' />
+												</span>
+												<Skeleton className={`h-[1lh] ${width}`} />
+											</span>
+											<span className='text-sm'>
+												<Skeleton className='h-[1lh] w-12' />
+											</span>
+										</div>
+									))}
+								</div>
+							))}
+						</div>
+					))}
+				</div>
+			</section>
 		</div>
 	);
 }

@@ -23,8 +23,8 @@ import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Input } from '../components/ui-kit/Input';
-import { LinkList } from '../components/ui-kit/LinkList';
-import { ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons';
+import { LinkList, linkGroupClassName } from '../components/ui-kit/LinkList';
+import { Skeleton } from '../components/ui/skeleton';
 import { fetchCourse, fetchDepartment } from '../lib/courseApi';
 import { departmentItems, storageDepartment } from '../lib/courseUtils';
 import { usePageTitle } from '../lib/pageTitle';
@@ -36,6 +36,15 @@ import { groupClassNames } from '../lib/classGroups';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { animateFilterSection, isReducedMotion } from '../lib/motion';
 import { cn } from '../lib/utils';
+
+const departmentPanelClassName =
+	'rounded-xl bg-[rgb(var(--vs-background))] p-5 shadow-[var(--shadow-rest)]';
+const departmentHeadingClassName = 'm-0 mb-4 text-lg font-bold';
+const wideCollegeHeadingClassName = 'm-0 flex items-center gap-2 px-1 pt-2 pb-1 text-xl font-bold';
+const narrowCollegeHeadingClassName = 'm-0 flex items-center gap-2 px-1 text-lg font-bold';
+const disclosureRowClassName = 'flex min-h-12 items-center gap-2 px-4 text-[0.95rem] font-medium';
+const navItemClassName =
+	'flex w-full items-baseline gap-2 rounded-md px-2 py-1.5 text-left text-sm';
 
 const validClassDepartments = new Set(departmentItems.map(storageDepartment));
 
@@ -167,7 +176,7 @@ export function ClassIndexPage() {
 			nav.scrollTop += itemBox.bottom - (navBox.bottom - margin);
 	}, [spiedDepartment]);
 
-	if (!departments) return <ClassIndexSkeleton />;
+	if (!departments) return <ClassIndexSkeleton isWide={isWide} />;
 
 	return (
 		<div className='space-y-4'>
@@ -231,19 +240,17 @@ export function ClassIndexPage() {
 						<div className='space-y-10'>
 							{colleges.map((college) => (
 								<section className='flex flex-col gap-3' key={college.name}>
-									<h2 className='m-0 flex items-center gap-2 px-1 pt-2 pb-1 text-xl font-bold'>
+									<h2 className={wideCollegeHeadingClassName}>
 										<CollegeIcon className='size-5' name={college.name} />
 										{college.name}
 									</h2>
 									{college.departments.map((department) => (
 										<section
-											className='scroll-mt-20 rounded-xl bg-[rgb(var(--vs-background))] p-5 shadow-[var(--shadow-rest)]'
+											className={`scroll-mt-20 ${departmentPanelClassName}`}
 											id={departmentAnchor(department.name)}
 											key={department.name}
 										>
-											<h3 className='m-0 mb-4 text-lg font-bold'>
-												{department.name}
-											</h3>
+											<h3 className={departmentHeadingClassName}>{department.name}</h3>
 											<DepartmentClasses department={department} href={classHref} />
 										</section>
 									))}
@@ -254,11 +261,11 @@ export function ClassIndexPage() {
 				) : (
 					colleges.map((college) => (
 						<section className='flex flex-col gap-3 pt-3 first:pt-0' key={college.name}>
-							<h2 className='m-0 flex items-center gap-2 px-1 text-lg font-bold'>
+							<h2 className={narrowCollegeHeadingClassName}>
 								<CollegeIcon className='size-5' name={college.name} />
 								{college.name}
 							</h2>
-							<div className='divide-y divide-[rgba(var(--vs-text),0.08)] overflow-hidden rounded-xl bg-[rgb(var(--vs-background))] shadow-[var(--shadow-rest)]'>
+							<div className={linkGroupClassName}>
 								{college.departments.map((department) => (
 									<DepartmentDisclosure
 										department={department}
@@ -391,7 +398,7 @@ function DepartmentDisclosure({
 		<div>
 			<button
 				aria-expanded={open}
-				className='flex min-h-12 w-full items-center gap-2 px-4 text-left text-[0.95rem] font-medium'
+				className={`w-full text-left ${disclosureRowClassName}`}
 				onClick={() => onToggle(!open)}
 				type='button'
 			>
@@ -423,7 +430,8 @@ function DepartmentNavItem({
 		<button
 			aria-current={active ? 'true' : undefined}
 			className={cn(
-				'flex w-full items-baseline gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-150',
+				navItemClassName,
+				'transition-colors duration-150',
 				active
 					? 'bg-[rgba(var(--vs-primary),0.12)] font-medium text-[color-mix(in_srgb,rgb(var(--vs-primary))_86%,rgb(var(--vs-text)))]'
 					: 'text-foreground hover:bg-[rgba(var(--vs-text),0.05)]',
@@ -589,7 +597,7 @@ export function ClassDetailPage() {
 		setVersion((value) => value + 1);
 	}
 
-	if (!courses) return <CourseCollectionSkeleton label='載入班級課程' />;
+	if (!courses) return <CourseCollectionSkeleton label='載入班級課程' title={id} />;
 
 	return (
 		<CourseCollectionPage
@@ -618,5 +626,80 @@ export function ClassDetailPage() {
 				</section>
 			}
 		/>
+	);
+}
+
+function ClassIndexSkeleton({ isWide }: { isWide: boolean }) {
+	const colleges = isWide ? [3, 2] : [3, 3];
+	return (
+		<div className='space-y-4' aria-busy='true' aria-label='載入班級'>
+			<h1>選擇班級</h1>
+			<Skeleton className='h-11 w-full md:h-9' />
+			{isWide ? (
+				<div className='grid grid-cols-[13rem_minmax(0,1fr)] items-start gap-6'>
+					<div className='-mx-2 space-y-4 px-2 pb-4'>
+						{colleges.map((departments, index) => (
+							<div key={index}>
+								<p className='m-0 mb-1 flex items-center gap-1.5 px-2 text-xs font-medium'>
+									<Skeleton className='size-3.5' />
+									<Skeleton className='h-[1lh] w-20' />
+								</p>
+								{Array.from({ length: departments + 2 }, (_, item) => (
+									<div className={navItemClassName} key={item}>
+										<Skeleton className='h-[1lh] w-3/4' />
+									</div>
+								))}
+							</div>
+						))}
+					</div>
+					<div className='space-y-10'>
+						{colleges.map((departments, index) => (
+							<div className='flex flex-col gap-3' key={index}>
+								<div className={wideCollegeHeadingClassName}>
+									<Skeleton className='size-5' />
+									<Skeleton className='h-[1lh] w-32' />
+								</div>
+								{Array.from({ length: departments }, (_, item) => (
+									<div className={departmentPanelClassName} key={item}>
+										<div className={departmentHeadingClassName}>
+											<Skeleton className='h-[1lh] w-28' />
+										</div>
+										<ClassButtonsSkeleton />
+									</div>
+								))}
+							</div>
+						))}
+					</div>
+				</div>
+			) : (
+				colleges.map((departments, index) => (
+					<div className='flex flex-col gap-3 pt-3 first:pt-0' key={index}>
+						<div className={narrowCollegeHeadingClassName}>
+							<Skeleton className='size-5' />
+							<Skeleton className='h-[1lh] w-32' />
+						</div>
+						<div className={linkGroupClassName}>
+							{Array.from({ length: departments + 2 }, (_, item) => (
+								<div className={disclosureRowClassName} key={item}>
+									<Skeleton className='h-[1lh] w-2/5' />
+									<span className='flex-1' />
+									<Skeleton className='size-4' />
+								</div>
+							))}
+						</div>
+					</div>
+				))
+			)}
+		</div>
+	);
+}
+
+function ClassButtonsSkeleton() {
+	return (
+		<div className='flex flex-wrap gap-2'>
+			{Array.from({ length: 6 }, (_, index) => (
+				<Skeleton className='h-11 w-16 min-w-11 sm:h-9' key={index} />
+			))}
+		</div>
 	);
 }

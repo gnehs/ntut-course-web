@@ -15,12 +15,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '../components/ui-kit/Button';
-import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCalendar, fetchHolidays } from '../lib/courseApi';
 import { buildCourseCalendar, trimEllip } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
 import type { CalendarCourse, CalendarEvent, Holiday } from '../types/course';
+
+const stepCardClassName =
+	'rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))]';
+const courseOptionClassName =
+	'rounded-control flex min-w-0 items-center gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3';
 
 export function AddCalendarPage() {
 	const { dataset, getCourses, getMyCourseIds } = useApp();
@@ -122,8 +127,9 @@ export function AddCalendarPage() {
 		URL.revokeObjectURL(url);
 	}
 
-	if (!courses) return <StepsPageSkeleton />;
-	const hasCourses = courses.length > 0;
+	const courseList = courses ?? [];
+	const loading = !courses;
+	const hasCourses = loading || courseList.length > 0;
 	return (
 		<div className='flex flex-col gap-5'>
 			<section className='flex flex-col gap-4'>
@@ -162,28 +168,34 @@ export function AddCalendarPage() {
 					</AlertDescription>
 				</Alert>
 			) : null}
-			<Card className='rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))]'>
+			<Card className={stepCardClassName}>
 				<CardHeader className='p-4 sm:px-5'>
 					<div className='flex flex-wrap items-start justify-between gap-3'>
 						<div className='flex min-w-0 flex-col gap-2'>
 							<CardTitle className='text-base font-semibold'>1. 選擇要加入的課程</CardTitle>
 						</div>
-						<Badge variant='outline'>
-							<IconCircleCheck data-icon='inline-start' />
-							{selectedCourses.length} / {courses.length}
-						</Badge>
+						{loading ? (
+							<Skeleton className='h-[1.375rem] w-14 rounded-full' />
+						) : (
+							<Badge variant='outline'>
+								<IconCircleCheck data-icon='inline-start' />
+								{selectedCourses.length} / {courseList.length}
+							</Badge>
+						)}
 					</div>
 				</CardHeader>
 				<CardContent className='p-4 pt-0 sm:px-5'>
-					{hasCourses ? (
+					{loading ? (
+						<CourseOptionsSkeleton />
+					) : hasCourses ? (
 						<div className='grid gap-2 md:grid-cols-2'>
-							{courses.map((course) => {
+							{courseList.map((course) => {
 								const checked = selectedIds.includes(course.id);
 								return (
 									<label
 										key={course.id}
 										htmlFor={`calendar-course-${course.id}`}
-										className='rounded-control flex min-w-0 cursor-pointer items-center gap-3 border border-[rgba(var(--vs-text),0.1)] bg-[rgb(var(--vs-gray-1))] p-3 transition-colors hover:bg-[rgba(var(--vs-text),0.07)]'
+										className={`${courseOptionClassName} cursor-pointer transition-colors hover:bg-[rgba(var(--vs-text),0.07)]`}
 									>
 										<Checkbox
 											id={`calendar-course-${course.id}`}
@@ -216,9 +228,7 @@ export function AddCalendarPage() {
 					)}
 				</CardContent>
 			</Card>
-			<Card
-				className={`rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))] ${!hasCourses ? 'opacity-70' : ''}`}
-			>
+			<Card className={`${stepCardClassName} ${!hasCourses ? 'opacity-70' : ''}`}>
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>2. 確認日期並下載</CardTitle>
 					<CardDescription>
@@ -233,7 +243,7 @@ export function AddCalendarPage() {
 						<Input
 							type='date'
 							value={start}
-							disabled={!hasCourses}
+							disabled={loading || !hasCourses}
 							onChange={(event) => setStart(event.target.value)}
 						/>
 					</label>
@@ -242,7 +252,7 @@ export function AddCalendarPage() {
 						<Input
 							type='date'
 							value={until}
-							disabled={!hasCourses}
+							disabled={loading || !hasCourses}
 							onChange={(event) => setUntil(event.target.value)}
 						/>
 					</label>
@@ -250,11 +260,19 @@ export function AddCalendarPage() {
 				<Separator className='bg-[rgba(var(--vs-text),0.08)]' />
 				<CardContent className='flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='text-sm text-[rgb(var(--vs-text))]/70'>
-						{hasCourses
-							? `將下載 \`${dataset.year}-${dataset.sem}-course.ics\`，內含 ${selectedCourses.length} 門課程。`
-							: '尚未有課程可下載。'}
+						{loading ? (
+							<Skeleton className='h-[1lh] w-72 max-w-full' />
+						) : hasCourses ? (
+							`將下載 \`${dataset.year}-${dataset.sem}-course.ics\`，內含 ${selectedCourses.length} 門課程。`
+						) : (
+							'尚未有課程可下載。'
+						)}
 					</div>
-					<Button active disabled={!selectedCourses.length || !hasCourses} onClick={downloadIcs}>
+					<Button
+						active
+						disabled={loading || !selectedCourses.length || !hasCourses}
+						onClick={downloadIcs}
+					>
 						<IconDownload className='size-4' data-icon='inline-start' />
 						下載 ICS
 					</Button>
@@ -262,13 +280,17 @@ export function AddCalendarPage() {
 			</Card>
 			{hasCourses ? (
 				<Alert>
-					{holidaysFailed ? <IconAlertCircle /> : <IconCalendarOff />}
+					{!loading && holidaysFailed ? <IconAlertCircle /> : <IconCalendarOff />}
 					<AlertTitle>
-						{holidaysFailed
-							? '無法取得完整的放假日'
-							: holidays
-								? `會跳過 ${holidaysInRange.length} 天放假日`
-								: '正在讀取放假日…'}
+						{loading ? (
+							<Skeleton className='h-[1lh] w-40' />
+						) : holidaysFailed ? (
+							'無法取得完整的放假日'
+						) : holidays ? (
+							`會跳過 ${holidaysInRange.length} 天放假日`
+						) : (
+							'正在讀取放假日…'
+						)}
 					</AlertTitle>
 					<AlertDescription>
 						{holidaysFailed
@@ -287,6 +309,24 @@ export function AddCalendarPage() {
 					</AlertDescription>
 				</Alert>
 			) : null}
+		</div>
+	);
+}
+
+function CourseOptionsSkeleton() {
+	return (
+		<div className='grid gap-2 md:grid-cols-2' aria-busy='true' aria-label='載入我的課程'>
+			{Array.from({ length: 6 }, (_, index) => (
+				<div key={index} className={courseOptionClassName}>
+					<Skeleton className='size-4 shrink-0' />
+					<div className='min-w-0 flex-1 text-base'>
+						<Skeleton className='h-[1lh] w-3/5' />
+						<div className='mt-1 text-sm'>
+							<Skeleton className='h-[1lh] w-2/5' />
+						</div>
+					</div>
+				</div>
+			))}
 		</div>
 	);
 }

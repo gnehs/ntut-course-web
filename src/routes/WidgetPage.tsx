@@ -4,7 +4,9 @@ import {
 	IconAlertCircle,
 	IconClipboard,
 	IconClock,
+	IconDownload,
 	IconPlayerPlay,
+	IconPlus,
 	IconRefresh,
 	IconSearch,
 } from '@tabler/icons-react';
@@ -12,9 +14,8 @@ import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '../components/ui-kit/Button';
-import { StepsPageSkeleton } from '../components/ui-kit/PageSkeletons';
 import { trimEllip } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
 import type { CourseTime } from '../types/course';
@@ -59,21 +60,23 @@ export function WidgetPage() {
 		};
 	}, [dataset.year, dataset.sem, dataset.department]);
 	const code = useMemo(() => createScriptableCode(courses || []), [courses]);
-	if (!courses) return <StepsPageSkeleton codeBlock />;
-	const hasCourses = courses.length > 0;
+	const addScriptUrl = useMemo(() => createAddScriptUrl(code), [code]);
+	const loading = !courses;
+	const courseCount = courses?.length ?? 0;
+	const hasCourses = loading || courseCount > 0;
 	const displayedCode = hasCourses ? code : '加入課程後，這裡會產生可貼到 Scriptable 的程式碼。';
 	return (
 		<div className='flex flex-col gap-5'>
 			<section className='flex flex-col gap-4'>
 				<h1 className='text-3xl font-semibold tracking-normal'>iOS 小工具</h1>
 				<p className='max-w-2xl text-[rgb(var(--vs-text))]/75'>
-					複製下方 Scriptable 程式碼，貼到 iPhone 後就能在桌面查看下一堂課。
+					在 iPhone 上安裝 Scriptable，再一鍵加入課表腳本，就能在桌面查看下一堂課。
 				</p>
 			</section>
 			<Alert>
 				<IconRefresh />
 				<AlertTitle>課表變更後要重新設定</AlertTitle>
-				<AlertDescription>加退選或修改課程後，課表變更後請重新複製程式碼。</AlertDescription>
+				<AlertDescription>加退選或修改課程後，請回到這頁重新加入腳本。</AlertDescription>
 			</Alert>
 			{!hasCourses ? (
 				<Alert>
@@ -98,28 +101,70 @@ export function WidgetPage() {
 					</AlertDescription>
 				</Alert>
 			) : null}
+			<Card className='rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))]'>
+				<CardHeader className='gap-3 p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
+					<div className='min-w-0'>
+						<CardTitle className='text-base font-semibold'>1. 安裝 Scriptable</CardTitle>
+						<CardDescription>
+							先從 App Store 安裝 Scriptable，再回到這頁繼續下一步。
+						</CardDescription>
+					</div>
+					<Button
+						as='a'
+						href='https://apps.apple.com/tw/app/scriptable/id1405459188'
+						target='_blank'
+						rel='noreferrer'
+						size='sm'
+					>
+						<IconDownload className='size-4' data-icon='inline-start' />
+						開啟 App Store
+					</Button>
+				</CardHeader>
+			</Card>
 			<Card
 				className={`rounded-surface bg-sheen-surface shadow-rest overflow-hidden bg-[rgb(var(--vs-background))] ${!hasCourses ? 'opacity-70' : ''}`}
 			>
 				<CardHeader className='gap-3 border-b border-[rgba(var(--vs-text),0.08)] p-4 sm:flex sm:flex-row sm:items-center sm:justify-between sm:px-5'>
 					<div className='min-w-0'>
 						<CardTitle className='text-base font-semibold'>
-							{hasCourses ? '1. 複製 Scriptable 程式碼' : '1. 加入課程後再複製程式碼'}
+							{hasCourses ? '2. 加入課表腳本' : '2. 加入課程後再加入腳本'}
 						</CardTitle>
 						<CardDescription>
-							{hasCourses
-								? `包含 ${courses.length} 門課程資料。`
-								: '目前沒有課程資料，複製功能已停用。'}
+							{loading ? (
+								<Skeleton className='h-[1lh] w-40' />
+							) : hasCourses ? (
+								`在 iPhone 上點「加入 Scriptable」，包含 ${courseCount} 門課程資料。`
+							) : (
+								'目前沒有課程資料，加入功能已停用。'
+							)}
 						</CardDescription>
 					</div>
 					<div className='flex flex-wrap items-center gap-2'>
-						<Badge variant='outline'>{courses.length} 門課</Badge>
+						{loading ? (
+							<Skeleton className='h-[1.375rem] w-14 rounded-full' />
+						) : (
+							<Badge variant='outline'>{courseCount} 門課</Badge>
+						)}
 						<Button
-							active
-							disabled={!hasCourses}
+							as={loading || !hasCourses ? 'button' : 'a'}
+							href={loading || !hasCourses ? undefined : addScriptUrl}
+							primary
+							disabled={loading || !hasCourses}
+							size='sm'
+							onClick={() => {
+								try {
+									window.gtag?.('event', 'add_ios_widget_script');
+								} catch {}
+							}}
+						>
+							<IconPlus className='size-4' data-icon='inline-start' />
+							加入 Scriptable
+						</Button>
+						<Button
+							disabled={loading || !hasCourses}
 							size='sm'
 							onClick={async () => {
-								if (!hasCourses) return;
+								if (loading || !hasCourses) return;
 								try {
 									await copyCode(code);
 									toast.success('已複製', {
@@ -138,34 +183,26 @@ export function WidgetPage() {
 					</div>
 				</CardHeader>
 				<CardContent className='p-0'>
-					<pre
-						id='scriptable-code'
-						className={`${hasCourses ? 'h-[512px]' : 'h-28'} overflow-auto bg-[rgb(var(--vs-gray-1))] p-4 text-sm leading-6 whitespace-pre-wrap`}
-					>
-						{displayedCode}
-					</pre>
+					{loading ? (
+						<CodeBlockSkeleton />
+					) : (
+						<pre
+							id='scriptable-code'
+							className={`${hasCourses ? 'h-[512px]' : 'h-28'} ${codeBlockClassName}`}
+						>
+							{displayedCode}
+						</pre>
+					)}
 				</CardContent>
 			</Card>
 			<Card className='rounded-surface bg-sheen-surface shadow-rest bg-[rgb(var(--vs-background))]'>
 				<CardHeader className='p-4 sm:px-5'>
-					<CardTitle className='text-base font-semibold'>2. 貼到 Scriptable 並加入小工具</CardTitle>
+					<CardTitle className='text-base font-semibold'>3. 加入桌面小工具</CardTitle>
 					<CardDescription>
-						先安裝 Scriptable，建立 Script 後貼上程式碼，再依照影片加入桌面小工具。
-						<br />* 課表變更後重新貼上程式碼
+						在 Scriptable 儲存腳本後，長按桌面加入 Scriptable 小工具，並選擇「{scriptName}」。
 					</CardDescription>
 				</CardHeader>
 				<CardContent className='flex flex-col gap-4 p-4 pt-0 sm:px-5'>
-					<div className='flex flex-wrap gap-2'>
-						<Button
-							as='a'
-							href='https://apps.apple.com/tw/app/scriptable/id1405459188'
-							target='_blank'
-							rel='noreferrer'
-						>
-							開啟 App Store
-						</Button>
-					</div>
-					<Separator className='bg-[rgba(var(--vs-text),0.08)]' />
 					<div className='flex items-center gap-2 text-sm font-medium'>
 						<IconPlayerPlay className='size-4' />
 						教學影片
@@ -179,11 +216,34 @@ export function WidgetPage() {
 	);
 }
 
+const codeBlockClassName =
+	'overflow-auto bg-[rgb(var(--vs-gray-1))] p-4 text-sm leading-6 whitespace-pre-wrap';
+
+const codeLineWidths = ['w-2/3', 'w-1/2', 'w-4/5', 'w-1/3', 'w-3/5', 'w-2/5', 'w-3/4', 'w-1/2'];
+
+function CodeBlockSkeleton() {
+	return (
+		<div className={`h-[512px] ${codeBlockClassName}`} aria-busy='true' aria-label='載入程式碼'>
+			{codeLineWidths.map((width, index) => (
+				<div key={index}>
+					<Skeleton className={`my-1 h-4 ${width}`} />
+				</div>
+			))}
+		</div>
+	);
+}
+
 async function copyCode(code: string) {
 	try {
 		window.gtag?.('event', 'copy_ios_widget_code');
 	} catch {}
 	await navigator.clipboard.writeText(code);
+}
+
+const scriptName = '北科課程好朋友';
+
+function createAddScriptUrl(code: string) {
+	return `scriptable:///add?name=${encodeURIComponent(scriptName)}&text=${encodeURIComponent(code)}`;
 }
 
 function createScriptableCode(courseData: WidgetCourse[]) {

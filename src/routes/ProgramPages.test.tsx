@@ -50,6 +50,7 @@ vi.mock('../components/CourseList', () => ({
 			))}
 		</div>
 	),
+	CourseListSkeleton: () => null,
 }));
 
 vi.mock('@tanstack/react-router', () => ({
@@ -104,8 +105,8 @@ describe('ProgramIndexPage', () => {
 
 		render(<ProgramIndexPage />);
 
-		expect(await screen.findByRole('heading', { name: '一般學程' })).toBeInTheDocument();
-		const link = screen.getByRole('link', { name: /人工智慧學程/ });
+		const link = await screen.findByRole('link', { name: /人工智慧學程/ });
+		expect(screen.getByRole('heading', { name: '一般學程' })).toBeInTheDocument();
 		expect(link).toHaveAttribute('href', '/program/115/1/P-001');
 		expect(screen.getByText('3 門課程')).toBeInTheDocument();
 		expect(mocks.fetchPrograms).toHaveBeenCalledWith('115', '1');

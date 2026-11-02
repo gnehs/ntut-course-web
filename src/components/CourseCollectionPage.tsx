@@ -1,11 +1,16 @@
 import { useState, type ReactNode } from 'react';
 import { IconCheck, IconX } from '@tabler/icons-react';
-import { CourseList, type CourseListLayout } from './CourseList';
+import { CourseList, CourseListSkeleton, type CourseListLayout } from './CourseList';
 import { CourseListToolbar } from './CourseListToolbar';
 import { Button } from './ui-kit/Button';
 import { Alert } from './ui-kit/Alert';
 import { Skeleton } from './ui/skeleton';
 import type { Course } from '../types/course';
+
+const pageClassName = 'flex flex-col gap-4';
+const headerClassName = 'flex flex-col gap-1';
+const codeClassName = 'm-0 font-mono text-sm';
+const countClassName = 'm-0 text-sm';
 
 type CourseCollectionGroup = {
 	key: string;
@@ -48,12 +53,12 @@ export function CourseCollectionPage({
 	const visibleGroups = groups.filter((group) => group.courses.length);
 	const count = visibleGroups.reduce((total, group) => total + group.courses.length, 0);
 	return (
-		<div className='flex flex-col gap-4'>
-			<header className='flex flex-col gap-1'>
-				{code ? <p className='m-0 font-mono text-sm opacity-65'>{code}</p> : null}
+		<div className={pageClassName}>
+			<header className={headerClassName}>
+				{code ? <p className={`${codeClassName} opacity-65`}>{code}</p> : null}
 				<h1 className='m-0'>{title}</h1>
 				{description ? <div className='opacity-75'>{description}</div> : null}
-				<p className='m-0 text-sm opacity-70'>共 {count} 門課程</p>
+				<p className={`${countClassName} opacity-70`}>共 {count} 門課程</p>
 			</header>
 			{notice}
 			{count ? (
@@ -111,24 +116,38 @@ export function CourseCollectionPage({
 	);
 }
 
-export function CourseCollectionSkeleton({ label = '載入課程' }: { label?: string }) {
+/** Pass `title` and `code` when the route already knows them, and `description` when the page will show one. */
+export function CourseCollectionSkeleton({
+	label = '載入課程',
+	title,
+	code,
+	description = false,
+}: {
+	label?: string;
+	title?: string;
+	code?: string;
+	description?: boolean;
+}) {
 	return (
-		<div className='flex flex-col gap-4' aria-busy='true' aria-label={label}>
-			<div className='flex flex-col gap-2'>
-				<Skeleton className='h-4 w-24' />
-				<Skeleton className='h-8 w-64 max-w-full' />
-				<Skeleton className='h-4 w-28' />
-			</div>
-			<div className='grid grid-cols-2 items-center gap-3 md:grid-cols-[1fr_auto_1fr]'>
-				<Skeleton className='col-start-1 row-start-1 h-11 w-24 md:h-9' />
-				<Skeleton className='col-span-2 h-11 w-56 justify-self-center md:col-span-1 md:col-start-2 md:row-start-1' />
-				<Skeleton className='col-start-2 row-start-1 h-11 w-32 justify-self-end md:col-start-3 md:h-9' />
-			</div>
-			<div className='grid grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] gap-3'>
-				{Array.from({ length: 6 }, (_, index) => (
-					<Skeleton key={index} className='h-48 w-full' />
-				))}
-			</div>
+		<div className={pageClassName} aria-busy='true' aria-label={label}>
+			<header className={headerClassName}>
+				{code ? <p className={`${codeClassName} opacity-65`}>{code}</p> : null}
+				<h1 className='m-0'>{title ?? <Skeleton className='h-[1lh] w-64 max-w-full' />}</h1>
+				{description ? (
+					<div>
+						<Skeleton className='h-[1lh] w-full' />
+						<Skeleton className='h-[1lh] w-3/4' />
+					</div>
+				) : null}
+				<p className={countClassName}>
+					<Skeleton className='h-[1lh] w-24' />
+				</p>
+			</header>
+			<CourseListSkeleton
+				showTimetable
+				toolbarStart={<Skeleton className='h-11 w-[102px] sm:h-9' />}
+				toolbarEnd={<Skeleton className='h-11 w-36 sm:h-9' />}
+			/>
 		</div>
 	);
 }

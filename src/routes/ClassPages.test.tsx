@@ -37,6 +37,7 @@ vi.mock('../components/CourseList', () => ({
 	CourseList: ({ department }: { department?: string }) => (
 		<div data-testid='course-list' data-department={department} />
 	),
+	CourseListSkeleton: () => null,
 }));
 
 vi.mock('../components/AdsByGoogle', () => ({ AdsByGoogle: () => null }));

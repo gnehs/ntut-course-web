@@ -1,6 +1,5 @@
-import { LinkList } from './ui-kit/LinkList';
-
-export { LinkListSkeleton as ProgramListSkeleton } from './ui-kit/LinkList';
+import { LinkList, LinkListSkeleton } from './ui-kit/LinkList';
+import { Skeleton } from './ui/skeleton';
 
 export type ProgramListItem = {
 	id: string;
@@ -26,5 +25,15 @@ export function ProgramList({ items }: { items: ProgramListItem[] }) {
 				detail: `${item.courseCount} 門課程`,
 			}))}
 		/>
+	);
+}
+
+export function ProgramIndexSkeleton({ title }: { title: string }) {
+	return (
+		<div className='flex flex-col gap-4' aria-busy='true' aria-label={`載入${title}`}>
+			<h1>{title}</h1>
+			<Skeleton className='h-11 w-full md:h-9' />
+			<LinkListSkeleton />
+		</div>
 	);
 }

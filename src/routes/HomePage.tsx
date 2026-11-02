@@ -27,6 +27,7 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { UniversalSearch } from '../components/UniversalSearch';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
+import { Skeleton } from '../components/ui/skeleton';
 import { fetchCalendar } from '../lib/courseApi';
 import { displayDepartment, timetable } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
@@ -50,6 +51,32 @@ function useStandardUrl() {
 		} catch {}
 	}, []);
 	return url;
+}
+
+const upcomingGridClassName = 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3';
+
+function UpcomingCourseSkeleton() {
+	return (
+		<div aria-busy='true' aria-label='載入今天的課程'>
+			<PageSection title='今天的課程'>
+				<div className={upcomingGridClassName}>
+					{Array.from({ length: 3 }, (_, index) => (
+						<Card className='px-4 py-3' key={index}>
+							<div className='min-w-0'>
+								<CardTitle>
+									<Skeleton className='h-[1lh] w-2/3' />
+								</CardTitle>
+								<p>
+									<Skeleton className='h-[1lh] w-1/3' />
+								</p>
+							</div>
+							<Skeleton className='size-5' data-card-icon />
+						</Card>
+					))}
+				</div>
+			</PageSection>
+		</div>
+	);
 }
 
 function UpcomingCourse() {
@@ -85,10 +112,12 @@ function UpcomingCourse() {
 		};
 	}, [dataset.year, dataset.sem, dataset.department]);
 
-	if (!items?.length) return null;
+	// The section only exists for people with saved courses, so only they get a placeholder.
+	if (!items) return getMyCourseIds().length ? <UpcomingCourseSkeleton /> : null;
+	if (!items.length) return null;
 	return (
 		<PageSection title='今天的課程'>
-			<div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+			<div className={upcomingGridClassName}>
 				{items.map((course) => (
 					<Card
 						className='px-4 py-3'

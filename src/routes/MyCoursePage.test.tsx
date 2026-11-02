@@ -27,13 +27,10 @@ vi.mock('../components/CourseList', () => ({
 	CourseList: ({ courses }: { courses: { id: string }[] }) => (
 		<div data-testid='course-list'>{courses.map((course) => course.id).join(',')}</div>
 	),
+	CourseListSkeleton: () => <div data-testid='course-list-skeleton' />,
 }));
 
 vi.mock('../components/AdsByGoogle', () => ({ AdsByGoogle: () => <div /> }));
-
-vi.mock('../components/ui-kit/PageSkeletons', () => ({
-	ClassDetailSkeleton: () => <div>載入中</div>,
-}));
 
 vi.mock('@tanstack/react-router', () => ({
 	Link: ({ to, children, ...props }: { to: string; children: React.ReactNode }) => (

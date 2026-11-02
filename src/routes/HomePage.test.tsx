@@ -139,7 +139,8 @@ describe('HomePage', () => {
 		] as never);
 
 		render(<HomePage />);
-		const section = (await screen.findByRole('heading', { name: '今天的課程' })).closest('section');
+		await screen.findByRole('link', { name: /早上課/ });
+		const section = screen.getByRole('heading', { name: '今天的課程' }).closest('section');
 		const courseLinks = within(section!).getAllByRole('link');
 
 		expect(courseLinks.map((link) => link.textContent)).toEqual([

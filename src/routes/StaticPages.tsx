@@ -19,7 +19,7 @@ import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
-import { StatusSkeleton } from '../components/ui-kit/PageSkeletons';
+import { Skeleton } from '../components/ui/skeleton';
 import { Textarea } from '../components/ui-kit/Textarea';
 import {
 	createMyCourseBackup,
@@ -909,57 +909,86 @@ export function StatusPage() {
 			cancelled = true;
 		};
 	}, []);
-	if (!runs) return <StatusSkeleton />;
 	return (
 		<div className='space-y-4'>
 			<h1>擷取狀態</h1>
 			<p>僅顯示最新 50 筆資料</p>
-			{error ? (
+			{runs && error ? (
 				<Alert danger className='mb-3'>
 					無法取得擷取狀態，請稍後再試。
 				</Alert>
 			) : null}
-			{!error && runs.length === 0 ? <Alert className='mb-3'>目前沒有擷取紀錄。</Alert> : null}
-			<div className='space-y-2'>
-				{runs.map((run) => (
-					<a
-						key={run.id}
-						href={run.html_url}
-						target='_blank'
-						rel='noreferrer'
-						className='rounded-surface bg-sheen-glow shadow-raised hover:shadow-lifted active:shadow-pressed flex items-center gap-3 bg-[rgb(var(--vs-background))] px-4 py-2.5 transition-[box-shadow,translate] duration-200 hover:-translate-y-0.5 active:translate-y-px'
-					>
-						<div
-							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}
+			{runs && !error && runs.length === 0 ? (
+				<Alert className='mb-3'>目前沒有擷取紀錄。</Alert>
+			) : null}
+			{runs ? (
+				<div className={statusListClassName}>
+					{runs.map((run) => (
+						<a
+							key={run.id}
+							href={run.html_url}
+							target='_blank'
+							rel='noreferrer'
+							className={`${statusRowClassName} hover:shadow-lifted active:shadow-pressed transition-[box-shadow,translate] duration-200 hover:-translate-y-0.5 active:translate-y-px`}
 						>
-							{run.status === 'in_progress' ? (
-								<IconLoader className='size-4 animate-spin' />
-							) : run.status === 'completed' ? (
-								<IconCheck className='size-4' />
-							) : (
-								<IconHelpHexagon className='size-4' />
-							)}
-						</div>
-						<div className='min-w-0 flex-1'>
-							<div className='font-semibold'>{parseName(run.name)}</div>
-							<div className='text-muted-foreground text-sm'>
-								{run.event === 'schedule' ? (
-									<IconCalendar className='inline-block size-4 align-[-0.125em]' />
-								) : run.event === 'push' ? (
-									<IconGitCommit className='inline-block size-4 align-[-0.125em]' />
-								) : run.event === 'dynamic' ? (
-									<IconRefresh className='inline-block size-4 align-[-0.125em]' />
+							<div
+								className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}
+							>
+								{run.status === 'in_progress' ? (
+									<IconLoader className='size-4 animate-spin' />
+								) : run.status === 'completed' ? (
+									<IconCheck className='size-4' />
 								) : (
-									<IconHelpHexagon className='inline-block size-4 align-[-0.125em]' />
+									<IconHelpHexagon className='size-4' />
 								)}
-								<span> • </span>
-								{timeSince(new Date(run.created_at))}前
 							</div>
+							<div className='min-w-0 flex-1'>
+								<div className='font-semibold'>{parseName(run.name)}</div>
+								<div className='text-muted-foreground text-sm'>
+									{run.event === 'schedule' ? (
+										<IconCalendar className='inline-block size-4 align-[-0.125em]' />
+									) : run.event === 'push' ? (
+										<IconGitCommit className='inline-block size-4 align-[-0.125em]' />
+									) : run.event === 'dynamic' ? (
+										<IconRefresh className='inline-block size-4 align-[-0.125em]' />
+									) : (
+										<IconHelpHexagon className='inline-block size-4 align-[-0.125em]' />
+									)}
+									<span> • </span>
+									{timeSince(new Date(run.created_at))}前
+								</div>
+							</div>
+						</a>
+					))}
+				</div>
+			) : (
+				<StatusRunsSkeleton />
+			)}
+			{runs && !error && runs.length ? <AdsByGoogle placement='footer' /> : null}
+		</div>
+	);
+}
+
+const statusListClassName = 'space-y-2';
+const statusRowClassName =
+	'rounded-surface bg-sheen-glow shadow-raised flex items-center gap-3 bg-[rgb(var(--vs-background))] px-4 py-2.5';
+
+function StatusRunsSkeleton() {
+	return (
+		<div className={statusListClassName} aria-busy='true' aria-label='載入擷取狀態'>
+			{Array.from({ length: 8 }, (_, index) => (
+				<div key={index} className={statusRowClassName}>
+					<Skeleton className='size-8 shrink-0 rounded-full' />
+					<div className='min-w-0 flex-1'>
+						<div className='font-semibold'>
+							<Skeleton className='h-[1lh] w-52 max-w-full' />
 						</div>
-					</a>
-				))}
-			</div>
-			{!error && runs.length ? <AdsByGoogle placement='footer' /> : null}
+						<div className='text-sm'>
+							<Skeleton className='h-[1lh] w-32 max-w-full' />
+						</div>
+					</div>
+				</div>
+			))}
 		</div>
 	);
 }

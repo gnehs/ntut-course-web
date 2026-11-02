@@ -24,7 +24,7 @@ import {
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { CourseDetailSkeleton, SkeletonBlock } from '../components/ui-kit/PageSkeletons';
+import { Skeleton } from '../components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { SportsCourseIcon } from '../components/SportsCourseIcon';
 import {
@@ -32,7 +32,7 @@ import {
 	collapsedFields,
 	renderSyllabusIndicator,
 } from '../components/SyllabusIndicators';
-import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
+import { fetchCourseDetail, fetchWithdrawalRate, loadedCourse } from '../lib/courseApi';
 import { isCourseHidden } from '../lib/contentVisibility';
 import { hasMeaningfulValue } from '../lib/courseFilters';
 import {
@@ -266,10 +266,12 @@ export function CourseDetail({
 	const conflictCourses = useMemo(() => {
 		if (!course) return [];
 		const ids = getMyCourseIds(year, sem, courseDepartment);
-		return relatedCourses.filter(
+		// The list that linked here already loaded this dataset, so conflicts show before the detail settles.
+		const pool = loaded ? relatedCourses : (loadedCourse(year, sem, courseDepartment) ?? []);
+		return pool.filter(
 			(item) => ids.includes(item.id) && item.id !== course.id && hasTimeConflict(course, item),
 		);
-	}, [course, relatedCourses, courseDepartment, version]);
+	}, [course, relatedCourses, loaded, courseDepartment, version]);
 	const conflicted = conflictCourses.length > 0;
 	const selectedSyllabus = syllabus[0] ?? null;
 	// The sidebar only sits beside the content on wide screens; on phones this slot would push the description down.
@@ -304,10 +306,10 @@ export function CourseDetail({
 	}
 
 	return (
-		<div className='grid min-w-0 gap-4 @3xl:grid-cols-[minmax(0,1fr)_20rem] @3xl:grid-rows-[auto_1fr] @3xl:items-start @3xl:gap-x-6'>
+		<div className={layoutClassName}>
 			{/* A peek's floating buttons sit over the top right; one column keeps the title clear of them. */}
-			<header className='flex min-w-0 flex-col gap-1 pr-[var(--course-header-inset,0px)] @3xl:col-start-1 @3xl:pr-0'>
-				<h1 className='m-0 text-2xl leading-snug font-semibold'>
+			<header className={headerClassName}>
+				<h1 className={titleClassName}>
 					<CourseDetailTitle course={currentCourse} />
 				</h1>
 				{currentCourse.name?.en ? (
@@ -317,7 +319,7 @@ export function CourseDetail({
 			<aside
 				aria-label='課程詳細資訊'
 				style={{ viewTransitionName: asideTransition ? COURSE_ASIDE_TRANSITION : undefined }}
-				className='flex min-w-0 flex-col gap-3 @3xl:sticky @3xl:top-[var(--course-sticky-top,74px)] @3xl:col-start-2 @3xl:row-start-2'
+				className={asideClassName}
 			>
 				<Button
 					primary={!isInMyCourse}
@@ -329,7 +331,7 @@ export function CourseDetail({
 					{isInMyCourse ? '從我的課程移除' : '加入我的課程'}
 				</Button>
 				<div className={panelClassName}>
-					<div className='rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)]'>
+					<div className={statsClassName}>
 						<CourseStat label='課號' value={currentCourse.id} />
 						<CourseStat label='學分' value={formatCredit(course.credit)} />
 						<WithdrawalRateStat
@@ -338,7 +340,7 @@ export function CourseDetail({
 							distribution={withdrawalDistribution}
 						/>
 					</div>
-					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] @xl:grid-cols-3 @xl:divide-x @xl:divide-y-0 @3xl:grid-cols-1 @3xl:divide-x-0 @3xl:divide-y'>
+					<div className={infoSectionsClassName}>
 						<InfoSection
 							icon={<IconInfoCircle />}
 							title='課程資訊'
@@ -410,7 +412,7 @@ export function CourseDetail({
 					</div>
 				) : null}
 			</aside>
-			<div className='flex min-w-0 flex-col gap-4 @3xl:col-start-1 @3xl:row-start-2'>
+			<div className={mainClassName}>
 				{conflicted ? (
 					<Alert danger>
 						<strong>課程衝堂</strong>
@@ -455,21 +457,7 @@ export function CourseDetail({
 						<AdsByGoogle placement='section' />
 					</div>
 				) : null}
-				{!loaded ? (
-					<div className={panelClassName}>
-						<section className={docSectionClassName}>
-							<div className={docHeadingClassName}>
-								<SkeletonBlock className='h-[1lh] w-16' />
-							</div>
-							<div className='flex flex-col gap-2 leading-relaxed'>
-								<SkeletonBlock className='h-[1lh] w-full' />
-								<SkeletonBlock className='h-[1lh] w-full' />
-								<SkeletonBlock className='h-[1lh] w-4/5' />
-								<SkeletonBlock className='h-[1lh] w-3/5' />
-							</div>
-						</section>
-					</div>
-				) : null}
+				{!loaded ? <SyllabusSkeleton /> : null}
 				{syllabusError ? <Alert>課程大綱暫時無法載入，請稍後再試。</Alert> : null}
 				{loaded && !syllabusError && !syllabus.length ? <Alert>尚無課程大綱資料。</Alert> : null}
 				{syllabus.length ? <SyllabusDetail items={syllabus} /> : null}
@@ -492,12 +480,126 @@ export function CourseDetail({
 	);
 }
 
+const layoutClassName =
+	'grid min-w-0 gap-4 @3xl:grid-cols-[minmax(0,1fr)_20rem] @3xl:grid-rows-[auto_1fr] @3xl:items-start @3xl:gap-x-6';
+const headerClassName =
+	'flex min-w-0 flex-col gap-1 pr-[var(--course-header-inset,0px)] @3xl:col-start-1 @3xl:pr-0';
+const titleClassName = 'm-0 text-2xl leading-snug font-semibold';
+const asideClassName =
+	'flex min-w-0 flex-col gap-3 @3xl:sticky @3xl:top-[var(--course-sticky-top,74px)] @3xl:col-start-2 @3xl:row-start-2';
+const mainClassName = 'flex min-w-0 flex-col gap-4 @3xl:col-start-1 @3xl:row-start-2';
+const statsClassName =
+	'rounded-t-surface grid grid-cols-3 divide-x divide-[rgba(var(--vs-text),0.08)] border-b border-[rgba(var(--vs-text),0.08)]';
+const statValueClassName = 'truncate text-lg leading-tight font-semibold tabular-nums';
+const infoSectionsClassName =
+	'grid divide-y divide-[rgba(var(--vs-text),0.08)] @xl:grid-cols-3 @xl:divide-x @xl:divide-y-0 @3xl:grid-cols-1 @3xl:divide-x-0 @3xl:divide-y';
 const panelClassName = 'rounded-surface min-w-0 bg-[rgb(var(--vs-background))] shadow-rest';
 const dividerClassName = 'divide-y divide-[rgba(var(--vs-text),0.08)]';
 // Label column beside the text keeps long syllabus fields scannable and the line length readable.
 const docSectionClassName =
 	'flex min-w-0 flex-col gap-2 px-4 py-4 text-[0.95rem] sm:px-5 md:grid md:grid-cols-[9rem_minmax(0,1fr)] md:gap-6';
 const docHeadingClassName = 'm-0 text-[0.95rem] leading-relaxed font-semibold';
+
+// Only a course with no list seed lands here, so everything that needs the course stands in.
+function CourseDetailSkeleton() {
+	return (
+		<div className={layoutClassName} aria-busy='true' aria-label='載入課程'>
+			<header className={headerClassName}>
+				<h1 className={titleClassName}>
+					<Skeleton className='h-[1lh] w-48 max-w-full' />
+				</h1>
+				<div className='text-base'>
+					<Skeleton className='h-[1lh] w-72 max-w-full' />
+				</div>
+			</header>
+			<aside className={asideClassName}>
+				<Skeleton className='h-11 w-full sm:h-9' />
+				<div className={panelClassName}>
+					<div className={statsClassName}>
+						<CourseStat label='課號' value={<Skeleton className='h-[1lh] w-16' />} />
+						<CourseStat label='學分' value={<Skeleton className='h-[1lh] w-8' />} />
+						<div className='min-w-0 px-4 py-3'>
+							<div className={statValueClassName}>
+								<Skeleton className='h-[1lh] w-14' />
+							</div>
+							<div className='mt-1 text-xs leading-tight'>
+								<Skeleton className='h-[1lh] w-16' />
+							</div>
+						</div>
+					</div>
+					<div className={infoSectionsClassName}>
+						<InfoSection
+							icon={<IconInfoCircle />}
+							title='課程資訊'
+							items={skeletonInfoItems(['課程標準', '人數', '時數'])}
+						/>
+						<InfoSection
+							icon={<IconUser />}
+							title='授課資訊'
+							items={skeletonInfoItems(['教師', '班級'])}
+						/>
+						<InfoSection
+							icon={<IconMapPin />}
+							title='上課資訊'
+							items={skeletonInfoItems(['教室', '時間'])}
+						/>
+					</div>
+				</div>
+			</aside>
+			<div className={mainClassName}>
+				<div className={panelClassName}>
+					<section className={docSectionClassName}>
+						<h3 className={docHeadingClassName}>課程概述</h3>
+						<TextLinesSkeleton widths={['w-full', 'w-full', 'w-2/3']} />
+					</section>
+				</div>
+				<SyllabusSkeleton />
+			</div>
+		</div>
+	);
+}
+
+function SyllabusSkeleton() {
+	return (
+		<div
+			className={`${panelClassName} ${dividerClassName}`}
+			aria-busy='true'
+			aria-label='載入課程大綱'
+		>
+			<section className={docSectionClassName}>
+				<h3 className={docHeadingClassName}>教師</h3>
+				<TextLinesSkeleton widths={['w-48']} />
+			</section>
+			{[
+				syllabusTextFields.objective,
+				syllabusTextFields.schedule,
+				syllabusTextFields.scorePolicy,
+			].map((label) => (
+				<section key={label} className={docSectionClassName}>
+					<h3 className={docHeadingClassName}>{label}</h3>
+					<TextLinesSkeleton widths={['w-full', 'w-full', 'w-4/5', 'w-3/5']} />
+				</section>
+			))}
+		</div>
+	);
+}
+
+// Each bar keeps the paragraph's line box, inset so stacked lines read as separate.
+function TextLinesSkeleton({ widths }: { widths: string[] }) {
+	return (
+		<div className='min-w-0 leading-relaxed'>
+			{widths.map((width, index) => (
+				<div key={index} className={`h-[1lh] py-1 ${width}`}>
+					<Skeleton className='h-full' />
+				</div>
+			))}
+		</div>
+	);
+}
+
+function skeletonInfoItems(labels: string[]): InfoCardItem[] {
+	return labels.map((label) => infoItem(label, <Skeleton className='h-[1lh] w-24 max-w-full' />));
+}
 
 function InfoSection({
 	icon,
@@ -533,7 +635,7 @@ function InfoSection({
 function CourseStat({ label, value }: { label: string; value: React.ReactNode }) {
 	return (
 		<div className='min-w-0 px-4 py-3'>
-			<div className='truncate text-lg leading-tight font-semibold tabular-nums'>{value}</div>
+			<div className={statValueClassName}>{value}</div>
 			<div className='mt-1 text-xs leading-tight opacity-70'>{label}</div>
 		</div>
 	);
@@ -576,12 +678,12 @@ function WithdrawalRateStat({
 							onClick={handleTooltipClick}
 						/>
 					</TooltipTrigger>
-					<div className='truncate text-lg leading-tight font-semibold tabular-nums'>
-						{loading ? <SkeletonBlock className='h-[1lh] w-14' /> : withdrawalRateLabel}
+					<div className={statValueClassName}>
+						{loading ? <Skeleton className='h-[1lh] w-14' /> : withdrawalRateLabel}
 					</div>
 					<div className='mt-1 text-xs leading-tight'>
 						{loading ? (
-							<SkeletonBlock className='h-[1lh] w-16' />
+							<Skeleton className='h-[1lh] w-16' />
 						) : (
 							<span
 								className={`inline-flex items-center gap-0.5 ${withdrawalRate !== null ? withdrawalLevelClassName(classification.level) : 'text-muted-foreground'}`}

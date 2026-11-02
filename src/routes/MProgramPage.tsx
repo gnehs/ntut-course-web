@@ -2,13 +2,12 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
-import { ProgramList, ProgramListSkeleton } from '../components/ProgramList';
+import { ProgramIndexSkeleton, ProgramList } from '../components/ProgramList';
 import { IconMinus, IconPlus, IconSearch } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Input } from '../components/ui-kit/Input';
-import { Skeleton } from '../components/ui/skeleton';
 import { fetchCourse, fetchMicroPrograms } from '../lib/courseApi';
 import { usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
@@ -52,7 +51,7 @@ export function MProgramIndexPage() {
 		);
 	}, [programs, filter]);
 
-	if (!programs) return <MProgramIndexSkeleton />;
+	if (!programs) return <ProgramIndexSkeleton title='微學程' />;
 
 	return (
 		<div className='flex flex-col gap-4'>
@@ -90,16 +89,6 @@ export function MProgramIndexPage() {
 					}))}
 				/>
 			) : null}
-		</div>
-	);
-}
-
-function MProgramIndexSkeleton() {
-	return (
-		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入微學程'>
-			<Skeleton className='h-8 w-32' />
-			<Skeleton className='h-11 w-full' />
-			<ProgramListSkeleton />
 		</div>
 	);
 }
@@ -173,7 +162,7 @@ export function MProgramDetailPage() {
 		setVersion((value) => value + 1);
 	}
 
-	if (!courses) return <CourseCollectionSkeleton label='載入微學程' />;
+	if (!courses) return <CourseCollectionSkeleton label='載入微學程' code={id} />;
 	const emptyState = error ? (
 		<></>
 	) : program ? (

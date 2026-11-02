@@ -39,6 +39,93 @@ function normalized(value: unknown) {
 		.toLocaleLowerCase();
 }
 
+const DISCLAIMER = '資料僅供課程與核心能力對照，不代表個人的畢業資格或修課認定。';
+const subtitleClassName = 'm-0 text-sm opacity-70';
+const filterRowClassName = 'grid gap-3 sm:grid-cols-2';
+const departmentHeadingClassName = 'text-lg font-semibold';
+const countClassName = 'm-0 text-sm opacity-65';
+const bodyGridClassName = 'grid gap-4 lg:grid-cols-[minmax(14rem,0.8fr)_minmax(0,1.6fr)]';
+const sectionHeadingClassName = 'text-base font-semibold';
+const abilitiesCardClassName = 'flex flex-col gap-2 px-4 py-3';
+const courseCardClassName = 'flex flex-col gap-3 px-4 py-3';
+
+function CompetenciesSkeleton() {
+	return (
+		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入核心能力'>
+			<div className='flex flex-col gap-1'>
+				<h1>核心能力</h1>
+				<p className={subtitleClassName}>查看系所課程與核心能力的對照關係</p>
+			</div>
+			<Alert>{DISCLAIMER}</Alert>
+			<div className={filterRowClassName}>
+				<div className='flex flex-col gap-1'>
+					<span className='text-sm font-medium'>系所</span>
+					<Skeleton className='h-11 w-full md:h-9' />
+				</div>
+				<div className='flex flex-col gap-1'>
+					<span className='text-sm font-medium'>搜尋能力或課程</span>
+					<Skeleton className='h-11 w-full md:h-9' />
+				</div>
+			</div>
+			<div className='flex flex-col gap-4'>
+				<div className='flex flex-col gap-1'>
+					<h2 className={departmentHeadingClassName}>
+						<Skeleton className='h-[1lh] w-40' />
+					</h2>
+					<p className={countClassName}>
+						<Skeleton className='h-[1lh] w-48' />
+					</p>
+				</div>
+				<div className={bodyGridClassName}>
+					<section className='flex flex-col gap-2'>
+						<h3 className={sectionHeadingClassName}>核心能力</h3>
+						<Card className={abilitiesCardClassName}>
+							{Array.from({ length: 5 }, (_, index) => (
+								<div
+									key={index}
+									className='flex items-start gap-2 border-b border-[rgba(var(--vs-text),0.08)] py-2 first:pt-0 last:border-0 last:pb-0'
+								>
+									<Skeleton className='h-5 w-10 shrink-0' />
+									<span className='min-w-0 flex-1 text-sm'>
+										<Skeleton className='h-[1lh] w-3/4' />
+									</span>
+								</div>
+							))}
+						</Card>
+					</section>
+					<section className='flex flex-col gap-2'>
+						<h3 className={sectionHeadingClassName}>課程對照</h3>
+						<div className='grid gap-3'>
+							{Array.from({ length: 3 }, (_, index) => (
+								<Card key={index} className={courseCardClassName}>
+									<div>
+										<div className='font-mono text-sm'>
+											<Skeleton className='h-[1lh] w-20' />
+										</div>
+										<CardTitle className='mt-1'>
+											<Skeleton className='h-[1lh] w-1/2' />
+										</CardTitle>
+									</div>
+									<ul className='m-0 flex list-none flex-col gap-2 p-0'>
+										{Array.from({ length: 2 }, (_, item) => (
+											<li key={item} className='flex items-start gap-2'>
+												<Skeleton className='h-5 w-10 shrink-0' />
+												<span className='min-w-0 flex-1 text-sm leading-relaxed'>
+													<Skeleton className='h-[1lh] w-2/3' />
+												</span>
+											</li>
+										))}
+									</ul>
+								</Card>
+							))}
+						</div>
+					</section>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 export function CompetenciesPage() {
 	const [departments, setDepartments] = useState<CompetencyDepartment[] | null>(null);
 	const [unavailable, setUnavailable] = useState(false);
@@ -107,26 +194,16 @@ export function CompetenciesPage() {
 		);
 	}, [filter, selectedDepartment, visibleCourses]);
 
-	if (!departments)
-		return (
-			<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入核心能力'>
-				<Skeleton className='h-8 w-32' />
-				<Skeleton className='h-11 w-full' />
-				<div className='grid gap-3 sm:grid-cols-2'>
-					<Skeleton className='h-48 w-full' />
-					<Skeleton className='h-48 w-full' />
-				</div>
-			</div>
-		);
+	if (!departments) return <CompetenciesSkeleton />;
 
 	return (
 		<div className='flex flex-col gap-4'>
 			<div className='flex flex-col gap-1'>
 				<h1>核心能力</h1>
-				<p className='m-0 text-sm opacity-70'>查看系所課程與核心能力的對照關係</p>
+				<p className={subtitleClassName}>查看系所課程與核心能力的對照關係</p>
 			</div>
 
-			<Alert>資料僅供課程與核心能力對照，不代表個人的畢業資格或修課認定。</Alert>
+			<Alert>{DISCLAIMER}</Alert>
 
 			{error ? (
 				<Alert danger>
@@ -146,7 +223,7 @@ export function CompetenciesPage() {
 
 			{departments.length ? (
 				<>
-					<div className='grid gap-3 sm:grid-cols-2'>
+					<div className={filterRowClassName}>
 						<div className='flex flex-col gap-1'>
 							<span className='text-sm font-medium'>系所</span>
 							<Select
@@ -183,19 +260,19 @@ export function CompetenciesPage() {
 						<div className='flex flex-col gap-4'>
 							<div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
 								<div className='flex flex-col gap-1'>
-									<h2 className='text-lg font-semibold'>{selectedDepartment.name}</h2>
-									<p className='m-0 text-sm opacity-65'>
+									<h2 className={departmentHeadingClassName}>{selectedDepartment.name}</h2>
+									<p className={countClassName}>
 										{visibleCourses.length} 門課程・{visibleAbilities.length} 項核心能力
 									</p>
 								</div>
 							</div>
 
-							<div className='grid gap-4 lg:grid-cols-[minmax(14rem,0.8fr)_minmax(0,1.6fr)]'>
+							<div className={bodyGridClassName}>
 								<section className='flex flex-col gap-2' aria-labelledby='ability-heading'>
-									<h3 id='ability-heading' className='text-base font-semibold'>
+									<h3 id='ability-heading' className={sectionHeadingClassName}>
 										核心能力
 									</h3>
-									<Card className='flex flex-col gap-2 px-4 py-3'>
+									<Card className={abilitiesCardClassName}>
 										{visibleAbilities.length ? (
 											visibleAbilities.map((ability) => (
 												<div
@@ -215,7 +292,7 @@ export function CompetenciesPage() {
 								</section>
 
 								<section className='flex flex-col gap-2' aria-labelledby='course-heading'>
-									<h3 id='course-heading' className='text-base font-semibold'>
+									<h3 id='course-heading' className={sectionHeadingClassName}>
 										課程對照
 									</h3>
 									<div className='grid gap-3'>
@@ -225,7 +302,7 @@ export function CompetenciesPage() {
 													.map((abilityId) => abilityById.get(abilityId))
 													.filter(Boolean);
 												return (
-													<Card key={course.code} className='flex flex-col gap-3 px-4 py-3'>
+													<Card key={course.code} className={courseCardClassName}>
 														<div>
 															<Link
 																to={advancedSearchCourseHref(course.name)}

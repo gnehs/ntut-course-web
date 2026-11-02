@@ -4,11 +4,10 @@ import { IconExternalLink, IconMinus, IconPlus, IconSearch } from '@tabler/icons
 import { toast } from 'sonner';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
-import { ProgramList, ProgramListSkeleton } from '../components/ProgramList';
+import { ProgramIndexSkeleton, ProgramList } from '../components/ProgramList';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Input } from '../components/ui-kit/Input';
-import { Skeleton } from '../components/ui/skeleton';
 import { fetchCourse, fetchPrograms } from '../lib/courseApi';
 import { departmentItems, storageDepartment } from '../lib/courseUtils';
 import { errorMessage } from '../lib/error';
@@ -95,7 +94,7 @@ export function ProgramIndexPage() {
 		);
 	}, [filter, programs]);
 
-	if (!programs) return <ProgramIndexSkeleton />;
+	if (!programs) return <ProgramIndexSkeleton title='一般學程' />;
 
 	return (
 		<div className='flex flex-col gap-4'>
@@ -144,16 +143,6 @@ export function ProgramIndexPage() {
 				/>
 			) : null}
 			{filteredPrograms.length ? <AdsByGoogle placement='footer' /> : null}
-		</div>
-	);
-}
-
-function ProgramIndexSkeleton() {
-	return (
-		<div className='flex flex-col gap-4' aria-busy='true' aria-label='載入一般學程'>
-			<Skeleton className='h-8 w-32' />
-			<Skeleton className='h-11 w-full' />
-			<ProgramListSkeleton />
 		</div>
 	);
 }
@@ -291,7 +280,7 @@ export function ProgramDetailPage() {
 		);
 
 	if (program === undefined && !error && !unavailable)
-		return <CourseCollectionSkeleton label='載入一般學程' />;
+		return <CourseCollectionSkeleton label='載入一般學程' code={id} description />;
 	if (unavailable)
 		return (
 			<div className='flex flex-col gap-4'>
