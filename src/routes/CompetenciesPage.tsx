@@ -167,13 +167,13 @@ export function CompetenciesPage() {
 								搜尋能力或課程
 							</label>
 							<div className='relative'>
-								<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
+								<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2' />
 								<Input
 									id='competency-search'
 									value={filter}
 									onChange={(event) => setFilter(event.target.value)}
 									placeholder='輸入能力名稱、課程代碼或課程名稱'
-									className='pl-10'
+									className='pl-9'
 								/>
 							</div>
 						</div>

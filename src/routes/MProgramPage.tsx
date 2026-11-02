@@ -59,13 +59,13 @@ export function MProgramIndexPage() {
 			<h1>微學程</h1>
 
 			<div className='relative'>
-				<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
+				<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2' />
 				<Input
 					value={filter}
 					onChange={(event) => setFilter(event.target.value)}
 					placeholder='搜尋學程名稱或代碼'
 					aria-label='搜尋微學程'
-					className='pl-10'
+					className='pl-9'
 				/>
 			</div>
 
