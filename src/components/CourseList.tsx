@@ -2,7 +2,7 @@ import { CourseListToolbar } from './CourseListToolbar';
 import { CourseLink } from './CoursePeek';
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
-import { CircleAlert, Minus, Plus } from 'lucide-react';
+import { IconAlertCircle, IconMinus, IconPlus } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { AdsByGoogle } from './AdsByGoogle';
 import { CourseTimeChips } from './CourseTimeChips';
@@ -273,7 +273,7 @@ export function CourseList({
 														{/* A conflict is a property of the time slot, so it sits beside it instead of taking its own row. */}
 														{conflicted ? (
 															<span className='inline-flex items-center gap-1 rounded-sm bg-[rgba(var(--vs-danger),0.12)] px-1.5 font-medium whitespace-nowrap text-[rgb(var(--vs-danger))]'>
-																<CircleAlert className='size-3.5' />
+																<IconAlertCircle className='size-3.5' />
 																衝堂
 															</span>
 														) : null}
@@ -295,7 +295,7 @@ export function CourseList({
 											</dl>
 											{/* Pinned to the card's bottom edge so domains line up across a row of cards. */}
 											{generalCourse.tags.length ? (
-												<div className='-mx-4 -mb-4 mt-auto flex flex-wrap'>
+												<div className='-mx-4 mt-auto -mb-4 flex flex-wrap'>
 													{generalCourse.tags.map((tag) => (
 														<span
 															key={tag.name}
@@ -396,7 +396,11 @@ export function CourseList({
 													aria-label={saved ? '從我的課程移除' : '加入我的課程'}
 													onClick={() => toggleSavedCourse(course)}
 												>
-													{saved ? <Minus className='size-4' /> : <Plus className='size-4' />}
+													{saved ? (
+														<IconMinus className='size-4' />
+													) : (
+														<IconPlus className='size-4' />
+													)}
 												</Button>
 											</td>
 										</tr>
@@ -495,7 +499,7 @@ function ScrollIndicator({ targetRef }: { targetRef: React.RefObject<HTMLDivElem
 }
 
 function SaveCourseButton({ saved, onClick }: { saved: boolean; onClick: () => void }) {
-	const Icon = saved ? Minus : Plus;
+	const Icon = saved ? IconMinus : IconPlus;
 	return (
 		<button
 			type='button'

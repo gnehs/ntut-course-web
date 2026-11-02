@@ -3,17 +3,17 @@ import type React from 'react';
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import {
-	BadgeQuestionMark,
-	Calendar,
-	CalendarDays,
-	Check,
-	ClipboardPaste,
-	Download,
-	GitCommit,
-	Loader,
-	RefreshCw,
-	Upload,
-} from 'lucide-react';
+	IconCalendar,
+	IconCalendarWeek,
+	IconCheck,
+	IconClipboardText,
+	IconDownload,
+	IconGitCommit,
+	IconHelpHexagon,
+	IconLoader,
+	IconRefresh,
+	IconUpload,
+} from '@tabler/icons-react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -349,12 +349,12 @@ export function AboutPage() {
 			<ul className='list-disc space-y-1 pl-6'>
 				<li>
 					<a
-						href='https://lucide.dev/'
+						href='https://tabler.io/icons'
 						target='_blank'
 						rel='noreferrer'
 						className='underline underline-offset-2'
 					>
-						Lucide
+						Tabler Icons
 					</a>
 				</li>
 				<li>
@@ -573,7 +573,7 @@ export function ChangelogPage() {
 									className='rounded-surface bg-sheen-surface shadow-raised grid overflow-hidden bg-[rgb(var(--vs-background))] sm:grid-cols-[10rem_minmax(0,1fr)]'
 								>
 									<div className='text-muted-foreground flex items-center gap-2 border-b border-[rgba(var(--vs-text),0.08)] bg-[rgba(var(--vs-text),0.025)] px-4 py-3 text-sm sm:border-r sm:border-b-0'>
-										<CalendarDays className='size-4 shrink-0' />
+										<IconCalendarWeek className='size-4 shrink-0' />
 										<time dateTime={entry.date} className='tabular-nums'>
 											{entry.date}
 										</time>
@@ -788,15 +788,15 @@ export function SettingsPage() {
 			>
 				<div className='flex flex-wrap gap-2'>
 					<Button onClick={exportBackup}>
-						<Download className='size-4' />
+						<IconDownload className='size-4' />
 						下載全部學期
 					</Button>
 					<Button onClick={() => fileInputRef.current?.click()}>
-						<Upload className='size-4' />
+						<IconUpload className='size-4' />
 						選擇備份檔
 					</Button>
 					<Button onClick={togglePastePanel}>
-						<ClipboardPaste className='size-4' />
+						<IconClipboardText className='size-4' />
 						貼上舊版資料
 					</Button>
 					<input
@@ -933,24 +933,24 @@ export function StatusPage() {
 							className={`grid h-8 w-8 place-items-center rounded-full text-lg ${run.status === 'completed' ? 'bg-[rgba(70,201,58,0.2)] text-[rgb(70,201,58)]' : 'bg-[rgba(var(--vs-primary),0.2)] text-[rgb(var(--vs-primary))]'}`}
 						>
 							{run.status === 'in_progress' ? (
-								<Loader className='size-4 animate-spin' />
+								<IconLoader className='size-4 animate-spin' />
 							) : run.status === 'completed' ? (
-								<Check className='size-4' />
+								<IconCheck className='size-4' />
 							) : (
-								<BadgeQuestionMark className='size-4' />
+								<IconHelpHexagon className='size-4' />
 							)}
 						</div>
 						<div className='min-w-0 flex-1'>
 							<div className='font-semibold'>{parseName(run.name)}</div>
 							<div className='text-muted-foreground text-sm'>
 								{run.event === 'schedule' ? (
-									<Calendar className='inline-block size-4 align-[-0.125em]' />
+									<IconCalendar className='inline-block size-4 align-[-0.125em]' />
 								) : run.event === 'push' ? (
-									<GitCommit className='inline-block size-4 align-[-0.125em]' />
+									<IconGitCommit className='inline-block size-4 align-[-0.125em]' />
 								) : run.event === 'dynamic' ? (
-									<RefreshCw className='inline-block size-4 align-[-0.125em]' />
+									<IconRefresh className='inline-block size-4 align-[-0.125em]' />
 								) : (
-									<BadgeQuestionMark className='inline-block size-4 align-[-0.125em]' />
+									<IconHelpHexagon className='inline-block size-4 align-[-0.125em]' />
 								)}
 								<span> • </span>
 								{timeSince(new Date(run.created_at))}前

@@ -7,7 +7,7 @@ type SportsCourseIconProps = {
 	className?: string;
 };
 
-// Drawn on lucide's 24-unit grid with its 2px round strokes, so they sit beside the other icons.
+// Drawn on Tabler's 24-unit grid with its 2px round strokes, so they sit beside the other icons.
 const sportsIcons = {
 	basketball: (
 		<>

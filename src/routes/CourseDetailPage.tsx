@@ -12,7 +12,14 @@ import { CourseTimeChips } from '../components/CourseTimeChips';
 import { Link, useParams, useRouterState } from '@tanstack/react-router';
 import { Fragment, startTransition, use, useEffect, useMemo, useRef, useState } from 'react';
 import type React from 'react';
-import { ExternalLink, Info, MapPin, Minus, Plus, User } from 'lucide-react';
+import {
+	IconExternalLink,
+	IconInfoCircle,
+	IconMapPin,
+	IconMinus,
+	IconPlus,
+	IconUser,
+} from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -313,7 +320,7 @@ export function CourseDetail({
 					className='w-full'
 					onClick={toggleCourse}
 				>
-					{isInMyCourse ? <Minus className='size-4' /> : <Plus className='size-4' />}
+					{isInMyCourse ? <IconMinus className='size-4' /> : <IconPlus className='size-4' />}
 					{isInMyCourse ? '從我的課程移除' : '加入我的課程'}
 				</Button>
 				<div className={panelClassName}>
@@ -328,7 +335,7 @@ export function CourseDetail({
 					</div>
 					<div className='grid divide-y divide-[rgba(var(--vs-text),0.08)] @xl:grid-cols-3 @xl:divide-x @xl:divide-y-0 @3xl:grid-cols-1 @3xl:divide-x-0 @3xl:divide-y'>
 						<InfoSection
-							icon={<Info />}
+							icon={<IconInfoCircle />}
 							title='課程資訊'
 							items={[
 								infoItem(
@@ -340,12 +347,15 @@ export function CourseDetail({
 								...optionalInfoItem('退選', course.peopleWithdraw, '人'),
 								infoItem('時數', formatQuantity(course.hours, '小時')),
 								// Stage 1 is the default every course has, so only a later stage is worth a row.
-								...optionalInfoItem('階段', course.stage?.trim() === '1' ? undefined : course.stage),
+								...optionalInfoItem(
+									'階段',
+									course.stage?.trim() === '1' ? undefined : course.stage,
+								),
 								...courseAttributeItems(course),
 							]}
 						/>
 						<InfoSection
-							icon={<User />}
+							icon={<IconUser />}
 							title='授課資訊'
 							items={[
 								infoItem(
@@ -375,7 +385,7 @@ export function CourseDetail({
 							]}
 						/>
 						<InfoSection
-							icon={<MapPin />}
+							icon={<IconMapPin />}
 							title='上課資訊'
 							items={[
 								infoItem(
@@ -567,7 +577,7 @@ function WithdrawalRateStat({
 					<div className='mt-1 flex flex-wrap items-center gap-x-1 text-xs leading-tight'>
 						<span className='text-muted-foreground inline-flex items-center gap-0.5'>
 							退選率
-							<Info aria-hidden='true' className='size-[1em]' />
+							<IconInfoCircle aria-hidden='true' className='size-[1em]' />
 						</span>
 						{loading ? (
 							<SkeletonBlock className='h-[1lh] w-16 text-xs' />
@@ -1239,7 +1249,7 @@ function CourseSourceLinks({ course }: { course: Course }) {
 							rel='noreferrer'
 						>
 							<span className='min-w-0 [overflow-wrap:anywhere]'>{link.label}</span>
-							<ExternalLink aria-hidden='true' className='text-icon-muted size-3.5 shrink-0' />
+							<IconExternalLink aria-hidden='true' className='text-icon-muted size-3.5 shrink-0' />
 						</a>
 					</li>
 				))}

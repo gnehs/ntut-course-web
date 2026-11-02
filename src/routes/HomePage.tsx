@@ -1,27 +1,27 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import {
-	BookOpen,
-	Building2,
-	Calendar,
-	CalendarPlus,
-	ChartNoAxesColumnIncreasing,
-	ChevronRight,
-	CircleHelp,
-	Clock3,
-	FileText,
-	GraduationCap,
-	History,
-	Info,
-	Layers3,
-	Puzzle,
-	Search,
-	Settings,
-	Sparkles,
-	Terminal,
-	UserRound,
-	UsersRound,
-} from 'lucide-react';
+	IconBook,
+	IconBuilding,
+	IconCalendar,
+	IconCalendarPlus,
+	IconChartBar,
+	IconChevronRight,
+	IconClock,
+	IconFileText,
+	IconHelpCircle,
+	IconHistory,
+	IconInfoCircle,
+	IconPuzzle,
+	IconSchool,
+	IconSearch,
+	IconSettings,
+	IconSparkles,
+	IconStack2,
+	IconTerminal2,
+	IconUser,
+	IconUsers,
+} from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { UniversalSearch } from '../components/UniversalSearch';
@@ -99,7 +99,7 @@ function UpcomingCourse() {
 							<CardTitle>{course.name?.zh || '未命名課程'}</CardTitle>
 							<p>{(course.teacher || []).map((item) => item.name).join('、')}</p>
 						</div>
-						<Clock3 data-card-icon aria-hidden='true' />
+						<IconClock data-card-icon aria-hidden='true' />
 					</Card>
 				))}
 			</div>
@@ -126,59 +126,59 @@ export function HomePage() {
 				: '/advanced-search',
 			title: '搜尋課程',
 			text: '課名、教師、時段篩選',
-			icon: Search,
+			icon: IconSearch,
 		},
 		{
 			to: '/class',
 			title: '班級課表',
 			text: '查詢各班開課與課表',
-			icon: UsersRound,
+			icon: IconUsers,
 		},
 		{
 			to: '/my-course',
 			title: '我的課程',
 			text: '收藏課程、檢查衝堂',
-			icon: UserRound,
+			icon: IconUser,
 		},
 	];
 
 	const planningLinks: HomeLink[] = [
-		{ to: '/program', title: '一般學程', text: '查看學程規劃與開課課程', icon: BookOpen },
-		{ to: '/mprogram', title: '微學程', text: '查詢跨領域微學程課程', icon: Layers3 },
+		{ to: '/program', title: '一般學程', text: '查看學程規劃與開課課程', icon: IconBook },
+		{ to: '/mprogram', title: '微學程', text: '查詢跨領域微學程課程', icon: IconStack2 },
 		{
 			to: standardURL,
 			title: '課程標準',
 			text: '對照畢業門檻與必修課程',
-			icon: GraduationCap,
+			icon: IconSchool,
 		},
 		{
 			to: '/competencies',
 			title: '核心能力',
 			text: '了解課程與系所能力的對照',
-			icon: Sparkles,
+			icon: IconSparkles,
 		},
 		{
 			to: '/withdrawal',
 			title: '退選率',
 			text: '參考教師與課程退選統計',
-			icon: ChartNoAxesColumnIncreasing,
+			icon: IconChartBar,
 		},
 	];
 
 	const toolLinks: HomeLink[] = [
-		{ to: '/emptyroom', title: '尋找空教室', text: '查看目前沒有課程的教室', icon: Building2 },
-		{ to: '/calendar', title: '學校行事曆', text: '掌握重要校務日期', icon: Calendar },
+		{ to: '/emptyroom', title: '尋找空教室', text: '查看目前沒有課程的教室', icon: IconBuilding },
+		{ to: '/calendar', title: '學校行事曆', text: '掌握重要校務日期', icon: IconCalendar },
 		{
 			to: dataset.year ? `/add-calendar?year=${dataset.year}` : '/add-calendar',
 			title: '匯入行事曆',
 			text: '將我的課程加入個人行事曆',
-			icon: CalendarPlus,
+			icon: IconCalendarPlus,
 		},
 		{
 			to: dataset.year ? `/widget?year=${dataset.year}` : '/widget',
 			title: 'iOS 小工具',
 			text: '在桌面查看接下來的課程',
-			icon: Puzzle,
+			icon: IconPuzzle,
 		},
 	];
 
@@ -280,7 +280,7 @@ function HomeLinkList({ items }: { items: HomeLink[] }) {
 							<div className='font-medium'>{item.title}</div>
 							<p>{item.text}</p>
 						</div>
-						<ChevronRight
+						<IconChevronRight
 							className='text-icon-subtle group-hover:text-icon-muted size-4 shrink-0 transition-[color,translate] duration-200 group-hover:translate-x-0.5'
 							aria-hidden='true'
 						/>
@@ -293,12 +293,12 @@ function HomeLinkList({ items }: { items: HomeLink[] }) {
 
 function SiteNavigation() {
 	const links = [
-		{ to: '/settings', title: '設定', icon: Settings },
-		{ to: '/status', title: '擷取狀態', icon: Terminal },
-		{ to: '/doc', title: '文件', icon: FileText },
-		{ to: '/changelog', title: '更新日誌', icon: History },
-		{ to: '/about', title: '關於', icon: Info },
-		{ to: '/privacy', title: '隱私權政策', icon: CircleHelp },
+		{ to: '/settings', title: '設定', icon: IconSettings },
+		{ to: '/status', title: '擷取狀態', icon: IconTerminal2 },
+		{ to: '/doc', title: '文件', icon: IconFileText },
+		{ to: '/changelog', title: '更新日誌', icon: IconHistory },
+		{ to: '/about', title: '關於', icon: IconInfoCircle },
+		{ to: '/privacy', title: '隱私權政策', icon: IconHelpCircle },
 	];
 
 	return (

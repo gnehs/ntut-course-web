@@ -2,7 +2,14 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseList } from '../components/CourseList';
-import { BookOpen, Calendar, Clock, Puzzle, Search, Sparkles } from 'lucide-react';
+import {
+	IconBook,
+	IconCalendar,
+	IconClock,
+	IconPuzzle,
+	IconSearch,
+	IconSparkles,
+} from '@tabler/icons-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
@@ -103,7 +110,7 @@ export function MyCoursePage() {
 						aria-hidden='true'
 						className='tone-neutral shadow-soft bg-sheen-soft text-muted-foreground grid size-14 place-items-center rounded-full bg-[rgba(var(--vs-text),0.06)]'
 					>
-						<BookOpen className='size-6' />
+						<IconBook className='size-6' />
 					</div>
 					<div className='flex max-w-[30rem] flex-col gap-2'>
 						<strong className='text-lg leading-snug'>尚未儲存任何課程</strong>
@@ -118,11 +125,11 @@ export function MyCoursePage() {
 							primary
 							to={`/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`}
 						>
-							<Search className='size-4' />
+							<IconSearch className='size-4' />
 							前往搜尋
 						</Button>
 						<Button as={Link} to='/class'>
-							<Clock className='size-4' />
+							<IconClock className='size-4' />
 							班級課表
 						</Button>
 					</div>
@@ -153,12 +160,12 @@ export function MyCoursePage() {
 							<Card to={`/widget?year=${dataset.year}`}>
 								<CardTitle>iOS 小工具</CardTitle>
 								<p>在桌面上檢視接下來的課程</p>
-								<Puzzle data-card-icon />
+								<IconPuzzle data-card-icon />
 							</Card>
 							<Card to={`/add-calendar?year=${dataset.year}`}>
 								<CardTitle>新增到行事曆</CardTitle>
 								<p>將我的課程匯入至行事曆</p>
-								<Calendar data-card-icon />
+								<IconCalendar data-card-icon />
 							</Card>
 						</div>
 					</section>
@@ -174,7 +181,7 @@ export function MyCoursePage() {
 								<Card key={chat.name} href={chat.url(advicePrompt)}>
 									<CardTitle>問 {chat.name}</CardTitle>
 									<p>在新分頁開啟對話</p>
-									<Sparkles data-card-icon />
+									<IconSparkles data-card-icon />
 								</Card>
 							))}
 						</div>

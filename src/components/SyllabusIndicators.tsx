@@ -1,4 +1,11 @@
-import { BookOpen, Check, Cpu, Minus, MonitorSmartphone, Users } from 'lucide-react';
+import {
+	IconBook,
+	IconCheck,
+	IconCpu,
+	IconDevices,
+	IconMinus,
+	IconUsers,
+} from '@tabler/icons-react';
 import type React from 'react';
 
 const sdgField = '課程對應SDGs指標';
@@ -134,9 +141,9 @@ function AiAdoption({ adopted }: { adopted: Set<string> }) {
 							className={`flex items-start gap-2 ${checked ? '' : 'text-muted-foreground'}`}
 						>
 							{checked ? (
-								<Check aria-hidden='true' className='text-primary mt-0.5 size-4 shrink-0' />
+								<IconCheck aria-hidden='true' className='text-primary mt-0.5 size-4 shrink-0' />
 							) : (
-								<Minus aria-hidden='true' className='text-icon-subtle mt-0.5 size-4 shrink-0' />
+								<IconMinus aria-hidden='true' className='text-icon-subtle mt-0.5 size-4 shrink-0' />
 							)}
 							<span>
 								<span className='sr-only'>{checked ? '有：' : '無：'}</span>
@@ -154,22 +161,22 @@ const teachingMethods: { title: string; description: string; icon: React.ReactNo
 	{
 		title: '混成學習',
 		description: '課程結合實體授課與線上學習（同步視訊／非同步活動）。',
-		icon: <MonitorSmartphone />,
+		icon: <IconDevices />,
 	},
 	{
 		title: '數位教材資源應用',
 		description: '採用影音多媒體或具開放授權之資源（如 OCW、開放教科書）作為主要或輔助教材。',
-		icon: <BookOpen />,
+		icon: <IconBook />,
 	},
 	{
 		title: '參與式創新教學',
 		description: '強調學生參與與產出，導入翻轉、PBL/專題、設計思考或遊戲化等策略。',
-		icon: <Users />,
+		icon: <IconUsers />,
 	},
 	{
 		title: '數位科技融入',
 		description: '運用生成式 AI、VR/AR、IoT、IRS 等新興科技輔助教學與評量。',
-		icon: <Cpu />,
+		icon: <IconCpu />,
 	},
 ];
 

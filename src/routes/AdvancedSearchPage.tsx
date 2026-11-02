@@ -10,20 +10,20 @@ import { SemesterButton, SiteBrand } from '../components/Layout';
 import type { CourseListLayout } from '../components/CourseList';
 
 import {
-	Check,
-	ChevronDown,
-	Clock3,
-	GraduationCap,
-	Languages,
-	LibraryBig,
-	ListFilter,
-	Search,
-	Shapes,
-	Sparkles,
-	Tags,
-	X,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+	IconAdjustmentsHorizontal,
+	IconBooks,
+	IconCategory,
+	IconCheck,
+	IconChevronDown,
+	IconClock,
+	IconLanguage,
+	IconSchool,
+	IconSearch,
+	IconSparkles,
+	IconTags,
+	IconX,
+} from '@tabler/icons-react';
+import type { Icon } from '@tabler/icons-react';
 import { TimetableSelector } from '../components/TimetableSelector';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -144,16 +144,16 @@ const filterSections: {
 	id: SearchSectionId;
 	label: string;
 	title: string;
-	icon: LucideIcon;
+	icon: Icon;
 }[] = [
-	{ id: 'display', label: '顯示與排序', title: '顯示與排序', icon: ListFilter },
-	{ id: 'language', label: '語言', title: '依授課語言篩選', icon: Languages },
-	{ id: 'standard', label: '課程標準', title: '依課程標準篩選', icon: GraduationCap },
-	{ id: 'category', label: '博雅類別', title: '依博雅類別篩選課程', icon: Shapes },
-	{ id: 'academy', label: '學院', title: '依學院篩選', icon: LibraryBig },
-	{ id: 'attributes', label: '課程屬性', title: '依課程屬性篩選', icon: Tags },
-	{ id: 'syllabus', label: '課綱主題', title: '依課綱主題篩選', icon: Sparkles },
-	{ id: 'time', label: '時間', title: '依時間篩選', icon: Clock3 },
+	{ id: 'display', label: '顯示與排序', title: '顯示與排序', icon: IconAdjustmentsHorizontal },
+	{ id: 'language', label: '語言', title: '依授課語言篩選', icon: IconLanguage },
+	{ id: 'standard', label: '課程標準', title: '依課程標準篩選', icon: IconSchool },
+	{ id: 'category', label: '博雅類別', title: '依博雅類別篩選課程', icon: IconCategory },
+	{ id: 'academy', label: '學院', title: '依學院篩選', icon: IconBooks },
+	{ id: 'attributes', label: '課程屬性', title: '依課程屬性篩選', icon: IconTags },
+	{ id: 'syllabus', label: '課綱主題', title: '依課綱主題篩選', icon: IconSparkles },
+	{ id: 'time', label: '時間', title: '依時間篩選', icon: IconClock },
 ];
 
 export function AdvancedSearchPage() {
@@ -919,7 +919,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 			<div className='flex min-w-0 items-center'>
 				<label className='relative min-w-0 flex-1'>
 					<span className='sr-only'>搜尋關鍵字</span>
-					<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2' />
+					<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2' />
 					<Input
 						value={props.searchCourseKeyword}
 						onChange={(event) => props.onKeywordChange(event.target.value)}
@@ -957,7 +957,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 							className='rounded-control bg-sheen-surface shadow-rest inline-flex min-h-11 shrink-0 items-center gap-1.5 bg-[rgb(var(--vs-background))] px-3 text-sm text-[rgb(var(--vs-text))] transition-[background-color,color,box-shadow]'
 							onClick={props.onReset}
 						>
-							<X className='size-4 shrink-0' />
+							<IconX className='size-4 shrink-0' />
 							<span>重設</span>
 						</button>
 					) : null}
@@ -965,7 +965,7 @@ function AdvancedSearchMobileControls(props: AdvancedSearchControlsProps) {
 						const count = getFilterSectionCount(section.id, props);
 						const active = activeSection === section.id;
 						const Icon = section.icon;
-						const TriggerIcon = count ? Check : Icon;
+						const TriggerIcon = count ? IconCheck : Icon;
 						return (
 							<Popover
 								key={section.id}
@@ -1054,7 +1054,7 @@ function AdvancedSearchSidebarContent(props: AdvancedSearchControlsProps) {
 					</Button>
 					{props.showCloseButton ? (
 						<Button icon className='m-0 lg:hidden' onClick={props.onClose}>
-							<X className='size-4' />
+							<IconX className='size-4' />
 						</Button>
 					) : null}
 				</div>
@@ -1315,7 +1315,7 @@ function SearchSection({
 					<Icon className='text-icon-muted size-4 shrink-0' />
 					<span>{section.title}</span>
 				</span>
-				<ChevronDown ref={iconRef} className='size-4 shrink-0' />
+				<IconChevronDown ref={iconRef} className='size-4 shrink-0' />
 			</button>
 			{rendered ? (
 				// The clip box bleeds 8px past the content so control shadows are not cut off.

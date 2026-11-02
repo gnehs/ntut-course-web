@@ -6,7 +6,7 @@ import { DESKTOP_MEDIA_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { createSearchParams } from '../lib/urlState';
 import { useRouteLocation } from '../lib/routeLocation';
 import { useApp } from '../state/AppContext';
-import { ChevronsUpDown, GitBranch, Search } from 'lucide-react';
+import { IconGitBranch, IconSearch, IconSelector } from '@tabler/icons-react';
 import { Button } from './ui-kit/Button';
 import { CoursePeek } from './CoursePeek';
 import { Alert } from './ui-kit/Alert';
@@ -113,7 +113,7 @@ export function Layout() {
 										aria-label='搜尋課程'
 										className='md:hidden'
 									>
-										<Search className='size-4' aria-hidden='true' />
+										<IconSearch className='size-4' aria-hidden='true' />
 									</Button>
 								) : null}
 								<SemesterButton label={yearSemLabel} onOpen={() => setDatasetDialogOpen(true)} />
@@ -187,7 +187,7 @@ export function Layout() {
 								rel='noreferrer'
 								className='bg-transparent'
 							>
-								<GitBranch className='size-4' />
+								<IconGitBranch className='size-4' />
 							</Button>
 						</div>
 					</footer>
@@ -237,7 +237,7 @@ export function SemesterButton({ label, onOpen }: { label: string; onOpen: () =>
 			onClick={onOpen}
 		>
 			{label}
-			<ChevronsUpDown className='text-icon-muted size-3.5' aria-hidden='true' />
+			<IconSelector className='text-icon-muted size-3.5' aria-hidden='true' />
 		</Button>
 	);
 }

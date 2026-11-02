@@ -17,7 +17,7 @@ import type {
 } from '../types/course';
 import { errorMessage } from '../lib/error';
 import { courseStandard, formatCredit, isZeroCreditValue } from '../lib/courseUtils';
-import { Building2, Calendar, GraduationCap, Search } from 'lucide-react';
+import { IconBuilding, IconCalendar, IconSchool, IconSearch } from '@tabler/icons-react';
 
 const courseStandardEntries = Object.entries(courseStandard);
 
@@ -156,7 +156,7 @@ export function StandardPage() {
 									htmlFor='standard-year'
 									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
 								>
-									<Calendar className='size-3.5' />
+									<IconCalendar className='size-3.5' />
 									入學年度
 								</label>
 								<Select
@@ -179,7 +179,7 @@ export function StandardPage() {
 									htmlFor='standard-system'
 									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
 								>
-									<Building2 className='size-3.5' />
+									<IconBuilding className='size-3.5' />
 									學制
 								</label>
 								<Select
@@ -203,7 +203,7 @@ export function StandardPage() {
 									htmlFor='standard-department'
 									className='text-muted-foreground flex items-center gap-1.5 text-sm font-medium'
 								>
-									<Search className='size-3.5' />
+									<IconSearch className='size-3.5' />
 									系所
 								</label>
 								<Select
@@ -232,7 +232,7 @@ export function StandardPage() {
 						aria-hidden='true'
 						className='text-muted-foreground grid size-14 place-items-center rounded-full bg-[rgba(var(--vs-text),0.06)]'
 					>
-						<GraduationCap className='size-6' />
+						<IconSchool className='size-6' />
 					</div>
 					<div className='flex max-w-[30rem] flex-col gap-2'>
 						<strong className='text-lg leading-snug'>還沒選擇課程標準</strong>

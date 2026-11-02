@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Clock, PanelTop, Table } from 'lucide-react';
+import { IconClock, IconLayoutNavbar, IconTable } from '@tabler/icons-react';
 import type { CourseListLayout } from './CourseList';
 import { Button } from './ui-kit/Button';
 import { cn } from '../lib/utils';
@@ -30,9 +30,9 @@ export function CourseListToolbar({
 				>
 					{(
 						[
-							{ value: 'table', label: '表格', icon: Table },
-							{ value: 'card', label: '卡片', icon: PanelTop },
-							...(showTimetable ? [{ value: 'timetable', label: '課表', icon: Clock }] : []),
+							{ value: 'table', label: '表格', icon: IconTable },
+							{ value: 'card', label: '卡片', icon: IconLayoutNavbar },
+							...(showTimetable ? [{ value: 'timetable', label: '課表', icon: IconClock }] : []),
 						] as const
 					).map(({ value, label, icon: Icon }) => (
 						<Button

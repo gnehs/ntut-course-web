@@ -1,6 +1,6 @@
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ExternalLink, Minus, Plus, Search } from 'lucide-react';
+import { IconExternalLink, IconMinus, IconPlus, IconSearch } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
@@ -103,7 +103,7 @@ export function ProgramIndexPage() {
 			<h1>一般學程</h1>
 
 			<div className='relative'>
-				<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
+				<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
 				<Input
 					value={filter}
 					onChange={(event) => setFilter(event.target.value)}
@@ -350,7 +350,7 @@ export function ProgramDetailPage() {
 					danger={allSaved}
 					onClick={allSaved ? removeProgramCourses : addProgramCourses}
 				>
-					{allSaved ? <Minus className='size-4' /> : <Plus className='size-4' />}
+					{allSaved ? <IconMinus className='size-4' /> : <IconPlus className='size-4' />}
 					{allSaved ? '從我的課程移除全部' : '全部加入我的課程'}
 				</Button>
 			}
@@ -390,7 +390,7 @@ export function ProgramDetailPage() {
 								rel='noreferrer'
 								className='text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm underline underline-offset-2'
 							>
-								學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
+								學校原始資料 <IconExternalLink className='size-4' aria-hidden='true' />
 							</a>
 						</div>
 					) : null}

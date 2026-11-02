@@ -1,14 +1,14 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
-	AlertCircle,
-	CalendarOff,
-	CheckCircle2,
-	Clock,
-	Download,
-	RefreshCw,
-	Search,
-} from 'lucide-react';
+	IconAlertCircle,
+	IconCalendarOff,
+	IconCircleCheck,
+	IconClock,
+	IconDownload,
+	IconRefresh,
+	IconSearch,
+} from '@tabler/icons-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -133,7 +133,7 @@ export function AddCalendarPage() {
 				</p>
 			</section>
 			<Alert>
-				<RefreshCw />
+				<IconRefresh />
 				<AlertTitle>課表變更後要重新匯入</AlertTitle>
 				<AlertDescription>
 					下載的 ICS 是一次性檔案；加退選或修改課程後，請重新下載並匯入新的行事曆檔案。
@@ -141,7 +141,7 @@ export function AddCalendarPage() {
 			</Alert>
 			{!hasCourses ? (
 				<Alert>
-					<AlertCircle />
+					<IconAlertCircle />
 					<AlertTitle>先新增課程</AlertTitle>
 					<AlertDescription>
 						行事曆檔案會從「我的課程」產生；先從搜尋或班級課表加入課程後，再回來下載 ICS。
@@ -151,11 +151,11 @@ export function AddCalendarPage() {
 								primary
 								to={`/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`}
 							>
-								<Search className='size-4' data-icon='inline-start' />
+								<IconSearch className='size-4' data-icon='inline-start' />
 								前往搜尋
 							</Button>
 							<Button as={Link} to='/class'>
-								<Clock className='size-4' data-icon='inline-start' />
+								<IconClock className='size-4' data-icon='inline-start' />
 								班級課表
 							</Button>
 						</div>
@@ -169,7 +169,7 @@ export function AddCalendarPage() {
 							<CardTitle className='text-base font-semibold'>1. 選擇要加入的課程</CardTitle>
 						</div>
 						<Badge variant='outline'>
-							<CheckCircle2 data-icon='inline-start' />
+							<IconCircleCheck data-icon='inline-start' />
 							{selectedCourses.length} / {courses.length}
 						</Badge>
 					</div>
@@ -255,14 +255,14 @@ export function AddCalendarPage() {
 							: '尚未有課程可下載。'}
 					</div>
 					<Button active disabled={!selectedCourses.length || !hasCourses} onClick={downloadIcs}>
-						<Download className='size-4' data-icon='inline-start' />
+						<IconDownload className='size-4' data-icon='inline-start' />
 						下載 ICS
 					</Button>
 				</CardContent>
 			</Card>
 			{hasCourses ? (
 				<Alert>
-					{holidaysFailed ? <AlertCircle /> : <CalendarOff />}
+					{holidaysFailed ? <IconAlertCircle /> : <IconCalendarOff />}
 					<AlertTitle>
 						{holidaysFailed
 							? '無法取得完整的放假日'

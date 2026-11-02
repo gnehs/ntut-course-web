@@ -1,6 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Clipboard, Clock, PlaySquare, RefreshCw, Search } from 'lucide-react';
+import {
+	IconAlertCircle,
+	IconClipboard,
+	IconClock,
+	IconPlayerPlay,
+	IconRefresh,
+	IconSearch,
+} from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -64,13 +71,13 @@ export function WidgetPage() {
 				</p>
 			</section>
 			<Alert>
-				<RefreshCw />
+				<IconRefresh />
 				<AlertTitle>課表變更後要重新設定</AlertTitle>
 				<AlertDescription>加退選或修改課程後，課表變更後請重新複製程式碼。</AlertDescription>
 			</Alert>
 			{!hasCourses ? (
 				<Alert>
-					<AlertCircle />
+					<IconAlertCircle />
 					<AlertTitle>先新增課程</AlertTitle>
 					<AlertDescription>
 						小工具會讀取「我的課程」內容；先從搜尋或班級課表加入課程後，再回來複製程式碼。
@@ -80,11 +87,11 @@ export function WidgetPage() {
 								primary
 								to={`/advanced-search?year=${dataset.year}&sem=${dataset.sem}&d=${dataset.department}`}
 							>
-								<Search className='size-4' data-icon='inline-start' />
+								<IconSearch className='size-4' data-icon='inline-start' />
 								前往搜尋
 							</Button>
 							<Button as={Link} to='/class'>
-								<Clock className='size-4' data-icon='inline-start' />
+								<IconClock className='size-4' data-icon='inline-start' />
 								班級課表
 							</Button>
 						</div>
@@ -125,7 +132,7 @@ export function WidgetPage() {
 								}
 							}}
 						>
-							<Clipboard className='size-4' data-icon='inline-start' />
+							<IconClipboard className='size-4' data-icon='inline-start' />
 							複製
 						</Button>
 					</div>
@@ -160,7 +167,7 @@ export function WidgetPage() {
 					</div>
 					<Separator className='bg-[rgba(var(--vs-text),0.08)]' />
 					<div className='flex items-center gap-2 text-sm font-medium'>
-						<PlaySquare className='size-4' />
+						<IconPlayerPlay className='size-4' />
 						教學影片
 					</div>
 					<video loop controls className='rounded-panel mx-auto block max-h-[640px] max-w-full'>

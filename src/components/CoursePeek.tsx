@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouter, useRouterState } from '@tanstack/react-router';
 import { createContext, memo, useEffect, useId, useRef, useState } from 'react';
 import type React from 'react';
-import { Maximize2, X } from 'lucide-react';
+import { IconArrowsDiagonal, IconX } from '@tabler/icons-react';
 import { Drawer } from 'vaul';
 import { fetchCourseDetail, fetchWithdrawalRate } from '../lib/courseApi';
 import { CourseDetail } from '../routes/CourseDetailPage';
@@ -333,10 +333,10 @@ function PeekActions({ onClose, onExpand }: { onClose: () => void; onExpand: () 
 	return (
 		<>
 			<Button icon aria-label='開啟完整頁面' title='開啟完整頁面' onClick={onExpand}>
-				<Maximize2 className='size-4' aria-hidden='true' />
+				<IconArrowsDiagonal className='size-4' aria-hidden='true' />
 			</Button>
 			<Button icon aria-label='關閉預覽' title='關閉預覽' onClick={onClose}>
-				<X className='size-4' aria-hidden='true' />
+				<IconX className='size-4' aria-hidden='true' />
 			</Button>
 		</>
 	);

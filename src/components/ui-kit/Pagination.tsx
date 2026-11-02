@@ -1,5 +1,5 @@
 import { Button } from './Button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import type React from 'react';
 
 type PaginationProps = {
@@ -19,7 +19,7 @@ export function Pagination({ page, length, onChange }: PaginationProps) {
 					disabled={page <= 1}
 					onClick={() => onChange(Math.max(page - 1, 1))}
 				>
-					<ChevronLeft className='size-4' />
+					<IconChevronLeft className='size-4' />
 				</PaginationArrow>
 				<span aria-live='polite' className='min-w-20 text-center text-sm tabular-nums'>
 					第 {page} / {length} 頁
@@ -29,7 +29,7 @@ export function Pagination({ page, length, onChange }: PaginationProps) {
 					disabled={page >= length}
 					onClick={() => onChange(Math.min(page + 1, length))}
 				>
-					<ChevronRight className='size-4' />
+					<IconChevronRight className='size-4' />
 				</PaginationArrow>
 			</div>
 			<div className='hidden flex-wrap items-center justify-center gap-2 sm:flex'>
@@ -38,7 +38,7 @@ export function Pagination({ page, length, onChange }: PaginationProps) {
 					disabled={page <= 1}
 					onClick={() => onChange(Math.max(page - 1, 1))}
 				>
-					<ChevronLeft className='size-4' />
+					<IconChevronLeft className='size-4' />
 				</PaginationArrow>
 				{items.map((item, index) =>
 					item === 'ellipsis' ? (
@@ -67,7 +67,7 @@ export function Pagination({ page, length, onChange }: PaginationProps) {
 					disabled={page >= length}
 					onClick={() => onChange(Math.min(page + 1, length))}
 				>
-					<ChevronRight className='size-4' />
+					<IconChevronRight className='size-4' />
 				</PaginationArrow>
 			</div>
 		</nav>

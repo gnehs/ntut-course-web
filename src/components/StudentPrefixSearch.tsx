@@ -1,4 +1,4 @@
-import { ArrowRight, Loader, RefreshCw, Search, X } from 'lucide-react';
+import { IconArrowRight, IconLoader, IconRefresh, IconSearch, IconX } from '@tabler/icons-react';
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Button } from './ui-kit/Button';
 import { Input } from './ui-kit/Input';
@@ -168,7 +168,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 					className='text-muted-foreground flex items-center gap-2 px-4 py-3 text-sm'
 					role='status'
 				>
-					<Loader aria-hidden='true' className='size-4 animate-spin' />
+					<IconLoader aria-hidden='true' className='size-4 animate-spin' />
 					載入 {year} 年的系所建議…
 				</div>
 			);
@@ -187,7 +187,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 							inputRef.current?.focus?.();
 						}}
 					>
-						<RefreshCw aria-hidden='true' className='size-3.5' />
+						<IconRefresh aria-hidden='true' className='size-3.5' />
 						重試
 					</Button>
 				</div>
@@ -264,7 +264,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 						inputRef.current?.focus?.();
 					}}
 				>
-					{input ? <X aria-hidden='true' /> : <Search aria-hidden='true' />}
+					{input ? <IconX aria-hidden='true' /> : <IconSearch aria-hidden='true' />}
 				</button>
 			</div>
 			<p id={`${searchId}-hint`} className='sr-only'>
@@ -314,7 +314,7 @@ export function StudentPrefixSearch({ years, onSelect }: StudentPrefixSearchProp
 													</span>
 													<span className='block text-base font-semibold'>{entry.department}</span>
 												</span>
-												<ArrowRight
+												<IconArrowRight
 													aria-hidden='true'
 													className={cn(
 														'mr-4 transition-transform duration-200',

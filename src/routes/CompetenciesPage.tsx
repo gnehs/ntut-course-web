@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ExternalLink, Search } from 'lucide-react';
+import { IconExternalLink, IconSearch } from '@tabler/icons-react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { Alert } from '../components/ui-kit/Alert';
 import { Card } from '../components/ui-kit/Card';
@@ -167,7 +167,7 @@ export function CompetenciesPage() {
 								搜尋能力或課程
 							</label>
 							<div className='relative'>
-								<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
+								<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
 								<Input
 									id='competency-search'
 									value={filter}
@@ -271,7 +271,7 @@ export function CompetenciesPage() {
 										rel='noreferrer'
 										className='text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm underline underline-offset-2'
 									>
-										學校原始資料 <ExternalLink className='size-4' aria-hidden='true' />
+										學校原始資料 <IconExternalLink className='size-4' aria-hidden='true' />
 									</a>
 								</div>
 							) : null}

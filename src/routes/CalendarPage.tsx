@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, Filter } from 'lucide-react';
+import { IconCheck, IconFilter } from '@tabler/icons-react';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { CalendarSkeleton } from '../components/ui-kit/PageSkeletons';
@@ -81,7 +81,7 @@ export function CalendarPage() {
 					className='m-0'
 					onClick={() => setImportant((value) => !value)}
 				>
-					{important ? <Check className='size-4' /> : <Filter className='size-4' />}
+					{important ? <IconCheck className='size-4' /> : <IconFilter className='size-4' />}
 					僅顯示重要日程
 				</Button>
 			</div>

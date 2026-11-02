@@ -2,7 +2,7 @@ import { AdsByGoogle } from '../components/AdsByGoogle';
 import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
-import { Minus, Plus, Search } from 'lucide-react';
+import { IconMinus, IconPlus, IconSearch } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -60,7 +60,7 @@ export function MProgramIndexPage() {
 			<h1>微學程</h1>
 
 			<div className='relative'>
-				<Search className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
+				<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 -translate-y-1/2' />
 				<Input
 					value={filter}
 					onChange={(event) => setFilter(event.target.value)}
@@ -214,12 +214,12 @@ export function MProgramDetailPage() {
 			actions={
 				!isInMyCourse ? (
 					<Button primary onClick={addProgramCourses}>
-						<Plus className='size-4' />
+						<IconPlus className='size-4' />
 						加入我的課程
 					</Button>
 				) : (
 					<Button danger onClick={removeProgramCourses}>
-						<Minus className='size-4' />
+						<IconMinus className='size-4' />
 						從我的課程移除
 					</Button>
 				)

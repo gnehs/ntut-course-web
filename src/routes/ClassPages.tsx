@@ -4,21 +4,21 @@ import { useRouteLocation } from '../lib/routeLocation';
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import {
-	BookOpen,
-	Briefcase,
-	Building2,
-	ChevronDown,
-	Cog,
-	Cpu,
-	FlaskConical,
-	Minus,
-	PenTool,
-	Plus,
-	Rocket,
-	School,
-	Star,
-	type LucideIcon,
-} from 'lucide-react';
+	IconBook,
+	IconBriefcase,
+	IconBuilding,
+	IconChevronDown,
+	IconCpu,
+	IconFlask,
+	IconMinus,
+	IconPlus,
+	IconRocket,
+	IconSchool,
+	IconSettings,
+	IconStar,
+	IconVectorBezier,
+	type TablerIcon,
+} from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
@@ -197,7 +197,7 @@ export function ClassIndexPage() {
 							>
 								<CardTitle>{item.name}</CardTitle>
 								<p>{item.description}</p>
-								<Star data-card-icon />
+								<IconStar data-card-icon />
 							</Card>
 						))}
 					</div>
@@ -277,19 +277,19 @@ export function ClassIndexPage() {
 	);
 }
 
-const collegeIcons: Record<string, LucideIcon> = {
-	校院級: School,
-	機電學院: Cog,
-	工程學院: FlaskConical,
-	管理學院: Briefcase,
-	設計學院: PenTool,
-	人文與社會科學學院: BookOpen,
-	電資學院: Cpu,
-	創新前瞻科技研究學院: Rocket,
+const collegeIcons: Record<string, TablerIcon> = {
+	校院級: IconSchool,
+	機電學院: IconSettings,
+	工程學院: IconFlask,
+	管理學院: IconBriefcase,
+	設計學院: IconVectorBezier,
+	人文與社會科學學院: IconBook,
+	電資學院: IconCpu,
+	創新前瞻科技研究學院: IconRocket,
 };
 
 function CollegeIcon({ name, className }: { name: string; className?: string }) {
-	const Icon = collegeIcons[name] ?? Building2;
+	const Icon = collegeIcons[name] ?? IconBuilding;
 	return <Icon aria-hidden className={cn('shrink-0 text-[var(--icon-muted)]', className)} />;
 }
 
@@ -396,7 +396,7 @@ function DepartmentDisclosure({
 				type='button'
 			>
 				<span className='flex-1'>{department.name}</span>
-				<ChevronDown aria-hidden className='size-4 text-[var(--icon-muted)]' ref={iconRef} />
+				<IconChevronDown aria-hidden className='size-4 text-[var(--icon-muted)]' ref={iconRef} />
 			</button>
 			{rendered ? (
 				// The clip box starts a few px above the buttons so their shadow rims are not cut off.
@@ -600,12 +600,12 @@ export function ClassDetailPage() {
 			actions={
 				!isInMyCourse ? (
 					<Button primary onClick={addClassCourses}>
-						<Plus className='size-4' />
+						<IconPlus className='size-4' />
 						加入到我的課程
 					</Button>
 				) : (
 					<Button danger onClick={removeClassCourses}>
-						<Minus className='size-4' />
+						<IconMinus className='size-4' />
 						從我的課程中移除
 					</Button>
 				)

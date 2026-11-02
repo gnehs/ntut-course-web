@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Check, X } from 'lucide-react';
+import { IconCheck, IconX } from '@tabler/icons-react';
 import { CourseList, type CourseListLayout } from './CourseList';
 import { CourseListToolbar } from './CourseListToolbar';
 import { Button } from './ui-kit/Button';
@@ -72,7 +72,11 @@ export function CourseCollectionPage({
 										: 'text-muted-foreground bg-transparent hover:bg-[rgba(var(--vs-text),0.06)]'
 								}
 							>
-								{showConflictCourse ? <Check className='size-4' /> : <X className='size-4' />}
+								{showConflictCourse ? (
+									<IconCheck className='size-4' />
+								) : (
+									<IconX className='size-4' />
+								)}
 								衝堂課程
 							</Button>
 						}
