@@ -54,4 +54,19 @@ describe('buildTimetableCourseItems', () => {
 		expect(items.map((item) => item.laneCount)).toEqual([2, 2, 2]);
 		expect(items.map((item) => item.laneIndex)).toEqual([0, 1, 0]);
 	});
+
+	it('splits non-consecutive slots on the same day into separate blocks', () => {
+		const items = buildTimetableCourseItems([
+			course('3001', ['4', '8']),
+			course('3002', ['5', '6', '7']),
+		]);
+
+		expect(items.map((item) => [item.id, item.startSlot, item.endSlot])).toEqual([
+			['3001', '4', 'N'],
+			['3001', '8', '9'],
+			['3002', '5', '8'],
+		]);
+		expect(items.map((item) => item.isConflict)).toEqual([false, false, false]);
+		expect(items.map((item) => item.laneCount)).toEqual([1, 1, 1]);
+	});
 });

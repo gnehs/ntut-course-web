@@ -753,21 +753,28 @@ export function buildTimetableCourseItems(courses: Course[]) {
 				.map((slot) => ({ slot, index: timetable.indexOf(slot) }))
 				.filter((item) => item.index >= 0)
 				.sort((a, b) => a.index - b.index);
-			if (!sortedSlots.length) continue;
-			const startIndex = sortedSlots[0].index;
-			const endIndex = sortedSlots[sortedSlots.length - 1].index + 1;
-			items.push({
-				...course,
-				date,
-				slots: sortedSlots.map((item) => item.slot),
-				startSlot: timetable[startIndex],
-				endSlot: timetable[endIndex] || 'end',
-				startIndex,
-				endIndex,
-				isConflict: false,
-				laneIndex: 0,
-				laneCount: 1,
-			});
+			const runs: (typeof sortedSlots)[] = [];
+			for (const item of sortedSlots) {
+				const run = runs.at(-1);
+				if (run && run[run.length - 1].index + 1 === item.index) run.push(item);
+				else runs.push([item]);
+			}
+			for (const run of runs) {
+				const startIndex = run[0].index;
+				const endIndex = run[run.length - 1].index + 1;
+				items.push({
+					...course,
+					date,
+					slots: run.map((item) => item.slot),
+					startSlot: timetable[startIndex],
+					endSlot: timetable[endIndex] || 'end',
+					startIndex,
+					endIndex,
+					isConflict: false,
+					laneIndex: 0,
+					laneCount: 1,
+				});
+			}
 		}
 	}
 
