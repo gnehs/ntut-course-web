@@ -60,7 +60,6 @@ export function WidgetPage() {
 		};
 	}, [dataset.year, dataset.sem, dataset.department]);
 	const code = useMemo(() => createScriptableCode(courses || []), [courses]);
-	const addScriptUrl = useMemo(() => createAddScriptUrl(code), [code]);
 	const loading = !courses;
 	const courseCount = courses?.length ?? 0;
 	const hasCourses = loading || courseCount > 0;
@@ -70,13 +69,15 @@ export function WidgetPage() {
 			<section className='flex flex-col gap-4'>
 				<h1 className='text-3xl font-semibold tracking-normal'>iOS 小工具</h1>
 				<p className='max-w-2xl text-[rgb(var(--vs-text))]/75'>
-					在 iPhone 上安裝 Scriptable，再一鍵加入課表腳本，就能在桌面查看下一堂課。
+					在 iPhone 上安裝 Scriptable，複製課表腳本貼到新腳本，就能在桌面查看下一堂課。
 				</p>
 			</section>
 			<Alert>
 				<IconRefresh />
 				<AlertTitle>課表變更後要重新設定</AlertTitle>
-				<AlertDescription>加退選或修改課程後，請回到這頁重新加入腳本。</AlertDescription>
+				<AlertDescription>
+					加退選或修改課程後，請回到這頁重新複製程式碼，貼上覆蓋原本的腳本。
+				</AlertDescription>
 			</Alert>
 			{!hasCourses ? (
 				<Alert>
@@ -133,9 +134,9 @@ export function WidgetPage() {
 							{loading ? (
 								<Skeleton className='h-[1lh] w-40' />
 							) : hasCourses ? (
-								`在 iPhone 上點「加入 Scriptable」，包含 ${courseCount} 門課程資料。`
+								`點「複製並開啟 Scriptable」，在新腳本貼上程式碼。包含 ${courseCount} 門課程資料。`
 							) : (
-								'目前沒有課程資料，加入功能已停用。'
+								'目前沒有課程資料，複製功能已停用。'
 							)}
 						</CardDescription>
 					</div>
@@ -146,19 +147,24 @@ export function WidgetPage() {
 							<Badge variant='outline'>{courseCount} 門課</Badge>
 						)}
 						<Button
-							as={loading || !hasCourses ? 'button' : 'a'}
-							href={loading || !hasCourses ? undefined : addScriptUrl}
 							primary
 							disabled={loading || !hasCourses}
 							size='sm'
-							onClick={() => {
+							onClick={async () => {
+								if (loading || !hasCourses) return;
 								try {
-									window.gtag?.('event', 'add_ios_widget_script');
-								} catch {}
+									await copyCode(code);
+								} catch {
+									toast.error('複製失敗', {
+										description: '請嘗試手動複製',
+									});
+									return;
+								}
+								window.location.href = addScriptUrl;
 							}}
 						>
 							<IconPlus className='size-4' data-icon='inline-start' />
-							加入 Scriptable
+							複製並開啟 Scriptable
 						</Button>
 						<Button
 							disabled={loading || !hasCourses}
@@ -178,7 +184,7 @@ export function WidgetPage() {
 							}}
 						>
 							<IconClipboard className='size-4' data-icon='inline-start' />
-							複製
+							只複製
 						</Button>
 					</div>
 				</CardHeader>
@@ -199,7 +205,7 @@ export function WidgetPage() {
 				<CardHeader className='p-4 sm:px-5'>
 					<CardTitle className='text-base font-semibold'>3. 加入桌面小工具</CardTitle>
 					<CardDescription>
-						在 Scriptable 儲存腳本後，長按桌面加入 Scriptable 小工具，並選擇「{scriptName}」。
+						在 Scriptable 貼上程式碼並儲存後，長按桌面加入 Scriptable 小工具，並選擇剛剛建立的腳本。
 					</CardDescription>
 				</CardHeader>
 				<CardContent className='flex flex-col gap-4 p-4 pt-0 sm:px-5'>
@@ -240,11 +246,8 @@ async function copyCode(code: string) {
 	await navigator.clipboard.writeText(code);
 }
 
-const scriptName = '北科課程好朋友';
-
-function createAddScriptUrl(code: string) {
-	return `scriptable:///add?name=${encodeURIComponent(scriptName)}&text=${encodeURIComponent(code)}`;
-}
+// https://docs.scriptable.app/urlscheme/
+const addScriptUrl = 'scriptable:///add';
 
 function createScriptableCode(courseData: WidgetCourse[]) {
 	return `const courseData = ${JSON.stringify(courseData)}
