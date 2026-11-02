@@ -770,7 +770,12 @@ function syllabusVariants(items: SyllabusItem[], field: string) {
 			checklistFields.has(field ?? '') && typeof value === 'string'
 				? value.trim()
 				: syllabusDisplayText(value);
-		const text = field === 'objective' ? withoutEnglishTranslation(raw) : raw;
+		const text =
+			field === 'objective'
+				? withoutEnglishTranslation(raw)
+				: field === 'materials'
+					? withoutCopyrightNotice(raw)
+					: raw;
 		if (!text) return;
 		const key = comparableValue(text);
 		const variant = variants.get(key);
@@ -996,6 +1001,14 @@ function SyllabusText({ text, field }: { text: string; field?: string }) {
 			</ol>
 		</div>
 	);
+}
+
+// The school's form prefixes every textbook list with the same reminder, which says nothing about the course.
+const copyrightNoticePattern =
+	/[【\[]?\s*遵守智慧財產權觀念，請使用正版教科書，不得使用非法影印教科書\s*[】\]]?/g;
+
+function withoutCopyrightNotice(text: string) {
+	return text.replace(copyrightNoticePattern, '').trim();
 }
 
 function formatSyllabusText(text: string) {

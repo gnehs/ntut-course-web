@@ -298,6 +298,27 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		}
 	});
 
+	it('drops the copyright reminder the form adds to every textbook list', async () => {
+		const notice = '【遵守智慧財產權觀念，請使用正版教科書，不得使用非法影印教科書】';
+		await renderCourseDetail([{ ...baseSyllabus, materials: `${notice}\n\n\n\n測試教科書` }]);
+
+		expect(screen.getByText('測試教科書', { exact: true })).toBeInTheDocument();
+		expect(screen.queryByText(/遵守智慧財產權觀念/)).not.toBeInTheDocument();
+	});
+
+	it('hides the textbook section when it only holds the copyright reminder', async () => {
+		await renderCourseDetail([
+			{
+				...baseSyllabus,
+				materials: '【遵守智慧財產權觀念，請使用正版教科書，不得使用非法影印教科書】',
+			},
+		]);
+
+		expect(
+			screen.queryByRole('heading', { name: '使用教材、參考書目或其他' }),
+		).not.toBeInTheDocument();
+	});
+
 	it('preserves meaningful syllabus line breaks while limiting repeated blank lines', async () => {
 		await renderCourseDetail([
 			{
