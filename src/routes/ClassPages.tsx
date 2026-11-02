@@ -14,17 +14,16 @@ import {
 	IconPlus,
 	IconRocket,
 	IconSchool,
+	IconSearch,
 	IconSettings,
-	IconStar,
 	IconVectorBezier,
 	type TablerIcon,
 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
-import { Card } from '../components/ui-kit/Card';
-import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
+import { LinkList } from '../components/ui-kit/LinkList';
 import { ClassIndexSkeleton } from '../components/ui-kit/PageSkeletons';
 import { fetchCourse, fetchDepartment } from '../lib/courseApi';
 import { departmentItems, storageDepartment } from '../lib/courseUtils';
@@ -173,11 +172,16 @@ export function ClassIndexPage() {
 	return (
 		<div className='space-y-4'>
 			<h1>選擇班級</h1>
-			<Input
-				value={filter}
-				onChange={(event) => setFilter(event.target.value)}
-				placeholder='輸入關鍵字來篩選...'
-			/>
+			<div className='relative'>
+				<IconSearch className='text-icon-muted pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2' />
+				<Input
+					value={filter}
+					onChange={(event) => setFilter(event.target.value)}
+					placeholder='搜尋系所或班級'
+					aria-label='搜尋班級'
+					className='pl-9'
+				/>
+			</div>
 			{error ? (
 				<Alert danger>
 					<strong>搜尋時發生了錯誤</strong>
@@ -185,23 +189,19 @@ export function ClassIndexPage() {
 				</Alert>
 			) : null}
 			{recommendClass.length ? (
-				<>
-					<h3>建議</h3>
-					<p>根據你先前儲存的班級所提供的建議</p>
-					<div className='grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-3'>
-						{recommendClass.map((item, index) => (
-							<Card
-								className='px-4 py-3'
-								key={`${item.id}-${index}`}
-								to={`/class/${dataset.year}/${dataset.sem}/${item.name}?d=${dataset.department}`}
-							>
-								<CardTitle>{item.name}</CardTitle>
-								<p>{item.description}</p>
-								<IconStar data-card-icon />
-							</Card>
-						))}
-					</div>
-				</>
+				<section className='flex flex-col gap-2'>
+					<h2 className='m-0 px-1 text-sm font-medium text-[var(--muted-foreground)]'>
+						根據你儲存的班級推薦
+					</h2>
+					<LinkList
+						items={recommendClass.map((item, index) => ({
+							key: `${item.id}-${index}`,
+							to: classHref(item.name),
+							title: item.name,
+							subtitle: item.description,
+						}))}
+					/>
+				</section>
 			) : null}
 			{colleges.length ? (
 				isWide ? (
