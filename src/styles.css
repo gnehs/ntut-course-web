@@ -25,6 +25,7 @@
 	--color-ring: var(--ring);
 	--color-page: var(--page);
 	--color-field: var(--field);
+	--color-thumb: var(--thumb);
 	--radius-sm: calc(var(--radius) * 0.5);
 	--radius-md: calc(var(--radius) * 0.75);
 	--radius-lg: var(--radius);
@@ -336,6 +337,7 @@
 	--ring: rgb(var(--vs-primary));
 	--page: rgb(var(--vs-page-background));
 	--field: rgb(250, 250, 252);
+	--thumb: rgb(var(--vs-background));
 	--font-sans:
 		-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Tight', 'PingFang TC', 'Noto Sans TC',
 		sans-serif;
@@ -375,9 +377,9 @@
 		--elevation-overlay:
 			inset 0 0.5px 0 rgba(255, 255, 255, 0.1), 0 0 0 0.5px rgba(255, 255, 255, 0.1),
 			0 16px 32px -8px rgba(0, 0, 0, 0.5), 0 40px 80px -20px rgba(0, 0, 0, 0.6);
-		--elevation-thumb:
-			0 0 0 1px rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1),
-			0 1px 3px rgba(0, 0, 0, 0.4);
+		/* The well is nearly as light as a surface, so the thumb lifts by fill; white rims only stack up against the well's. */
+		--thumb: color-mix(in srgb, rgb(var(--vs-text)) 14%, rgb(var(--vs-background)));
+		--elevation-thumb: 0 0 0 0.5px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.45);
 	}
 }
 
@@ -398,7 +400,7 @@
 
 /* Keep tab selection visible independently of generated utility variants. */
 [data-slot='tabs-trigger'][data-state='active'] {
-	background-color: rgb(var(--vs-background));
+	background-color: var(--thumb);
 	color: rgb(var(--vs-text));
 	background-image: var(--sheen-surface);
 	box-shadow: var(--elevation-thumb);

@@ -42,7 +42,7 @@ export function CourseListToolbar({
 							className={cn(
 								'm-0 px-2.5 py-1 sm:min-h-8',
 								layout === value
-									? 'bg-background bg-sheen-surface text-foreground hover:bg-background shadow-thumb hover:shadow-thumb'
+									? 'bg-thumb bg-sheen-surface text-foreground hover:bg-thumb shadow-thumb hover:shadow-thumb'
 									: 'text-muted-foreground hover:text-foreground bg-transparent bg-none shadow-none hover:bg-[rgba(var(--vs-text),0.06)] hover:shadow-none',
 							)}
 							onClick={() => onLayoutChange(value as CourseListLayout)}
