@@ -543,3 +543,35 @@
 .timetable-slot.timetable-slot-noon {
 	background: color-mix(in srgb, rgb(var(--vs-text)) 1%, var(--card));
 }
+
+/* A light mix barely lifts off a dark card, and a little orange on dark gray turns to mud,
+   so dark slots recess toward the page and course blocks keep their chroma in OKLCH. */
+@media (prefers-color-scheme: dark) {
+	.timetable-slot {
+		background: color-mix(in srgb, rgb(var(--vs-page-background)) 45%, var(--card));
+	}
+
+	.timetable-slot.timetable-slot-noon {
+		background: color-mix(in srgb, rgb(var(--vs-page-background)) 22%, var(--card));
+	}
+
+	.timetable-course {
+		background: oklch(from rgb(var(--course-tone)) 0.42 calc(c * 0.6) h);
+		color: oklch(from rgb(var(--course-tone)) 0.92 calc(c * 0.3) h);
+	}
+
+	/* Red and orange sit close at this lightness, so a conflict also keeps a red title. */
+	.timetable-course.timetable-course-conflict {
+		background: oklch(from rgb(var(--course-tone)) 0.4 calc(c * 0.6) h);
+		color: oklch(from rgb(var(--course-tone)) 0.8 calc(c * 0.7) h);
+	}
+
+	.timetable-course:hover {
+		background: oklch(from rgb(var(--course-tone)) 0.46 calc(c * 0.65) h);
+	}
+
+	.timetable-course-sub,
+	.timetable-course-conflict .timetable-course-sub {
+		color: oklch(from rgb(var(--course-tone)) 0.8 calc(c * 0.5) h);
+	}
+}

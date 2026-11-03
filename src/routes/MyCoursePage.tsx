@@ -21,7 +21,7 @@ import { useApp } from '../state/AppContext';
 import type { Course } from '../types/course';
 
 const statsListClassName =
-	'rounded-surface shadow-rest m-0 grid grid-cols-3 gap-px overflow-hidden bg-[rgba(var(--vs-text),0.08)]';
+	'rounded-surface shadow-rest m-0 grid grid-cols-3 gap-px overflow-hidden bg-[color-mix(in_srgb,rgb(var(--vs-text))_12%,rgb(var(--vs-background)))]';
 const statItemClassName =
 	'flex min-w-0 flex-col-reverse gap-1 bg-[rgb(var(--vs-background))] px-4 py-3';
 const statLabelClassName = 'text-xs leading-tight opacity-70';
