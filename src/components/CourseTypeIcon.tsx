@@ -20,6 +20,12 @@ const courseTypeIcons = {
 	'★': IconStarFilled,
 } satisfies Record<keyof typeof courseStandard, Icon>;
 
+// A triangle's visual weight sits in its wide base, so a box-centered one reads low beside the text.
+const opticalShift: Partial<Record<keyof typeof courseTypeIcons, string>> = {
+	'△': '-translate-y-[0.08em]',
+	'▲': '-translate-y-[0.08em]',
+};
+
 type CourseTypeIconProps = {
 	type?: string;
 	className?: string;
@@ -32,7 +38,11 @@ export function CourseTypeIcon({ type, className }: CourseTypeIconProps) {
 	return (
 		<Icon
 			aria-label={courseStandard[type as keyof typeof courseStandard]}
-			className={cn('inline-block size-[0.9em] shrink-0 align-[-0.1em]', className)}
+			className={cn(
+				'inline-block size-[0.9em] shrink-0 align-[-0.1em]',
+				opticalShift[type as keyof typeof courseTypeIcons],
+				className,
+			)}
 			role='img'
 			stroke={2}
 		/>
