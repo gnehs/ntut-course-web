@@ -9,8 +9,7 @@ import type { Course } from '../types/course';
 
 const pageClassName = 'flex flex-col gap-4';
 const headerClassName = 'flex flex-col gap-1';
-const codeClassName = 'm-0 font-mono text-sm';
-const countClassName = 'm-0 text-sm';
+const metaClassName = 'm-0 flex items-baseline gap-2 text-sm';
 
 type CourseCollectionGroup = {
 	key: string;
@@ -55,10 +54,17 @@ export function CourseCollectionPage({
 	return (
 		<div className={pageClassName}>
 			<header className={headerClassName}>
-				{code ? <p className={`${codeClassName} opacity-65`}>{code}</p> : null}
+				<p className={metaClassName}>
+					{code ? (
+						<>
+							<span className='font-mono opacity-65'>{code}</span>
+							<span aria-hidden className='opacity-40'>·</span>
+						</>
+					) : null}
+					<span className='opacity-70'>共 {count} 門課程</span>
+				</p>
 				<h1 className='m-0'>{title}</h1>
 				{description ? <div className='opacity-75'>{description}</div> : null}
-				<p className={`${countClassName} opacity-70`}>共 {count} 門課程</p>
 			</header>
 			{notice}
 			{count ? (
@@ -131,7 +137,15 @@ export function CourseCollectionSkeleton({
 	return (
 		<div className={pageClassName} aria-busy='true' aria-label={label}>
 			<header className={headerClassName}>
-				{code ? <p className={`${codeClassName} opacity-65`}>{code}</p> : null}
+				<p className={metaClassName}>
+					{code ? (
+						<>
+							<span className='font-mono opacity-65'>{code}</span>
+							<span aria-hidden className='opacity-40'>·</span>
+						</>
+					) : null}
+					<Skeleton className='h-[1lh] w-24' />
+				</p>
 				<h1 className='m-0'>{title ?? <Skeleton className='h-[1lh] w-64 max-w-full' />}</h1>
 				{description ? (
 					<div>
@@ -139,9 +153,6 @@ export function CourseCollectionSkeleton({
 						<Skeleton className='h-[1lh] w-3/4' />
 					</div>
 				) : null}
-				<p className={countClassName}>
-					<Skeleton className='h-[1lh] w-24' />
-				</p>
 			</header>
 			<CourseListSkeleton
 				showTimetable
