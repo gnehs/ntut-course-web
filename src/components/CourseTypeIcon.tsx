@@ -20,10 +20,10 @@ const courseTypeIcons = {
 	'★': IconStarFilled,
 } satisfies Record<keyof typeof courseStandard, Icon>;
 
-// A triangle's visual weight sits in its wide base, so a box-centered one reads low beside the text.
+// Tabler's triangles sit high in their viewBox, so a box-centered one rides above the CJK ink.
 const opticalShift: Partial<Record<keyof typeof courseTypeIcons, string>> = {
-	'△': '-translate-y-[0.08em]',
-	'▲': '-translate-y-[0.08em]',
+	'△': 'translate-y-[0.04em]',
+	'▲': 'translate-y-[0.04em]',
 };
 
 type CourseTypeIconProps = {
