@@ -5,6 +5,7 @@ import { ProgramDetailPage, ProgramIndexPage, safeProgramHref } from './ProgramP
 
 const mocks = vi.hoisted(() => ({
 	fetchPrograms: vi.fn(),
+	fetchProgramDocs: vi.fn(),
 	fetchCourse: vi.fn(),
 	addCourse: vi.fn(),
 	removeCourse: vi.fn(),
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../lib/courseApi', () => ({
 	fetchPrograms: mocks.fetchPrograms,
+	fetchProgramDocs: mocks.fetchProgramDocs,
 	fetchCourse: mocks.fetchCourse,
 }));
 
@@ -136,11 +138,30 @@ describe('ProgramDetailPage', () => {
 		vi.clearAllMocks();
 		mocks.params.id = 'P-001';
 		mocks.fetchPrograms.mockResolvedValue([program]);
+		mocks.fetchProgramDocs.mockResolvedValue(null);
 		mocks.fetchCourse.mockImplementation((_year: string, _sem: string, department: string) => {
 			if (department === 'main') return Promise.resolve([course('C-MAIN')]);
 			if (department === '進修部') return Promise.resolve([course('C-EVENING')]);
 			return Promise.resolve([course('C-GRAD')]);
 		});
+	});
+
+	it('falls back to the scraped intro and shows the program documents', async () => {
+		mocks.fetchPrograms.mockResolvedValue([{ ...program, description: '' }]);
+		mocks.fetchProgramDocs.mockResolvedValue({
+			name: '人工智慧科技學程',
+			code: null,
+			rules: 'https://oaa.ntut.edu.tw/var/file/8/1008/img/4321/AX0_.pdf',
+			plan: null,
+			apply: 'https://oaa.ntut.edu.tw/var/file/8/1008/img/547267148.docx',
+			intro: '培養人工智慧跨領域人才。',
+		});
+		render(<ProgramDetailPage />);
+
+		expect(await screen.findByText('培養人工智慧跨領域人才。')).toBeInTheDocument();
+		expect(mocks.fetchProgramDocs).toHaveBeenCalledWith('P-001', '人工智慧學程');
+		expect(screen.getByRole('link', { name: /修畢申請表/ })).toHaveTextContent('Word 格式');
+		expect(screen.queryByRole('link', { name: /課程規劃表/ })).not.toBeInTheDocument();
 	});
 
 	it('checks all three departments and keeps the source link on a safe protocol', async () => {
@@ -159,7 +180,7 @@ describe('ProgramDetailPage', () => {
 			'1',
 			'研究所(日間部、進修部、週末碩士班)',
 		);
-		expect(screen.getByRole('link', { name: '學校原始資料' })).toHaveAttribute(
+		expect(screen.getByRole('link', { name: '課程系統原始頁面' })).toHaveAttribute(
 			'href',
 			'https://aps.ntut.edu.tw/course/tw/SearchProgram.jsp?format=-2&code=P-001',
 		);
@@ -218,7 +239,7 @@ describe('ProgramDetailPage', () => {
 		render(<ProgramDetailPage />);
 
 		await screen.findByText('人工智慧學程');
-		expect(screen.queryByRole('link', { name: '學校原始資料' })).not.toBeInTheDocument();
+		expect(screen.queryByRole('link', { name: '課程系統原始頁面' })).not.toBeInTheDocument();
 		expect(safeProgramHref('data:text/html,not-safe')).toBeNull();
 		expect(safeProgramHref('SearchProgram.jsp?code=P-001')).toBe(
 			'https://aps.ntut.edu.tw/course/tw/SearchProgram.jsp?code=P-001',

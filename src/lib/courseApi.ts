@@ -1,4 +1,5 @@
 import { API_BASE } from './courseUtils';
+import { findGeneralProgramDocs, findMicroProgramDocs } from './programDocs';
 import { getStore, setStore } from './storage';
 import type { StandardDepartmentEntry } from './studentPrefix';
 import type {
@@ -8,7 +9,9 @@ import type {
 	DepartmentGroup,
 	Holiday,
 	MicroProgram,
+	MicroProgramDocs,
 	Program,
+	ProgramDocs,
 	StandardYearData,
 	SyllabusItem,
 	WithdrawalRateMap,
@@ -191,6 +194,14 @@ function fetchOptionalDataset<T>(path: string): Promise<T | null> {
 export function fetchPrograms(year: string, sem: string): Promise<Program[] | null> {
 	if (!year || !sem) return Promise.resolve(null);
 	return fetchOptionalDataset(`${year}/${sem}/programs.json`);
+}
+
+export async function fetchMicroProgramDocs(id: string): Promise<MicroProgramDocs | null> {
+	return findMicroProgramDocs(await fetchOptionalDataset('mprogram-docs.json'), id);
+}
+
+export async function fetchProgramDocs(id: string, name: string): Promise<ProgramDocs | null> {
+	return findGeneralProgramDocs(await fetchOptionalDataset('program-docs.json'), id, name);
 }
 
 export function fetchCompetencies(): Promise<CompetencyDepartment[] | null> {

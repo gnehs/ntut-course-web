@@ -1,19 +1,50 @@
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
-import { IconExternalLink, IconMinus, IconPlus, IconSearch } from '@tabler/icons-react';
+import {
+	IconClipboardList,
+	IconGavel,
+	IconMinus,
+	IconPlus,
+	IconSearch,
+	IconWorld,
+} from '@tabler/icons-react';
 import { toast } from 'sonner';
 import { AdsByGoogle } from '../components/AdsByGoogle';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { ProgramIndexSkeleton, ProgramList } from '../components/ProgramList';
+import { documentLinks, ProgramDocsSection } from '../components/ProgramDocsSection';
+import { ActionList, type ActionListItem } from '../components/ui-kit/ActionList';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Input } from '../components/ui-kit/Input';
-import { fetchCourse, fetchPrograms } from '../lib/courseApi';
+import { fetchCourse, fetchProgramDocs, fetchPrograms } from '../lib/courseApi';
 import { departmentItems, storageDepartment } from '../lib/courseUtils';
 import { errorMessage } from '../lib/error';
 import { usePageTitle } from '../lib/pageTitle';
+import { PROGRAM_OFFICIAL_URL, programOfficialLinks } from '../lib/programLinks';
 import { useApp } from '../state/AppContext';
-import type { Course, Program } from '../types/course';
+import type { Course, Program, ProgramDocs } from '../types/course';
+
+const officialLinks: ActionListItem[] = [
+	{
+		href: PROGRAM_OFFICIAL_URL,
+		title: '教務處學程專區',
+		text: '各學程規劃書、修畢申請表與負責人',
+		icon: IconWorld,
+	},
+	{
+		href: programOfficialLinks.regulation,
+		title: '學程實施辦法',
+		text: '學程認證、學分採計與跨領域學分規定',
+		icon: IconGavel,
+	},
+	{
+		href: programOfficialLinks.register,
+		title: '登記修讀',
+		text: '每學期依教務處公告期限登記',
+		icon: IconClipboardList,
+	},
+];
 
 const APS_COURSE_ROOT = 'https://aps.ntut.edu.tw/course/tw/';
 
@@ -142,6 +173,14 @@ export function ProgramIndexPage() {
 					}))}
 				/>
 			) : null}
+
+			<section className='flex flex-col gap-2'>
+				<h2 className='m-0 text-lg font-semibold'>關於一般學程</h2>
+				<p className='m-0 opacity-75'>
+					學程採認證制：依教務處公告期限登記修讀，修畢相關課程後即可申請學程證明書。各學程的修讀資格與課程規定，請見其學程規劃書。
+				</p>
+				<ActionList items={officialLinks} />
+			</section>
 			{filteredPrograms.length ? <AdsByGoogle placement='footer' /> : null}
 		</div>
 	);
@@ -150,6 +189,7 @@ export function ProgramIndexPage() {
 export function ProgramDetailPage() {
 	const { year = '', sem = '', id = '' } = programParams();
 	const [program, setProgram] = useState<Program | null | undefined>(undefined);
+	const [docs, setDocs] = useState<ProgramDocs | null>(null);
 	const [departmentCourses, setDepartmentCourses] = useState<DepartmentCourses[]>([]);
 	const [courseErrors, setCourseErrors] = useState<{ department: string; reason: unknown }[]>([]);
 	const [unavailable, setUnavailable] = useState(false);
@@ -161,6 +201,7 @@ export function ProgramDetailPage() {
 	useEffect(() => {
 		let cancelled = false;
 		setProgram(undefined);
+		setDocs(null);
 		setDepartmentCourses([]);
 		setCourseErrors([]);
 		setUnavailable(false);
@@ -184,6 +225,9 @@ export function ProgramDetailPage() {
 			}
 
 			const found = programResult.value.find((item) => item.id === id);
+			// The documents are extra context; the course list stands on its own without them.
+			const programDocs = found ? await fetchProgramDocs(id, found.name).catch(() => null) : null;
+			if (cancelled) return;
 			const groups: DepartmentCourses[] = [];
 			const failures: { department: string; reason: unknown }[] = [];
 			for (const [index, department] of departmentItems.entries()) {
@@ -205,6 +249,7 @@ export function ProgramDetailPage() {
 			}
 			setDepartmentCourses(groups);
 			setCourseErrors(failures);
+			setDocs(programDocs);
 			setProgram(found || null);
 		}
 
@@ -314,7 +359,7 @@ export function ProgramDetailPage() {
 		<CourseCollectionPage
 			title={program.name}
 			code={program.id}
-			description={program.description}
+			description={program.description || docs?.intro || undefined}
 			year={year}
 			sem={sem}
 			groups={matchedGroups.map((group) => ({
@@ -361,18 +406,15 @@ export function ProgramDetailPage() {
 			onSavedChange={() => setSavedVersion((value) => value + 1)}
 			footer={
 				<>
-					{sourceHref ? (
-						<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
-							<a
-								href={sourceHref}
-								target='_blank'
-								rel='noreferrer'
-								className='text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm underline underline-offset-2'
-							>
-								學校原始資料 <IconExternalLink className='size-4' aria-hidden='true' />
-							</a>
-						</div>
-					) : null}
+					<ProgramDocsSection
+						links={[
+							...documentLinks(docs, '學程規劃書'),
+							...(sourceHref
+								? [{ href: sourceHref, title: '課程系統原始頁面', icon: IconWorld }]
+								: []),
+							{ href: PROGRAM_OFFICIAL_URL, title: '教務處學程專區', icon: IconWorld },
+						]}
+					/>
 					{matchedCourses.length ? <AdsByGoogle placement='footer' /> : null}
 				</>
 			}

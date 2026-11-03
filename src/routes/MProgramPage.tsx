@@ -3,16 +3,64 @@ import { useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { CourseCollectionPage, CourseCollectionSkeleton } from '../components/CourseCollectionPage';
 import { ProgramIndexSkeleton, ProgramList } from '../components/ProgramList';
-import { IconMinus, IconPlus, IconSearch } from '@tabler/icons-react';
+import {
+	IconCertificate,
+	IconClipboardList,
+	IconGavel,
+	IconMinus,
+	IconPlus,
+	IconSearch,
+	IconUsers,
+	IconWorld,
+} from '@tabler/icons-react';
 import { toast } from 'sonner';
+import { documentLinks, ProgramDocsSection } from '../components/ProgramDocsSection';
+import { ActionList, type ActionListItem } from '../components/ui-kit/ActionList';
 import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Input } from '../components/ui-kit/Input';
-import { fetchCourse, fetchMicroPrograms } from '../lib/courseApi';
+import { fetchCourse, fetchMicroProgramDocs, fetchMicroPrograms } from '../lib/courseApi';
 import { usePageTitle } from '../lib/pageTitle';
 import { useApp } from '../state/AppContext';
-import type { Course, MicroProgram } from '../types/course';
+import type { Course, MicroProgram, MicroProgramDocs } from '../types/course';
 import { errorMessage } from '../lib/error';
+import {
+	MPROGRAM_OFFICIAL_URL,
+	programOfficialLinks,
+	mprogramSourceUrl,
+} from '../lib/programLinks';
+
+const officialLinks: ActionListItem[] = [
+	{
+		href: MPROGRAM_OFFICIAL_URL,
+		title: '教務處微學程專區',
+		text: '修讀規定、修畢審核期程與常見問題',
+		icon: IconWorld,
+	},
+	{
+		href: programOfficialLinks.regulation,
+		title: '學程實施辦法',
+		text: '學程認證、學分採計與跨領域學分規定',
+		icon: IconGavel,
+	},
+	{
+		href: programOfficialLinks.register,
+		title: '登記修讀',
+		text: '每學期依教務處公告期限登記',
+		icon: IconClipboardList,
+	},
+	{
+		href: programOfficialLinks.contacts,
+		title: '主責單位與聯絡人',
+		icon: IconUsers,
+	},
+	{
+		href: programOfficialLinks.certificate,
+		title: '申請微學程證書',
+		text: '修畢申請表先送設置單位初審',
+		icon: IconCertificate,
+	},
+];
 
 export function MProgramIndexPage() {
 	const { dataset } = useApp();
@@ -89,6 +137,14 @@ export function MProgramIndexPage() {
 					}))}
 				/>
 			) : null}
+
+			<section className='flex flex-col gap-2'>
+				<h2 className='m-0 text-lg font-semibold'>關於微學程</h2>
+				<p className='m-0 opacity-75'>
+					微學程採認證制：依教務處公告期限登記修讀，修畢相關課程後即可申請學程證明書。各微學程的修讀資格與課程規定，請見其施行細則與課程規劃表。
+				</p>
+				<ActionList items={officialLinks} />
+			</section>
 		</div>
 	);
 }
@@ -98,6 +154,7 @@ export function MProgramDetailPage() {
 	const { addCourse, removeCourse } = useApp();
 	const [program, setProgram] = useState<MicroProgram | null>(null);
 	const [courses, setCourses] = useState<Course[] | null>(null);
+	const [docs, setDocs] = useState<MicroProgramDocs | null>(null);
 	const [error, setError] = useState<unknown>(null);
 	const [version, setVersion] = useState(0);
 	const storageKey = `my-couse-mprogram-${year}-${sem}`;
@@ -111,9 +168,11 @@ export function MProgramDetailPage() {
 		setCourses(null);
 		setError(null);
 		async function load() {
-			const [programList, allCourses] = await Promise.all([
+			const [programList, allCourses, programDocs] = await Promise.all([
 				fetchMicroPrograms(year, sem),
 				fetchCourse(year, sem),
+				// The documents are extra context; the course list stands on its own without them.
+				fetchMicroProgramDocs(id).catch(() => null),
 			]);
 			const foundProgram = programList.find((item) => item.id === id);
 			const courseIds = foundProgram?.course || [];
@@ -123,6 +182,7 @@ export function MProgramDetailPage() {
 			if (!cancelled) {
 				setProgram(foundProgram || { id, name: '微學程' });
 				setCourses(result);
+				setDocs(programDocs);
 			}
 		}
 		load().catch((e) => {
@@ -163,16 +223,22 @@ export function MProgramDetailPage() {
 	}
 
 	if (!courses) return <CourseCollectionSkeleton label='載入微學程' code={id} />;
+	const sourceUrl = program?.href ? mprogramSourceUrl(program.href) : undefined;
+	const documentLinkItems: ActionListItem[] = [
+		...documentLinks(docs),
+		...(sourceUrl ? [{ href: sourceUrl, title: '課程系統原始頁面', icon: IconWorld }] : []),
+		{ href: MPROGRAM_OFFICIAL_URL, title: '教務處微學程專區', icon: IconWorld },
+	];
 	const emptyState = error ? (
 		<></>
 	) : program ? (
 		<Alert>
 			<strong>查無資料</strong>
-			{program.href ? (
+			{sourceUrl ? (
 				<>
 					<br />
 					<a
-						href={`https://aps.ntut.edu.tw/course/tw/${program.href}`}
+						href={sourceUrl}
 						target='_blank'
 						rel='noreferrer'
 					>
@@ -187,6 +253,7 @@ export function MProgramDetailPage() {
 		<CourseCollectionPage
 			title={programName}
 			code={id}
+			description={docs?.intro ?? undefined}
 			year={year}
 			sem={sem}
 			groups={[{ key: 'micro', courses }]}
@@ -214,9 +281,12 @@ export function MProgramDetailPage() {
 			emptyState={emptyState}
 			savedVersion={version}
 			footer={
-				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4 has-[[data-ad-collapsed]]:hidden'>
-					<AdsByGoogle title='贊助商廣告' />
-				</section>
+				<>
+					<ProgramDocsSection links={documentLinkItems} />
+					<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4 has-[[data-ad-collapsed]]:hidden'>
+						<AdsByGoogle title='贊助商廣告' />
+					</section>
+				</>
 			}
 		/>
 	);

@@ -188,6 +188,25 @@ export type MicroProgram = {
 	course?: string[];
 };
 
+/** Scraped from the 教務處 pages and each program's 施行細則 PDF. */
+type ProgramDocsBase = {
+	name: string;
+	rules: string | null;
+	plan: string | null;
+	apply: string | null;
+	intro: string | null;
+};
+
+/** One entry of `mprogram-docs.json`. */
+export type MicroProgramDocs = ProgramDocsBase & {
+	id: string;
+};
+
+/** One entry of `program-docs.json`; most rows carry no APS code, so they match by name. */
+export type ProgramDocs = ProgramDocsBase & {
+	code: string | null;
+};
+
 export type Program = {
 	id: string;
 	name: string;
