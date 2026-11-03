@@ -1,59 +1,42 @@
 # [🍤 北科課程好朋友](https://ntut-course.gnehs.net/)
 
-這裡是北科課程好朋友，提供課程資訊的可愛網站！
+查北科課程、排課表的可愛網站！選課季救星，希望你今年也搶到想上的課 🙏
 
-## 關於
+- 關於本站：<https://ntut-course.gnehs.net/about>
+- API 文件：<https://ntut-course.gnehs.net/doc>
+- 資料與爬蟲：<https://github.com/gnehs/ntut-course-crawler-node>
 
-https://ntut-course.gnehs.net/about
-
-## API 文件
-
-https://ntut-course.gnehs.net/doc
-
-## 爬蟲與資料
-
-https://github.com/gnehs/ntut-course-crawler-node
-
-## 環境變數
-
-可透過 `VITE_API_BASE` 環境變數指定 API 進入點，
-未設定時預設為 `https://gnehs.github.io/ntut-course-crawler-node`。
+## 開始開發
 
 ```bash
-# 使用自訂的 API 進入點啟動開發伺服器
+pnpm install
+pnpm dev        # http://localhost:7190
+pnpm test
+pnpm typecheck
+pnpm build      # 輸出到 dist/
+```
+
+## 資料從哪來
+
+網站本身不爬資料，髒活都交給爬蟲了，課程、學程等資料都由 [爬蟲](https://github.com/gnehs/ntut-course-crawler-node) 發布在 GitHub Pages，網站直接讀那裡的 JSON。
+
+想換成別的資料來源，啟動時設定 `VITE_API_BASE`：
+
+```bash
 VITE_API_BASE=https://example.com pnpm dev
 ```
 
-Vite 只會把 `VITE_` 前綴的變數暴露給前端程式碼。
+## 程式放在哪
 
-## Build Setup
+| 位置 | 內容 |
+| --- | --- |
+| `src/routes/` | 各個頁面 |
+| `src/components/` | 共用元件 |
+| `src/lib/` | 讀取資料與工具函式 |
+| `src/worker.ts`、`src/worker/` | Cloudflare Worker：分享連結的預覽資訊、預覽圖片、sitemap |
+| `static/` | 原樣放到網站根目錄的檔案，例如 `static/robots.txt` 會變成 `/robots.txt` |
+| `docs/` | 開發文件與設計原始檔 |
 
-```bash
-# install dependencies
-$ pnpm install
+使用 React、Vite、Tailwind CSS 和 TanStack Router，網站部署在 Cloudflare Workers，設定在 `wrangler.jsonc`。
 
-# serve with hot reload at localhost:7190
-$ pnpm dev
-
-# build for production and launch server
-$ pnpm build
-$ pnpm start
-
-# run tests
-$ pnpm test
-```
-
-## 技術棧
-
-本站目前使用 React、Vite、Tailwind CSS 與 TanStack Router 建置。靜態資產放在 `static/`，應用程式入口在 `src/main.tsx`，路由定義在 `src/router.tsx`。
-
-`static/` 內的檔案會直接複製到網站根目錄，例如 `static/robots.txt` 對應 `/robots.txt`。文件與設計原始檔不放在公開目錄；圖示設計原始檔保存在 `docs/design/icon.psd`。
-
-## 課程資料功能
-
-- 課程詳情包含授課語言、隨班附讀、實驗實習、跨領域、教師諮商時間與課綱原始連結；空白或無作用的欄位隱藏。
-- 進階搜尋支援授課語言、AI 教學方式、SDGs 與課程屬性，使用每學期單一 `syllabus-index.json`，不逐門下載課綱。
-- `/program` 提供一般學程；`/competencies` 提供系所核心能力對照。
-- 新增 API 尚未發布的舊學期會顯示未提供資料，不將其視為沒有開課或沒有導入 AI。
-
-欄位語意、相容性及驗證記錄請見 [欄位盤點](docs/course-field-audit.md)。
+課程各欄位的意思與來源，請見 [欄位盤點](docs/course-field-audit.md)。
