@@ -426,7 +426,6 @@ export function DocPage() {
 					['/main.json', '取得所有可用之年份與學期'],
 					['/{year}/{sem}/{system}.json', '取得某學期某學制課程資料'],
 					['/{year}/{sem}/course/{id}.json', '取得教師課綱陣列'],
-					['/{year}/{sem}/syllabus-index.json', '取得 AI、SDGs 與教學資源搜尋索引'],
 					['/{year}/{sem}/programs.json', '取得一般學程與開課課號'],
 					['/{year}/{sem}/mprogram.json', '取得微學程'],
 					['/competencies.json', '取得系所課程核心能力對照'],
