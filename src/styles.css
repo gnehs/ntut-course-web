@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './fonts.css';
 
 /* A compact shared radius scale for controls and their surrounding surfaces. */
 @theme inline {
@@ -338,9 +339,7 @@
 	--page: rgb(var(--vs-page-background));
 	--field: rgb(250, 250, 252);
 	--thumb: rgb(var(--vs-background));
-	--font-sans:
-		-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter Tight', 'PingFang TC', 'Noto Sans TC',
-		sans-serif;
+	--font-sans: 'Ntut Course Web Composite', 'Noto Sans TC', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -394,7 +393,14 @@
 		color: var(--foreground);
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
-		font-feature-settings: 'kern';
+		/* Don't set font-size-adjust anywhere: it overrides the size-adjust in fonts.css. */
+		text-autospace: normal;
+		text-spacing-trim: trim-start;
+		line-break: strict;
+		hanging-punctuation: allow-end;
+		font-feature-settings: 'halt';
+		font-variant-numeric: lining-nums tabular-nums;
+		font-synthesis-style: none;
 	}
 }
 

@@ -1,0 +1,927 @@
+/* 複合字型「Ntut Course Web Composite」
+ * 漢字基礎字型 Noto Sans TC 由 index.html 從 Google Fonts 載入，排在 font-family 的第二位；
+ * 下面只定義需要覆蓋它的類別：用 unicode-range 接管字元，用 size-adjust 調整大小。
+ * 同名 @font-face 中，瀏覽器從最後一條往前比對。 */
+/* 斜體：每組規則另有一份 font-style: italic。有斜體的類別用斜體字型（或傾斜軸）；
+ * 沒有斜體的類別（漢字、假名等）用一般（非斜體）的檔案、也宣告成 italic，瀏覽器就不會把它們模擬傾斜。 */
+/* font-variation-settings 用於細調可變字型的粗細和其他軸：Chrome 140+、Firefox 62+ 支援；Safari 不認這一行，粗細按 font-weight 那一段、其他軸按字型的預設值顯示。 */
+/* ascent-override / descent-override / line-gap-override：西文等規則使用漢字字型的行高度量（已除以 size-adjust），
+ * 行高和基線位置都和漢字字型一致。Chrome 87+、Firefox 89+ 支援；Safari 會忽略，按各字型自己的度量顯示。 */
+
+/* ===== font-weight: 100 ===== */
+
+/* 半形西文 — Instrument Sans 400（Google，2 個分片） · 102% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSTF-Tf8kywN2u7ZWwUbNA.woff2)
+		format('woff2');
+	font-weight: 100;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 102%;
+	ascent-override: 113.73%;
+	descent-override: 28.43%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSTF-TfykywN2u7ZWwU.woff2)
+		format('woff2');
+	font-weight: 100;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 102%;
+	ascent-override: 113.73%;
+	descent-override: 28.43%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 340（Google） · 100.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbV2o-flEEny0FZhsfKu5WU4xD7OwGtT0rU.woff2)
+		format('woff2');
+	font-weight: 100;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 340;
+	size-adjust: 100.5%;
+	ascent-override: 115.42%;
+	descent-override: 28.86%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 400（Google，2 個分片） · 102% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENuu-2oyAH28zdQwQzNOgX.woff2)
+		format('woff2');
+	font-weight: 100;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 102%;
+	ascent-override: 113.73%;
+	descent-override: 28.43%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENuu-2oy4H28zdQwQzNA.woff2)
+		format('woff2');
+	font-weight: 100;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 102%;
+	ascent-override: 113.73%;
+	descent-override: 28.43%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 340（Google） · 100.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbX2o-flEEny0FZhsfKu5WU4xD-CwOnSGjW7BA.woff2)
+		format('woff2');
+	font-weight: 100;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 340;
+	size-adjust: 100.5%;
+	ascent-override: 115.42%;
+	descent-override: 28.86%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 200 ===== */
+
+/* 半形西文 — Instrument Sans 400（Google，2 個分片） · 102.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSTF-Tf8kywN2u7ZWwUbNA.woff2)
+		format('woff2');
+	font-weight: 200;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 102.5%;
+	ascent-override: 113.17%;
+	descent-override: 28.29%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSTF-TfykywN2u7ZWwU.woff2)
+		format('woff2');
+	font-weight: 200;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 102.5%;
+	ascent-override: 113.17%;
+	descent-override: 28.29%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 340（Google） · 101% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbV2o-flEEny0FZhsfKu5WU4xD7OwGtT0rU.woff2)
+		format('woff2');
+	font-weight: 200;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 340;
+	size-adjust: 101%;
+	ascent-override: 114.85%;
+	descent-override: 28.71%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 400（Google，2 個分片） · 102.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENuu-2oyAH28zdQwQzNOgX.woff2)
+		format('woff2');
+	font-weight: 200;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 102.5%;
+	ascent-override: 113.17%;
+	descent-override: 28.29%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENuu-2oy4H28zdQwQzNA.woff2)
+		format('woff2');
+	font-weight: 200;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 102.5%;
+	ascent-override: 113.17%;
+	descent-override: 28.29%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 340（Google） · 101% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbX2o-flEEny0FZhsfKu5WU4xD-CwOnSGjW7BA.woff2)
+		format('woff2');
+	font-weight: 200;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 340;
+	size-adjust: 101%;
+	ascent-override: 114.85%;
+	descent-override: 28.71%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 300 ===== */
+
+/* 半形西文 — Instrument Sans 400（Google，2 個分片） · 103% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSTF-Tf8kywN2u7ZWwUbNA.woff2)
+		format('woff2');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 103%;
+	ascent-override: 112.62%;
+	descent-override: 28.16%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSTF-TfykywN2u7ZWwU.woff2)
+		format('woff2');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 103%;
+	ascent-override: 112.62%;
+	descent-override: 28.16%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 340（Google） · 101.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbV2o-flEEny0FZhsfKu5WU4xD7OwGtT0rU.woff2)
+		format('woff2');
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 340;
+	size-adjust: 101.5%;
+	ascent-override: 114.29%;
+	descent-override: 28.57%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 400（Google，2 個分片） · 103% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENuu-2oyAH28zdQwQzNOgX.woff2)
+		format('woff2');
+	font-weight: 300;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 103%;
+	ascent-override: 112.62%;
+	descent-override: 28.16%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENuu-2oy4H28zdQwQzNA.woff2)
+		format('woff2');
+	font-weight: 300;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 103%;
+	ascent-override: 112.62%;
+	descent-override: 28.16%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 340（Google） · 101.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbX2o-flEEny0FZhsfKu5WU4xD-CwOnSGjW7BA.woff2)
+		format('woff2');
+	font-weight: 300;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 340;
+	size-adjust: 101.5%;
+	ascent-override: 114.29%;
+	descent-override: 28.57%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 400 ===== */
+
+/* 半形西文 — Instrument Sans 440（Google，2 個分片） · 104% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0She1ZuWi3hKpA.woff2)
+		format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 440;
+	size-adjust: 104%;
+	ascent-override: 111.54%;
+	descent-override: 27.88%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0SZe1ZuWi3g.woff2)
+		format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 440;
+	size-adjust: 104%;
+	ascent-override: 111.54%;
+	descent-override: 27.88%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 400（Google） · 102.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxTOlOVk6OThhvA.woff2)
+		format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 102.5%;
+	ascent-override: 113.17%;
+	descent-override: 28.29%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 440（Google，2 個分片） · 104% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxitypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNu2ZGRqXp6pRwM.woff2)
+		format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 440;
+	size-adjust: 104%;
+	ascent-override: 111.54%;
+	descent-override: 27.88%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxitypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNu15GRqXp6pQ.woff2)
+		format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 440;
+	size-adjust: 104%;
+	ascent-override: 111.54%;
+	descent-override: 27.88%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 400（Google） · 102.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDba2o-flEEny0FZhsfKu5WU4xD-IQ-PuZJJXxfpAO-LfmOXmaKxggPBcV8.woff2)
+		format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 102.5%;
+	ascent-override: 113.17%;
+	descent-override: 28.29%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 500 ===== */
+
+/* 半形西文 — Instrument Sans 520（Google，2 個分片） · 105% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0She1ZuWi3hKpA.woff2)
+		format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 520;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0SZe1ZuWi3g.woff2)
+		format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 520;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 500（Google） · 103.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8-qxTOlOVk6OThhvA.woff2)
+		format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 103.5%;
+	ascent-override: 112.08%;
+	descent-override: 28.02%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 520（Google，2 個分片） · 105% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxitypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNu2ZGRqXp6pRwM.woff2)
+		format('woff2');
+	font-weight: 500;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 520;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxitypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNu15GRqXp6pQ.woff2)
+		format('woff2');
+	font-weight: 500;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 520;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 500（Google） · 103.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDba2o-flEEny0FZhsfKu5WU4xD-IQ-PuZJJXxfpAO-5fmOXmaKxggPBcV8.woff2)
+		format('woff2');
+	font-weight: 500;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 103.5%;
+	ascent-override: 112.08%;
+	descent-override: 28.02%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 600 ===== */
+
+/* 半形西文 — Instrument Sans 600（Google，2 個分片） · 105.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSQb_jf8kywN2u7ZWwUbNA.woff2)
+		format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 105.5%;
+	ascent-override: 109.95%;
+	descent-override: 27.49%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSQb_jfykywN2u7ZWwU.woff2)
+		format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 105.5%;
+	ascent-override: 109.95%;
+	descent-override: 27.49%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 700（Google） · 104% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8L6tTOlOVk6OThhvA.woff2)
+		format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 104%;
+	ascent-override: 111.54%;
+	descent-override: 27.88%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 600（Google，2 個分片） · 105.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENujGxoyAH28zdQwQzNOgX.woff2)
+		format('woff2');
+	font-weight: 600;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 105.5%;
+	ascent-override: 109.95%;
+	descent-override: 27.49%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENujGxoy4H28zdQwQzNA.woff2)
+		format('woff2');
+	font-weight: 600;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 105.5%;
+	ascent-override: 109.95%;
+	descent-override: 27.49%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 700（Google） · 104% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDba2o-flEEny0FZhsfKu5WU4xD-IQ-PuZJJXxfpAO9seWOXmaKxggPBcV8.woff2)
+		format('woff2');
+	font-weight: 600;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 104%;
+	ascent-override: 111.54%;
+	descent-override: 27.88%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 700 ===== */
+
+/* 半形西文 — Instrument Sans 640（Google，2 個分片） · 106% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0She1ZuWi3hKpA.woff2)
+		format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 640;
+	size-adjust: 106%;
+	ascent-override: 109.43%;
+	descent-override: 27.36%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxiTypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr0SZe1ZuWi3g.woff2)
+		format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+	font-variation-settings: 'wght' 640;
+	size-adjust: 106%;
+	ascent-override: 109.43%;
+	descent-override: 27.36%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 700（Google） · 104.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8L6tTOlOVk6OThhvA.woff2)
+		format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 104.5%;
+	ascent-override: 111%;
+	descent-override: 27.75%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 640（Google，2 個分片） · 106% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxitypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNu2ZGRqXp6pRwM.woff2)
+		format('woff2');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 640;
+	size-adjust: 106%;
+	ascent-override: 109.43%;
+	descent-override: 27.36%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxitypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNu15GRqXp6pQ.woff2)
+		format('woff2');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+	font-variation-settings: 'wght' 640;
+	size-adjust: 106%;
+	ascent-override: 109.43%;
+	descent-override: 27.36%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 700（Google） · 104.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDba2o-flEEny0FZhsfKu5WU4xD-IQ-PuZJJXxfpAO9seWOXmaKxggPBcV8.woff2)
+		format('woff2');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 104.5%;
+	ascent-override: 111%;
+	descent-override: 27.75%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 800 ===== */
+
+/* 半形西文 — Instrument Sans 700（Google，2 個分片） · 106.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSQi_jf8kywN2u7ZWwUbNA.woff2)
+		format('woff2');
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSQi_jfykywN2u7ZWwU.woff2)
+		format('woff2');
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 800（Google） · 105% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8SKtTOlOVk6OThhvA.woff2)
+		format('woff2');
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 700（Google，2 個分片） · 106.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENugixoyAH28zdQwQzNOgX.woff2)
+		format('woff2');
+	font-weight: 800;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENugixoy4H28zdQwQzNA.woff2)
+		format('woff2');
+	font-weight: 800;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 800（Google） · 105% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDba2o-flEEny0FZhsfKu5WU4xD-IQ-PuZJJXxfpAO8LeWOXmaKxggPBcV8.woff2)
+		format('woff2');
+	font-weight: 800;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* ===== font-weight: 900 ===== */
+
+/* 半形西文 — Instrument Sans 700（Google，2 個分片） · 106.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSQi_jf8kywN2u7ZWwUbNA.woff2)
+		format('woff2');
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pximypc9vsFDm051Uf6KVwgkfoSxQ0GsQv8ToedPibnr-yp2JGEJOH9npSQi_jfykywN2u7ZWwU.woff2)
+		format('woff2');
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono 800（Google） · 105% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8SKtTOlOVk6OThhvA.woff2)
+		format('woff2');
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
+
+/* --- 斜體 --- */
+
+/* 半形西文 — Instrument Sans Italic 700（Google，2 個分片） · 106.5% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENugixoyAH28zdQwQzNOgX.woff2)
+		format('woff2');
+	font-weight: 900;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
+		U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/instrumentsans/v4/pxigypc9vsFDm051Uf6KVwgkfoSbSnNPooZAN0lInHGpCWNE27lgU-XJojENugixoy4H28zdQwQzNA.woff2)
+		format('woff2');
+	font-weight: 900;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 106.5%;
+	ascent-override: 108.92%;
+	descent-override: 27.23%;
+	line-gap-override: 0%;
+	unicode-range:
+		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
+		U+308, U+329, U+2000-2013, U+2016-2017, U+201A-201B, U+201E-2024, U+2027-203A, U+203C-206F,
+		U+20AC, U+2122;
+}
+
+/* 半形數字 — JetBrains Mono Italic 800（Google） · 105% */
+@font-face {
+	font-family: 'Ntut Course Web Composite';
+	src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDba2o-flEEny0FZhsfKu5WU4xD-IQ-PuZJJXxfpAO8LeWOXmaKxggPBcV8.woff2)
+		format('woff2');
+	font-weight: 900;
+	font-style: italic;
+	font-display: swap;
+	size-adjust: 105%;
+	ascent-override: 110.48%;
+	descent-override: 27.62%;
+	line-gap-override: 0%;
+	unicode-range: U+30-39;
+}
