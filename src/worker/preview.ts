@@ -5,6 +5,7 @@ import type {
 	WithdrawalResponse,
 	WithdrawalStat,
 } from '../types/course';
+import { normalizeDataset } from '../lib/legacyData';
 import { PROGRAM_KINDS, findProgram, isProgramKind, type ProgramKind, type ProgramSummary } from './programs';
 
 const DEFAULT_API_BASE = 'https://gnehs.github.io/ntut-course-crawler-node';
@@ -223,7 +224,7 @@ function createApiFetcher(apiBase = DEFAULT_API_BASE): FetchJson {
 	return async function fetchJson<T>(path: string) {
 		const response = await fetch(`${base}${path}`);
 		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-		return response.json() as Promise<T>;
+		return normalizeDataset<T>(path, await response.json());
 	};
 }
 

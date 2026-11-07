@@ -126,9 +126,9 @@ describe('preview metadata', () => {
 
 	it('creates micro program and program metadata from their own datasets', async () => {
 		const datasets: Record<string, unknown> = {
-			'/115/1/mprogram.json': [{ id: 'AV2', name: '面板微學程', course: ['1', '2', '3'] }],
+			'/115/1/mprogram.json': [{ id: 'AV2', name: '面板微學程', courses: ['1', '2', '3'] }],
 			'/115/1/programs.json': [
-				{ id: '620', name: '教育學程', href: '', courses: ['1', '2'], description: '師資培育' },
+				{ id: '620', name: '教育學程', link: '', courses: ['1', '2'], description: '師資培育' },
 			],
 		};
 		const fetchJson = async <T,>(path: string) => datasets[path] as T;
@@ -154,9 +154,9 @@ describe('preview metadata', () => {
 
 	it('uses the intro from the documents datasets when APS has no description', async () => {
 		const datasets: Record<string, unknown> = {
-			'/115/1/mprogram.json': [{ id: 'AZ9', name: '先進電動自駕車輛微學程', course: ['1'] }],
+			'/115/1/mprogram.json': [{ id: 'AZ9', name: '先進電動自駕車輛微學程', courses: ['1'] }],
 			'/mprogram-docs.json': { programs: [{ id: 'AZ9', intro: '培養電動車與自駕車產業人才。' }] },
-			'/115/1/programs.json': [{ id: 'AI0', name: '工業 4.0 電資學程', href: '', courses: [] }],
+			'/115/1/programs.json': [{ id: 'AI0', name: '工業 4.0 電資學程', link: '', courses: [] }],
 			'/program-docs.json': {
 				programs: [{ name: '工業4.0_電資學程', code: null, intro: '整合電資領域的工業 4.0 課程。' }],
 			},
@@ -176,7 +176,7 @@ describe('preview metadata', () => {
 	it('keeps the fallback description when the documents dataset fails', async () => {
 		const fetchJson = async <T,>(path: string) => {
 			if (path === '/mprogram-docs.json') throw new Error('503 Service Unavailable');
-			return [{ id: 'AV2', name: '面板微學程', course: ['1'] }] as T;
+			return [{ id: 'AV2', name: '面板微學程', courses: ['1'] }] as T;
 		};
 		const route = parsePreviewRoute(new URL('https://example.com/mprogram/115/1/AV2'));
 		expect(await resolvePreviewMeta(route!, config, fetchJson)).toMatchObject({

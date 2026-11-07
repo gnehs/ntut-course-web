@@ -20,22 +20,23 @@ export type CourseDescription = {
 };
 
 export type SyllabusItem = {
-	[field: string]: unknown;
-	name?: string;
+	teacher?: string;
 	email?: string;
 	officeHoursLink?: string;
 	latestUpdate?: string;
-	objective?: string;
+	outline?: string;
 	schedule?: string;
 	scorePolicy?: string;
 	materials?: string;
 	consultation?: string;
 	remarks?: string;
-	延伸教學與資源?: string;
-	課程對應SDGs指標?: string;
-	課程是否導入AI?: string;
+	resources?: string;
+	sdgs?: string;
+	aiUsage?: string;
 	foreignLanguageTextbooks?: boolean | null;
 	covid19?: CovidCourseInfo | null;
+	/** Rows the school's form added that have no field of their own, keyed by their Chinese label. */
+	extra?: Record<string, string>;
 };
 
 export type CovidCourseInfo = {
@@ -93,13 +94,13 @@ export type DepartmentClass = {
 	year?: string;
 	sem?: string;
 	description?: string;
-	href?: string;
+	link?: string;
 };
 
 export type DepartmentGroup = {
 	category: string;
 	name: string;
-	href: string;
+	link: string;
 	class?: DepartmentClass[];
 };
 
@@ -183,9 +184,8 @@ export type GroupedStandardDepartment = Omit<StandardDepartment, 'courses'> & {
 export type MicroProgram = {
 	id: string;
 	name: string;
-	href?: string;
-	courses?: string[];
-	course?: string[];
+	link?: string;
+	courses: string[];
 };
 
 /** Scraped from the 教務處 pages and each program's 施行細則 PDF. */
@@ -210,7 +210,7 @@ export type ProgramDocs = ProgramDocsBase & {
 export type Program = {
 	id: string;
 	name: string;
-	href: string;
+	link: string;
 	courses: string[];
 	description?: string;
 };
@@ -218,7 +218,7 @@ export type Program = {
 export type CompetencyDepartment = {
 	id: string;
 	name: string;
-	href: string;
+	link: string;
 	abilities: { id: string; name: string }[];
 	courses: { code: string; name: string; abilityIds: string[] }[];
 };

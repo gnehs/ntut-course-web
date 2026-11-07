@@ -354,7 +354,7 @@ export function ProgramDetailPage() {
 			</div>
 		);
 
-	const sourceHref = safeProgramHref(program.href);
+	const sourceHref = safeProgramHref(program.link);
 	return (
 		<CourseCollectionPage
 			title={program.name}

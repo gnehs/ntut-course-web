@@ -1,4 +1,5 @@
 import { API_BASE } from './courseUtils';
+import { normalizeDataset } from './legacyData';
 import { findGeneralProgramDocs, findMicroProgramDocs } from './programDocs';
 import { getStore, setStore } from './storage';
 import type { StandardDepartmentEntry } from './studentPrefix';
@@ -48,8 +49,8 @@ function remember(key: string, data: unknown, expiration?: number) {
 function fetchCached<T>(key: string, path: string, expiration?: number): Promise<T> {
 	return shared(key, async () => {
 		const cached = await getStore(key);
-		if (cached) return cached as T;
-		const data = await fetchJson<T>(`${API_BASE}/${path}`);
+		if (cached) return normalizeDataset<T>(path, cached);
+		const data = normalizeDataset<T>(path, await fetchJson<unknown>(`${API_BASE}/${path}`));
 		remember(key, data, expiration);
 		return data;
 	});
@@ -181,11 +182,11 @@ function fetchOptionalDataset<T>(path: string): Promise<T | null> {
 	const key = `optional_${path}`;
 	return shared(key, async () => {
 		const cached = await getStore(key);
-		if (cached) return cached as T;
+		if (cached) return normalizeDataset<T>(path, cached);
 		const response = await fetch(`${API_BASE}/${path}`);
 		if (response.status === 404) return null;
 		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-		const data = (await response.json()) as T;
+		const data = normalizeDataset<T>(path, await response.json());
 		remember(key, data);
 		return data;
 	});

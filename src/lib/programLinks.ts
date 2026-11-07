@@ -8,7 +8,7 @@ export const programOfficialLinks = {
 	certificate: 'https://forms.gle/BwD9T5xFeVrATugL9',
 };
 
-/** The crawler stored relative hrefs before it switched to absolute ones. */
-export function mprogramSourceUrl(href: string) {
-	return /^https?:\/\//.test(href) ? href : `https://aps.ntut.edu.tw/course/tw/${href}`;
+/** The crawler stored relative links before it switched to absolute ones. */
+export function mprogramSourceUrl(link: string) {
+	return /^https?:\/\//.test(link) ? link : `https://aps.ntut.edu.tw/course/tw/${link}`;
 }

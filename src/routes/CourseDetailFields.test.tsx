@@ -62,17 +62,17 @@ const baseCourse: Course = {
 };
 
 const baseSyllabus: SyllabusItem = {
-	name: '測試教師',
+	teacher: '測試教師',
 	email: 'fake.teacher@example.com',
 	latestUpdate: '2026-09-01T10:00:00+08:00',
-	objective: '測試課程目標內容',
+	outline: '測試課程目標內容',
 	schedule: '測試課程進度內容',
 	scorePolicy: '測試評量標準內容',
 	materials: '測試教材內容',
 	consultation: '測試課程諮詢內容',
 	remarks: '測試課程備註內容',
 	foreignLanguageTextbooks: false,
-	教學方式: '案例討論',
+	extra: { 教學方式: '案例討論' },
 	covid19: {
 		lv2Method: '同步線上授課',
 		lv2Description: '透過 example.com 進行',
@@ -209,9 +209,9 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		await renderCourseDetail([
 			{
 				...baseSyllabus,
-				延伸教學與資源: '延伸教學資源測試',
-				課程對應SDGs指標: 'SDG4：優質教育測試',
-				課程是否導入AI: '導入 AI 測試',
+				resources: '延伸教學資源測試',
+				sdgs: 'SDG4：優質教育測試',
+				aiUsage: '導入 AI 測試',
 			},
 		]);
 
@@ -269,8 +269,10 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		await renderCourseDetail([
 			{
 				...syllabusWithout('schedule'),
-				'課程進度(1-16週)': '16+2 課程進度測試',
-				'彈性學習(17-18週)': '16+2 彈性學習測試',
+				extra: {
+					'課程進度(1-16週)': '16+2 課程進度測試',
+					'彈性學習(17-18週)': '16+2 彈性學習測試',
+				},
 			},
 		]);
 
@@ -351,8 +353,8 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		],
 	])(
 		'drops only the English translation of a Chinese course outline',
-		async (objective, expected) => {
-			await renderCourseDetail([{ ...baseSyllabus, objective }]);
+		async (outline, expected) => {
+			await renderCourseDetail([{ ...baseSyllabus, outline }]);
 
 			const heading = screen.getByRole('heading', { name: '課程大綱' });
 			expect(heading.nextElementSibling?.textContent).toBe(expected);
@@ -405,13 +407,15 @@ describe('CourseDetailPage course and syllabus fields', () => {
 		await renderCourseDetail([
 			{
 				...baseSyllabus,
-				測試空欄位一: '無',
-				測試空欄位二: '● 無 (None)',
-				測試空欄位三: '無（None）',
-				測試空欄位四: '● 無（None）',
-				測試布林欄位: false,
-				測試數值欄位: 0,
-				測試含None有效內容: '● 無 (None)；仍有實際內容：測試資料',
+				extra: {
+					測試空欄位一: '無',
+					測試空欄位二: '● 無 (None)',
+					測試空欄位三: '無（None）',
+					測試空欄位四: '● 無（None）',
+					測試布林欄位: '否',
+					測試數值欄位: '0',
+					測試含None有效內容: '● 無 (None)；仍有實際內容：測試資料',
+				},
 			},
 		]);
 

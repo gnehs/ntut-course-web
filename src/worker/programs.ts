@@ -19,13 +19,7 @@ export type ProgramSummary = {
 	description?: string;
 };
 
-type RawProgram = {
-	id: string;
-	name: string;
-	courses?: string[];
-	course?: string[];
-	description?: string;
-};
+type ProgramRow = { id: string; name: string; courses: string[]; description?: string };
 
 type FetchJson = <T>(path: string) => Promise<T>;
 
@@ -40,7 +34,7 @@ export async function findProgram(
 	id: string,
 	fetchJson: FetchJson,
 ): Promise<ProgramSummary | null> {
-	const programs = await fetchJson<RawProgram[]>(
+	const programs = await fetchJson<ProgramRow[]>(
 		`/${year}/${sem}/${PROGRAM_KINDS[kind].file}`,
 	);
 	const program = programs.find((item) => item.id === id);
@@ -48,13 +42,13 @@ export async function findProgram(
 	return {
 		id: program.id,
 		name: program.name,
-		courseCount: (program.courses ?? program.course ?? []).length,
+		courseCount: program.courses.length,
 		description: program.description || (await findIntro(kind, program, fetchJson)),
 	};
 }
 
 // The documents dataset only adds an intro, so a missing or broken file keeps the fallback text.
-async function findIntro(kind: ProgramKind, program: RawProgram, fetchJson: FetchJson) {
+async function findIntro(kind: ProgramKind, program: ProgramRow, fetchJson: FetchJson) {
 	const path = `/${PROGRAM_KINDS[kind].docs}`;
 	try {
 		const docs =

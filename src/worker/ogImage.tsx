@@ -1,4 +1,5 @@
 import { GoogleFont, ImageResponse } from '@cf-wasm/og/workerd';
+import { normalizeDataset } from '../lib/legacyData';
 import type { Course, DepartmentGroup, WithdrawalResponse, WithdrawalStat } from '../types/course';
 import { WORKER_PREVIEW_CACHE_CONTROL } from './cache';
 import { parseOgImageRoute, type OgImageRoute } from './ogImageRoute';
@@ -740,6 +741,6 @@ function createApiFetcher(apiBase = DEFAULT_API_BASE): FetchJson {
 	return async function fetchJson<T>(path: string) {
 		const response = await fetch(`${base}${path}`);
 		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-		return response.json() as Promise<T>;
+		return normalizeDataset<T>(path, await response.json());
 	};
 }

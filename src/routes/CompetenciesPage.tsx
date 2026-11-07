@@ -340,10 +340,10 @@ export function CompetenciesPage() {
 									</div>
 								</section>
 							</div>
-							{safeCompetencyHref(selectedDepartment.href) ? (
+							{safeCompetencyHref(selectedDepartment.link) ? (
 								<div className='border-t border-[rgba(var(--vs-text),0.1)] pt-4'>
 									<a
-										href={safeCompetencyHref(selectedDepartment.href)!}
+										href={safeCompetencyHref(selectedDepartment.link)!}
 										target='_blank'
 										rel='noreferrer'
 										className='text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm underline underline-offset-2'

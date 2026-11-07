@@ -8,9 +8,9 @@ import {
 } from '@tabler/icons-react';
 import type React from 'react';
 
-const sdgField = '課程對應SDGs指標';
-const aiField = '課程是否導入AI';
-const teachingField = '延伸教學與資源';
+const sdgField = 'sdgs';
+const aiField = 'aiUsage';
+const teachingField = 'resources';
 
 // These fields are checklists, so ticking "none" is an answer worth showing rather than a blank.
 export const checklistFields = new Set([aiField, teachingField]);

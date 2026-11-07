@@ -1,4 +1,5 @@
 import type { Course, DepartmentGroup, WithdrawalResponse, YearSemData } from '../types/course';
+import { normalizeDataset } from '../lib/legacyData';
 import { isCourseHidden, isTeacherHidden } from '../lib/contentVisibility';
 import { WORKER_SITEMAP_CACHE_CONTROL } from './cache';
 
@@ -195,7 +196,7 @@ function createApiFetcher(apiBase = DEFAULT_API_BASE): FetchJson {
 	return async function fetchJson<T>(path: string) {
 		const response = await fetch(`${base}${path}`);
 		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-		return response.json() as Promise<T>;
+		return normalizeDataset<T>(path, await response.json());
 	};
 }
 

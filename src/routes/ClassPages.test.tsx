@@ -53,7 +53,7 @@ beforeEach(() => {
 		{
 			category: '系所',
 			name: '資訊工程系',
-			href: '',
+			link: '',
 			class: [{ id: 'class-1', name: '資工一' }],
 		},
 	]);

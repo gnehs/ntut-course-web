@@ -132,7 +132,7 @@ export function MProgramIndexPage() {
 					items={filteredPrograms.map((program) => ({
 						id: program.id,
 						name: program.name,
-						courseCount: (program.course || program.courses || []).length,
+						courseCount: program.courses.length,
 						to: `/mprogram/${dataset.year}/${dataset.sem}/${program.id}`,
 					}))}
 				/>
@@ -175,12 +175,12 @@ export function MProgramDetailPage() {
 				fetchMicroProgramDocs(id).catch(() => null),
 			]);
 			const foundProgram = programList.find((item) => item.id === id);
-			const courseIds = foundProgram?.course || [];
+			const courseIds = foundProgram?.courses || [];
 			const result = foundProgram
 				? allCourses.filter((course) => courseIds.includes(course.id))
 				: [];
 			if (!cancelled) {
-				setProgram(foundProgram || { id, name: '微學程' });
+				setProgram(foundProgram || { id, name: '微學程', courses: [] });
 				setCourses(result);
 				setDocs(programDocs);
 			}
@@ -223,7 +223,7 @@ export function MProgramDetailPage() {
 	}
 
 	if (!courses) return <CourseCollectionSkeleton label='載入微學程' code={id} />;
-	const sourceUrl = program?.href ? mprogramSourceUrl(program.href) : undefined;
+	const sourceUrl = program?.link ? mprogramSourceUrl(program.link) : undefined;
 	const documentLinkItems: ActionListItem[] = [
 		...documentLinks(docs),
 		...(sourceUrl ? [{ href: sourceUrl, title: '課程系統原始頁面', icon: IconWorld }] : []),

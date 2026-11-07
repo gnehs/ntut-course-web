@@ -27,7 +27,7 @@ const datasets = {
 		{
 			id: 'program-001',
 			name: '測試學程',
-			href: 'https://example.com/program',
+			link: 'https://example.com/program',
 			courses: ['CODE-001'],
 		},
 	],
@@ -35,7 +35,7 @@ const datasets = {
 		{
 			id: 'department-001',
 			name: '測試系所',
-			href: 'https://example.com/department',
+			link: 'https://example.com/department',
 			abilities: [{ id: 'ability-001', name: '測試能力' }],
 			courses: [{ code: 'CODE-001', name: '測試課程', abilityIds: ['ability-001'] }],
 		},

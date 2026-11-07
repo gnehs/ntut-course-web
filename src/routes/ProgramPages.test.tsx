@@ -67,7 +67,7 @@ vi.mock('@tanstack/react-router', () => ({
 const program = {
 	id: 'P-001',
 	name: '人工智慧學程',
-	href: 'SearchProgram.jsp?format=-2&code=P-001',
+	link: 'SearchProgram.jsp?format=-2&code=P-001',
 	courses: ['C-MAIN', 'C-EVENING', 'C-GRAD'],
 	description: '跨領域學習人工智慧。',
 };
@@ -235,7 +235,7 @@ describe('ProgramDetailPage', () => {
 	});
 
 	it('does not render unsafe source URLs', async () => {
-		mocks.fetchPrograms.mockResolvedValue([{ ...program, href: 'javascript:alert(1)' }]);
+		mocks.fetchPrograms.mockResolvedValue([{ ...program, link: 'javascript:alert(1)' }]);
 		render(<ProgramDetailPage />);
 
 		await screen.findByText('人工智慧學程');

@@ -41,7 +41,7 @@ const data = [
 	{
 		id: 'cs',
 		name: '資訊工程系',
-		href: 'SearchCompetency.jsp?code=cs',
+		link: 'SearchCompetency.jsp?code=cs',
 		abilities: [
 			{ id: 'A1', name: '程式設計能力' },
 			{ id: 'A2', name: '團隊合作能力' },
@@ -54,7 +54,7 @@ const data = [
 	{
 		id: 'ee',
 		name: '電機工程系',
-		href: 'SearchCompetency.jsp?code=ee',
+		link: 'SearchCompetency.jsp?code=ee',
 		abilities: [{ id: 'E1', name: '電路分析能力' }],
 		courses: [{ code: 'EE101', name: '電路學', abilityIds: ['E1'] }],
 	},

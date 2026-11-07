@@ -68,7 +68,7 @@ describe('sitemap XML', () => {
 			{
 				category: '電資學院',
 				name: '資訊工程系',
-				href: '',
+				link: '',
 				class: [{ id: 'A', name: '四技資工一' }],
 			},
 		] as DepartmentGroup[];

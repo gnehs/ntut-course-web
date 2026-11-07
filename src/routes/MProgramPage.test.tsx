@@ -48,7 +48,7 @@ const docs = {
 describe('MProgramDetailPage', () => {
 	beforeEach(() => {
 		mocks.fetchMicroPrograms.mockResolvedValue([
-			{ id: 'AZ9', name: '先進電動自駕車輛微學程', course: ['C1'] },
+			{ id: 'AZ9', name: '先進電動自駕車輛微學程', courses: ['C1'] },
 		]);
 		mocks.fetchCourse.mockResolvedValue([{ id: 'C1', time: {} }]);
 	});

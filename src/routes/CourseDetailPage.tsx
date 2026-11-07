@@ -454,7 +454,7 @@ export function CourseDetail({
 					</section>
 				</div>
 				{selectedSyllabus &&
-				[selectedSyllabus.objective, selectedSyllabus.schedule, selectedSyllabus.materials]
+				[selectedSyllabus.outline, selectedSyllabus.schedule, selectedSyllabus.materials]
 					.join('')
 					.trim().length >= 400 ? (
 					<div className='empty:hidden has-[[data-ad-collapsed]]:hidden'>
@@ -575,7 +575,7 @@ function SyllabusSkeleton() {
 				<TextLinesSkeleton widths={['w-48']} />
 			</section>
 			{[
-				syllabusTextFields.objective,
+				syllabusTextFields.outline,
 				syllabusTextFields.schedule,
 				syllabusTextFields.scorePolicy,
 			].map((label) => (
@@ -835,7 +835,7 @@ function splitUrlSuffix(rawUrl: string) {
 }
 
 const syllabusTextFields = {
-	objective: '課程大綱',
+	outline: '課程大綱',
 	schedule: '課程進度',
 	scorePolicy: '評量標準',
 	materials: '使用教材、參考書目或其他',
@@ -843,21 +843,19 @@ const syllabusTextFields = {
 	remarks: '備註',
 } as const;
 
-const syllabusMetadata = new Set([
-	'name',
-	'email',
-	'officeHoursLink',
-	'latestUpdate',
-	'foreignLanguageTextbooks',
-	'covid19',
-]);
+// The school's checklist answers keep the labels the form gives them; they follow the text fields.
+const syllabusFormFields = {
+	resources: '延伸教學與資源',
+	sdgs: '課程對應SDGs指標',
+	aiUsage: '課程是否導入AI',
+} as const;
 
 function comparableValue(value: unknown) {
 	return typeof value === 'string' ? value.replace(/\s+/g, '') : JSON.stringify(value ?? null);
 }
 
 function teacherName(item: SyllabusItem, index: number) {
-	return item.name?.trim() || `教師 ${index + 1}`;
+	return item.teacher?.trim() || `教師 ${index + 1}`;
 }
 
 type SyllabusVariant = { teachers: string[]; text: string };
@@ -865,16 +863,20 @@ type SyllabusVariant = { teachers: string[]; text: string };
 // Teachers who share a course mostly agree on some fields and differ on others, so each field is
 // shown once when everyone filed the same text and otherwise lists each distinct version under
 // the teachers who wrote it.
-function syllabusVariants(items: SyllabusItem[], field: string) {
+function syllabusVariants(
+	items: SyllabusItem[],
+	field: string,
+	read: (item: SyllabusItem) => unknown = (item) => item[field as keyof SyllabusItem],
+) {
 	const variants = new Map<string, SyllabusVariant>();
 	items.forEach((item, index) => {
-		const value = item[field];
+		const value = read(item);
 		const raw =
 			checklistFields.has(field ?? '') && typeof value === 'string'
 				? value.trim()
 				: syllabusDisplayText(value);
 		const text =
-			field === 'objective'
+			field === 'outline'
 				? withoutEnglishTranslation(raw)
 				: field === 'materials'
 					? withoutCopyrightNotice(raw)
@@ -890,15 +892,7 @@ function syllabusVariants(items: SyllabusItem[], field: string) {
 
 function SyllabusDetail({ items }: { items: SyllabusItem[] }) {
 	const covid19 = items.find((item) => item.covid19)?.covid19;
-	const additionalFields = [
-		...new Set(
-			items.flatMap((item) =>
-				Object.keys(item).filter(
-					(key) => !syllabusMetadata.has(key) && !Object.hasOwn(syllabusTextFields, key),
-				),
-			),
-		),
-	];
+	const extraLabels = [...new Set(items.flatMap((item) => Object.keys(item.extra ?? {})))];
 	const foreignTextbooks = syllabusVariants(
 		items.map((item) => ({
 			...item,
@@ -923,7 +917,7 @@ function SyllabusDetail({ items }: { items: SyllabusItem[] }) {
 							<li key={index} className='flex min-w-0 flex-wrap items-baseline gap-x-3'>
 								<HtmlText
 									as='p'
-									text={[teacher.name, teacher.email].filter(Boolean).join(' ') || '無資料'}
+									text={[teacher.teacher, teacher.email].filter(Boolean).join(' ') || '無資料'}
 								/>
 								{officeHoursUrl ? (
 									<a
@@ -949,13 +943,21 @@ function SyllabusDetail({ items }: { items: SyllabusItem[] }) {
 					field={key}
 				/>
 			))}
-			{additionalFields.map((key) => (
+			{Object.entries(syllabusFormFields).map(([key, label]) => (
 				<VariantSection
 					key={key}
-					label={key}
+					label={label}
 					variants={syllabusVariants(items, key)}
 					teacherCount={items.length}
 					field={key}
+				/>
+			))}
+			{extraLabels.map((label) => (
+				<VariantSection
+					key={label}
+					label={label}
+					variants={syllabusVariants(items, label, (item) => item.extra?.[label])}
+					teacherCount={items.length}
 				/>
 			))}
 			{/* The crawler also emits false when the school's answer is blank. */}
