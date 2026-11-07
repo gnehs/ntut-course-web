@@ -5,8 +5,9 @@
 /* 斜體：每組規則另有一份 font-style: italic。有斜體的類別用斜體字型（或傾斜軸）；
  * 沒有斜體的類別（漢字、假名等）用一般（非斜體）的檔案、也宣告成 italic，瀏覽器就不會把它們模擬傾斜。 */
 /* font-variation-settings 用於細調可變字型的粗細和其他軸：Chrome 140+、Firefox 62+ 支援；Safari 不認這一行，粗細按 font-weight 那一段、其他軸按字型的預設值顯示。 */
-/* ascent-override / descent-override / line-gap-override：西文等規則使用漢字字型的行高度量（已除以 size-adjust），
- * 行高和基線位置都和漢字字型一致。Chrome 87+、Firefox 89+ 支援；Safari 會忽略，按各字型自己的度量顯示。 */
+/* ascent-override / descent-override / line-gap-override：西文等規則使用漢字字型的總行高（已除以 size-adjust），
+ * 但把基線往下移 0.055em，讓行框中心落在漢字墨跡中心（基線上 0.38em），和行框置中的 icon 光學對齊。
+ * Chrome 87+、Firefox 89+ 支援；Safari 會忽略，按各字型自己的度量顯示。 */
 
 /* ===== font-weight: 100 ===== */
 
@@ -19,8 +20,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 102%;
-	ascent-override: 113.73%;
-	descent-override: 28.43%;
+	ascent-override: 108.33%;
+	descent-override: 33.82%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -34,8 +35,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 102%;
-	ascent-override: 113.73%;
-	descent-override: 28.43%;
+	ascent-override: 108.33%;
+	descent-override: 33.82%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -53,8 +54,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 340;
 	size-adjust: 100.5%;
-	ascent-override: 115.42%;
-	descent-override: 28.86%;
+	ascent-override: 109.95%;
+	descent-override: 34.33%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -70,8 +71,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 102%;
-	ascent-override: 113.73%;
-	descent-override: 28.43%;
+	ascent-override: 108.33%;
+	descent-override: 33.82%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -85,8 +86,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 102%;
-	ascent-override: 113.73%;
-	descent-override: 28.43%;
+	ascent-override: 108.33%;
+	descent-override: 33.82%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -104,8 +105,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 340;
 	size-adjust: 100.5%;
-	ascent-override: 115.42%;
-	descent-override: 28.86%;
+	ascent-override: 109.95%;
+	descent-override: 34.33%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -121,8 +122,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 102.5%;
-	ascent-override: 113.17%;
-	descent-override: 28.29%;
+	ascent-override: 107.8%;
+	descent-override: 33.66%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -136,8 +137,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 102.5%;
-	ascent-override: 113.17%;
-	descent-override: 28.29%;
+	ascent-override: 107.8%;
+	descent-override: 33.66%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -155,8 +156,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 340;
 	size-adjust: 101%;
-	ascent-override: 114.85%;
-	descent-override: 28.71%;
+	ascent-override: 109.41%;
+	descent-override: 34.16%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -172,8 +173,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 102.5%;
-	ascent-override: 113.17%;
-	descent-override: 28.29%;
+	ascent-override: 107.8%;
+	descent-override: 33.66%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -187,8 +188,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 102.5%;
-	ascent-override: 113.17%;
-	descent-override: 28.29%;
+	ascent-override: 107.8%;
+	descent-override: 33.66%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -206,8 +207,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 340;
 	size-adjust: 101%;
-	ascent-override: 114.85%;
-	descent-override: 28.71%;
+	ascent-override: 109.41%;
+	descent-override: 34.16%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -223,8 +224,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 103%;
-	ascent-override: 112.62%;
-	descent-override: 28.16%;
+	ascent-override: 107.28%;
+	descent-override: 33.5%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -238,8 +239,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 103%;
-	ascent-override: 112.62%;
-	descent-override: 28.16%;
+	ascent-override: 107.28%;
+	descent-override: 33.5%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -257,8 +258,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 340;
 	size-adjust: 101.5%;
-	ascent-override: 114.29%;
-	descent-override: 28.57%;
+	ascent-override: 108.87%;
+	descent-override: 33.99%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -274,8 +275,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 103%;
-	ascent-override: 112.62%;
-	descent-override: 28.16%;
+	ascent-override: 107.28%;
+	descent-override: 33.5%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -289,8 +290,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 103%;
-	ascent-override: 112.62%;
-	descent-override: 28.16%;
+	ascent-override: 107.28%;
+	descent-override: 33.5%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -308,8 +309,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 340;
 	size-adjust: 101.5%;
-	ascent-override: 114.29%;
-	descent-override: 28.57%;
+	ascent-override: 108.87%;
+	descent-override: 33.99%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -326,8 +327,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 440;
 	size-adjust: 104%;
-	ascent-override: 111.54%;
-	descent-override: 27.88%;
+	ascent-override: 106.25%;
+	descent-override: 33.17%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -342,8 +343,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 440;
 	size-adjust: 104%;
-	ascent-override: 111.54%;
-	descent-override: 27.88%;
+	ascent-override: 106.25%;
+	descent-override: 33.17%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -360,8 +361,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 102.5%;
-	ascent-override: 113.17%;
-	descent-override: 28.29%;
+	ascent-override: 107.8%;
+	descent-override: 33.66%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -378,8 +379,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 440;
 	size-adjust: 104%;
-	ascent-override: 111.54%;
-	descent-override: 27.88%;
+	ascent-override: 106.25%;
+	descent-override: 33.17%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -394,8 +395,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 440;
 	size-adjust: 104%;
-	ascent-override: 111.54%;
-	descent-override: 27.88%;
+	ascent-override: 106.25%;
+	descent-override: 33.17%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -412,8 +413,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 102.5%;
-	ascent-override: 113.17%;
-	descent-override: 28.29%;
+	ascent-override: 107.8%;
+	descent-override: 33.66%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -430,8 +431,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 520;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -446,8 +447,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 520;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -464,8 +465,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 103.5%;
-	ascent-override: 112.08%;
-	descent-override: 28.02%;
+	ascent-override: 106.76%;
+	descent-override: 33.33%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -482,8 +483,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 520;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -498,8 +499,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 520;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -516,8 +517,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 103.5%;
-	ascent-override: 112.08%;
-	descent-override: 28.02%;
+	ascent-override: 106.76%;
+	descent-override: 33.33%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -533,8 +534,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 105.5%;
-	ascent-override: 109.95%;
-	descent-override: 27.49%;
+	ascent-override: 104.74%;
+	descent-override: 32.7%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -548,8 +549,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 105.5%;
-	ascent-override: 109.95%;
-	descent-override: 27.49%;
+	ascent-override: 104.74%;
+	descent-override: 32.7%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -566,8 +567,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 104%;
-	ascent-override: 111.54%;
-	descent-override: 27.88%;
+	ascent-override: 106.25%;
+	descent-override: 33.17%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -583,8 +584,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 105.5%;
-	ascent-override: 109.95%;
-	descent-override: 27.49%;
+	ascent-override: 104.74%;
+	descent-override: 32.7%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -598,8 +599,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 105.5%;
-	ascent-override: 109.95%;
-	descent-override: 27.49%;
+	ascent-override: 104.74%;
+	descent-override: 32.7%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -616,8 +617,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 104%;
-	ascent-override: 111.54%;
-	descent-override: 27.88%;
+	ascent-override: 106.25%;
+	descent-override: 33.17%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -634,8 +635,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 640;
 	size-adjust: 106%;
-	ascent-override: 109.43%;
-	descent-override: 27.36%;
+	ascent-override: 104.25%;
+	descent-override: 32.55%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -650,8 +651,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 640;
 	size-adjust: 106%;
-	ascent-override: 109.43%;
-	descent-override: 27.36%;
+	ascent-override: 104.25%;
+	descent-override: 32.55%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -668,8 +669,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 104.5%;
-	ascent-override: 111%;
-	descent-override: 27.75%;
+	ascent-override: 105.74%;
+	descent-override: 33.01%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -686,8 +687,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 640;
 	size-adjust: 106%;
-	ascent-override: 109.43%;
-	descent-override: 27.36%;
+	ascent-override: 104.25%;
+	descent-override: 32.55%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -702,8 +703,8 @@
 	font-display: swap;
 	font-variation-settings: 'wght' 640;
 	size-adjust: 106%;
-	ascent-override: 109.43%;
-	descent-override: 27.36%;
+	ascent-override: 104.25%;
+	descent-override: 32.55%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -720,8 +721,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 104.5%;
-	ascent-override: 111%;
-	descent-override: 27.75%;
+	ascent-override: 105.74%;
+	descent-override: 33.01%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -737,8 +738,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -752,8 +753,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -770,8 +771,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -787,8 +788,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -802,8 +803,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -820,8 +821,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -837,8 +838,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -852,8 +853,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -870,8 +871,8 @@
 	font-style: normal;
 	font-display: swap;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
@@ -887,8 +888,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+100-2BA, U+2BD-2C5, U+2C8-2C9, U+2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1E00-1E9F,
@@ -902,8 +903,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 106.5%;
-	ascent-override: 108.92%;
-	descent-override: 27.23%;
+	ascent-override: 103.76%;
+	descent-override: 32.39%;
 	line-gap-override: 0%;
 	unicode-range:
 		U+20-2F, U+3A-7E, U+A0-B6, U+B8-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304,
@@ -920,8 +921,8 @@
 	font-style: italic;
 	font-display: swap;
 	size-adjust: 105%;
-	ascent-override: 110.48%;
-	descent-override: 27.62%;
+	ascent-override: 105.24%;
+	descent-override: 32.86%;
 	line-gap-override: 0%;
 	unicode-range: U+30-39;
 }
