@@ -185,7 +185,7 @@ export function AdvancedSearchPage() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [departmentData, setDepartmentData] = useState<DepartmentGroup[] | null>(null);
 	const [withdrawalRate, setWithdrawalRate] = useState<WithdrawalRateMap | null>(null);
-	const [onError, setOnError] = useState<unknown>(null);
+	const [loadError, setLoadError] = useState<unknown>(null);
 	const [recommandKeyword, setRecommandKeyword] = useState(['體育', '博雅']);
 	const [resultPage, setResultPage] = useState(restoredPage);
 	const [resultLayout, setResultLayout] = useState<CourseListLayout>(restoredLayout);
@@ -275,7 +275,7 @@ export function AdvancedSearchPage() {
 		let cancelled = false;
 		async function load() {
 			setIsLoading(true);
-			setOnError(null);
+			setLoadError(null);
 			try {
 				setAllCourses(null);
 				setDepartmentData(null);
@@ -300,7 +300,7 @@ export function AdvancedSearchPage() {
 				if (!cancelled) {
 					setAllCourses([]);
 					setDepartmentData(null);
-					setOnError(e);
+					setLoadError(e);
 				}
 			} finally {
 				if (!cancelled) setIsLoading(false);
@@ -312,7 +312,7 @@ export function AdvancedSearchPage() {
 		};
 	}, [year, sem, department, getCourses]);
 
-	const searchResult = useMemo(() => {
+	const search = useMemo(() => {
 		if (!allCourses) return null;
 		try {
 			let filtered = filterCoursesByMetadata(allCourses, {
@@ -432,10 +432,9 @@ export function AdvancedSearchPage() {
 				});
 			}
 
-			return filtered;
+			return { courses: filtered, error: null };
 		} catch (e) {
-			setOnError(e);
-			return [];
+			return { courses: [], error: e };
 		}
 	}, [
 		allCourses,
@@ -453,9 +452,11 @@ export function AdvancedSearchPage() {
 		withdrawalRate,
 		showPlaceholder,
 	]);
+	const searchResult = search?.courses ?? null;
+	const error = loadError ?? search?.error ?? null;
 
 	const metadataWarnings = useMemo(() => {
-		if (!allCourses || onError) return [];
+		if (!allCourses || error) return [];
 		const warnings: string[] = [];
 		if (languageFilter && languageOptions.length === 0)
 			warnings.push('目前學期沒有可用的授課語言資料，語言條件未套用。');
@@ -463,7 +464,7 @@ export function AdvancedSearchPage() {
 		if (attributeFilter.length && attributeOptions.length === 0)
 			warnings.push('目前學期沒有可用的課程屬性資料，課程屬性條件未套用。');
 		return warnings;
-	}, [allCourses, attributeFilter, attributeOptions, languageFilter, languageOptions, onError]);
+	}, [allCourses, attributeFilter, attributeOptions, languageFilter, languageOptions, error]);
 	useEffect(() => {
 		if (location.pathname !== '/advanced-search') return;
 		// A route navigation can render once with the previous local state. Let the
@@ -673,16 +674,16 @@ export function AdvancedSearchPage() {
 			<section className='min-w-0 px-3 pt-4 pb-10 lg:pr-4 lg:pl-0'>
 				<h1 className='sr-only'>搜尋課程</h1>
 				<AdvancedSearchMobileControls {...searchControlsProps} />
-				{onError ? (
+				{error ? (
 					<Alert danger>
 						<strong>搜尋時發生錯誤</strong>
-						<pre>{errorMessage(onError)}</pre>
+						<pre>{errorMessage(error)}</pre>
 					</Alert>
 				) : null}
 				{metadataWarnings.map((warning) => (
 					<Alert key={warning}>{warning}</Alert>
 				))}
-				{onError ? null : isLoading || !searchResult ? (
+				{error ? null : isLoading || !searchResult ? (
 					<CourseListSkeleton count={12} />
 				) : (
 					<CourseList
@@ -721,7 +722,7 @@ export function AdvancedSearchPage() {
 						}
 					/>
 				)}
-				{!onError && !isLoading && searchResult?.length ? <AdsByGoogle placement='footer' /> : null}
+				{!error && !isLoading && searchResult?.length ? <AdsByGoogle placement='footer' /> : null}
 			</section>
 		</div>
 	);

@@ -301,4 +301,23 @@ describe('AdvancedSearchPage navigation', () => {
 			expect(router.state.location.search).not.toHaveProperty('q');
 		});
 	});
+
+	it('clears a filter error once the filters that caused it change', async () => {
+		mockGetCourses.mockResolvedValue([
+			{ id: '1', courseType: '○', name: { zh: '格式錯誤課程' }, class: [], teacher: '王老師' },
+		]);
+		const history = createMemoryHistory({
+			initialEntries: ['/advanced-search?year=115&sem=1&d=main&q=%7B%22k%22%3A%22abc%22%7D'],
+		});
+		const router = createAppRouter({ history });
+		const user = userEvent.setup();
+
+		render(<RouterProvider router={router} />);
+		expect(await screen.findByText('搜尋時發生錯誤')).toBeInTheDocument();
+
+		const inputs = await screen.findAllByDisplayValue('abc');
+		await user.clear(inputs[0]);
+
+		await waitFor(() => expect(screen.queryByText('搜尋時發生錯誤')).not.toBeInTheDocument());
+	});
 });
