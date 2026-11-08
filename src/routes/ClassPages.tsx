@@ -538,6 +538,7 @@ export function ClassDetailPage() {
 	);
 	const [courses, setCourses] = useState<Course[] | null>(null);
 	const [classData, setClassData] = useState<DepartmentClass | null>(null);
+	const [loadError, setLoadError] = useState<unknown>(null);
 	const [savedVersion, setSavedVersion] = useState(0);
 	const isInMyCourse = localStorage.getItem(myCourseClassKey(year, sem)) === id;
 	usePageTitle(classData?.name || id);
@@ -546,6 +547,7 @@ export function ClassDetailPage() {
 		let cancelled = false;
 		setCourses(null);
 		setClassData(null);
+		setLoadError(null);
 		async function load() {
 			const [departments, allCourses] = await Promise.all([
 				fetchDepartment(year, sem),
@@ -562,8 +564,10 @@ export function ClassDetailPage() {
 				setCourses(result);
 			}
 		}
-		load().catch(() => {
-			if (!cancelled) setCourses([]);
+		load().catch((reason) => {
+			if (cancelled) return;
+			setLoadError(reason);
+			setCourses([]);
 		});
 		return () => {
 			cancelled = true;
@@ -618,7 +622,15 @@ export function ClassDetailPage() {
 					</Button>
 				)
 			}
-			emptyState={classData ? <Alert>此班級目前沒有課程。</Alert> : undefined}
+			notice={
+				loadError ? (
+					<Alert danger>
+						<strong>班級課程載入失敗</strong>
+						<p className='mt-1 mb-0 text-sm'>{errorMessage(loadError)}</p>
+					</Alert>
+				) : undefined
+			}
+			emptyState={loadError ? <></> : classData ? <Alert>此班級目前沒有課程。</Alert> : undefined}
 			savedVersion={savedVersion}
 			footer={
 				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4 has-[[data-ad-collapsed]]:hidden'>

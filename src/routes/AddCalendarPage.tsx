@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '../components/ui-kit/Button';
 import { fetchCalendar, fetchHolidays } from '../lib/courseApi';
+import { errorMessage } from '../lib/error';
 import { buildCourseCalendar, trimEllip } from '../lib/courseUtils';
 import { useApp } from '../state/AppContext';
 import type { CalendarCourse, CalendarEvent, Holiday } from '../types/course';
@@ -35,10 +36,12 @@ export function AddCalendarPage() {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [holidays, setHolidays] = useState<Holiday[] | null>(null);
 	const [holidaysFailed, setHolidaysFailed] = useState(false);
+	const [loadError, setLoadError] = useState<unknown>(null);
 
 	useEffect(() => {
 		if (!dataset.year || !dataset.sem) return undefined;
 		let cancelled = false;
+		setLoadError(null);
 		async function load() {
 			const calendar = await fetchCalendar().catch(() => []);
 			const startDate = resolveStartDate(calendar, dataset.year, dataset.sem);
@@ -68,7 +71,11 @@ export function AddCalendarPage() {
 				setSelectedIds(myCourses.map((course) => course.id));
 			}
 		}
-		load().catch(() => setCourses([]));
+		load().catch((reason) => {
+			if (cancelled) return;
+			setLoadError(reason);
+			setCourses([]);
+		});
 		return () => {
 			cancelled = true;
 		};
@@ -145,7 +152,13 @@ export function AddCalendarPage() {
 					下載的 ICS 是一次性檔案；加退選或修改課程後，請重新下載並匯入新的行事曆檔案。
 				</AlertDescription>
 			</Alert>
-			{!hasCourses ? (
+			{loadError ? (
+				<Alert variant='destructive'>
+					<IconAlertCircle />
+					<AlertTitle>課程資料載入失敗</AlertTitle>
+					<AlertDescription>{errorMessage(loadError)}</AlertDescription>
+				</Alert>
+			) : !hasCourses ? (
 				<Alert>
 					<IconAlertCircle />
 					<AlertTitle>先新增課程</AlertTitle>

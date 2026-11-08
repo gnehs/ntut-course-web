@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AdsByGoogle } from '../components/AdsByGoogle';
+import { Alert } from '../components/ui-kit/Alert';
 import { Button } from '../components/ui-kit/Button';
 import { Card } from '../components/ui-kit/Card';
 import { CardTitle } from '../components/ui-kit/CardTitle';
 import { Input } from '../components/ui-kit/Input';
 import { Select, SelectOption } from '../components/ui-kit/Select';
 import { fetchWithdrawal } from '../lib/courseApi';
+import { errorMessage } from '../lib/error';
 import { cn } from '../lib/utils';
 import { Skeleton } from '../components/ui/skeleton';
 import {
@@ -39,6 +41,8 @@ export function WithdrawalPage() {
 	const [groupBy, setGroupBy] = useState<GroupMode>('risk');
 	const [data, setData] = useState<WithdrawalStat[] | null>(null);
 	const [stat, setStat] = useState<WithdrawalResponse['stat'] | null>(null);
+	const [error, setError] = useState<unknown>(null);
+	const [version, setVersion] = useState(0);
 	const batchSize = useWithdrawalBatchSize();
 	const [visibleCount, setVisibleCount] = useState(batchSize);
 	const suffix = period === 'all' ? '' : period;
@@ -47,6 +51,7 @@ export function WithdrawalPage() {
 		let cancelled = false;
 		setData(null);
 		setStat(null);
+		setError(null);
 		fetchWithdrawal(suffix)
 			.then((value) => {
 				if (!cancelled) {
@@ -54,8 +59,9 @@ export function WithdrawalPage() {
 					setStat(value.stat || []);
 				}
 			})
-			.catch(() => {
+			.catch((reason) => {
 				if (!cancelled) {
+					setError(reason);
 					setData([]);
 					setStat([]);
 				}
@@ -63,7 +69,7 @@ export function WithdrawalPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [suffix]);
+	}, [suffix, version]);
 	useEffect(() => {
 		setVisibleCount(batchSize);
 	}, [batchSize]);
@@ -170,6 +176,16 @@ export function WithdrawalPage() {
 			</div>
 			{!data ? (
 				<WithdrawalSkeleton />
+			) : error ? (
+				<Alert danger>
+					<strong>退選率資料載入失敗</strong>
+					<p className='mt-1 mb-0 text-sm'>{errorMessage(error)}</p>
+					<div className='mt-3'>
+						<Button primary onClick={() => setVersion((value) => value + 1)}>
+							重新載入
+						</Button>
+					</div>
+				</Alert>
 			) : (
 				<>
 					{stat ? (

@@ -148,4 +148,14 @@ describe('ClassDetailPage department query', () => {
 		expect(mocks.fetchCourse).not.toHaveBeenCalled();
 		expect(mocks.fetchDepartment).not.toHaveBeenCalled();
 	});
+
+	it('reports a failed load instead of an empty class', async () => {
+		mocks.fetchCourse.mockRejectedValue(new Error('503 Service Unavailable'));
+		render(<ClassDetailPage />);
+
+		expect(await screen.findByText('班級課程載入失敗')).toBeInTheDocument();
+		expect(screen.getByText('503 Service Unavailable')).toBeInTheDocument();
+		expect(screen.queryByText('目前沒有課程。')).not.toBeInTheDocument();
+		expect(screen.queryByText('此班級目前沒有課程。')).not.toBeInTheDocument();
+	});
 });
