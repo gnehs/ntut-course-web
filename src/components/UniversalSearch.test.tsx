@@ -60,4 +60,15 @@ describe('UniversalSearch accessibility and keyboard navigation', () => {
 			});
 		});
 	});
+
+	it('loads the course list once while the user types a query', async () => {
+		const user = userEvent.setup();
+		render(<UniversalSearch />);
+
+		const input = screen.getByRole('combobox', { name: '搜尋課程、教師、課號、班級' });
+		await user.type(input, '資料結構');
+		await screen.findByRole('option', { name: /CS101/ });
+
+		expect(mocks.getCourses).toHaveBeenCalledTimes(1);
+	});
 });

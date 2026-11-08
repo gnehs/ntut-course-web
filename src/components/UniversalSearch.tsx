@@ -20,9 +20,10 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 	const [loading, setLoading] = useState(false);
 	const [currentSelectionIndex, setCurrentSelectionIndex] = useState(-1);
 
+	const active = focused || Boolean(input);
 	useEffect(() => {
 		let cancelled = false;
-		if (!focused && !input) return undefined;
+		if (!active) return undefined;
 		setLoading(true);
 		getCourses()
 			.then((data) => {
@@ -37,7 +38,7 @@ export function UniversalSearch({ navbar = false, className = '' }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [dataset.year, dataset.sem, dataset.department, focused, input, getCourses]);
+	}, [dataset.year, dataset.sem, dataset.department, active, getCourses]);
 
 	const items = useMemo(() => {
 		if (!input) return JSON.parse(localStorage.getItem('search-history') || '[]').reverse();
