@@ -85,9 +85,9 @@ describe('optional course datasets', () => {
 
 			expect(mocks.fetch).toHaveBeenCalledTimes(1);
 			expect(mocks.fetch).toHaveBeenCalledWith(`${API_BASE}/${request.path}`);
-			expect(mocks.getStore).toHaveBeenCalledWith(`optional_${request.path}`);
+			expect(mocks.getStore).toHaveBeenCalledWith(`optional_${request.path}@v2`);
 			expect(mocks.setStore).toHaveBeenCalledTimes(1);
-			expect(mocks.setStore).toHaveBeenCalledWith(`optional_${request.path}`, request.data);
+			expect(mocks.setStore).toHaveBeenCalledWith(`optional_${request.path}@v2`, request.data);
 		},
 	);
 

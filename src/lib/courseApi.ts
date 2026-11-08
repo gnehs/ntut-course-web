@@ -1,5 +1,4 @@
 import { API_BASE } from './courseUtils';
-import { normalizeDataset } from './legacyData';
 import { findGeneralProgramDocs, findMicroProgramDocs } from './programDocs';
 import { getStore, setStore } from './storage';
 import type { StandardDepartmentEntry } from './studentPrefix';
@@ -41,6 +40,10 @@ function shared<T>(key: string, load: () => Promise<T>): Promise<T> {
 }
 
 /** Persisting is best effort: a full or blocked IndexedDB must not fail data that already arrived. */
+/** Datasets cached before the published JSON switched to English field names hold the old shape. */
+const DATASET_CACHE_VERSION = 2;
+const storeKey = (key: string) => `${key}@v${DATASET_CACHE_VERSION}`;
+
 function remember(key: string, data: unknown, expiration?: number) {
 	const saved = expiration === undefined ? setStore(key, data) : setStore(key, data, expiration);
 	void Promise.resolve(saved).catch(() => {});
@@ -48,10 +51,10 @@ function remember(key: string, data: unknown, expiration?: number) {
 
 function fetchCached<T>(key: string, path: string, expiration?: number): Promise<T> {
 	return shared(key, async () => {
-		const cached = await getStore(key);
-		if (cached) return normalizeDataset<T>(path, cached);
-		const data = normalizeDataset<T>(path, await fetchJson<unknown>(`${API_BASE}/${path}`));
-		remember(key, data, expiration);
+		const cached = await getStore(storeKey(key));
+		if (cached) return cached as T;
+		const data = await fetchJson<T>(`${API_BASE}/${path}`);
+		remember(storeKey(key), data, expiration);
 		return data;
 	});
 }
@@ -181,13 +184,13 @@ export async function fetchMicroPrograms(year: string, sem: string): Promise<Mic
 function fetchOptionalDataset<T>(path: string): Promise<T | null> {
 	const key = `optional_${path}`;
 	return shared(key, async () => {
-		const cached = await getStore(key);
-		if (cached) return normalizeDataset<T>(path, cached);
+		const cached = await getStore(storeKey(key));
+		if (cached) return cached as T;
 		const response = await fetch(`${API_BASE}/${path}`);
 		if (response.status === 404) return null;
 		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-		const data = normalizeDataset<T>(path, await response.json());
-		remember(key, data);
+		const data = (await response.json()) as T;
+		remember(storeKey(key), data);
 		return data;
 	});
 }
