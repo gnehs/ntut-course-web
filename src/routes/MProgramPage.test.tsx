@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MProgramDetailPage } from './MProgramPage';
 
@@ -30,6 +31,7 @@ vi.mock('../components/CourseList', () => ({
 }));
 
 vi.mock('../components/AdsByGoogle', () => ({ AdsByGoogle: () => null }));
+vi.mock('sonner', () => ({ toast: { success: vi.fn() } }));
 
 vi.mock('@tanstack/react-router', () => ({
 	Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
@@ -47,6 +49,8 @@ const docs = {
 
 describe('MProgramDetailPage', () => {
 	beforeEach(() => {
+		vi.clearAllMocks();
+		localStorage.clear();
 		mocks.fetchMicroPrograms.mockResolvedValue([
 			{ id: 'AZ9', name: '先進電動自駕車輛微學程', courses: ['C1'] },
 		]);
@@ -70,5 +74,22 @@ describe('MProgramDetailPage', () => {
 		expect(await screen.findByText('C1')).toBeInTheDocument();
 		expect(screen.queryByRole('link', { name: /施行細則/ })).not.toBeInTheDocument();
 		expect(screen.getByRole('link', { name: /教務處微學程專區/ })).toBeInTheDocument();
+	});
+
+	it('keeps the loaded courses on screen when adding and removing the program', async () => {
+		mocks.fetchMicroProgramDocs.mockResolvedValue(docs);
+		render(<MProgramDetailPage />);
+		await screen.findByText('C1');
+		mocks.fetchMicroPrograms.mockClear();
+		mocks.fetchCourse.mockClear();
+
+		await userEvent.click(screen.getByRole('button', { name: '加入我的課程' }));
+		expect(screen.getByText('C1')).toBeInTheDocument();
+		await userEvent.click(await screen.findByRole('button', { name: '從我的課程移除' }));
+		expect(screen.getByText('C1')).toBeInTheDocument();
+		expect(await screen.findByRole('button', { name: '加入我的課程' })).toBeInTheDocument();
+
+		expect(mocks.fetchMicroPrograms).not.toHaveBeenCalled();
+		expect(mocks.fetchCourse).not.toHaveBeenCalled();
 	});
 });

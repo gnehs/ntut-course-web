@@ -156,7 +156,7 @@ export function MProgramDetailPage() {
 	const [courses, setCourses] = useState<Course[] | null>(null);
 	const [docs, setDocs] = useState<MicroProgramDocs | null>(null);
 	const [error, setError] = useState<unknown>(null);
-	const [version, setVersion] = useState(0);
+	const [savedVersion, setSavedVersion] = useState(0);
 	const storageKey = `my-couse-mprogram-${year}-${sem}`;
 	const programName = program?.name || '微學程';
 	const isInMyCourse = localStorage.getItem(storageKey) === programName;
@@ -194,7 +194,7 @@ export function MProgramDetailPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [year, sem, id, version]);
+	}, [year, sem, id]);
 
 	function addProgramCourses() {
 		const previous = localStorage.getItem(storageKey);
@@ -210,7 +210,7 @@ export function MProgramDetailPage() {
 		toast.success(`已加入 ${courses?.length || 0} 門課程`, {
 			description: `${programName} 已加入我的課程`,
 		});
-		setVersion((value) => value + 1);
+		setSavedVersion((value) => value + 1);
 	}
 
 	function removeProgramCourses() {
@@ -219,7 +219,7 @@ export function MProgramDetailPage() {
 		toast.success(`已移除 ${courses?.length || 0} 門課程`, {
 			description: `${programName} 已從我的課程移除`,
 		});
-		setVersion((value) => value + 1);
+		setSavedVersion((value) => value + 1);
 	}
 
 	if (!courses) return <CourseCollectionSkeleton label='載入微學程' code={id} />;
@@ -279,7 +279,7 @@ export function MProgramDetailPage() {
 				) : undefined
 			}
 			emptyState={emptyState}
-			savedVersion={version}
+			savedVersion={savedVersion}
 			footer={
 				<>
 					<ProgramDocsSection links={documentLinkItems} />

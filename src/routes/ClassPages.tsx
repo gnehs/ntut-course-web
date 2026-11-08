@@ -538,7 +538,7 @@ export function ClassDetailPage() {
 	);
 	const [courses, setCourses] = useState<Course[] | null>(null);
 	const [classData, setClassData] = useState<DepartmentClass | null>(null);
-	const [version, setVersion] = useState(0);
+	const [savedVersion, setSavedVersion] = useState(0);
 	const isInMyCourse = localStorage.getItem(myCourseClassKey(year, sem)) === id;
 	usePageTitle(classData?.name || id);
 
@@ -568,7 +568,7 @@ export function ClassDetailPage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [year, sem, id, version, department]);
+	}, [year, sem, id, department]);
 
 	function addClassCourses() {
 		const previous = localStorage.getItem(myCourseClassKey(year, sem));
@@ -585,7 +585,7 @@ export function ClassDetailPage() {
 		toast.success(`已加入 ${courses?.length || 0} 門課程`, {
 			description: `${id} 已加入我的課程`,
 		});
-		setVersion((value) => value + 1);
+		setSavedVersion((value) => value + 1);
 	}
 
 	function removeClassCourses() {
@@ -594,7 +594,7 @@ export function ClassDetailPage() {
 		toast.success(`已移除 ${courses?.length || 0} 門課程`, {
 			description: `${id} 已從我的課程移除`,
 		});
-		setVersion((value) => value + 1);
+		setSavedVersion((value) => value + 1);
 	}
 
 	if (!courses) return <CourseCollectionSkeleton label='載入班級課程' title={id} />;
@@ -619,7 +619,7 @@ export function ClassDetailPage() {
 				)
 			}
 			emptyState={classData ? <Alert>此班級目前沒有課程。</Alert> : undefined}
-			savedVersion={version}
+			savedVersion={savedVersion}
 			footer={
 				<section className='border-t border-[rgba(var(--vs-text),0.1)] pt-4 has-[[data-ad-collapsed]]:hidden'>
 					<AdsByGoogle title='贊助商廣告' />

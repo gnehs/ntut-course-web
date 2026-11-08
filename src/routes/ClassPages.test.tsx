@@ -133,4 +133,19 @@ describe('ClassDetailPage department query', () => {
 
 		await waitFor(() => expect(mocks.fetchCourse).toHaveBeenCalledWith('115', '1', 'main'));
 	});
+
+	it('keeps the loaded courses on screen when adding and removing the class', async () => {
+		await renderPage();
+		mocks.fetchCourse.mockClear();
+		mocks.fetchDepartment.mockClear();
+
+		await userEvent.click(screen.getByRole('button', { name: '加入到我的課程' }));
+		expect(screen.getByTestId('course-list')).toBeInTheDocument();
+		await userEvent.click(await screen.findByRole('button', { name: '從我的課程中移除' }));
+		expect(screen.getByTestId('course-list')).toBeInTheDocument();
+		expect(await screen.findByRole('button', { name: '加入到我的課程' })).toBeInTheDocument();
+
+		expect(mocks.fetchCourse).not.toHaveBeenCalled();
+		expect(mocks.fetchDepartment).not.toHaveBeenCalled();
+	});
 });
